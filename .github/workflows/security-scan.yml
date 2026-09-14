@@ -110,7 +110,6 @@ jobs:
             --config p/react \
             --config p/nodejsscan \
             --config p/secrets \
-            --error \
             --sarif \
             --output semgrep.sarif \
             .
@@ -136,11 +135,58 @@ jobs:
         env:
           ARTIFACT_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-semgrep-sarif.outputs.artifact-id }}
         run: bun run scripts/annotate-sarif.ts semgrep.sarif --label "Semgrep" --top "$SARIF_SUMMARY_TOP_N" --artifact-url "$ARTIFACT_URL"
-      - name: Enforce Semgrep result
-        if: steps.semgrep.outcome == 'failure'
+      - name: Enforce Semgrep error-level gate
+        if: always()
+        env:
+          SCAN_OUTCOME: ${{ steps.semgrep.outcome }}
         run: |
-          echo "::error::Semgrep reported findings or a scanner/configuration error. Review the SARIF artifact."
-          exit 1
+          set -euo pipefail
+          if [ "$SCAN_OUTCOME" != "success" ]; then
+            echo "::error::Semgrep scanner/configuration failed. Review the scan log."
+            exit 1
+          fi
+          if [ ! -s semgrep.sarif ]; then
+            echo "::error::Semgrep completed without producing semgrep.sarif."
+            exit 1
+          fi
+          python - <<'PY'
+          import json
+          import sys
+
+          with open("semgrep.sarif", encoding="utf-8") as fh:
+              sarif = json.load(fh)
+
+          offenders = []
+          for run in sarif.get("runs", []):
+              rules = run.get("tool", {}).get("driver", {}).get("rules", [])
+              levels = {
+                  rule.get("id"): (rule.get("defaultConfiguration") or {}).get("level", "warning")
+                  for rule in rules
+              }
+              for result in run.get("results", []):
+                  rule_id = result.get("ruleId", "unknown-rule")
+                  level = result.get("level") or levels.get(rule_id, "warning")
+                  if level != "error":
+                      continue
+                  message = (result.get("message") or {}).get("text", "Semgrep error-level finding")
+                  locations = result.get("locations") or []
+                  uri = ""
+                  line = ""
+                  if locations:
+                      physical = (locations[0].get("physicalLocation") or {})
+                      uri = (physical.get("artifactLocation") or {}).get("uri", "")
+                      line = (physical.get("region") or {}).get("startLine", "")
+                  offenders.append((rule_id, uri, line, message))
+
+          if offenders:
+              print(f"::error::Semgrep found {len(offenders)} error-level finding(s).")
+              for rule_id, uri, line, message in offenders:
+                  location = f" file={uri},line={line}" if uri and line else ""
+                  print(f"::error{location}::{rule_id}: {message}")
+              sys.exit(1)
+
+          print("Semgrep: no error-level findings; warning-level findings remain visible in SARIF.")
+          PY
   pr-comment:
     name: SARIF artifacts PR comment
     # Only runs on pull_request events; skipped for push/schedule/manual runs
