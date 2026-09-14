@@ -75,7 +75,10 @@ $repositoryChecks = foreach ($entry in $topology.repositories) {
     if ($isRepository -and $gitCommand) {
         $branch = Invoke-GitText $localPath @('branch', '--show-current')
         $head = Invoke-GitText $localPath @('rev-parse', 'HEAD')
-        $remote = Invoke-GitText $localPath @('remote', 'get-url', 'origin')
+        $remoteNames = Invoke-GitText $localPath @('remote')
+        if (@($remoteNames -split "`r?`n") -contains 'origin') {
+            $remote = Invoke-GitText $localPath @('remote', 'get-url', 'origin')
+        }
         $statusLines = & $gitCommand.Source -C $localPath status --porcelain 2>$null
         $dirty = @($statusLines).Count
 
