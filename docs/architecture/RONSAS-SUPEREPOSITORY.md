@@ -116,10 +116,10 @@ All declared service listener ports except the intentionally indirect gateway po
 | Repository | Local path | Configured remote | State |
 | --- | --- | --- | --- |
 | RCGF | `C:\Users\Ashley\Documents\GitHub\RCGF` | `https://github.com/resonance36912-cell/RCGF.git` | clean; cached `main` aligned |
-| Resonance Hub | `C:\Users\Ashley\Documents\GitHub\resonance-hub` | `https://github.com/resonance36912-cell/resonance-hub.git` | local branch ahead 3; remote lookup returned repository not found while unauthenticated |
-| RONS sovereign codebase | `C:\Users\Ashley\Documents\GitHub\rons-sovereign-codebase` | none | local consolidated candidate; target control root |
+| Resonance Hub | `C:\Users\Ashley\Documents\GitHub\resonance-hub` | `https://github.com/resonance36912-cell/resonance-hub.git` | developer history retained; local working-tree drift remains to reconcile |
+| RONS sovereign codebase | `C:\Users\Ashley\Documents\GitHub\rons-sovereign-codebase` | `https://github.com/resonance36912-cell/RONSAS.git` | private GitHub source authority; `main` baseline and reconciliation review branch published |
 
-The GitHub CLI is not authenticated and the connected GitHub account returned no visible repositories. Therefore GitHub cloud state, protected branches, PRs, and remote heads cannot currently be certified. Do not push until the account connection is restored and the exact destination repository is confirmed.
+GitHub CLI authentication is restored as `resonance36912-cell`. The private `resonance36912-cell/RONSAS` repository is the verified source authority, with `main` and the reconciliation review branch published and PR #1 open. Native GitHub branch protection for this private repository is unavailable on the current plan (GitHub returned HTTP 403 requiring Pro or public visibility), so the repository remains private and RONSAS enforces PR-based promotion by policy plus a versioned local pre-push guard that blocks direct `main` pushes on configured workstations.
 
 ## Dropbox map
 
@@ -157,11 +157,11 @@ The verifier checks required paths, Git branch/head/remote/dirty counts, and dec
 
 ### 3. GitHub promotion
 
-1. Restore authenticated visibility to the `resonance36912-cell` account/organization.
-2. Confirm or create the exact private RONSAS destination repository.
-3. Add the remote to `rons-sovereign-codebase` only after that check.
-4. Push a review branch such as `ronsas/topology-20260914`.
-5. Merge through a protected pull request after required CI passes.
+1. Authenticate GitHub as `resonance36912-cell` and verify `https://github.com/resonance36912-cell/RONSAS.git`.
+2. Keep the RONSAS repository private; do not make it public merely to obtain branch protection.
+3. Enable the repository Git guard on each authorized workstation with `scripts/Enable-RonsasGitGuards.ps1`.
+4. Push review branches only; direct `main` pushes are blocked by the local guard unless an explicit emergency override is set.
+5. Open a pull request to `main` and merge only after the required CI/validation gates pass and conversations are resolved.
 6. Tag a release; never deploy directly from an uncommitted working tree.
 
 ### 4. Local promotion
@@ -226,4 +226,4 @@ Upload/copy into it:
 
 Expected result: a new immutable evidence snapshot; no existing Dropbox item is moved, renamed, overwritten, or deleted.
 
-Separately, after GitHub authentication and destination confirmation, add the verified remote to the local superepository, commit only the portable topology/documentation/verifier, and open a review branch. The exact GitHub destination remains intentionally unset until it can be verified.
+GitHub publication is now established at `https://github.com/resonance36912-cell/RONSAS.git`: `main` is the baseline source branch and PR #1 carries the topology/control-plane changes. Dropbox publication remains a separate, one-way audit action and must not mutate existing evidence items.

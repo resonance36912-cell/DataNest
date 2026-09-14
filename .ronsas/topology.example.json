@@ -7,8 +7,8 @@
   "control_root": "%USERPROFILE%\\Documents\\GitHub\\rons-sovereign-codebase",
   "cloud": {
     "github": {
-      "destination_remote": null,
-      "note": "Set only after authenticated repository verification."
+      "destination_remote": "https://github.com/resonance36912-cell/RONSAS.git",
+      "note": "Authenticated private GitHub source authority created and verified 2026-09-14."
     },
     "dropbox": {
       "local_root": "%USERPROFILE%\\Dropbox\\RONS-Audit\\RONS-AI-AUDIT-REPOSITORY",
@@ -21,7 +21,8 @@
       "id": "ronsas-control",
       "role": "target-superepository",
       "local_path": "%USERPROFILE%\\Documents\\GitHub\\rons-sovereign-codebase",
-      "required": true
+      "required": true,
+      "configured_remote": "https://github.com/resonance36912-cell/RONSAS.git"
     },
     {
       "id": "hub-developer",
