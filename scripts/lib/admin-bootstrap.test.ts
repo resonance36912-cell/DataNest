@@ -360,7 +360,7 @@ describe("first-admin bootstrap security regressions", () => {
   });
 
   test("does not place the private allowlist in tracked runtime config", () => {
-    expect(read(".env")).not.toContain("ADMIN_BOOTSTRAP_EMAILS");
+    expect(read(".gitignore")).toMatch(/(?:^|\r?\n)\.env(?:\r?\n|$)/);
     expect(read("wrangler.jsonc")).not.toContain("ADMIN_BOOTSTRAP_EMAILS");
   });
 });
