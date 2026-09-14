@@ -17,17 +17,15 @@ env:
   # enough to keep artifact storage bounded.
   SARIF_RETENTION_DAYS: ${{ vars.SARIF_RETENTION_DAYS || '14' }}
   # Number of top rule IDs to include in job-summary tables AND PR-annotation
-  # emissions for both CodeQL and Semgrep. Override with repo/org variable
+  # emissions for Semgrep. Override with the repo/org variable
   # SARIF_SUMMARY_TOP_N. Default: 10 — small enough to skim in a PR review,
   # large enough to cover the meaningful long tail on most runs.
   SARIF_SUMMARY_TOP_N: ${{ vars.SARIF_SUMMARY_TOP_N || '10' }}
 
 permissions:
   contents: read
-  security-events: write
-  # `write` (not `read`) is required so the pr-comment job below can post
-  # and update the sticky SARIF-artifacts comment via the GitHub API.
-  pull-requests: write
+  # Scan jobs need PR metadata read access; the pr-comment job overrides this to write.
+  pull-requests: read
 
 concurrency:
   group: security-scan-${{ github.ref }}
@@ -42,7 +40,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: 1.3.3
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Run verify-security-invariants
@@ -74,7 +72,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: 1.3.3
       - name: Verify pinned dependency versions
         # Fails if package.json uses range specifiers (^, ~, >=) or if
         # bun.lock resolved a different version than package.json declares.
@@ -93,16 +91,19 @@ jobs:
     name: SAST (semgrep)
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    container:
-      image: semgrep/semgrep
     steps:
       - uses: actions/checkout@v4
-      - name: semgrep ci
-        # Curated rulesets:
-        #   p/owasp-top-ten, p/javascript, p/typescript, p/react,
-        #   p/nodejsscan, p/secrets
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Semgrep
+        run: python -m pip install --disable-pip-version-check semgrep
+      - name: Run Semgrep
+        id: semgrep
+        continue-on-error: true
         run: |
-          semgrep ci \
+          semgrep scan \
             --config p/owasp-top-ten \
             --config p/javascript \
             --config p/typescript \
@@ -110,112 +111,43 @@ jobs:
             --config p/nodejsscan \
             --config p/secrets \
             --error \
-            --sarif --output=semgrep.sarif || true
-      - name: Upload SARIF to GitHub code scanning
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: semgrep.sarif
-          category: semgrep
-      - name: Setup Bun (for SARIF summarizer)
-        if: always()
+            --sarif \
+            --output semgrep.sarif \
+            .
+      - name: Set up Bun for SARIF tooling
+        if: always() && hashFiles('semgrep.sarif') != ''
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
-      - name: Summarize Semgrep findings to job summary
-        # Parses semgrep.sarif and appends top rule IDs + file:line to
-        # $GITHUB_STEP_SUMMARY so alerts are visible in the run log.
-        if: always()
+          bun-version: 1.3.3
+      - name: Summarize Semgrep findings
+        if: always() && hashFiles('semgrep.sarif') != ''
         run: bun run scripts/summarize-sarif.ts semgrep.sarif --label "Semgrep" --top "$SARIF_SUMMARY_TOP_N"
-      - name: Upload Semgrep SARIF artifact (always)
-        # Uploads SARIF on every run — success or failure — so alerts can be
-        # triaged locally without needing the Security tab. Retention is
-        # controlled by the SARIF_RETENTION_DAYS repo variable (default 14).
+      - name: Upload Semgrep SARIF artifact
         id: upload-semgrep-sarif
-        if: always()
+        if: always() && hashFiles('semgrep.sarif') != ''
         uses: actions/upload-artifact@v4
         with:
-          # Artifact name includes the short SHA and workflow run ID so multiple
-          # runs (e.g. re-runs, matrix retries) don't collide and each artifact
-          # can be traced back to its exact commit + run.
           name: semgrep-sarif-${{ github.run_id }}-${{ github.sha }}
           path: semgrep.sarif
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: ${{ env.SARIF_RETENTION_DAYS }}
       - name: Annotate PR with top Semgrep findings
-        # Emits ::warning / ::error workflow commands so the top findings
-        # render as inline annotations on the PR "Files changed" tab. Each
-        # annotation message links back to this run's SARIF artifact entry.
-        # Runs on pull_request only; only fires when the upload actually
-        # produced an artifact ID (i.e. semgrep.sarif existed).
         if: always() && github.event_name == 'pull_request' && steps.upload-semgrep-sarif.outputs.artifact-id != ''
         env:
           ARTIFACT_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-semgrep-sarif.outputs.artifact-id }}
         run: bun run scripts/annotate-sarif.ts semgrep.sarif --label "Semgrep" --top "$SARIF_SUMMARY_TOP_N" --artifact-url "$ARTIFACT_URL"
-
-  codeql:
-    name: CodeQL (JavaScript/TypeScript)
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    permissions:
-      security-events: write
-      actions: read
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: javascript-typescript
-          queries: security-extended,security-and-quality
-      - name: Analyze
-        id: codeql-analyze
-        uses: github/codeql-action/analyze@v3
-        with:
-          category: "/language:javascript-typescript"
-          output: codeql-results
-      - name: Summarize CodeQL findings to job summary
-        # Parses the SARIF that CodeQL just emitted and appends a compact
-        # Markdown table (top rule IDs + locations) to $GITHUB_STEP_SUMMARY
-        # so reviewers can triage the top alerts without downloading anything.
-        if: always()
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-      - name: Write CodeQL summary
-        if: always()
-        run: bun run scripts/summarize-sarif.ts codeql-results --label "CodeQL" --top "$SARIF_SUMMARY_TOP_N"
-      - name: Upload CodeQL SARIF artifact (always)
-        # Uploads SARIF on every run — success or failure — so alerts can be
-        # triaged locally without needing the Security tab. Retention is
-        # controlled by the SARIF_RETENTION_DAYS repo variable (default 14).
-        id: upload-codeql-sarif
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          # Artifact name includes the workflow run ID and commit SHA for easy
-          # correlation across re-runs and branches.
-          name: codeql-sarif-${{ github.run_id }}-${{ github.sha }}
-          path: codeql-results
-          if-no-files-found: warn
-          retention-days: ${{ env.SARIF_RETENTION_DAYS }}
-      - name: Annotate PR with top CodeQL findings
-        # Emits ::warning / ::error workflow commands so the top findings
-        # render as inline annotations on the PR "Files changed" tab. Each
-        # annotation message links back to this run's SARIF artifact entry.
-        # Runs on pull_request only; skipped if the SARIF wasn't produced.
-        if: always() && github.event_name == 'pull_request' && steps.upload-codeql-sarif.outputs.artifact-id != ''
-        env:
-          ARTIFACT_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-codeql-sarif.outputs.artifact-id }}
-        run: bun run scripts/annotate-sarif.ts codeql-results --label "CodeQL" --top "$SARIF_SUMMARY_TOP_N" --artifact-url "$ARTIFACT_URL"
-
+      - name: Enforce Semgrep result
+        if: steps.semgrep.outcome == 'failure'
+        run: |
+          echo "::error::Semgrep reported findings or a scanner/configuration error. Review the SARIF artifact."
+          exit 1
   pr-comment:
     name: SARIF artifacts PR comment
     # Only runs on pull_request events; skipped for push/schedule/manual runs
     # since there is no PR to comment on. Always runs even if scan jobs
     # failed — reviewers still want the SARIF download link for triage.
-    if: github.event_name == 'pull_request'
-    needs: [sast-semgrep, codeql]
+    if: always() && github.event_name == 'pull_request'
+    needs: [sast-semgrep]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -229,12 +161,11 @@ jobs:
           RUN_ID: ${{ github.run_id }}
           SHA: ${{ github.sha }}
           SEMGREP_RESULT: ${{ needs.sast-semgrep.result }}
-          CODEQL_RESULT: ${{ needs.codeql.result }}
           RETENTION: ${{ env.SARIF_RETENTION_DAYS }}
         with:
           script: |
             const marker = '<!-- security-scan:sarif-artifacts -->';
-            const { RUN_ID, SHA, SEMGREP_RESULT, CODEQL_RESULT, RETENTION } = process.env;
+            const { RUN_ID, SHA, SEMGREP_RESULT, RETENTION } = process.env;
             const { owner, repo } = context.repo;
             const pr = context.payload.pull_request;
             const prNumber = pr.number;
@@ -290,7 +221,6 @@ jobs:
               `| Scanner | Status | SARIF artifact |`,
               `| ------- | ------ | -------------- |`,
               `| Semgrep | ${icon(SEMGREP_RESULT)} \`${SEMGREP_RESULT}\` | ${artifactCell('semgrep-sarif-', 'Semgrep')} |`,
-              `| CodeQL  | ${icon(CODEQL_RESULT)} \`${CODEQL_RESULT}\` | ${artifactCell('codeql-sarif-', 'CodeQL')} |`,
               ``,
               `<sub>Download the SARIF, then triage with any viewer (e.g. \`code --install-extension MS-SarifVSCode.sarif-viewer\`), or check the top rule IDs in the [job summary](${summaryUrl}).</sub>`,
             ].join('\n');

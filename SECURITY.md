@@ -29,7 +29,7 @@ We aim to acknowledge within 3 business days and provide a remediation timeline 
 - Row Level Security enabled on all `public` tables; grants pinned per table
 - PayFast ITN idempotency via `public.webhook_events`; refund/cancellation revocation implemented
 - Cron + webhook auth uses `timingSafeEqual`
-- CodeQL, Semgrep, Dependabot, lockfile-drift check, and `bun run prebuild` run in CI on every PR
+- Semgrep, Gitleaks, dependency audit, Dependabot lockfile-drift checks, security invariants, and `bun run prebuild` run in CI on every PR. CodeQL is intentionally disabled while GitHub code scanning is unavailable for this private repository.
 
 ## Governance
 
