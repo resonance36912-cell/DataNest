@@ -36,3 +36,7 @@ supabase/.temp/
 *.njsproj
 *.sln
 *.sw?
+
+# RONSAS machine-local topology and generated state
+.ronsas/topology.local.json
+.ronsas/state/
