@@ -38,7 +38,10 @@ export function normalizeOutboundOrigin(input: string): string {
   try {
     url = new URL(trimmed);
   } catch {
-    throw new OutboundOriginPolicyError("invalid_origin", "Outbound destination is not a valid URL.");
+    throw new OutboundOriginPolicyError(
+      "invalid_origin",
+      "Outbound destination is not a valid URL.",
+    );
   }
   if (url.username || url.password) {
     throw new OutboundOriginPolicyError(

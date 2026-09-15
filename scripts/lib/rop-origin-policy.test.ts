@@ -28,7 +28,9 @@ describe("ROP outbound origin policy", () => {
     expect(() => requireAllowedOutboundOrigin("http://syncvision.life", allowed)).toThrow();
     expect(() => requireAllowedOutboundOrigin("https://syncvision.life:8443", allowed)).toThrow();
     expect(() => requireAllowedOutboundOrigin("https://evil.syncvision.life", allowed)).toThrow();
-    expect(() => requireAllowedOutboundOrigin("https://syncvision.life.evil.test", allowed)).toThrow();
+    expect(() =>
+      requireAllowedOutboundOrigin("https://syncvision.life.evil.test", allowed),
+    ).toThrow();
   });
   test("rejects credentials, non-origin paths, and local or literal hosts", () => {
     const cases = [
@@ -56,10 +58,9 @@ describe("ROP outbound origin policy", () => {
   });
 
   test("normalizes allowlist entries and portable policy stays in parity", () => {
-    expect([...parseAllowedOutboundOrigins("https://reson8.life:443, https://syncvision.life")]).toEqual([
-      "https://reson8.life",
-      "https://syncvision.life",
-    ]);
+    expect([
+      ...parseAllowedOutboundOrigins("https://reson8.life:443, https://syncvision.life"),
+    ]).toEqual(["https://reson8.life", "https://syncvision.life"]);
     expect(read("docs/hub/functions/_shared/rop-origin-policy.ts")).toBe(
       read("src/lib/rop/origin-policy.ts"),
     );

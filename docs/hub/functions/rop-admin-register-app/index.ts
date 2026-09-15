@@ -87,20 +87,20 @@ Deno.serve(async (req) => {
   let normalizedOrigin: string | null = null;
   try {
     normalizedOrigin = b.origin_url
-      ? requireAllowedOutboundOrigin(
-          b.origin_url,
-          Deno.env.get(ROP_OUTBOUND_ALLOWED_ORIGINS_ENV),
-        )
+      ? requireAllowedOutboundOrigin(b.origin_url, Deno.env.get(ROP_OUTBOUND_ALLOWED_ORIGINS_ENV))
       : null;
   } catch (error) {
     const status =
       error instanceof OutboundOriginPolicyError && error.code === "allowlist_unconfigured"
         ? 503
         : 400;
-    return jsonResponse({
-      error: "outbound_origin_rejected",
-      detail: error instanceof Error ? error.message : "Outbound origin rejected.",
-    }, status);
+    return jsonResponse(
+      {
+        error: "outbound_origin_rejected",
+        detail: error instanceof Error ? error.message : "Outbound origin rejected.",
+      },
+      status,
+    );
   }
 
   const admin = adminClient();
