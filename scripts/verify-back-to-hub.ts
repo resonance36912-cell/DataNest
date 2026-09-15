@@ -25,15 +25,11 @@
  */
 
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join, relative } from "node:path";
+import { basename, join, relative } from "node:path";
 
 const ROUTES_DIR = "src/routes";
 
-const SKIP_FILENAMES = new Set<string>([
-  "__root.tsx",
-  "index.tsx",
-  "sitemap[.]xml.ts",
-]);
+const SKIP_FILENAMES = new Set<string>(["__root.tsx", "index.tsx", "sitemap[.]xml.ts"]);
 
 const SKIP_PREFIXES = ["admin."];
 const SKIP_DIRS = new Set(["api", "email", "lovable"]);
@@ -63,10 +59,13 @@ const failures: Diag[] = [];
 
 for (const path of walk(ROUTES_DIR)) {
   const rel = relative(".", path);
-  const name = path.split("/").pop()!;
+  const name = basename(path);
 
   if (!/\.(t|j)sx?$/.test(name)) continue;
-  if (SKIP_FILENAMES.has(name)) { skipped.push({ file: rel, reason: "infra" }); continue; }
+  if (SKIP_FILENAMES.has(name)) {
+    skipped.push({ file: rel, reason: "infra" });
+    continue;
+  }
   if (SKIP_PREFIXES.some((p) => name.startsWith(p))) {
     skipped.push({ file: rel, reason: "admin" });
     continue;
@@ -85,7 +84,6 @@ for (const path of walk(ROUTES_DIR)) {
     skipped.push({ file: rel, reason: "non-route" });
     continue;
   }
-
 
   if (src.includes(OPT_OUT_MARKER)) {
     skipped.push({ file: rel, reason: "opted out via // @no-back-to-hub" });

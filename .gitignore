@@ -36,3 +36,16 @@ supabase/.temp/
 *.njsproj
 *.sln
 *.sw?
+
+# RONSAS machine-local topology and generated state
+.ronsas/topology.local.json
+.ronsas/state/
+# Generated verification and build evidence (publish sanitized evidence to Dropbox, not Git)
+.lighthouseci/
+reports/*
+!reports/.gitkeep
+drift-artifacts/
+
+# Vendor-local metadata and non-canonical package-manager state
+.lovable/
+package-lock.json

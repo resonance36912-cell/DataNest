@@ -288,6 +288,8 @@ jobs:
 
       - name: Compare contract files
         shell: bash
+        env:
+          HUB_REF: ${{ inputs.hub-ref }}
         run: |
           set -euo pipefail
           fail=0
@@ -297,7 +299,7 @@ jobs:
             src/lib/discernment-guard.ts
           do
             if ! diff -q "hub/$f" "spoke/$f" >/dev/null 2>&1; then
-              echo "::error file=$f::Spoke copy of $f drifts from resonance-hub@${{ inputs.hub-ref }}. Re-sync the file from the Hub."
+              echo "::error file=$f::Spoke copy of $f drifts from resonance-hub@$HUB_REF. Re-sync the file from the Hub."
               diff -u "hub/$f" "spoke/$f" || true
               fail=1
             fi

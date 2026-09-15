@@ -6,6 +6,9 @@ Source of truth for the Reson8 ecosystem — billing authority, entitlements, RO
 - **Governance (RCGF v1.0):** https://reson8.life/governance
 - **Canonical constitution:** https://github.com/resonance36912-cell/RCGF
 
+## RONSAS workspace
+
+This repository is the manifest-driven RONSAS source/control root. Start with `RONSAS-WORKSPACE.md` for the governed local/GitHub/Dropbox topology. Live runtime, secrets, mutable state, models, caches, and audit evidence remain outside this Git working tree.
 ## What lives here
 
 | Area | Path |
@@ -40,7 +43,7 @@ bun run prebuild       # run all verification scripts (checkout, security, lockf
 bun run test           # vitest suite (auth/RLS, rate limits, invariants, serverfn authz)
 ```
 
-CI runs `verify-prebuild`, `security-scan`, `codeql`, `discernment-lint`, `verify-checkout-links`, and `verify-epublisher` on every PR.
+CI runs `verify-prebuild`, `security-scan` (Semgrep, Gitleaks, dependency audit, and security invariants), `discernment-lint`, `verify-checkout-links`, and `verify-epublisher` on every PR.
 
 ## License
 

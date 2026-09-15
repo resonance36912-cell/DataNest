@@ -3,20 +3,13 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  getInvoiceById,
-  formatMoney,
-  type InvoiceRow,
-} from "@/lib/invoices.functions";
+import { getInvoiceById, formatMoney, type InvoiceRow } from "@/lib/invoices.functions";
 import { labelForApp } from "@/lib/billing-portal.functions";
 import { StatusPill } from "./account.invoices";
 
 export const Route = createFileRoute("/account/invoices/$id")({
   head: () => ({
-    meta: [
-      { title: "Receipt — The Resonance" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "Receipt — The Resonance" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   ssr: false,
   component: ReceiptGate,
@@ -35,15 +28,25 @@ function ReceiptGate() {
       if (!mounted) return;
       setState(data.user ? "authed" : "anon");
     });
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   if (state === "checking") return <div className="p-8 text-muted-foreground">Loading…</div>;
-  if (state === "anon") return (
-    <div className="p-8 text-sm">
-      <Link to="/auth" className="text-primary underline">Sign in</Link> to view this receipt.
-    </div>
-  );
+  if (state === "anon")
+    return (
+      <div className="p-8 text-sm">
+        <Link
+          to="/login"
+          search={{ next: `/account/invoices/${id}` }}
+          className="text-primary underline"
+        >
+          Sign in
+        </Link>{" "}
+        to view this receipt.
+      </div>
+    );
   return <ReceiptPage id={id} />;
 }
 
@@ -66,7 +69,14 @@ function ReceiptPage({ id }: { id: string }) {
     <div className="min-h-screen bg-background text-foreground">
       <div className="max-w-3xl mx-auto px-4 py-10 space-y-6">
         <div className="flex items-center justify-between print:hidden">
-          <Link to="/account/invoices" className="text-sm text-primary underline">← Back to invoices</Link>
+          <div className="flex gap-3 text-sm">
+            <Link to="/" className="text-primary underline">
+              Back to Hub
+            </Link>
+            <Link to="/account/invoices" className="text-primary underline">
+              ← Back to invoices
+            </Link>
+          </div>
           <div className="flex gap-3">
             <button
               onClick={() => window.print()}
@@ -86,7 +96,9 @@ function ReceiptPage({ id }: { id: string }) {
             <div className="text-right">
               <div className="text-lg font-semibold">The Resonance</div>
               <div className="text-xs text-muted-foreground">reson8.life</div>
-              <div className="mt-2"><StatusPill status={inv.status} /></div>
+              <div className="mt-2">
+                <StatusPill status={inv.status} />
+              </div>
             </div>
           </header>
 

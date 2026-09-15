@@ -14,7 +14,11 @@ export const Route = createFileRoute("/account/billing")({
   head: () => ({
     meta: [
       { title: "Billing — The Resonance" },
-      { name: "description", content: "View subscriptions, credit balances, and payment history across every Resonance app." },
+      {
+        name: "description",
+        content:
+          "View subscriptions, credit balances, and payment history across every Resonance app.",
+      },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
@@ -38,12 +42,15 @@ function BillingGate() {
       if (!alive) return;
       setState(session?.user ? "authed" : "anon");
     });
-    return () => { alive = false; sub.subscription.unsubscribe(); };
+    return () => {
+      alive = false;
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
     if (state === "anon") {
-      navigate({ to: "/auth", search: { redirect: "/account/billing" } as never });
+      navigate({ to: "/login", search: { next: "/account/billing" } });
     }
   }, [state, navigate]);
 
@@ -76,9 +83,17 @@ function BillingPortal() {
             </p>
           </div>
           <div className="flex gap-2 text-sm">
-            <Link to="/account/subscriptions" className="text-primary underline">Manage subscriptions</Link>
+            <Link to="/" className="text-primary underline">
+              Back to Hub
+            </Link>
             <span className="text-muted-foreground">·</span>
-            <Link to="/pricing" className="text-primary underline">Plans</Link>
+            <Link to="/account/subscriptions" className="text-primary underline">
+              Manage subscriptions
+            </Link>
+            <span className="text-muted-foreground">·</span>
+            <Link to="/pricing" className="text-primary underline">
+              Plans
+            </Link>
           </div>
         </header>
 
@@ -86,7 +101,9 @@ function BillingPortal() {
         {error && (
           <div className="rounded border border-destructive/40 bg-destructive/10 p-4 text-sm">
             <p>Could not load billing: {(error as Error).message}</p>
-            <button onClick={() => refetch()} className="mt-2 underline">Retry</button>
+            <button onClick={() => refetch()} className="mt-2 underline">
+              Retry
+            </button>
           </div>
         )}
 
@@ -112,11 +129,20 @@ function SubscriptionsCard({ data }: { data: MyBilling }) {
         <span className="text-xs text-muted-foreground">{active.length} active</span>
       </div>
       {data.subscriptions.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No subscriptions yet. <Link to="/pricing" className="underline">Browse plans</Link>.</p>
+        <p className="text-sm text-muted-foreground">
+          No subscriptions yet.{" "}
+          <Link to="/pricing" className="underline">
+            Browse plans
+          </Link>
+          .
+        </p>
       ) : (
         <div className="space-y-2">
           {[...active, ...other].map((s) => (
-            <div key={`${s.app}-${s.tier}`} className="flex flex-wrap items-center justify-between gap-3 rounded border p-3 text-sm">
+            <div
+              key={`${s.app}-${s.tier}`}
+              className="flex flex-wrap items-center justify-between gap-3 rounded border p-3 text-sm"
+            >
               <div>
                 <div className="font-medium">{labelForApp(s.app)}</div>
                 <div className="text-muted-foreground text-xs">
@@ -144,14 +170,20 @@ function WalletsCard({ data }: { data: MyBilling }) {
     <section className="rounded-lg border bg-card p-6">
       <h2 className="text-xl font-semibold mb-4">Credit wallets</h2>
       {data.wallets.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No credit wallets yet. Credits appear here after you purchase a credit pack.</p>
+        <p className="text-sm text-muted-foreground">
+          No credit wallets yet. Credits appear here after you purchase a credit pack.
+        </p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {data.wallets.map((w) => (
             <div key={w.app} className="rounded border p-4">
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">{labelForApp(w.app)}</div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                {labelForApp(w.app)}
+              </div>
               <div className="text-2xl font-semibold mt-1">{w.balance.toLocaleString()}</div>
-              <div className="text-xs text-muted-foreground">{w.currency} · updated {new Date(w.updated_at).toLocaleDateString()}</div>
+              <div className="text-xs text-muted-foreground">
+                {w.currency} · updated {new Date(w.updated_at).toLocaleDateString()}
+              </div>
             </div>
           ))}
         </div>
@@ -165,7 +197,9 @@ function ReceiptsCard({ data }: { data: MyBilling }) {
     <section className="rounded-lg border bg-card p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">Payment history</h2>
-        <Link to="/account/invoices" className="text-sm text-primary underline">All invoices →</Link>
+        <Link to="/account/invoices" className="text-sm text-primary underline">
+          All invoices →
+        </Link>
       </div>
       {data.receipts.length === 0 ? (
         <p className="text-sm text-muted-foreground">No verified payments yet.</p>
@@ -186,7 +220,9 @@ function ReceiptsCard({ data }: { data: MyBilling }) {
                 <tr key={r.id} className="border-b last:border-0">
                   <td className="py-2 pr-3">{new Date(r.received_at).toLocaleString()}</td>
                   <td className="py-2 pr-3">{r.sku ?? "—"}</td>
-                  <td className="py-2 pr-3">{r.amount_cents != null ? formatZar(r.amount_cents) : "—"}</td>
+                  <td className="py-2 pr-3">
+                    {r.amount_cents != null ? formatZar(r.amount_cents) : "—"}
+                  </td>
                   <td className="py-2 pr-3 capitalize">{r.payment_status ?? "—"}</td>
                   <td className="py-2 pr-3 font-mono text-xs">{r.pf_payment_id ?? "—"}</td>
                 </tr>
@@ -201,9 +237,14 @@ function ReceiptsCard({ data }: { data: MyBilling }) {
 
 function StatusBadge({ status }: { status: string }) {
   const cls =
-    status === "active" ? "bg-emerald-500/15 text-emerald-500" :
-    status === "past_due" ? "bg-amber-500/15 text-amber-500" :
-    status === "cancelled" ? "bg-muted text-muted-foreground" :
-    "bg-blue-500/15 text-blue-500";
-  return <span className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${cls}`}>{status}</span>;
+    status === "active"
+      ? "bg-emerald-500/15 text-emerald-500"
+      : status === "past_due"
+        ? "bg-amber-500/15 text-amber-500"
+        : status === "cancelled"
+          ? "bg-muted text-muted-foreground"
+          : "bg-blue-500/15 text-blue-500";
+  return (
+    <span className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${cls}`}>{status}</span>
+  );
 }

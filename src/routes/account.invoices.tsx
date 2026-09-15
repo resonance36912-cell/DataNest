@@ -3,11 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  getMyInvoices,
-  formatMoney,
-  type InvoiceRow,
-} from "@/lib/invoices.functions";
+import { getMyInvoices, formatMoney, type InvoiceRow } from "@/lib/invoices.functions";
 import { labelForApp } from "@/lib/billing-portal.functions";
 
 export const Route = createFileRoute("/account/invoices")({
@@ -30,17 +26,32 @@ function InvoicesGate() {
       if (!mounted) return;
       setState(data.user ? "authed" : "anon");
     });
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  if (state === "checking") return <Shell><p className="text-muted-foreground">Loading…</p></Shell>;
-  if (state === "anon") return (
-    <Shell>
-      <p className="text-sm">
-        <Link to="/auth" className="text-primary underline">Sign in</Link> to view your invoices.
-      </p>
-    </Shell>
-  );
+  if (state === "checking")
+    return (
+      <Shell>
+        <p className="text-muted-foreground">Loading…</p>
+      </Shell>
+    );
+  if (state === "anon")
+    return (
+      <Shell>
+        <p className="text-sm">
+          <Link
+            to="/login"
+            search={{ next: "/account/invoices" }}
+            className="text-primary underline"
+          >
+            Sign in
+          </Link>{" "}
+          to view your invoices.
+        </p>
+      </Shell>
+    );
   return <InvoicesPage />;
 }
 
@@ -58,7 +69,9 @@ function InvoicesPage() {
       {error && (
         <div className="rounded border border-destructive/40 bg-destructive/10 p-4 text-sm">
           <p>Could not load invoices: {(error as Error).message}</p>
-          <button onClick={() => refetch()} className="mt-2 underline">Retry</button>
+          <button onClick={() => refetch()} className="mt-2 underline">
+            Retry
+          </button>
         </div>
       )}
       {data && data.length === 0 && (
@@ -84,10 +97,16 @@ function InvoicesPage() {
                   <td className="py-2 px-3">{new Date(row.issued_at).toLocaleDateString()}</td>
                   <td className="py-2 px-3">
                     <div>{labelForApp(row.app ?? "")}</div>
-                    <div className="text-xs text-muted-foreground">{row.tier ?? "—"} · {row.billing_cycle ?? "—"}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {row.tier ?? "—"} · {row.billing_cycle ?? "—"}
+                    </div>
                   </td>
-                  <td className="py-2 px-3 font-mono">{formatMoney(row.amount_cents, row.currency)}</td>
-                  <td className="py-2 px-3"><StatusPill status={row.status} /></td>
+                  <td className="py-2 px-3 font-mono">
+                    {formatMoney(row.amount_cents, row.currency)}
+                  </td>
+                  <td className="py-2 px-3">
+                    <StatusPill status={row.status} />
+                  </td>
                   <td className="py-2 px-3">
                     <Link
                       to="/account/invoices/$id"
@@ -119,8 +138,15 @@ function Shell({ children }: { children: React.ReactNode }) {
             </p>
           </div>
           <nav className="flex gap-3 text-sm">
-            <Link to="/account/billing" className="text-primary underline">Billing</Link>
-            <Link to="/account/subscriptions" className="text-primary underline">Subscriptions</Link>
+            <Link to="/" className="text-primary underline">
+              Back to Hub
+            </Link>
+            <Link to="/account/billing" className="text-primary underline">
+              Billing
+            </Link>
+            <Link to="/account/subscriptions" className="text-primary underline">
+              Subscriptions
+            </Link>
           </nav>
         </header>
         {children}
@@ -138,7 +164,9 @@ export function StatusPill({ status }: { status: InvoiceRow["status"] }) {
     cancelled: "bg-muted text-muted-foreground border-border",
   };
   return (
-    <span className={`inline-block rounded-full border px-2 py-0.5 text-xs font-medium ${map[status]}`}>
+    <span
+      className={`inline-block rounded-full border px-2 py-0.5 text-xs font-medium ${map[status]}`}
+    >
       {status}
     </span>
   );

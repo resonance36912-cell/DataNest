@@ -11,9 +11,13 @@ export const Route = createFileRoute("/account/invoices/by-payment/$pf")({
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
-  beforeLoad: async () => {
+  beforeLoad: async ({ params }) => {
     const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) throw redirect({ to: "/auth" });
+    if (error || !data.user)
+      throw redirect({
+        to: "/login",
+        search: { next: `/account/invoices/by-payment/${params.pf}` },
+      });
   },
   component: ByPaymentPage,
 });
@@ -27,7 +31,11 @@ function ByPaymentPage() {
   });
 
   if (isLoading) {
-    return <main className="mx-auto max-w-2xl px-6 py-16 text-sm text-muted-foreground">Looking up receipt…</main>;
+    return (
+      <main className="mx-auto max-w-2xl px-6 py-16 text-sm text-muted-foreground">
+        Looking up receipt…
+      </main>
+    );
   }
 
   if (error) {
@@ -60,8 +68,8 @@ function ByPaymentPage() {
       <h1 className="text-2xl font-semibold">No receipt found</h1>
       <p className="text-sm text-muted-foreground">
         No invoice is linked to PayFast payment{" "}
-        <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">{pf}</code>. It may not have
-        been issued yet, or you may not have access to it.
+        <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">{pf}</code>. It may not
+        have been issued yet, or you may not have access to it.
       </p>
       <BackLinks />
     </main>
@@ -71,8 +79,15 @@ function ByPaymentPage() {
 function BackLinks() {
   return (
     <div className="flex gap-4 text-sm">
-      <Link to="/account/invoices" className="underline">All invoices</Link>
-      <Link to="/account/billing" className="underline">Billing</Link>
+      <Link to="/" className="underline">
+        Back to Hub
+      </Link>
+      <Link to="/account/invoices" className="underline">
+        All invoices
+      </Link>
+      <Link to="/account/billing" className="underline">
+        Billing
+      </Link>
     </div>
   );
 }
