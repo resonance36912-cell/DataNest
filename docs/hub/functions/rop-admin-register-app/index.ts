@@ -4,9 +4,9 @@
 // =====================================================================
 //
 // Mints a signing secret for a new Resonance app and records it in
-// hub_apps. The plain secret is returned ONCE in the response — the
-// caller must paste it into the target app's HUB_SIGNING_KEY secret.
-// Only sha256(secret) is persisted.
+// hub_apps. A raw provisioning key and its derived HMAC secret are returned
+// ONCE. The target app signs with hmac_secret; only that derived verifier key
+// is persisted in hub_apps.signing_key_hash.
 //
 // Auth: hub_admin Supabase JWT.
 //
@@ -23,7 +23,8 @@
 //   {
 //     "ok": true,
 //     "app_id": "uuid",
-//     "signing_key": "hex string (64 chars)"   // shown ONCE
+//     "raw_signing_key": "hex string",          // provisioning material
+//     "hmac_secret": "sha256(raw_signing_key)"   // actual HMAC key
 //   }
 
 import { z } from "https://esm.sh/zod@3.23.8";
@@ -117,20 +118,18 @@ Deno.serve(async (req) => {
     payload: { slug: app.slug, prefix: secret.slice(0, 8) },
   });
 
-  // SECURITY: the plain secret is returned ONCE; the Hub does not store it.
-  // The admin UI must show it to the operator with copy-to-clipboard and
-  // an explicit "you cannot retrieve this later" warning. The operator
-  // then pastes it into the target app's HUB_SIGNING_KEY secret AND
-  // sets ROP_SECRET_<APP_ID_HEX> in the Hub's own env (so ingest
-  // verifier can recompute HMACs — see rop-lookups.ts).
+  // SECURITY: provisioning material is returned ONCE. The app signs with
+  // hmac_secret, which is also the verifier key stored in hub_apps. The raw
+  // signing key is not needed by ingest runtimes and is never persisted.
   return jsonResponse({
     ok: true,
     app_id: app.id,
     slug: app.slug,
-    signing_key: secret,
+    raw_signing_key: secret,
+    hmac_secret: hash,
     next_steps: [
-      "Paste signing_key into the target app's HUB_SIGNING_KEY secret",
-      `Set ROP_SECRET_${app.id.replace(/-/g, "").toUpperCase()} on the Hub`,
+      "Paste hmac_secret into the target app's HUB_SIGNING_KEY secret",
+      "Generate a fresh x-rop-nonce for every signed request",
     ],
   });
 });

@@ -29,7 +29,7 @@ import {
   jsonResponse,
   verifyRopRequest,
 } from "../_shared/rop-verify.ts";
-import { admin, auditEvent, getAppById, getAppSecret } from "../_shared/rop-lookups.ts";
+import { admin, auditEvent, consumeNonce, getAppById } from "../_shared/rop-lookups.ts";
 
 const PerfEvent = z.object({
   event_type: z.string().min(1).max(120),
@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST")    return jsonResponse({ error: "method_not_allowed" }, 405);
 
-  const verified = await verifyRopRequest(req, getAppById, getAppSecret);
+  const verified = await verifyRopRequest(req, getAppById, consumeNonce);
   if (!verified.ok) return jsonResponse({ error: verified.error }, verified.status);
 
   const parsed = Body.safeParse(verified.body);

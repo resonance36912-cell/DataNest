@@ -105,8 +105,8 @@ function RopAdmin() {
               New signing material for {minted.slug} — store now, it won't be shown again.
             </p>
             <div className="mt-3 space-y-2 font-mono text-xs">
-              <KeyRow label="HUB_SIGNING_KEY (raw)" value={minted.raw} />
-              <KeyRow label="HMAC secret (sha256 hex — actual secret used to sign requests)" value={minted.hmac} />
+              <KeyRow label="Provisioning key (raw, store securely)" value={minted.raw} />
+              <KeyRow label="HUB_SIGNING_KEY (HMAC secret — use this to sign requests)" value={minted.hmac} />
             </div>
             <button
               onClick={() => setMinted(null)}

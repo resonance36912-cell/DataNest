@@ -444,6 +444,38 @@ export type Database = {
         }
         Relationships: []
       }
+      hub_rop_nonces: {
+        Row: {
+          app_id: string
+          created_at: string
+          expires_at: string
+          nonce: string
+          request_timestamp: number
+        }
+        Insert: {
+          app_id: string
+          created_at?: string
+          expires_at: string
+          nonce: string
+          request_timestamp: number
+        }
+        Update: {
+          app_id?: string
+          created_at?: string
+          expires_at?: string
+          nonce?: string
+          request_timestamp?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hub_rop_nonces_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "hub_apps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hub_audit_events: {
         Row: {
           actor_kind: string
@@ -1339,6 +1371,15 @@ export type Database = {
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
+      }
+      consume_rop_nonce: {
+        Args: {
+          _app_id: string
+          _nonce: string
+          _request_timestamp: number
+          _ttl_seconds: number
+        }
+        Returns: boolean
       }
       has_role: {
         Args: {

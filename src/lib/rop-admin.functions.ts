@@ -37,7 +37,7 @@ export const registerHubApp = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { mintSigningKey, hashSigningKey } = await import("@/lib/rop/hmac.server");
+    const { mintSigningKey } = await import("@/lib/rop/hmac.server");
     const minted = mintSigningKey();
     const { data: row, error } = await supabaseAdmin
       .from("hub_apps")
@@ -62,7 +62,7 @@ export const registerHubApp = createServerFn({ method: "POST" })
     return {
       app: row,
       raw_signing_key: minted.raw,
-      hmac_secret: hashSigningKey(minted.raw),
+      hmac_secret: minted.hash,
     };
   });
 
@@ -75,7 +75,7 @@ export const rotateHubAppKey = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { mintSigningKey, hashSigningKey } = await import("@/lib/rop/hmac.server");
+    const { mintSigningKey } = await import("@/lib/rop/hmac.server");
     const minted = mintSigningKey();
     const { error } = await supabaseAdmin
       .from("hub_apps")
@@ -89,7 +89,7 @@ export const rotateHubAppKey = createServerFn({ method: "POST" })
       payload: {} as never,
       actor_user_id: context.userId,
     });
-    return { raw_signing_key: minted.raw, hmac_secret: hashSigningKey(minted.raw) };
+    return { raw_signing_key: minted.raw, hmac_secret: minted.hash };
   });
 
 // ─── Set status ───────────────────────────────────────────────────────────────
