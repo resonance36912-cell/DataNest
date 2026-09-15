@@ -31,14 +31,13 @@ const Body = z.object({
 function randomSecretHex(byteLen = 32): string {
   const bytes = new Uint8Array(byteLen);
   crypto.getRandomValues(bytes);
-  return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 async function sha256Hex(input: string): Promise<string> {
-  const buf = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(input),
-  );
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
   return Array.from(new Uint8Array(buf))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
@@ -46,21 +45,21 @@ async function sha256Hex(input: string): Promise<string> {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  if (req.method !== "POST")    return jsonResponse({ error: "method_not_allowed" }, 405);
+  if (req.method !== "POST") return jsonResponse({ error: "method_not_allowed" }, 405);
 
   const auth = await requireHubAdmin(req);
   if (!auth.ok) return jsonResponse({ error: auth.error }, auth.status);
 
   let raw: unknown;
-  try { raw = await req.json(); }
-  catch { return jsonResponse({ error: "bad_json" }, 400); }
+  try {
+    raw = await req.json();
+  } catch {
+    return jsonResponse({ error: "bad_json" }, 400);
+  }
 
   const parsed = Body.safeParse(raw);
   if (!parsed.success) {
-    return jsonResponse(
-      { error: "invalid_body", detail: parsed.error.flatten() },
-      400,
-    );
+    return jsonResponse({ error: "invalid_body", detail: parsed.error.flatten() }, 400);
   }
   const { app_id, reason } = parsed.data;
 
@@ -73,7 +72,7 @@ Deno.serve(async (req) => {
     .eq("id", app_id)
     .maybeSingle();
   if (appErr) return jsonResponse({ error: appErr.message }, 500);
-  if (!app)   return jsonResponse({ error: "unknown_app" }, 404);
+  if (!app) return jsonResponse({ error: "unknown_app" }, 404);
   if (app.status === "revoked") {
     return jsonResponse({ error: "app_revoked" }, 409);
   }

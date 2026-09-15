@@ -80,18 +80,20 @@ async function hmacSha256Hex(hmacSecret: string, message: string): Promise<strin
     false,
     ["sign"],
   );
-  const sig = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    new TextEncoder().encode(message),
-  );
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(message));
   return bytesToHex(new Uint8Array(sig));
 }
 
+function hasControlCharacter(value: string): boolean {
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    if (code <= 31 || code === 127) return true;
+  }
+  return false;
+}
+
 function validNonce(nonce: string): boolean {
-  return nonce.length > 0 &&
-    nonce.length <= MAX_NONCE_LENGTH &&
-    !/[\u0000-\u001f\u007f]/.test(nonce);
+  return nonce.length > 0 && nonce.length <= MAX_NONCE_LENGTH && !hasControlCharacter(nonce);
 }
 
 export async function verifyRopRequest(
@@ -134,10 +136,7 @@ export async function verifyRopRequest(
     return { ok: false, status: 403, error: `app_${app.status}` };
   }
 
-  const expectedSig = await hmacSha256Hex(
-    app.signing_key_hash,
-    `${tsHeader}.${nonce}.${rawBody}`,
-  );
+  const expectedSig = await hmacSha256Hex(app.signing_key_hash, `${tsHeader}.${nonce}.${rawBody}`);
   if (!constantTimeEqual(hexToBytes(expectedSig), hexToBytes(signature))) {
     return { ok: false, status: 401, error: "bad_signature" };
   }

@@ -17,10 +17,13 @@ export function mintSigningKey(): { raw: string; hash: string; prefix: string } 
 }
 
 /** Sign a ROP payload using the provisioned HMAC secret (the stored sha256 verifier key). */
-export function signBody(hmacSecret: string, timestamp: string, nonce: string, body: string): string {
-  return createHmac("sha256", hmacSecret)
-    .update(`${timestamp}.${nonce}.${body}`)
-    .digest("hex");
+export function signBody(
+  hmacSecret: string,
+  timestamp: string,
+  nonce: string,
+  body: string,
+): string {
+  return createHmac("sha256", hmacSecret).update(`${timestamp}.${nonce}.${body}`).digest("hex");
 }
 
 function safeHexEq(a: string, b: string): boolean {
@@ -30,8 +33,16 @@ function safeHexEq(a: string, b: string): boolean {
   return timingSafeEqual(aBuf, bBuf);
 }
 
+function hasControlCharacter(value: string): boolean {
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    if (code <= 31 || code === 127) return true;
+  }
+  return false;
+}
+
 function validNonce(nonce: string): boolean {
-  return nonce.length > 0 && nonce.length <= ROP_MAX_NONCE_LENGTH && !/[\u0000-\u001f\u007f]/.test(nonce);
+  return nonce.length > 0 && nonce.length <= ROP_MAX_NONCE_LENGTH && !hasControlCharacter(nonce);
 }
 
 export type RopAppRow = {
@@ -97,7 +108,12 @@ export async function logAudit(
   appId: string | null,
   eventType: string,
   payload: Record<string, unknown>,
-  opts: { actorKind?: string; actorUserId?: string | null; entityType?: string; entityId?: string } = {},
+  opts: {
+    actorKind?: string;
+    actorUserId?: string | null;
+    entityType?: string;
+    entityId?: string;
+  } = {},
 ) {
   try {
     await supabaseAdmin.from("hub_audit_events").insert({

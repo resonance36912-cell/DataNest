@@ -47,11 +47,7 @@
 //   - max 500 rows; default 100; ordered by updated_at ASC for cursor stability
 
 import { z } from "https://esm.sh/zod@3.23.8";
-import {
-  corsHeaders,
-  jsonResponse,
-  verifyRopRequest,
-} from "../_shared/rop-verify.ts";
+import { corsHeaders, jsonResponse, verifyRopRequest } from "../_shared/rop-verify.ts";
 import { admin, auditEvent, consumeNonce, getAppById } from "../_shared/rop-lookups.ts";
 
 const Body = z.object({
@@ -75,7 +71,7 @@ type SuggestionRow = {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  if (req.method !== "POST")    return jsonResponse({ error: "method_not_allowed" }, 405);
+  if (req.method !== "POST") return jsonResponse({ error: "method_not_allowed" }, 405);
 
   const verified = await verifyRopRequest(req, getAppById, consumeNonce);
   if (!verified.ok) return jsonResponse({ error: verified.error }, verified.status);
@@ -83,10 +79,7 @@ Deno.serve(async (req) => {
   // body may legitimately be empty `{}` — accept that.
   const parsed = Body.safeParse(verified.body ?? {});
   if (!parsed.success) {
-    return jsonResponse(
-      { error: "invalid_body", detail: parsed.error.flatten() },
-      400,
-    );
+    return jsonResponse({ error: "invalid_body", detail: parsed.error.flatten() }, 400);
   }
   const { since, limit = 100 } = parsed.data;
 
@@ -122,15 +115,13 @@ Deno.serve(async (req) => {
       rows
         .map((r) => {
           const pc = r.proposed_change as Record<string, unknown> | null;
-          return pc && typeof pc.tunable_key === "string"
-            ? (pc.tunable_key as string)
-            : null;
+          return pc && typeof pc.tunable_key === "string" ? (pc.tunable_key as string) : null;
         })
         .filter((k): k is string => !!k),
     ),
   );
 
-  let appliedMap = new Map<string, string[]>();
+  const appliedMap = new Map<string, string[]>();
   if (tunableKeys.length > 0) {
     const { data: tuns } = await admin
       .from("hub_tunables")
@@ -147,9 +138,7 @@ Deno.serve(async (req) => {
 
   const suggestions = rows.map((r) => {
     const pc = r.proposed_change as Record<string, unknown> | null;
-    const key = pc && typeof pc.tunable_key === "string"
-      ? (pc.tunable_key as string)
-      : null;
+    const key = pc && typeof pc.tunable_key === "string" ? (pc.tunable_key as string) : null;
     return {
       id: r.id,
       source_app: r.hub_apps ? { id: r.hub_apps.id, slug: r.hub_apps.slug } : null,
@@ -160,14 +149,15 @@ Deno.serve(async (req) => {
       proposed_change: r.proposed_change,
       evidence: r.evidence,
       confidence: r.confidence,
-      applied_in_apps: key ? appliedMap.get(key) ?? [] : [],
+      applied_in_apps: key ? (appliedMap.get(key) ?? []) : [],
       updated_at: r.updated_at,
     };
   });
 
-  const nextSince = suggestions.length > 0
-    ? suggestions[suggestions.length - 1].updated_at
-    : (since ?? new Date(0).toISOString());
+  const nextSince =
+    suggestions.length > 0
+      ? suggestions[suggestions.length - 1].updated_at
+      : (since ?? new Date(0).toISOString());
 
   auditEvent({
     appId: verified.appId,

@@ -33,7 +33,11 @@ import { adminClient, requireHubAdmin } from "../_shared/rop-admin-auth.ts";
 import { auditEvent } from "../_shared/rop-lookups.ts";
 
 const Body = z.object({
-  slug: z.string().min(2).max(64).regex(/^[a-z0-9][a-z0-9-]*$/),
+  slug: z
+    .string()
+    .min(2)
+    .max(64)
+    .regex(/^[a-z0-9][a-z0-9-]*$/),
   name: z.string().min(1).max(120),
   origin_url: z.string().url().nullish(),
   workspace_id: z.string().max(120).nullish(),
@@ -43,14 +47,13 @@ const Body = z.object({
 function randomSecretHex(byteLen = 32): string {
   const bytes = new Uint8Array(byteLen);
   crypto.getRandomValues(bytes);
-  return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 async function sha256Hex(input: string): Promise<string> {
-  const buf = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(input),
-  );
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
   return Array.from(new Uint8Array(buf))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
@@ -58,21 +61,21 @@ async function sha256Hex(input: string): Promise<string> {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  if (req.method !== "POST")    return jsonResponse({ error: "method_not_allowed" }, 405);
+  if (req.method !== "POST") return jsonResponse({ error: "method_not_allowed" }, 405);
 
   const auth = await requireHubAdmin(req);
   if (!auth.ok) return jsonResponse({ error: auth.error }, auth.status);
 
   let raw: unknown;
-  try { raw = await req.json(); }
-  catch { return jsonResponse({ error: "bad_json" }, 400); }
+  try {
+    raw = await req.json();
+  } catch {
+    return jsonResponse({ error: "bad_json" }, 400);
+  }
 
   const parsed = Body.safeParse(raw);
   if (!parsed.success) {
-    return jsonResponse(
-      { error: "invalid_body", detail: parsed.error.flatten() },
-      400,
-    );
+    return jsonResponse({ error: "invalid_body", detail: parsed.error.flatten() }, 400);
   }
   const b = parsed.data;
 
@@ -97,7 +100,7 @@ Deno.serve(async (req) => {
     .single();
 
   if (insErr) {
-    const status = insErr.code === "23505" ? 409 : 500;   // unique violation
+    const status = insErr.code === "23505" ? 409 : 500; // unique violation
     return jsonResponse({ error: insErr.message }, status);
   }
 

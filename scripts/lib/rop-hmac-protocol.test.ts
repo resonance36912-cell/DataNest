@@ -20,9 +20,7 @@ describe("ROP HMAC protocol", () => {
       .digest("hex");
     expect(signBody(hmacSecret, ts, nonce, body)).toBe(expected);
 
-    const legacy = createHmac("sha256", hmacSecret)
-      .update(`${ts}.${body}`)
-      .digest("hex");
+    const legacy = createHmac("sha256", hmacSecret).update(`${ts}.${body}`).digest("hex");
     expect(expected).not.toBe(legacy);
   });
 
@@ -40,8 +38,12 @@ describe("ROP HMAC protocol", () => {
     expect(sql).toContain("PRIMARY KEY (app_id, nonce)");
     expect(sql).toContain("ON CONFLICT (app_id, nonce) DO NOTHING");
     expect(sql).toContain("GET DIAGNOSTICS inserted_count = ROW_COUNT");
-    expect(sql).toMatch(/REVOKE ALL ON FUNCTION public\.consume_rop_nonce[\s\S]*FROM PUBLIC, anon, authenticated/);
-    expect(sql).toMatch(/GRANT EXECUTE ON FUNCTION public\.consume_rop_nonce[\s\S]*TO service_role/);
+    expect(sql).toMatch(
+      /REVOKE ALL ON FUNCTION public\.consume_rop_nonce[\s\S]*FROM PUBLIC, anon, authenticated/,
+    );
+    expect(sql).toMatch(
+      /GRANT EXECUTE ON FUNCTION public\.consume_rop_nonce[\s\S]*TO service_role/,
+    );
   });
 
   test("portable verifier uses the stored HMAC secret and persistent nonce consumer", () => {

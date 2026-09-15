@@ -30,12 +30,7 @@ export const getAppById: AppLookup = async (appId) => {
   return data as HubAppRow;
 };
 
-export const consumeNonce: NonceConsumer = async (
-  appId,
-  nonce,
-  requestTimestamp,
-  ttlSeconds,
-) => {
+export const consumeNonce: NonceConsumer = async (appId, nonce, requestTimestamp, ttlSeconds) => {
   const { data, error } = await admin.rpc("consume_rop_nonce", {
     _app_id: appId,
     _nonce: nonce,
