@@ -1,2 +1,2 @@
-﻿# Historical false positive: non-secret localStorage preference key in admin.ci-health.tsx.
+# Historical false positive: non-secret localStorage preference key in admin.ci-health.tsx.
 db2817e581e3bf8830bc5020fc9a9d00a2b50048:src/routes/admin.ci-health.tsx:generic-api-key:40
