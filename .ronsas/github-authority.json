@@ -1,0 +1,40 @@
+{
+  "schema": "ronsas-github-authority/v1",
+  "snapshot_date": "2026-09-15",
+  "canonical_owner": "resonance36912-cell",
+  "development_identity": "ResonanceAppDev",
+  "control_repository": "resonance36912-cell/RONSAS",
+  "promotion_policy": "review-branch-pr-only",
+  "history_policy": "preserve-independent-repository-history",
+  "force_rewrite_allowed": false,
+  "repositories": [
+    {
+      "id": "ronsas-control",
+      "repository": "resonance36912-cell/RONSAS",
+      "role": "sovereign-control-authority",
+      "default_branch": "main",
+      "verified_head": "8ddce3ff3e26ba9e584b64af96e616c631de70bc"
+    },
+    {
+      "id": "resonance-hub",
+      "repository": "resonance36912-cell/resonance-hub",
+      "role": "preserved-development-history",
+      "default_branch": "main",
+      "verified_head": "0a48e34103b0c21fb9917ca79545b049a68883d1"
+    },
+    {
+      "id": "rcgf",
+      "repository": "resonance36912-cell/RCGF",
+      "role": "governance-upstream",
+      "default_branch": "main",
+      "verified_head": "26c40c14e011dc494457b033c96a8e68029e46cb"
+    },
+    {
+      "id": "epublisher-source",
+      "repository": "resonance36912-cell/rons-epublisher-sovereign-source",
+      "role": "application-source-upstream",
+      "default_branch": "main",
+      "verified_head": "bf4b2b88b6e0f3f77fe4e17e9c9070eea5a712cf"
+    }
+  ]
+}
