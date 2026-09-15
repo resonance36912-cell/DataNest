@@ -18,20 +18,28 @@ It also verifies the canonical Git remote, enables `.githooks`, fetches/prunes s
 Required topology paths and repositories are checked against the local topology manifest. Required remotes must match. Dropbox audit authority must be available and rooted in Dropbox or a junction resolving into Dropbox.
 
 Review branches are never auto-merged, rebased, reset, force-pushed, or promoted.
-## One-click and startup entry points
 
-`Install-RonsasSovereignShortcuts.ps1` copies the active guard to `%LOCALAPPDATA%\Resonance\RONSAS\Launcher` so repository refreshes cannot break installed shortcuts.
+## One-click, startup, and browser-process entry points
 
-It creates `RONSAS Sovereign Start`, `RONSAS Web - Default`, profile-specific Chrome and Firefox shortcuts, an Edge shortcut when installed, and `RONSAS Sovereignty Guard` in the Windows Startup folder.
+`Install-RonsasSovereignShortcuts.ps1` copies the active guard and browser watcher to `%LOCALAPPDATA%\Resonance\RONSAS\Launcher` so repository refreshes cannot break installed enforcement.
 
-Each browser/profile shortcut runs the same sovereignty preflight before opening GitHub, Dropbox audit authority, and the Resonance governance page. Existing browser credentials, cookies, and account data are neither read nor copied.
+It creates `RONSAS Sovereign Start`, `RONSAS Web - Default`, profile-specific Chrome and Firefox shortcuts, an Edge shortcut when installed, `RONSAS Sovereignty Guard`, and `RONSAS Browser Process Guard` in the Windows Startup folder.
+Each browser/profile shortcut runs the sovereignty preflight before opening GitHub, Dropbox audit authority, and the Resonance governance page. Existing browser credentials, cookies, and account data are neither read nor copied.
 
 The profile-specific shortcuts preserve separate signed-in account contexts for multi-browser and multi-account operation. They do not attempt to merge browser identities.
 
+`Watch-RonsasBrowserProcesses.ps1` runs hidden at sign-in, detects new Chrome, Firefox, and Edge processes, and re-runs the same sovereignty preflight with debounce protection. It records pass/block results locally but does not terminate unrelated browser sessions or inspect browser content.
+
+## Dropbox propagation evidence
+
+On 2026-09-15 Ealiophin wrote a 193-byte verification marker into the governed Dropbox audit root. Weed and Spider independently received the same marker with SHA-256 `32505AD00D2FBE87FAE3FB275A2E80F7770DAF85EE22EE3F9700335381EC4BF3`, establishing end-to-end cross-device Dropbox propagation for that evidence object.
+
+This is stronger than merely observing a local Dropbox folder or process, but it is a point-in-time verification rather than a guarantee about every future object.
+
 ## Execution boundary
 
-Shortcuts use process-scoped `-ExecutionPolicy Bypass`. No machine-wide or user-wide PowerShell execution policy is changed.
+Shortcuts and watcher use process-scoped `-ExecutionPolicy Bypass`. No machine-wide or user-wide PowerShell execution policy is changed.
 
-Each invocation logs success or blocking reasons under `%LOCALAPPDATA%\Resonance\RONSAS\sovereignty-guard.log`; secrets, tokens, cookies, and browser credentials are not logged.
+Guard invocations log under `%LOCALAPPDATA%\Resonance\RONSAS\sovereignty-guard.log`; watcher events log under `%LOCALAPPDATA%\Resonance\RONSAS\browser-process-guard.log`. Secrets, tokens, cookies, and browser credentials are not logged.
 
-Arbitrary web navigation outside the governed RONSAS shortcuts is not intercepted. Enforcing every unrelated browser URL would require browser enterprise policy or network enforcement and is intentionally outside this launcher layer.
+Arbitrary web navigation inside an already-running unrelated browser is not intercepted. Full URL-level enforcement would require browser enterprise policy, an extension, or a governed network/proxy layer and remains outside this workstation launcher layer.
