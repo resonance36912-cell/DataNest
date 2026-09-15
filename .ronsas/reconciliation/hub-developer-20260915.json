@@ -611,5 +611,17 @@
       "supabase/migrations/20260821000000_secure_first_admin_bootstrap.sql",
       "supabase/migrations/20260822000000_harden_role_helper_privileges.sql"
     ]
-  }
+  },
+  "semantic_decisions": [
+    {
+      "feature": "admin-access",
+      "hub_paths": [
+        "src/routes/admin.access.tsx",
+        "src/lib/admin-access.functions.ts"
+      ],
+      "decision": "reject-replacement-as-security-regression",
+      "rationale": "The Hub route replaces the sovereign first-admin bootstrap workflow with read-only diagnostics, removing the short-lived single-use email proof and explicit claim flow. Retain the RONSAS implementation.",
+      "future_option": "Consider the Hub diagnostics helper only as a separate read-only admin diagnostic after independent review."
+    }
+  ]
 }

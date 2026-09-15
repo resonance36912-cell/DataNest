@@ -24,3 +24,13 @@ The Hub remote tracks a top-level `.env`. Its contents were not read and must ne
 6. Production Hub and runtime-stage drift remain separate evidence sources and require Ealiophin access before promotion.
 
 The full path inventory is `.ronsas/reconciliation/hub-developer-20260915.json`.
+
+## Semantic decision 1 — admin access
+
+**Decision:** reject the Hub admin-access replacement as a security regression.
+
+The Hub head (`0a48e34`, “Added admin access page”) adds `src/lib/admin-access.functions.ts` and replaces the existing `/admin/access` route with a read-only diagnostics view. RONSAS already carries a hardened first-admin bootstrap implementation across `src/lib/admin-bootstrap.core.ts`, `src/lib/admin-bootstrap.functions.ts`, `src/routes/admin.access.tsx`, its dedicated test, and migration `20260821000000_secure_first_admin_bootstrap.sql`.
+
+The RONSAS flow requires a fresh short-lived, single-use email proof, scrubs the bootstrap token from the URL, re-checks eligibility server-side, and uses a permanent one-time bootstrap marker. Replacing it with the Hub route would remove those controls.
+
+The Hub diagnostics helper may be reconsidered later only as a separate read-only diagnostic capability after independent authorization and data-exposure review. It must not replace or weaken the sovereign bootstrap path.
