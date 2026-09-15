@@ -34,3 +34,11 @@ The Hub head (`0a48e34`, “Added admin access page”) adds `src/lib/admin-acce
 The RONSAS flow requires a fresh short-lived, single-use email proof, scrubs the bootstrap token from the URL, re-checks eligibility server-side, and uses a permanent one-time bootstrap marker. Replacing it with the Hub route would remove those controls.
 
 The Hub diagnostics helper may be reconsidered later only as a separate read-only diagnostic capability after independent authorization and data-exposure review. It must not replace or weaken the sovereign bootstrap path.
+
+## Semantic decision 2 — Hub control plane
+
+**Decision:** defer direct import until the ROP authentication protocol is hardened and unified.
+
+The Hub adds outbound control push/probe helpers and a signed pull-config endpoint. Its outbound HMAC signs `timestamp.body` without a nonce. The current RONSAS runtime ROP verifier also uses `timestamp.body`, while the portable ROP contract under `docs/hub/functions/_shared/rop-verify.ts` requires `timestamp.nonce.body` and an `x-rop-nonce` header. This mismatch must be resolved before adding another control surface.
+
+Admission requirements: unify runtime and portable signatures with nonce/replay rejection; validate outbound destination origins against an explicit allowlist; constrain or redact persisted request/response delivery bodies; and review the pull-config schema separately from outbound push support.

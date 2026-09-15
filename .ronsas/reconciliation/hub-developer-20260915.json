@@ -622,6 +622,23 @@
       "decision": "reject-replacement-as-security-regression",
       "rationale": "The Hub route replaces the sovereign first-admin bootstrap workflow with read-only diagnostics, removing the short-lived single-use email proof and explicit claim flow. Retain the RONSAS implementation.",
       "future_option": "Consider the Hub diagnostics helper only as a separate read-only admin diagnostic after independent review."
+    },
+    {
+      "feature": "hub-control-plane",
+      "hub_paths": [
+        "src/lib/hub-control.functions.ts",
+        "src/lib/hub-control/hmac.server.ts",
+        "src/lib/hub-control/push.server.ts",
+        "src/routes/api/public/hub-control/pull-config.ts"
+      ],
+      "decision": "defer-import-pending-protocol-hardening",
+      "rationale": "The runtime ROP helper and Hub outbound push scheme omit the nonce required by the portable ROP contract, leaving replay protection inconsistent.",
+      "requirements": [
+        "Unify runtime and portable signatures on timestamp + nonce + body with replay rejection.",
+        "Validate outbound control origins against an explicit allowlist before fetch.",
+        "Redact or constrain delivery request/response logging before persistence.",
+        "Review pull-config schema compatibility independently from outbound push support."
+      ]
     }
   ]
 }
