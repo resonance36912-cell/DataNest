@@ -66,8 +66,10 @@ try{
  $dropboxPath=[Environment]::ExpandEnvironmentVariables($topology.cloud.dropbox.local_root)
  Assert-Guard (Test-Path -LiteralPath $dropboxPath) 'Dropbox audit authority path is unavailable.'
  $dropboxItem=Get-Item -LiteralPath $dropboxPath -Force
- if($dropboxItem.Attributes -band [IO.FileAttributes]::ReparsePoint){$targets=@($dropboxItem.Target);Assert-Guard (@($targets|Where-Object{$_ -match '\\Dropbox\\'}).Count -gt 0) 'Audit junction does not resolve into Dropbox.'}
- elseif($dropboxPath -notmatch '\\Dropbox\\'){throw 'Audit authority is not rooted in Dropbox.'}
+ if($dropboxPath -notmatch '\\Dropbox\\'){
+   if($dropboxItem.Attributes -band [IO.FileAttributes]::ReparsePoint){$targets=@($dropboxItem.Target);Assert-Guard (@($targets|Where-Object{$_ -match '\\Dropbox\\'}).Count -gt 0) 'Audit junction does not resolve into Dropbox.'}
+   else{throw 'Audit authority is not rooted in Dropbox.'}
+ }
  Write-GuardLog 'Authority, Git, hooks, topology, and Dropbox checks passed.'
  if($Mode -eq 'Workspace'){Start-Process explorer.exe -ArgumentList ('"{0}"' -f $repoRoot)}
  elseif($Mode -eq 'Web'){
