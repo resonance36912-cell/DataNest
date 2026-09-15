@@ -16,12 +16,8 @@
 //   }
 
 import { z } from "https://esm.sh/zod@3.23.8";
-import {
-  corsHeaders,
-  jsonResponse,
-  verifyRopRequest,
-} from "../_shared/rop-verify.ts";
-import { admin, auditEvent, getAppById, getAppSecret } from "../_shared/rop-lookups.ts";
+import { corsHeaders, jsonResponse, verifyRopRequest } from "../_shared/rop-verify.ts";
+import { admin, auditEvent, consumeNonce, getAppById } from "../_shared/rop-lookups.ts";
 
 const Body = z.object({
   external_id: z.string().min(1).max(200),
@@ -37,17 +33,14 @@ const Body = z.object({
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  if (req.method !== "POST")    return jsonResponse({ error: "method_not_allowed" }, 405);
+  if (req.method !== "POST") return jsonResponse({ error: "method_not_allowed" }, 405);
 
-  const verified = await verifyRopRequest(req, getAppById, getAppSecret);
+  const verified = await verifyRopRequest(req, getAppById, consumeNonce);
   if (!verified.ok) return jsonResponse({ error: verified.error }, verified.status);
 
   const parsed = Body.safeParse(verified.body);
   if (!parsed.success) {
-    return jsonResponse(
-      { error: "invalid_body", detail: parsed.error.flatten() },
-      400,
-    );
+    return jsonResponse({ error: "invalid_body", detail: parsed.error.flatten() }, 400);
   }
   const b = parsed.data;
 
@@ -82,18 +75,16 @@ Deno.serve(async (req) => {
 
   // On 'applied' upsert the tunable so the broadcast view sees it.
   if (b.status === "applied" && b.tunable) {
-    const { error: tunErr } = await admin
-      .from("hub_tunables")
-      .upsert(
-        {
-          app_id: verified.appId,
-          key: b.tunable.key,
-          value: b.tunable.value as never,
-          applied_from: sug.id,
-          applied_at: new Date().toISOString(),
-        },
-        { onConflict: "app_id,key" },
-      );
+    const { error: tunErr } = await admin.from("hub_tunables").upsert(
+      {
+        app_id: verified.appId,
+        key: b.tunable.key,
+        value: b.tunable.value as never,
+        applied_from: sug.id,
+        applied_at: new Date().toISOString(),
+      },
+      { onConflict: "app_id,key" },
+    );
     if (tunErr) {
       console.error("[rop-ingest-applied] tunable upsert failed", tunErr);
       // Don't fail the request — lifecycle change already persisted.

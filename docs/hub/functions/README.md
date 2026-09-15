@@ -10,7 +10,7 @@ project. They implement the HMAC-verified ingest surface defined in
 supabase/functions/
 ├── _shared/
 │   ├── rop-verify.ts        # HMAC verification + JSON response helpers
-│   └── rop-lookups.ts       # cached hub_apps lookup + per-app secret cache
+│   └── rop-lookups.ts       # live hub_apps lookup + atomic nonce consumption
 ├── rop-ingest-perf/index.ts        # batch perf events
 ├── rop-ingest-suggestion/index.ts  # one suggestion (idempotent)
 └── rop-ingest-applied/index.ts     # lifecycle update + tunable upsert
@@ -18,14 +18,13 @@ supabase/functions/
 
 ## Required Hub secrets
 
-| Name                              | Purpose                                    |
-| --------------------------------- | ------------------------------------------ |
-| `SUPABASE_URL`                    | auto-injected                              |
-| `SUPABASE_SERVICE_ROLE_KEY`       | auto-injected                              |
-| `ROP_SECRET_<APP_ID_HEX>`         | plain HMAC secret per registered app (set by `rop-admin-register-app`, one per app) |
+| Name                        | Purpose       |
+| --------------------------- | ------------- |
+| `SUPABASE_URL`              | auto-injected |
+| `SUPABASE_SERVICE_ROLE_KEY` | auto-injected |
 
-`<APP_ID_HEX>` is the app's `uuid` with hyphens stripped, upper-cased.
-Example: app id `5b3...c2f` → env var `ROP_SECRET_5B3...C2F`.
+Per-app raw signing keys are not stored in Hub environment variables. The Hub
+verifies with the derived `hmac_secret` persisted as `hub_apps.signing_key_hash`.
 
 ## Wire protocol (recap)
 
@@ -34,34 +33,32 @@ Headers on every signed request:
 - `x-rop-app-id`     — `hub_apps.id`
 - `x-rop-timestamp`  — unix seconds (±300 s tolerance)
 - `x-rop-nonce`      — random, ≤64 chars
-- `x-rop-signature`  — `hex(hmac_sha256(secret, "${ts}.${nonce}.${rawBody}"))`
+- `x-rop-signature`  — `hex(hmac_sha256(hmac_secret, "${ts}.${nonce}.${rawBody}"))`
 
-Body is JSON; size cap 1 MB; perf batches capped at 500 events.
+Body is JSON; size cap 1 MB; perf batches capped at 500 events. Every nonce is consumed atomically and may be used only once per app within the replay window.
 
-## What's deliberately NOT here
+## Portable reference coverage and remaining admission gates
 
-These functions cover **ingest only**. Still to build in the Hub:
+This tree now contains reference implementations for signed ingest, broadcast pulls,
+admin key registration/rotation, and the Hub cron paths. It remains reference material,
+not an authorization to copy the developer Hub control plane wholesale into RONSAS.
 
-1. `rop-pull-broadcasts` — outbound feed of cross-app + broadcast
-   suggestions, called by app publishers every ~10 min.
-2. `rop-admin-register-app` / `rop-admin-rotate-key` — mints a secret,
-   stores its sha256 in `hub_apps`, sets `ROP_SECRET_<APP_ID_HEX>`.
-3. `cron-cross-app-scan` — periodic detector that promotes patterns
-   across apps into `hub_suggestions` with `source='cross_app'`.
-4. `cron-measure-outcomes` — fills `hub_outcomes` after each applied
-   suggestion (24 h baseline / 24 h observed window).
-5. `rop-ai-suggest` — Lovable AI Gateway call (Gemini 2.5 Flash) for
-   AI-authored suggestions, admin-triggered.
+Before direct control-plane promotion, the remaining admission gates are:
+
+1. validate every outbound control destination against an explicit origin allowlist;
+2. constrain or redact persisted request/response delivery bodies;
+3. review the pull-config schema independently from outbound push support; and
+4. deploy the `hub_rop_nonces` / `consume_rop_nonce` schema before enabling nonce-required traffic.
 
 ## Manual test snippet
 
 ```bash
 APP_ID=...
-SECRET=...
+HMAC_SECRET=...
 TS=$(date +%s)
 NONCE=$(openssl rand -hex 8)
 BODY='{"events":[{"event_type":"render_job.completed","scope":"storyboard","metric":"duration_ms","value_num":12450,"tags":{"provider":"wan25"},"client_ts":"2026-06-21T01:23:45.000Z"}]}'
-SIG=$(printf "%s.%s.%s" "$TS" "$NONCE" "$BODY" | openssl dgst -sha256 -hmac "$SECRET" -hex | awk '{print $2}')
+SIG=$(printf "%s.%s.%s" "$TS" "$NONCE" "$BODY" | openssl dgst -sha256 -hmac "$HMAC_SECRET" -hex | awk '{print $2}')
 
 curl -X POST "$HUB_URL/functions/v1/rop-ingest-perf" \
   -H "Content-Type: application/json" \
