@@ -1,0 +1,122 @@
+name: Production release
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type RELEASE reson8.life
+        required: true
+        type: string
+      apply_migrations:
+        description: Apply pending Supabase migrations
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-reson8-life
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate release candidate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.3
+      - name: Require main and typed confirmation
+        env:
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          test "${GITHUB_REF}" = "refs/heads/main"
+          test "${CONFIRMATION}" = "RELEASE reson8.life"
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Verify, test, typecheck, and build
+        run: |
+          bun run prebuild
+          bun run test
+          bun x tsc --noEmit
+          bun run build
+      - name: Upload immutable worker bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-worker-${{ github.sha }}
+          path: .output/
+          include-hidden-files: true
+          retention-days: 30
+
+  deploy:
+    name: Migrate and deploy production
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: ${{ vars.PRODUCTION_BASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.3
+      - name: Download validated worker bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: production-worker-${{ github.sha }}
+          path: .output
+      - name: Require production configuration
+        env:
+          PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+          WORKER_NAME: ${{ vars.CLOUDFLARE_WORKER_NAME }}
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL }}
+          SUPABASE_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test "${PROJECT_REF}" = "qitzhxncffcszbpsddpm"
+          test -n "${WORKER_NAME}"
+          test "${BASE_URL}" = "https://reson8.life"
+          test -n "${SUPABASE_TOKEN}"
+          test -n "${DB_PASSWORD}"
+          test -n "${CF_TOKEN}"
+          test -n "${CF_ACCOUNT}"
+      - name: Apply pending Supabase migrations
+        if: inputs.apply_migrations
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Push linked database migrations
+        if: inputs.apply_migrations
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+        run: |
+          supabase link --project-ref "${PROJECT_REF}" --password "${SUPABASE_DB_PASSWORD}"
+          supabase db push --linked --include-all
+      - name: Install smoke-test dependencies and set worker name
+        env:
+          WORKER_NAME: ${{ vars.CLOUDFLARE_WORKER_NAME }}
+        run: |
+          bun install --frozen-lockfile
+          jq --arg name "${WORKER_NAME}" '.name = $name' .output/server/wrangler.json > /tmp/wrangler.json
+          mv /tmp/wrangler.json .output/server/wrangler.json
+      - name: Deploy Cloudflare Worker
+        working-directory: .output/server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bun x wrangler deploy --config wrangler.json
+      - name: Verify production health
+        env:
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL }}
+        run: |
+          curl --fail --show-error --location --retry 6 --retry-delay 10 "${BASE_URL}/"
+          BASE_URL="${BASE_URL}" bun run scripts/smoke-hub-routes.ts
