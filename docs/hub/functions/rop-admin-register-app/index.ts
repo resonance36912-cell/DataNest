@@ -31,6 +31,11 @@ import { z } from "https://esm.sh/zod@3.23.8";
 import { corsHeaders, jsonResponse } from "../_shared/rop-verify.ts";
 import { adminClient, requireHubAdmin } from "../_shared/rop-admin-auth.ts";
 import { auditEvent } from "../_shared/rop-lookups.ts";
+import {
+  OutboundOriginPolicyError,
+  requireAllowedOutboundOrigin,
+  ROP_OUTBOUND_ALLOWED_ORIGINS_ENV,
+} from "../_shared/rop-origin-policy.ts";
 
 const Body = z.object({
   slug: z
@@ -79,6 +84,25 @@ Deno.serve(async (req) => {
   }
   const b = parsed.data;
 
+  let normalizedOrigin: string | null = null;
+  try {
+    normalizedOrigin = b.origin_url
+      ? requireAllowedOutboundOrigin(
+          b.origin_url,
+          Deno.env.get(ROP_OUTBOUND_ALLOWED_ORIGINS_ENV),
+        )
+      : null;
+  } catch (error) {
+    const status =
+      error instanceof OutboundOriginPolicyError && error.code === "allowlist_unconfigured"
+        ? 503
+        : 400;
+    return jsonResponse({
+      error: "outbound_origin_rejected",
+      detail: error instanceof Error ? error.message : "Outbound origin rejected.",
+    }, status);
+  }
+
   const admin = adminClient();
   const secret = randomSecretHex();
   const hash = await sha256Hex(secret);
@@ -88,7 +112,7 @@ Deno.serve(async (req) => {
     .insert({
       slug: b.slug,
       name: b.name,
-      origin_url: b.origin_url ?? null,
+      origin_url: normalizedOrigin,
       workspace_id: b.workspace_id ?? null,
       signing_key_hash: hash,
       signing_key_prefix: secret.slice(0, 8),

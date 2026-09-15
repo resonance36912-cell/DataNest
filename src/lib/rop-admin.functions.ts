@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireAllowedOutboundOrigin, ROP_OUTBOUND_ALLOWED_ORIGINS_ENV } from "@/lib/rop/origin-policy";
 
 // Middleware supplies the authenticated Supabase client; its generated generic type is not exported here.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,13 +45,19 @@ export const registerHubApp = createServerFn({ method: "POST" })
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { mintSigningKey } = await import("@/lib/rop/hmac.server");
+    const normalizedOrigin = data.origin_url
+      ? requireAllowedOutboundOrigin(
+          data.origin_url,
+          process.env[ROP_OUTBOUND_ALLOWED_ORIGINS_ENV],
+        )
+      : null;
     const minted = mintSigningKey();
     const { data: row, error } = await supabaseAdmin
       .from("hub_apps")
       .insert({
         slug: data.slug,
         name: data.name,
-        origin_url: data.origin_url || null,
+        origin_url: normalizedOrigin,
         signing_key_hash: minted.hash,
         signing_key_prefix: minted.prefix,
         created_by: context.userId,
