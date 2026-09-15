@@ -9,6 +9,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import type { AppLookup, HubAppRow, NonceConsumer } from "./rop-verify.ts";
+import { sanitizePersistenceMetadata } from "./rop-delivery-persistence.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -55,6 +56,6 @@ export async function auditEvent(opts: {
     event_type: opts.eventType,
     entity_type: opts.entityType ?? null,
     entity_id: opts.entityId ?? null,
-    payload: opts.payload ?? {},
+    payload: sanitizePersistenceMetadata(opts.payload ?? {}),
   });
 }

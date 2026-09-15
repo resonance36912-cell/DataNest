@@ -1,6 +1,7 @@
 // Server-only ROP signature verification helpers.
 import { createHmac, timingSafeEqual, createHash, randomBytes } from "crypto";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { sanitizePersistenceMetadata } from "@/lib/rop/delivery-persistence";
 
 export const ROP_SKEW_SECONDS = 300;
 export const ROP_NONCE_TTL_SECONDS = ROP_SKEW_SECONDS * 2;
@@ -122,7 +123,7 @@ export async function logAudit(
       event_type: eventType,
       entity_type: opts.entityType ?? null,
       entity_id: opts.entityId ?? null,
-      payload: payload as never,
+      payload: sanitizePersistenceMetadata(payload) as never,
       actor_user_id: opts.actorUserId ?? null,
     });
   } catch (e) {
