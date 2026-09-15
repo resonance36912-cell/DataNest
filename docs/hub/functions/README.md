@@ -30,10 +30,10 @@ verifies with the derived `hmac_secret` persisted as `hub_apps.signing_key_hash`
 
 Headers on every signed request:
 
-- `x-rop-app-id`     — `hub_apps.id`
-- `x-rop-timestamp`  — unix seconds (±300 s tolerance)
-- `x-rop-nonce`      — random, ≤64 chars
-- `x-rop-signature`  — `hex(hmac_sha256(hmac_secret, "${ts}.${nonce}.${rawBody}"))`
+- `x-rop-app-id` — `hub_apps.id`
+- `x-rop-timestamp` — unix seconds (±300 s tolerance)
+- `x-rop-nonce` — random, ≤64 chars
+- `x-rop-signature` — `hex(hmac_sha256(hmac_secret, "${ts}.${nonce}.${rawBody}"))`
 
 Body is JSON; size cap 1 MB; perf batches capped at 500 events. Every nonce is consumed atomically and may be used only once per app within the replay window.
 
@@ -43,12 +43,12 @@ This tree now contains reference implementations for signed ingest, broadcast pu
 admin key registration/rotation, and the Hub cron paths. It remains reference material,
 not an authorization to copy the developer Hub control plane wholesale into RONSAS.
 
-Before direct control-plane promotion, the remaining admission gates are:
+Admission gate status:
 
-1. validate every outbound control destination against an explicit origin allowlist;
-2. constrain or redact persisted request/response delivery bodies;
-3. review the pull-config schema independently from outbound push support; and
-4. deploy the `hub_rop_nonces` / `consume_rop_nonce` schema before enabling nonce-required traffic.
+1. **Complete:** every supplied outbound control destination is validated against the explicit `ROP_OUTBOUND_ALLOWED_ORIGINS` exact-origin allowlist.
+2. **Complete:** ROP delivery persistence is hash/byte-count only for bodies, and audit metadata is recursively redacted/bounded before persistence.
+3. **Pending:** review the pull-config schema independently from outbound push support.
+4. **Environment verification required:** the `hub_rop_nonces` / `consume_rop_nonce` migration exists in RONSAS; verify it is deployed in each target environment before enabling nonce-required traffic there.
 
 ## Manual test snippet
 
