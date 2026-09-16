@@ -6,6 +6,7 @@ DECLARE
   fn text;
   rls_enabled boolean;
   migration_applied boolean;
+  hardening_applied boolean;
 BEGIN
   SELECT EXISTS (
     SELECT 1 FROM supabase_migrations.schema_migrations
@@ -13,6 +14,14 @@ BEGIN
   ) INTO migration_applied;
   IF NOT migration_applied THEN
     RAISE EXCEPTION 'governance migration is not recorded';
+  END IF;
+
+  SELECT EXISTS (
+    SELECT 1 FROM supabase_migrations.schema_migrations
+    WHERE version = '20260916114000'
+  ) INTO hardening_applied;
+  IF NOT hardening_applied THEN
+    RAISE EXCEPTION 'governance grant hardening migration is not recorded';
   END IF;
 
   FOREACH t IN ARRAY ARRAY[
@@ -34,8 +43,20 @@ BEGIN
     END IF;
     IF has_table_privilege('authenticated', 'public.' || t, 'INSERT')
        OR has_table_privilege('authenticated', 'public.' || t, 'UPDATE')
-       OR has_table_privilege('authenticated', 'public.' || t, 'DELETE') THEN
-      RAISE EXCEPTION 'authenticated role has forbidden mutation privilege on %', t;
+       OR has_table_privilege('authenticated', 'public.' || t, 'DELETE')
+       OR has_table_privilege('authenticated', 'public.' || t, 'TRUNCATE')
+       OR has_table_privilege('authenticated', 'public.' || t, 'REFERENCES')
+       OR has_table_privilege('authenticated', 'public.' || t, 'TRIGGER') THEN
+      RAISE EXCEPTION 'authenticated role has forbidden non-SELECT privilege on %', t;
+    END IF;
+    IF has_table_privilege('anon', 'public.' || t, 'SELECT')
+       OR has_table_privilege('anon', 'public.' || t, 'INSERT')
+       OR has_table_privilege('anon', 'public.' || t, 'UPDATE')
+       OR has_table_privilege('anon', 'public.' || t, 'DELETE')
+       OR has_table_privilege('anon', 'public.' || t, 'TRUNCATE')
+       OR has_table_privilege('anon', 'public.' || t, 'REFERENCES')
+       OR has_table_privilege('anon', 'public.' || t, 'TRIGGER') THEN
+      RAISE EXCEPTION 'anon role has governance table privilege on %', t;
     END IF;
     IF NOT EXISTS (
       SELECT 1 FROM pg_policies p
