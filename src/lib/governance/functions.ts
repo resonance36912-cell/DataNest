@@ -27,6 +27,18 @@ async function assertAdmin(context: { supabase: any; userId: string }) {
   if (error || !data) throw new Error("Forbidden");
 }
 
+export const listGovernanceParticipants = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async () => {
+    const db = await governanceDb();
+    const { data, error } = await db
+      .from("governance_participants")
+      .select("id,kind,slug,display_name,role_label,status,metadata,created_at")
+      .order("created_at", { ascending: true })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    return { participants: data ?? [] };
+  });
 export const listGovernanceProposals = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async () => {
