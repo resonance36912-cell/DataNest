@@ -42,11 +42,18 @@ function Invoke-GitText {
         [string[]]$Arguments
     )
 
-    $text = & $gitCommand.Source -C $Repository @Arguments 2>$null
-    if ($LASTEXITCODE -ne 0) {
-        return $null
+    $previousErrorActionPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = 'Continue'
+        $text = & $gitCommand.Source -C $Repository @Arguments 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            return $null
+        }
+        return (($text | Out-String).Trim())
     }
-    return (($text | Out-String).Trim())
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
 }
 
 $pathChecks = foreach ($entry in $topology.paths) {
