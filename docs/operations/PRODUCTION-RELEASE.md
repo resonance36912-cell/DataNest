@@ -1,54 +1,47 @@
-# Production release runbook
+# Production release
 
-Production releases are manual and run only from `main` through
-`.github/workflows/production-release.yml`.
+## Current production architecture
 
-## One-time GitHub configuration
+The current `reson8.life` production path is the sovereign Ealiophin stack:
 
-Create the `production` environment and require an approving reviewer.
-Prevent administrators from bypassing the protection rule where supported.
+`Cloudflare named tunnel -> Caddy -> 127.0.0.1:4173 -> ronsas-hub-canonical`
 
-Environment variables:
+The Hub process serves `C:\Resonance\Sources\ronsas-hub-canonical\.output-local\server\index.mjs` and is owned by the RONSAS ecosystem supervisor. The GitHub workflow `.github/workflows/production-release.yml` describes a Cloudflare Worker deployment path that is **not the current production hosting path**. Keep that workflow fail-closed; do not configure `CLOUDFLARE_WORKER_NAME` or Worker credentials unless a separately reviewed hosting migration intentionally replaces the sovereign Ealiophin path.
 
-- `PRODUCTION_BASE_URL=https://reson8.life`
-- `SUPABASE_PROJECT_REF=qitzhxncffcszbpsddpm`
-- `CLOUDFLARE_WORKER_NAME=<confirmed production worker name>`
+## Database release
 
-Environment secrets:
+Production Supabase project: `qitzhxncffcszbpsddpm`.
 
-- `SUPABASE_ACCESS_TOKEN`
-- `SUPABASE_DB_PASSWORD`
-- `CLOUDFLARE_API_TOKEN`
-- `CLOUDFLARE_ACCOUNT_ID`
+1. Confirm the project is active and the repository is linked to the exact project ref.
+2. Run `supabase migration list --linked` and `supabase db push --linked --include-all --dry-run`.
+3. Review the exact pending migration set before applying it.
+4. Apply only reviewed migrations with `supabase db push --linked --include-all`.
+5. Re-run the migration ledger and verify RLS, grants, policies, and privileged RPC boundaries with read-only catalog queries.
 
-Use least-privilege tokens restricted to the named production resources.
+Database rollback is forward-only. Never delete an applied migration or run an unreviewed destructive reversal. Prepare and review a corrective migration instead.
 
-## Release
+## Hub release
 
-1. Merge a reviewed pull request into `main` with all required checks green.
-2. Open Actions, select **Production release**, and choose **Run workflow** on `main`.
-3. Enter the exact confirmation `RELEASE reson8.life`.
-4. Keep **Apply pending Supabase migrations** enabled when migrations are part of the release.
-5. Approve the protected `production` environment only after reviewing the commit SHA.
-6. Confirm the migration, Worker deployment, and production smoke test succeed.
+1. Start from a clean, reviewed production-Hub commit on `ronsas/ealiophin-production`.
+2. Build in an isolated worktree at the exact reviewed commit. Reuse the existing production `.env.local` only by filesystem link; never print or copy its contents into logs or Git.
+3. Run the release gates in the isolated tree:
+   - `bun run prebuild`
+   - `bun test`
+   - `bun run typecheck`
+   - `bun run build:local`
+4. Stage the resulting `.output-local` beside the live bundle and compare a deterministic SHA-256 tree hash with the validated build.
+5. Read the RONSAS cluster ownership record and replace only the supervisor-owned Hub listener. Never stop an unrecognized process.
+6. Preserve the previous `.output-local` directory under `runtime\production-edge\backups` before promoting the validated bundle.
+7. Run `runtime\production-edge\START-RONSAS-CANONICAL.ps1` to restore the supervised ecosystem, validate/reload Caddy, and ensure the named Cloudflare tunnel is running.
+8. Verify both `http://127.0.0.1:4173/` and `https://reson8.life/`, then run `BASE_URL=https://reson8.life bun run scripts/smoke-hub-routes.ts`.
+9. Record the reviewed commit, bundle hash, rollback path, process identity, migration ledger, and smoke-test result in a dated operations ledger entry.
 
-The workflow serializes releases, validates the candidate before accessing
-production, checks the exact Supabase project and public URL, and uploads the
-validated build as an immutable artifact.
+## Application rollback
 
-## Rollback
+1. Stop only the Hub PID recorded as RONSAS-owned in the cluster ownership/state file.
+2. Restore the preserved pre-release `.output-local` bundle.
+3. Restart through `START-RONSAS-CANONICAL.ps1`.
+4. Verify local `:4173`, the public canonical URL, and the production smoke suite.
+5. Record the failed release and restored bundle hashes in the incident/release record.
 
-Application rollback:
-
-1. In Cloudflare Workers, select the confirmed production Worker.
-2. Roll back to the version that preceded the failed GitHub workflow run.
-3. Re-run the production smoke test against `https://reson8.life`.
-4. Record the failed and restored version IDs in the incident record.
-
-Database rollback is forward-only. Do not delete an applied migration or run an
-unreviewed destructive reversal. Prepare a new corrective migration, review it
-through a pull request, back up affected data, and run the release workflow again.
-
-If a migration succeeds but application deployment fails, restore the previous
-Worker version only when it remains compatible with the migrated schema.
-Otherwise, deploy a reviewed compatibility fix.
+If a database migration succeeds but the Hub release fails, restore the previous Hub bundle only when it remains schema-compatible. Otherwise promote a reviewed compatibility fix.
