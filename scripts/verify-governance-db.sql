@@ -3,7 +3,7 @@ BEGIN;
 DO $$
 DECLARE
   t text;
-  fn text;
+  function_signature text;
   rls_enabled boolean;
   migration_applied boolean;
   hardening_applied boolean;
@@ -74,7 +74,7 @@ BEGIN
     END IF;
   END LOOP;
 
-  FOREACH fn IN ARRAY ARRAY[
+  FOREACH function_signature IN ARRAY ARRAY[
     'public.governance_create_proposal(uuid,text,text,text,jsonb)',
     'public.governance_submit_proposal(uuid,uuid,integer)',
     'public.governance_record_decision(uuid,uuid,integer,public.governance_decision_outcome,text)',
@@ -82,14 +82,14 @@ BEGIN
     'public.governance_add_human_review(uuid,uuid,public.governance_review_stance,text,double precision,uuid[])',
     'public.governance_register_agent(uuid,public.governance_participant_kind,text,text,text,jsonb)'
   ] LOOP
-    IF to_regprocedure(fn) IS NULL THEN
-      RAISE EXCEPTION 'missing governance RPC: %', fn;
+    IF to_regprocedure(function_signature) IS NULL THEN
+      RAISE EXCEPTION 'missing governance RPC: %', function_signature;
     END IF;
-    IF has_function_privilege('authenticated', fn, 'EXECUTE') THEN
-      RAISE EXCEPTION 'authenticated can execute governance RPC: %', fn;
+    IF has_function_privilege('authenticated', function_signature, 'EXECUTE') THEN
+      RAISE EXCEPTION 'authenticated can execute governance RPC: %', function_signature;
     END IF;
-    IF NOT has_function_privilege('service_role', fn, 'EXECUTE') THEN
-      RAISE EXCEPTION 'service_role cannot execute governance RPC: %', fn;
+    IF NOT has_function_privilege('service_role', function_signature, 'EXECUTE') THEN
+      RAISE EXCEPTION 'service_role cannot execute governance RPC: %', function_signature;
     END IF;
   END LOOP;
 END
