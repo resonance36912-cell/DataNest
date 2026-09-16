@@ -34,7 +34,7 @@
     {
       "id": "hub-production",
       "role": "local-production-source",
-      "local_path": "%SystemDrive%\\Resonance\\Sources\\resonance-hub-sanitized",
+      "local_path": "%SystemDrive%\\Resonance\\Sources\\ronsas-hub-canonical",
       "required": true
     },
     {
