@@ -4,7 +4,7 @@ This record captures the verified production publication of the authenticated Re
 
 ## Authorities
 
-- RONSAS control `main`: `ea22f9e9947a9dc091a5ed5a51befcbddf492b77`
+- RONSAS control `main` at stabilization verification: `1402b3a277e491d6cc25a9032abe338a649d9af6`
 - Production Hub branch `ronsas/ealiophin-production`: `919338f2b7bd937ed72954aeadfe532b260487e4`
 - Production URL: `https://reson8.life/governance/workspace`
 - Production database project ref: `qitzhxncffcszbpsddpm`
@@ -55,6 +55,28 @@ After promotion:
 - production route/sitemap smoke suite: `13/13` passed.
 
 The RONSAS sovereignty guard also completed successfully after release. An unauthenticated initial HTML request exposed no proposal, review, or decision data markers; the workspace is client-rendered, so this HTML observation is not used as the sole authentication proof. Authentication and mutation authority remain enforced by the tested server boundaries and the verified production database grants/RLS described above.
+
+## Sovereign backend stabilization
+
+Post-release verification found that the stateful sovereign backend was healthy but the running gateway container still used the older `resonance-service-gateway:0.9` image. The compose runtime already required `resonance-service-gateway:0.10`, and the validated local `0.10` image was present. Only the stateless gateway container was recreated; Postgres, auth, storage, and their volumes were left untouched.
+
+After recreation, the live gateway reported version `0.10.0`, all nine governance procedures were allowlisted, and the production Hub's own `callSovereignGovernanceProcedure` helper successfully returned empty proposal and participant collections through the keyed loopback gateway. Backend health reported Postgres, auth, storage, and gateway reachable with `network_scope=loopback_only`. The public workspace remained HTTP `200`, the sovereignty guard remained green, and the public route/sitemap smoke suite remained `13/13`.
+
+Gateway image evidence at verification time:
+
+`localhost/resonance-service-gateway:0.10`
+
+Image ID:
+
+`44a58cf94869b313f4cf553b2f349efa21de5a295cce51b142ea4c81533613ef`
+
+A second non-secret stabilization receipt was written at:
+
+`%USERPROFILE%\Resonance\OpenNova\runtime\production-edge\RONSAS-GOVERNANCE-PRODUCTION-STABILIZATION-20260916.json`
+
+Receipt SHA-256:
+
+`ee5e4e8fa891299fe7f0180fcaa452b7d78d3cd285fb871b8908b946425c7dac`
 
 ## Local receipt
 
