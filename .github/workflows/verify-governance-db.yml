@@ -31,7 +31,10 @@ jobs:
         run: supabase start
 
       - name: Verify governance schema, RLS, RPCs, and transaction flow
-        run: supabase db query --local --file scripts/verify-governance-db.sql
+        run: |
+          DB_CONTAINER="$(docker ps --filter 'name=supabase_db_' --format '{{.ID}}' | head -n 1)"
+          test -n "$DB_CONTAINER"
+          docker exec -i "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres < scripts/verify-governance-db.sql
 
       - name: Stop local Supabase
         if: always()
