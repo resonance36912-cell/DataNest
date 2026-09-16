@@ -6,7 +6,10 @@ const root = process.cwd();
 const runtimeRoute = join(root, "src/routes/api/public/hub-control/pull-config.ts");
 const portableFunction = join(root, "docs/hub/functions/rop-pull-config/index.ts");
 const routeTree = readFileSync(join(root, "src/routeTree.gen.ts"), "utf8");
-const review = readFileSync(join(root, "docs/architecture/ROP-PULL-CONFIG-REVIEW-20260916.md"), "utf8");
+const review = readFileSync(
+  join(root, "docs/architecture/ROP-PULL-CONFIG-REVIEW-20260916.md"),
+  "utf8",
+);
 
 describe("ROP pull-config admission boundary", () => {
   test("legacy runtime route remains absent", () => {
@@ -20,7 +23,9 @@ describe("ROP pull-config admission boundary", () => {
 
   test("review keeps pull authority separate from outbound control authority", () => {
     expect(review).toContain("Pull authority is read-only and independent");
-    expect(review).toContain("must not imply outbound push, probe, signing, delivery, or execution authority");
+    expect(review).toContain(
+      "must not imply outbound push, probe, signing, delivery, or execution authority",
+    );
     expect(review).toContain("No arbitrary outbound fetch");
   });
 
