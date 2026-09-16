@@ -3,6 +3,7 @@ BEGIN;
 DO $$
 DECLARE
   t text;
+  fn text;
   rls_enabled boolean;
   migration_applied boolean;
 BEGIN
