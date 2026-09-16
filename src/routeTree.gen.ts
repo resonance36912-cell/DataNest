@@ -25,6 +25,7 @@ import { Route as ToolsPrStatusRouteImport } from './routes/tools.pr-status'
 import { Route as ToolsIssueTriageRouteImport } from './routes/tools.issue-triage'
 import { Route as SyncVisionPricingRouteImport } from './routes/sync-vision.pricing'
 import { Route as LegalGovernanceRouteImport } from './routes/legal.governance'
+import { Route as GovernanceWorkspaceRouteImport } from './routes/governance_.workspace'
 import { Route as EpublisherPricingRouteImport } from './routes/epublisher.pricing'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CreativeStudioPricingRouteImport } from './routes/creative-studio.pricing'
@@ -153,6 +154,11 @@ const SyncVisionPricingRoute = SyncVisionPricingRouteImport.update({
 const LegalGovernanceRoute = LegalGovernanceRouteImport.update({
   id: '/legal/governance',
   path: '/legal/governance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GovernanceWorkspaceRoute = GovernanceWorkspaceRouteImport.update({
+  id: '/governance_/workspace',
+  path: '/governance/workspace',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EpublisherPricingRoute = EpublisherPricingRouteImport.update({
@@ -454,6 +460,7 @@ export interface FileRoutesByFullPath {
   '/creative-studio/pricing': typeof CreativeStudioPricingRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/epublisher/pricing': typeof EpublisherPricingRoute
+  '/governance/workspace': typeof GovernanceWorkspaceRoute
   '/legal/governance': typeof LegalGovernanceRoute
   '/sync-vision/pricing': typeof SyncVisionPricingRoute
   '/tools/issue-triage': typeof ToolsIssueTriageRoute
@@ -521,6 +528,7 @@ export interface FileRoutesByTo {
   '/creative-studio/pricing': typeof CreativeStudioPricingRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/epublisher/pricing': typeof EpublisherPricingRoute
+  '/governance/workspace': typeof GovernanceWorkspaceRoute
   '/legal/governance': typeof LegalGovernanceRoute
   '/sync-vision/pricing': typeof SyncVisionPricingRoute
   '/tools/issue-triage': typeof ToolsIssueTriageRoute
@@ -589,6 +597,7 @@ export interface FileRoutesById {
   '/creative-studio/pricing': typeof CreativeStudioPricingRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/epublisher/pricing': typeof EpublisherPricingRoute
+  '/governance_/workspace': typeof GovernanceWorkspaceRoute
   '/legal/governance': typeof LegalGovernanceRoute
   '/sync-vision/pricing': typeof SyncVisionPricingRoute
   '/tools/issue-triage': typeof ToolsIssueTriageRoute
@@ -658,6 +667,7 @@ export interface FileRouteTypes {
     | '/creative-studio/pricing'
     | '/email/unsubscribe'
     | '/epublisher/pricing'
+    | '/governance/workspace'
     | '/legal/governance'
     | '/sync-vision/pricing'
     | '/tools/issue-triage'
@@ -725,6 +735,7 @@ export interface FileRouteTypes {
     | '/creative-studio/pricing'
     | '/email/unsubscribe'
     | '/epublisher/pricing'
+    | '/governance/workspace'
     | '/legal/governance'
     | '/sync-vision/pricing'
     | '/tools/issue-triage'
@@ -792,6 +803,7 @@ export interface FileRouteTypes {
     | '/creative-studio/pricing'
     | '/email/unsubscribe'
     | '/epublisher/pricing'
+    | '/governance_/workspace'
     | '/legal/governance'
     | '/sync-vision/pricing'
     | '/tools/issue-triage'
@@ -858,6 +870,7 @@ export interface RootRouteChildren {
   CreativeStudioPricingRoute: typeof CreativeStudioPricingRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   EpublisherPricingRoute: typeof EpublisherPricingRoute
+  GovernanceWorkspaceRoute: typeof GovernanceWorkspaceRoute
   LegalGovernanceRoute: typeof LegalGovernanceRoute
   SyncVisionPricingRoute: typeof SyncVisionPricingRoute
   ToolsIssueTriageRoute: typeof ToolsIssueTriageRoute
@@ -1001,6 +1014,13 @@ declare module '@tanstack/react-router' {
       path: '/legal/governance'
       fullPath: '/legal/governance'
       preLoaderRoute: typeof LegalGovernanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/governance_/workspace': {
+      id: '/governance_/workspace'
+      path: '/governance/workspace'
+      fullPath: '/governance/workspace'
+      preLoaderRoute: typeof GovernanceWorkspaceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/epublisher/pricing': {
@@ -1411,6 +1431,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreativeStudioPricingRoute: CreativeStudioPricingRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   EpublisherPricingRoute: EpublisherPricingRoute,
+  GovernanceWorkspaceRoute: GovernanceWorkspaceRoute,
   LegalGovernanceRoute: LegalGovernanceRoute,
   SyncVisionPricingRoute: SyncVisionPricingRoute,
   ToolsIssueTriageRoute: ToolsIssueTriageRoute,
