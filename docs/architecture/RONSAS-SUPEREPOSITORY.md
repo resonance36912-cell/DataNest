@@ -2,7 +2,7 @@
 
 ## Superepository architecture and workflow
 
-Snapshot date: 2026-09-14  
+Snapshot date: 2026-09-16
 Host: Ealiophin  
 Pattern: manifest-driven superepository (meta-repository), not a Dropbox-synced monorepo
 
@@ -12,16 +12,19 @@ Use `C:\Users\Ashley\Documents\GitHub\rons-sovereign-codebase` as the RONSAS sup
 
 Keep the live source, runtime, models, logs, secrets, release installations, and Dropbox audit vault at their existing paths. The superepository maps those paths through `.ronsas\topology.local.json`; it does not duplicate or junction them into Git. This preserves all current launch paths and prevents Git and Dropbox from competing over one working tree.
 
-The present system does not yet have one reconciled Git source of truth. Three Hub lines exist and must be merged deliberately:
+Hub authority is intentionally split by role. These trees are preserved independently and must be reconciled deliberately rather than copied over one another:
 
 | Line | Path | Observed state | Authority now |
 | --- | --- | --- | --- |
-| Consolidated RONS candidate | `C:\Users\Ashley\Documents\GitHub\rons-sovereign-codebase` | `main` at `db2817e`; clean before this mapping; no remote | Target superepository/control root |
-| GitHub-linked developer Hub | `C:\Users\Ashley\Documents\GitHub\resonance-hub` | `main` at `a8c8a6d`; 3 commits ahead of cached `origin/main`; 11 working-tree changes | Developer history; upstream currently inaccessible |
-| Production Hub source | `C:\Resonance\Sources\resonance-hub-sanitized` | `rons/ealiophin-production-20260907` at `a09723b`; 25 working-tree changes; no remote | Local production source |
-| Runtime Hub stage | `C:\Users\Ashley\Resonance\OpenNova\runtime\hub-sovereign-stage` | Same base commit `a09723b`; 34 working-tree changes; origin is the local production source | Runtime staging only |
+| RONSAS control root | `C:\Users\Ashley\Documents\GitHub\rons-sovereign-codebase` | `main` promoted through PR and CI | Superepository/control authority |
+| GitHub-linked developer Hub | `C:\Users\Ashley\Documents\GitHub\resonance-hub` | Independent development history | Semantic reconciliation source; not production authority |
+| Canonical production Hub | `C:\Resonance\Sources\ronsas-hub-canonical` | `rons/ealiophin-production-20260907` at `36a1dc6`; tag `ronsas-public-2026-09-16` | Current production source |
+| Retired production Hub evidence | `C:\Resonance\Quarantine\resonance-hub-sanitized-retired-20260916-0950` | Base `a09723b`; preserved working-tree drift | Quarantine evidence only; never overwrite |
+| Runtime Hub stage | `C:\Users\Ashley\Resonance\OpenNova\runtime\hub-sovereign-stage` | Independent working-tree drift on the retired base | Runtime staging only; origin must follow the canonical production source |
 
 Do not copy one of these trees over another. Reconciliation must be commit- and diff-based.
+
+Since the 2026-09-16 cutover, the canonical production Hub source is `C:\Resonance\Sources\ronsas-hub-canonical` at `36a1dc6`, tagged `ronsas-public-2026-09-16`. The retired pre-cutover tree remains preserved in quarantine at its original `a09723b` base with local drift intact.
 
 ## Authority model
 
@@ -44,7 +47,7 @@ Do not copy one of these trees over another. Reconciliation must be commit- and 
 Authority is separated by concern:
 
 - Git/GitHub owns source history, review, CI, tags, and release metadata.
-- `C:\Resonance\Sources\resonance-hub-sanitized` plus `C:\Users\Ashley\Resonance\OpenNova` own the currently running Ealiophin installation.
+- `C:\Resonance\Sources\ronsas-hub-canonical` plus `C:\Users\Ashley\Resonance\OpenNova` own the currently running Ealiophin installation.
 - `C:\Users\Ashley\AppData\Local\Resonance\RONS-ControlCenter` owns machine-local orchestration.
 - Dropbox owns immutable audit evidence and distributable release bundles, not editable source history.
 - Runtime data, caches, models, logs, credentials, `.env` files, private keys, and databases remain outside Git and outside audit packages unless explicitly sanitized.
@@ -67,7 +70,7 @@ C:\Users\Ashley\Documents\GitHub\rons-sovereign-codebase\    <- RONSAS control r
 `-- RONSAS-WORKSPACE.md              <- operator entry point
 
 C:\Resonance\
-|-- Sources\resonance-hub-sanitized\ <- production Hub source
+|-- Sources\ronsas-hub-canonical\      <- canonical production Hub source
 |-- OpenNova\                         <- legacy v1.5.3 tree; non-canonical
 `-- Sovereign Resonance AppDev\       <- incomplete/legacy Git shell
 
@@ -94,7 +97,7 @@ C:\Users\Ashley\Dropbox\RONS-Audit\RONS-AI-AUDIT-REPOSITORY\ <- Dropbox local mi
 
 | Component | Local source/runtime path | Endpoint | Evidence path inside blueprint 17 |
 | --- | --- | --- | --- |
-| RONS Hub | `C:\Resonance\Sources\resonance-hub-sanitized` | `http://127.0.0.1:4173/` | `04-SOURCE-BUNDLES/RONS-Hub-SOURCE-v1.0.0.zip` |
+| RONS Hub | `C:\Resonance\Sources\ronsas-hub-canonical` | `http://127.0.0.1:4173/` | `04-SOURCE-BUNDLES/RONS-Hub-SOURCE-v1.0.0.zip` |
 | ePublisher | `C:\Users\Ashley\Resonance\OpenNova\apps\epublisher-sovereign-local-v0.1` | `http://127.0.0.1:3101/` | `04-SOURCE-BUNDLES/ePublisher-SOURCE-v1.0.0.zip` |
 | Creative Studio | `C:\Users\Ashley\Resonance\OpenNova\apps\creative-studio-sovereign-local-v0.1` | `http://127.0.0.1:3201/studio` | `04-SOURCE-BUNDLES/Creative-Studio-SOURCE-v1.0.0.zip` |
 | SyncVision | `C:\Users\Ashley\Resonance\OpenNova\apps\sync-vision-sovereign-local-v0.1` | `http://127.0.0.1:3301/` | `04-SOURCE-BUNDLES/SyncVision-SOURCE-v1.0.0.zip` |
