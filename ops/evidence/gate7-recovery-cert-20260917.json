@@ -1,0 +1,47 @@
+{
+  "schema": "ronsas.gate7.recovery-cert.v1",
+  "capturedAtUtc": "2026-09-17T12:25:49.099947+00:00",
+  "scope": "Checkpoint-defined Gate 7 cold-boot recovery certification",
+  "result": "PASS",
+  "authority": {
+    "controlHeadAtObservation": "c52739750babd747c84f40998eb3501762c963e5",
+    "device": "Ealiophin"
+  },
+  "coldBoot": {
+    "bootAtUtc": "2026-09-17T12:12:22Z",
+    "bootstrapStartedLocal": "2026-09-17T14:12:50+02:00",
+    "identity": "EALIOPHIN$",
+    "governedRecoveryPassedLocal": "2026-09-17T14:14:27+02:00",
+    "acceptanceSettledProbe": 5,
+    "publicEdgePassedLocal": "2026-09-17T14:14:42+02:00",
+    "bootstrapResult": "passed"
+  },
+  "postBootValidation": {
+    "canonicalAcceptance": "13/13 pass",
+    "canonicalAcceptanceExit": 0,
+    "publicEndpointVerifierExit": 0
+  },
+  "promotedLiveHardening": {
+    "recoveryScriptSha256": "6c5a397fbe1fc269d48d33c31f0103848e48e6cff55aed7322b351d9d21331cd",
+    "bootstrapScriptSha256": "14f345fe6ea734fbac13cb03aa5192265ba87fce459e04a6a3be9366702595c5",
+    "clusterStartupScriptSha256": "59b6bce055e33103f3a636ef0874e3dae8aa57b7bc750aaf86fd3413f183d638",
+    "installerScriptSha256": "e7fe6e5682f1e5c6ff96c1462ebe60823a22e3f2e5f44a8f0e324fdb782994f4"
+  },
+  "startupPersistence": {
+    "systemTaskReinstalledLocal": "2026-09-17T14:17:26+02:00",
+    "installerExit": 0,
+    "elevatedInstallerVerifiedRegistration": true,
+    "nonElevatedEnumeration": "not_visible_after_registration"
+  },
+  "evidenceSources": [
+    "RONS-ControlCenter/logs/boot-public.log",
+    "RONS-ControlCenter/logs/recovery.log",
+    "RONS-ControlCenter/logs/boot-task-install.log",
+    "runtime/FINAL-RONS-ACCEPTANCE.ps1",
+    "RONS-ControlCenter/RONS-Verify-Public-Endpoints.ps1"
+  ],
+  "limitations": [
+    "The SYSTEM-owned bootstrap task is not enumerable from the current non-elevated remote shell after re-registration; elevated installer logs record successful registration and lastResult=0.",
+    "This receipt certifies Ealiophin cold-boot recovery behavior only; downstream Gate 8 scope remains separate."
+  ]
+}

@@ -145,9 +145,12 @@ function Start-LaunchBroker {
 $services = @()
 $foundryUrl = 'http://127.0.0.1:8787/v1/apps'
 if (-not (Test-Http $foundryUrl)) {
-    $startFoundry = Join-Path $AppDev 'scripts\platform\start_or_repair_sovereign_appdev.ps1'
-    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $startFoundry | Out-Host
-    Wait-Http 'Foundry' $foundryUrl 45 | Out-Null
+    $startFoundry = Join-Path $AppDev 'scripts\start-open-nova-offline.ps1'
+    if (-not (Test-Path -LiteralPath $startFoundry -PathType Leaf)) { throw "Foundry offline launcher missing: $startFoundry" }
+    $foundryOut = Join-Path $LogRoot 'foundry.out.log'
+    $foundryErr = Join-Path $LogRoot 'foundry.err.log'
+    Start-Process -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',$startFoundry) -WorkingDirectory $AppDev -RedirectStandardOutput $foundryOut -RedirectStandardError $foundryErr -WindowStyle Hidden | Out-Null
+    Wait-Http 'Foundry' $foundryUrl 60 | Out-Null
 }
 $foundryPid = Get-ListenerPid 8787
 $services += [pscustomobject]@{name='foundry';port=8787;url=$foundryUrl;pid=$foundryPid;owned=$false;root=$AppDev}
