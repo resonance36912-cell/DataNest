@@ -1,0 +1,37 @@
+{
+  "schema": "ronsas.worker-ops-manifest.v1",
+  "node": "weed",
+  "captured_at_utc": "2026-09-17T07:22:13.4815030Z",
+  "role": "support-worker",
+  "control_branch": "main",
+  "hub_branch": "ronsas/ealiophin-production",
+  "live_root": "C:\\Users\\iamas\\Resonance\\RONSAS",
+  "mutable_authority_json_tracked": false,
+  "files": [
+    {
+      "name": "Import-RonsasControlMirror.ps1",
+      "sha256": "40b8086a6da2fc36bf25172c238ad1dbbe251c8461f3b60a4f9358dc8ec3040a",
+      "bytes": 1565
+    },
+    {
+      "name": "Start-RonsasWorkerLoop.ps1",
+      "sha256": "f362bcaaddba20761ab1313e65a966ed32af99702d23f1adc6773c7ead5086d7",
+      "bytes": 892
+    },
+    {
+      "name": "sync-ronsas.cjs",
+      "sha256": "757abc19a7035f1713544ee168dfcca87d575919a6b15b4a23f1b79dc6971165",
+      "bytes": 1277
+    },
+    {
+      "name": "Sync-RonsasWorker.ps1",
+      "sha256": "1963d8ecffcf3c5ea80a0428500ad2037632b45b70bc40475aa8220400edefd6",
+      "bytes": 2290
+    },
+    {
+      "name": "Verify-RONSAS.ps1",
+      "sha256": "17f80e6a7883364eefc303bb770f8b4aed0432a8fb18071b2cb72bea2e9078bc",
+      "bytes": 1193
+    }
+  ]
+}
