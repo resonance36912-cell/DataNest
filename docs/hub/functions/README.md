@@ -47,7 +47,7 @@ Admission gate status:
 
 1. **Complete:** every supplied outbound control destination is validated against the explicit `ROP_OUTBOUND_ALLOWED_ORIGINS` exact-origin allowlist.
 2. **Complete:** ROP delivery persistence is hash/byte-count only for bodies, and audit metadata is recursively redacted/bounded before persistence.
-3. **Pending:** review the pull-config schema independently from outbound push support.
+3. **Complete:** pull-config was independently reviewed and intentionally remains absent; the recovered legacy schema was rejected pending any future versioned/strict contract. See `docs/architecture/ROP-PULL-CONFIG-REVIEW-20260916.md`.
 4. **Environment verification required:** the `hub_rop_nonces` / `consume_rop_nonce` migration exists in RONSAS; verify it is deployed in each target environment before enabling nonce-required traffic there.
 
 ## Manual test snippet
