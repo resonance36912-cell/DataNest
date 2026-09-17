@@ -1,4 +1,4 @@
-{
+﻿{
   "schema": "ronsas.ealiophin.ops-manifest.v1",
   "captured_at_utc": "2026-09-17T03:04:09.6891284Z",
   "files": [
@@ -70,7 +70,7 @@
     {
       "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\INSTALL-RONS-PUBLIC-BOOT-TASK.ps1",
       "repo_path": "control-center\\INSTALL-RONS-PUBLIC-BOOT-TASK.ps1",
-      "sha256": "8d76cb2723a3967d1569a1c5f53b6fb55310b643d7d4754891e66dea554fabcb"
+      "sha256": "e7fe6e5682f1e5c6ff96c1462ebe60823a22e3f2e5f44a8f0e324fdb782994f4"
     }
   ],
   "model_artifacts": [
