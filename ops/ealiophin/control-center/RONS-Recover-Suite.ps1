@@ -1,7 +1,9 @@
 param(
   [int]$Attempts = 2,
   [int]$DelaySeconds = 12,
-  [int]$StepTimeoutSeconds = 180
+  [int]$StepTimeoutSeconds = 180,
+  [int]$AcceptanceSettleSeconds = 240,
+  [int]$AcceptancePollSeconds = 12
 )
 $ErrorActionPreference = 'Continue'
 $Root = Join-Path $env:USERPROFILE 'Resonance\OpenNova'
@@ -60,6 +62,22 @@ function Invoke-BoundedProcess {
     return $false
   }
 }
+function Wait-RecoveryAcceptance {
+  param([int]$SettleSeconds, [int]$PollSeconds)
+  $deadline = (Get-Date).AddSeconds([Math]::Max(0, $SettleSeconds))
+  $probe = 0
+  do {
+    $probe++
+    $ok = Invoke-BoundedProcess -Name ('acceptance-' + $probe) -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',$Acceptance) -TimeoutSeconds 45 -SuccessMarker 'RONS ACCEPTANCE PASSED:'
+    if ($ok) { Log ('Recovery acceptance settled on probe ' + $probe + '.'); return $true }
+    if ((Get-Date) -ge $deadline) { break }
+    Log ('Recovery acceptance not ready on probe ' + $probe + '; waiting ' + $PollSeconds + ' seconds.')
+    Start-Sleep -Seconds ([Math]::Max(1, $PollSeconds))
+  } while ((Get-Date) -lt $deadline)
+  Log ('Recovery acceptance did not settle within ' + $SettleSeconds + ' seconds.')
+  return $false
+}
+
 function Test-CriticalRecoverySurface {
   Log 'Critical surface is verified by semantic acceptance and public sovereign-session checks.'
   return $true
@@ -69,8 +87,7 @@ try {
     Log ("Recovery attempt $i/$Attempts started.")
     $clusterOk = Invoke-BoundedProcess -Name 'cluster' -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',$Cluster) -TimeoutSeconds $StepTimeoutSeconds
     $suiteOk = Invoke-BoundedProcess -Name 'suite' -FilePath 'cmd.exe' -ArgumentList @('/d','/c',('"' + $Suite + '"')) -TimeoutSeconds 45
-    Start-Sleep -Seconds 6
-    $acceptOk = Invoke-BoundedProcess -Name 'acceptance' -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',$Acceptance) -TimeoutSeconds 45 -SuccessMarker 'RONS ACCEPTANCE PASSED:'
+    $acceptOk = Wait-RecoveryAcceptance -SettleSeconds $AcceptanceSettleSeconds -PollSeconds $AcceptancePollSeconds
     $criticalOk = Test-CriticalRecoverySurface
     if ($clusterOk -and $suiteOk -and $acceptOk -and $criticalOk) {
       Log ("Recovery attempt $i passed acceptance. cluster=$clusterOk suite=$suiteOk critical=$criticalOk")

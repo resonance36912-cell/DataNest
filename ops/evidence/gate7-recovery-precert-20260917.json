@@ -1,0 +1,49 @@
+{
+  "schema": "ronsas.gate7.recovery-precert.v1",
+  "capturedAtUtc": "2026-09-17T11:06:38Z",
+  "scope": "Checkpoint-defined Gate 7 recovery validation",
+  "result": "pending_postfix_coldboot_retest",
+  "coldBootObservation": {
+    "bootAt": "2026-09-17T08:45:23.5000000+02:00",
+    "systemBootstrapStartedAt": "2026-09-17T08:45:52+02:00",
+    "systemIdentity": "EALIOPHIN$",
+    "firstAcceptanceFailure": ["Local Image Service", "Backend"],
+    "secondAcceptanceFailure": ["Backend"],
+    "bootstrapTerminalAt": "2026-09-17T08:47:43+02:00",
+    "bootstrapResult": "failed",
+    "supervisorFallbackRecoveryPassedAt": "2026-09-17T08:51:42+02:00"
+  },
+  "rootCauseClass": "boot-time semantic readiness race",
+  "hardening": {
+    "recoveryScriptSha256": "6c5a397fbe1fc269d48d33c31f0103848e48e6cff55aed7322b351d9d21331cd",
+    "acceptanceSettleSeconds": 240,
+    "acceptancePollSeconds": 12,
+    "behavior": "repeat bounded semantic acceptance probes before declaring a recovery attempt failed"
+  },
+  "postfixValidation": {
+    "governedRecoveryAt": "2026-09-17T13:05:46+02:00",
+    "governedRecoveryExit": 0,
+    "acceptanceProbe": 1,
+    "systemBootstrapReplayAt": "2026-09-17T13:06:38+02:00",
+    "systemBootstrapReplayResult": 0,
+    "publicEdgeVerification": 0,
+    "systemBootstrapReplayPassed": true,
+    "supervisorTask": "Running",
+    "bootstrapTask": "Ready"
+  },
+  "currentRuntime": {
+    "semanticAcceptance": "13/13 pass",
+    "publicAccess": "healthy"
+  },
+  "evidenceSources": [
+    "RONS-ControlCenter/logs/boot-public.log",
+    "RONS-ControlCenter/logs/recovery.log",
+    "RONS-ControlCenter/logs/recovery-steps/20260917-084631-145-acceptance.out.log",
+    "RONS-ControlCenter/logs/recovery-steps/20260917-084721-599-acceptance.out.log"
+  ],
+  "limitations": [
+    "This is a pre-certification receipt, not a final Gate 7 pass.",
+    "A physical reboot after the acceptance-settle hardening has not yet been observed.",
+    "Gate 7 becomes certifiable only after a post-fix cold boot autonomously reaches the required production gates."
+  ]
+}
