@@ -11,6 +11,11 @@ $env:RONS_USER_HOME = $UserHome
 $env:RONS_LOCALAPPDATA = Join-Path $UserHome 'AppData\Local'
 $env:USERPROFILE = $UserHome
 $env:LOCALAPPDATA = $env:RONS_LOCALAPPDATA
+$env:APPDATA = Join-Path $UserHome 'AppData\Roaming'
+$env:HOME = $UserHome
+$env:HOMEDRIVE = 'C:'
+$env:HOMEPATH = '\Users\Ashley'
+$env:PODMAN_COMPOSE_PROVIDER = 'C:\Users\Ashley\AppData\Local\Microsoft\WinGet\Packages\Docker.DockerCompose_Microsoft.Winget.Source_8wekyb3d8bbwe\docker-compose.exe'
 $machinePath = [Environment]::GetEnvironmentVariable('Path','Machine')
 $runtimePath = @(
   'C:\Program Files\nodejs',
@@ -21,7 +26,7 @@ $runtimePath = @(
 $env:Path = $runtimePath + ';' + $machinePath
 Log ("Boot public bootstrap started as $env:USERNAME.")
 try {
-  & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Control 'RONS-Recover-Suite.ps1') -Attempts 2 -StepTimeoutSeconds 75
+  & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Control 'RONS-Recover-Suite.ps1') -Attempts 2 -StepTimeoutSeconds 180
   $recoveryExit = $LASTEXITCODE
   Log ("Governed recovery exit=$recoveryExit")
   & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Control 'RONS-Ensure-Public-Edge.ps1')

@@ -1,6 +1,6 @@
 {
   "schema": "ronsas.ealiophin.ops-manifest.v1",
-  "captured_at_utc": "2026-09-17T11:06:38Z",
+  "captured_at_utc": "2026-09-17T12:25:49.099947+00:00",
   "files": [
     {
       "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Supervisor.ps1",
@@ -45,7 +45,7 @@
     {
       "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\integrations\\rons-cluster\\START-RONSAS-ECOSYSTEM.ps1",
       "repo_path": "cluster\\START-RONSAS-ECOSYSTEM.ps1",
-      "sha256": "f001705778b344b0b8234895e6c8fa124ab6b9fd783d47e5090cc4ec4af64ce0"
+      "sha256": "59b6bce055e33103f3a636ef0874e3dae8aa57b7bc750aaf86fd3413f183d638"
     },
     {
       "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\integrations\\rons-cluster\\START-RONS-ECOSYSTEM.ps1",
@@ -65,7 +65,7 @@
     {
       "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Bootstrap-Public.ps1",
       "repo_path": "control-center\\RONS-Bootstrap-Public.ps1",
-      "sha256": "54308284a2424f00a10c8d8bac3e2393da43111e1b88fb7219754a13a18dfa12"
+      "sha256": "14f345fe6ea734fbac13cb03aa5192265ba87fce459e04a6a3be9366702595c5"
     },
     {
       "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\INSTALL-RONS-PUBLIC-BOOT-TASK.ps1",
