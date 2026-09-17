@@ -1,0 +1,146 @@
+{
+  "schema": "ronsas.gate8.final-ledger.v1",
+  "capturedAtUtc": "2026-09-17T12:39:22.713057+00:00",
+  "scope": "Final ledger consolidating checkpoint-defined Gates 5-7 and current production authority, runtime, worker, governance-evidence, and CI state",
+  "result": "PASS_WITH_DECLARED_LIMITATIONS",
+  "authority": {
+    "control": {
+      "repo": "resonance36912-cell/RONSAS",
+      "branch": "main",
+      "head": "b2ac281a1600657ed5f5e6edf11b8282f04f3431",
+      "clean": true,
+      "ahead": 0,
+      "behind": 0
+    },
+    "productionHub": {
+      "repo": "resonance36912-cell/resonance-hub",
+      "branch": "ronsas/ealiophin-production",
+      "head": "65443f2b5c75ad5c789a8b6e8fc0dcfee852c19f",
+      "clean": true,
+      "ahead": 0,
+      "behind": 0
+    },
+    "rcgf": {
+      "branch": "main",
+      "head": "26c40c14e011dc494457b033c96a8e68029e46cb",
+      "clean": true
+    }
+  },
+  "topology": {
+    "status": "mapped",
+    "missingRequiredPaths": 0,
+    "missingRequiredRepositories": 0,
+    "requiredServicesDown": 0,
+    "preservedNonAuthorityWorktrees": [
+      {
+        "id": "hub-developer",
+        "branch": "main",
+        "head": "a8c8a6dc0046f5cbcd92eba822f749b1ab7779d3",
+        "dirty": 12,
+        "ahead": 3,
+        "behind": 1259
+      },
+      {
+        "id": "hub-runtime-stage",
+        "branch": "rons/ealiophin-production-20260907",
+        "head": "a09723bb930fea850469027a981c7ad42498e82d",
+        "dirty": 34,
+        "ahead": 0,
+        "behind": 0
+      }
+    ]
+  },
+  "workers": {
+    "spider": {
+      "status": "ok",
+      "controlHead": "b2ac281a1600657ed5f5e6edf11b8282f04f3431",
+      "hubHead": "65443f2b5c75ad5c789a8b6e8fc0dcfee852c19f",
+      "topology": "mapped",
+      "syncedAtLocal": "2026-09-17T14:36:24.4599431+02:00"
+    },
+    "weed": {
+      "status": "ok",
+      "controlHead": "b2ac281a1600657ed5f5e6edf11b8282f04f3431",
+      "hubHead": "65443f2b5c75ad5c789a8b6e8fc0dcfee852c19f",
+      "topology": "mapped",
+      "controlMode": "dropbox-bundle-pinned",
+      "syncedAtLocal": "2026-09-17T14:36:36.3927169+02:00"
+    },
+    "controlMirror": {
+      "head": "b2ac281a1600657ed5f5e6edf11b8282f04f3431",
+      "sha256": "7fa392d072fc06587cc5aedfbcf6d8c087e9433fc615e255125fa96daa4b8f3d",
+      "generatedAtLocal": "2026-09-17T14:36:30.5011068+02:00",
+      "producer": "Spider",
+      "transport": "Dropbox support staging"
+    }
+  },
+  "runtime": {
+    "physicalColdBootAtUtc": "2026-09-17T12:12:22Z",
+    "canonicalAcceptance": "13/13 pass",
+    "canonicalAcceptanceExit": 0,
+    "publicEndpointVerifierExit": 0,
+    "requiredServicesDown": 0
+  },
+  "gateReceipts": [
+    {
+      "gate": 5,
+      "path": "ops/evidence/gate5-topology-audit-20260917.json",
+      "result": "pass",
+      "sha256": "9696625f601119c777cd57474bb8c3af74248b661a14d34459342e8d4bb3b8bc"
+    },
+    {
+      "gate": 6,
+      "path": "ops/evidence/gate6-governance-evidence-20260917.json",
+      "result": "pass",
+      "sha256": "4fd1219607673a8c09a52c7bb5e8360735a588b4f8a44097e0a40be7eac50c94"
+    },
+    {
+      "gate": 7,
+      "path": "ops/evidence/gate7-recovery-cert-20260917.json",
+      "result": "PASS",
+      "sha256": "5ed78e92f84b92591770194bab1ccf1628bfa176a42b8c5578136ea79270844a"
+    }
+  ],
+  "governance": {
+    "productionClaimSha256": "58dd13e1f14e5f7bc15067b9ec0f50b0cb19e1ed0ea353f1081f0cdb8f2bfd1e",
+    "stabilizationSha256": "ee5e4e8fa891299fe7f0180fcaa452b7d78d3cd285fb871b8908b946425c7dac",
+    "hashesReverified": true,
+    "freshDatabaseCatalogQuery": {
+      "attempted": true,
+      "result": "not_authorized",
+      "claim": "No fresh SQL grant/RLS catalog claim is asserted from this session."
+    }
+  },
+  "postMergeCi": {
+    "controlHead": "b2ac281a1600657ed5f5e6edf11b8282f04f3431",
+    "runs": [
+      {
+        "id": 35221494599,
+        "name": "Verify prebuild",
+        "result": "success"
+      },
+      {
+        "id": 35221494578,
+        "name": "Verify ePublisher checkout",
+        "result": "success"
+      },
+      {
+        "id": 35221494579,
+        "name": "Verify checkout links",
+        "result": "success"
+      },
+      {
+        "id": 35221494655,
+        "name": "Security scan",
+        "result": "success"
+      }
+    ]
+  },
+  "promotionNote": "This evidence-only ledger promotion advances control main by its own merge commit. Spider and Weed must be fast-forwarded to that resulting merge commit after promotion; doing so does not invalidate this pre-promotion ledger snapshot.",
+  "declaredLimitations": [
+    "Fresh production governance SQL catalog reads remain unavailable to the connected Supabase session; only hash-reverified historical database evidence is carried forward.",
+    "hub-developer and hub-runtime-stage contain unreviewed non-authority work and are intentionally preserved rather than cleaned or reset.",
+    "The SYSTEM bootstrap task is not enumerable from the current non-elevated Ealiophin shell; physical cold-boot execution and elevated installer logs provide the Gate 7 startup evidence."
+  ],
+  "conclusion": "No unresolved production-authority, required-service, worker-alignment, or CI failure is observed at ledger capture time."
+}
