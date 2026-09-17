@@ -45,7 +45,7 @@ jobs:
           bun x tsc --noEmit
           bun run build
       - name: Upload immutable worker bundle
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: production-worker-${{ github.sha }}
           path: .output/
