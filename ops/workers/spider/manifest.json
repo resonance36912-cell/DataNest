@@ -20,13 +20,13 @@
     },
     {
       "name": "Sync-RonsasWorker.ps1",
-      "sha256": "7ea92f9664e904f63c899ae134fd0ac6dd22d06e874c82724e16615d4c1a0963",
-      "bytes": 2281
+      "sha256": "6fafb66d11d215acc17f21c3313f1f274316ba85f46e6db25a49e8788111d63d",
+      "bytes": 2278
     },
     {
       "name": "Verify-RONSAS.ps1",
-      "sha256": "e8b47a12c7275d912bdee2359fec2a4cbab1affe29417824203caefc7bcb9721",
-      "bytes": 1126
+      "sha256": "42546a11ad8153497c7292ab109883e8800e66af8aa57d4df223217b3e614f7d",
+      "bytes": 1123
     }
   ]
 }
