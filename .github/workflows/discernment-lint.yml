@@ -57,7 +57,7 @@ jobs:
       checks: write
     steps:
       - name: Checkout spoke
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -275,12 +275,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout spoke
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: spoke
 
       - name: Checkout Hub (contract source of truth)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ inputs.hub-repo }}
           ref: ${{ inputs.hub-ref }}
