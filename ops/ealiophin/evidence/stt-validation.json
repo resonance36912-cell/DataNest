@@ -1,0 +1,18 @@
+{
+    "schema":  "rons.stt.validation.v1",
+    "status":  "pass",
+    "validatedAtUtc":  "2026-09-17T02:23:06.7164605Z",
+    "provider":  "rons-local-faster-whisper",
+    "resolvedModel":  "large-v3",
+    "modelSha256":  "69f74147e3334731bc3a76048724833325d2ec74642fb52620eda87352e3d4f1",
+    "modelBytes":  3087284237,
+    "device":  "cuda",
+    "computeType":  "int8_float16",
+    "cudaRuntime":  "venv-local",
+    "nvidiaDriver":  "591.86",
+    "fasterWhisper":  "1.2.1",
+    "ctranslate2":  "4.8.2",
+    "cublas":  "12.9.2.10",
+    "cudnn":  "9.26.0.51",
+    "smokeText":  "resonance sovereign speech transcription functional test"
+}

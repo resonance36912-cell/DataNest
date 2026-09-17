@@ -1,0 +1,129 @@
+param([switch]$Once)
+
+$ErrorActionPreference = 'Continue'
+Set-StrictMode -Version Latest
+
+$Base = Split-Path -Parent $MyInvocation.MyCommand.Path
+$Config = Get-Content -Raw -LiteralPath (Join-Path $Base 'rons-control.json') | ConvertFrom-Json
+$LogDir = Join-Path $Base 'logs'
+New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
+$SupervisorLog = Join-Path $LogDir ('supervisor-' + (Get-Date -Format 'yyyyMMdd') + '.log')
+$CommanderOut = Join-Path $LogDir 'desktop-commander.out.log'
+$CommanderErr = Join-Path $LogDir 'desktop-commander.err.log'
+
+function Log([string]$Message) {
+    $dailyLog = Join-Path $LogDir ('supervisor-' + (Get-Date -Format 'yyyyMMdd') + '.log')
+    Add-Content -LiteralPath $dailyLog -Value ((Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + ' ' + $Message) -Encoding UTF8
+}
+
+$created = $false
+$mutex = New-Object System.Threading.Mutex($true, 'Local\RONS_Autonomous_Supervisor', [ref]$created)
+if (-not $created) { Log 'A supervisor instance is already running.'; exit 0 }
+
+$commanderFailures = 0
+$nextCommanderAttempt = [datetime]::MinValue
+$chromeEnrollmentWarned = $false
+
+function Get-DesktopCommanderProcess {
+    $entry = [regex]::Escape([string]$Config.remote.desktopCommanderEntry)
+    Get-CimInstance Win32_Process -Filter "Name='node.exe'" -ErrorAction SilentlyContinue |
+        Where-Object { [string]$_.CommandLine -match $entry -and [string]$_.CommandLine -match '(?i)\sremote(?:\s|$)' } |
+        Select-Object -First 1
+}
+
+function Test-SovereignGateway {
+    try {
+        $r = Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:58600/v1/auth/session' -TimeoutSec 5
+        return ($r.StatusCode -eq 200)
+    } catch { return $false }
+}
+
+function Ensure-RonsSuite {
+    if (-not [bool]$Config.autonomy.ensureSuite) { return }
+    $requiredDown = @($Config.services | Where-Object { $_.required -and $_.key -ne 'backend' } | Where-Object { -not (Get-NetTCPConnection -State Listen -LocalPort ([int]$_.port) -ErrorAction SilentlyContinue) })
+    $gatewayDown = -not (Test-SovereignGateway)
+    if ($requiredDown.Count -eq 0 -and -not $gatewayDown) { return }
+    $launcher = [string]$Config.launchSuite
+    if (-not (Test-Path -LiteralPath $launcher -PathType Leaf)) { Log 'Suite launcher missing.'; return }
+    $existing = Get-Process | Where-Object { $_.Path -like '*cmd.exe' }
+    $downNames = @($requiredDown | ForEach-Object { $_.name })
+    if ($gatewayDown) { $downNames += 'Sovereign Gateway' }
+    Log ('Required services missing: ' + ($downNames -join ', ') + '. Requesting governed restart.')
+    Start-Process -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File','C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Recover-Suite.ps1') -WindowStyle Hidden | Out-Null
+}
+function Ensure-Dropbox {
+    if (-not [bool]$Config.autonomy.ensureDropbox) { return }
+    if (@(Get-Process -Name Dropbox -ErrorAction SilentlyContinue).Count) { return }
+    if (Test-Path -LiteralPath $Config.dropboxExe -PathType Leaf) {
+        Log 'Dropbox was not running; starting the installed client.'
+        Start-Process -FilePath $Config.dropboxExe -WindowStyle Hidden | Out-Null
+    } else { Log 'Dropbox executable is missing.' }
+}
+
+function Ensure-ChromeRemoteDesktop {
+    if (-not [bool]$Config.autonomy.ensureChromeRemoteDesktop) { return }
+    $service = Get-Service -Name 'chromoting' -ErrorAction SilentlyContinue
+    if (-not $service) { Log 'Chrome Remote Desktop host is not installed.'; return }
+    $programData = if ($env:ProgramData) { $env:ProgramData } else { [Environment]::GetFolderPath('CommonApplicationData') }
+    $hostConfig = Join-Path $programData 'Google\Chrome Remote Desktop\host.json'
+    if (-not (Test-Path -LiteralPath $hostConfig -PathType Leaf)) {
+        if (-not $script:chromeEnrollmentWarned) {
+            Log 'Chrome Remote Desktop is installed but requires interactive enrollment; service was not forced on.'
+            $script:chromeEnrollmentWarned = $true
+        }
+        return
+    }
+    $script:chromeEnrollmentWarned = $false
+    if ($service.Status -ne 'Running') {
+        try { Start-Service -Name 'chromoting' -ErrorAction Stop; Log 'Chrome Remote Desktop service started.' }
+        catch { Log ('Chrome Remote Desktop could not start: ' + $_.Exception.Message) }
+    }
+}
+
+function Ensure-DesktopCommander {
+    if (-not [bool]$Config.autonomy.ensureDesktopCommander) { return }
+    if (Get-DesktopCommanderProcess) { $script:commanderFailures = 0; return }
+    if ((Get-Date) -lt $script:nextCommanderAttempt) { return }
+    if (-not (Test-Path -LiteralPath $Config.remote.desktopCommanderEntry -PathType Leaf)) {
+        Log 'Pinned Desktop Commander entry point is missing.'
+        return
+    }
+    if (-not (Test-Path -LiteralPath $Config.remote.desktopCommanderDeviceConfig -PathType Leaf)) {
+        Log 'Desktop Commander requires interactive device authorization; unattended start skipped.'
+        return
+    }
+    try {
+        Start-Process -FilePath 'node.exe' -ArgumentList @([string]$Config.remote.desktopCommanderEntry,'remote') -WorkingDirectory $Base -WindowStyle Hidden -RedirectStandardOutput $CommanderOut -RedirectStandardError $CommanderErr | Out-Null
+        Start-Sleep -Seconds 6
+        if (Get-DesktopCommanderProcess) {
+            $script:commanderFailures = 0
+            Log ('Desktop Commander remote started with pinned version ' + [string]$Config.remote.desktopCommanderVersion + '.')
+        } else {
+            $script:commanderFailures++
+            $delay = [math]::Min([int]$Config.autonomy.maxRestartBackoffSeconds, [int](30 * [math]::Pow(2, [math]::Min($script:commanderFailures - 1, 5))))
+            $script:nextCommanderAttempt = (Get-Date).AddSeconds($delay)
+            Log "Desktop Commander exited; next retry in $delay seconds."
+        }
+    } catch {
+        $script:commanderFailures++
+        $delay = [math]::Min([int]$Config.autonomy.maxRestartBackoffSeconds, [int](30 * [math]::Pow(2, [math]::Min($script:commanderFailures - 1, 5))))
+        $script:nextCommanderAttempt = (Get-Date).AddSeconds($delay)
+        Log ('Desktop Commander launch failed: ' + $_.Exception.Message + "; retry in $delay seconds.")
+    }
+}
+
+try {
+    Log 'Supervisor started.'
+    do {
+        Ensure-Dropbox
+        Ensure-ChromeRemoteDesktop
+        Ensure-DesktopCommander
+        Ensure-RonsSuite
+        if ([bool]$Config.autonomy.ensurePublicEdge) { & (Join-Path $Base 'RONS-Ensure-Public-Edge.ps1') }
+        if ($Once) { break }
+        Start-Sleep -Seconds ([int]$Config.autonomy.pollSeconds)
+    } while ($true)
+} finally {
+    Log 'Supervisor stopped.'
+    if ($mutex) { $mutex.ReleaseMutex(); $mutex.Dispose() }
+}

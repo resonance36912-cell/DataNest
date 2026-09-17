@@ -1,0 +1,97 @@
+﻿ {
+	admin 127.0.0.1:2029
+	auto_https off
+}
+
+(common_security) {
+	encode zstd gzip
+	header X-Content-Type-Options "nosniff"
+	header X-Frame-Options "DENY"
+	header Referrer-Policy "strict-origin-when-cross-origin"
+	header Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	header Strict-Transport-Security "max-age=31536000"
+}
+
+:8800 {
+	bind 127.0.0.1
+	import common_security
+	@internal path /admin* /mcp* /.mcp* /.well-known/oauth-protected-resource* /.lovable* /lovable/email*
+	respond @internal 404
+	reverse_proxy 127.0.0.1:4173 {
+		header_up Host reson8.life
+		header_up X-Forwarded-Host reson8.life
+		header_up X-Forwarded-Proto https
+	}
+}
+
+:8801 {
+	bind 127.0.0.1
+	import common_security
+	handle /_rons/* {
+		reverse_proxy 127.0.0.1:4450 {
+			header_up X-RONS-App epublisher
+			header_up X-Forwarded-Proto https
+		}
+	}
+	handle {
+		reverse_proxy 127.0.0.1:3101 {
+			header_up Host 127.0.0.1:3101
+			header_up X-Forwarded-Host epublisher.reson8.life
+			header_up X-Forwarded-Proto https
+		}
+	}
+}
+
+:8802 {
+	bind 127.0.0.1
+	import common_security
+	handle /_rons/* {
+		reverse_proxy 127.0.0.1:4450 {
+			header_up X-RONS-App creative_studio
+			header_up X-Forwarded-Proto https
+		}
+	}
+	handle {
+		reverse_proxy 127.0.0.1:3201 {
+			header_up Host 127.0.0.1:3201
+			header_up X-Forwarded-Host creative.reson8.life
+			header_up X-Forwarded-Proto https
+		}
+	}
+}
+
+:8803 {
+	bind 127.0.0.1
+	import common_security
+	handle /_rons/* {
+		reverse_proxy 127.0.0.1:4450 {
+			header_up X-RONS-App sync_vision
+			header_up X-Forwarded-Proto https
+		}
+	}
+	handle {
+		reverse_proxy 127.0.0.1:3301 {
+			header_up Host 127.0.0.1:3301
+			header_up X-Forwarded-Host sync.reson8.life
+			header_up X-Forwarded-Proto https
+		}
+	}
+}
+
+:8804 {
+	bind 127.0.0.1
+	import common_security
+	handle /_rons/* {
+		reverse_proxy 127.0.0.1:4450 {
+			header_up X-RONS-App youtube_optimizer
+			header_up X-Forwarded-Proto https
+		}
+	}
+	handle {
+		reverse_proxy 127.0.0.1:3401 {
+			header_up Host 127.0.0.1:3401
+			header_up X-Forwarded-Host youtube.reson8.life
+			header_up X-Forwarded-Proto https
+		}
+	}
+}
