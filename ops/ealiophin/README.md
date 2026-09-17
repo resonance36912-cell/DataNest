@@ -13,6 +13,8 @@ This directory captures the governed, non-secret runtime sources used to keep th
 ## Included
 
 - Supervisor and governed recovery scripts
+- Bounded cross-session recovery lock that prevents hung or duplicate recovery workers
+- Pre-login public runtime bootstrap plus one-time elevated SYSTEM startup-task installer
 - Public edge recovery and endpoint verification
 - Semantic 13-service acceptance test
 - Sovereign suite and canonical cluster launchers
@@ -26,3 +28,5 @@ This directory captures the governed, non-secret runtime sources used to keep th
 No `.env` files, API keys, tunnel credentials, auth exchange keys, device credentials, database secrets, model weights, or other runtime secret material belong in this directory.
 
 Large model weights are installed under the live runtime model directory and are verified separately by hash.
+
+Windows requires administrator elevation to register the SYSTEM startup task. The bootstrap itself is non-secret and can be validated without elevation.
