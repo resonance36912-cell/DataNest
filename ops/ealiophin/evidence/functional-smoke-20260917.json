@@ -1,0 +1,101 @@
+{
+  "schema": "ronsas.ealiophin.functional-smoke.v1",
+  "captured_at_utc": "2026-09-17T03:20:32.2859119Z",
+  "authority": {
+    "ronsas_main": "171db63e79967d96c79f96764d196e5e484cca57",
+    "hub_production": "65443f2",
+    "device": "Ealiophin"
+  },
+  "public": {
+    "core_endpoints_http_200": 8,
+    "ui_asset_samples_passed": true,
+    "admin_mcp_edge_blocks_404": true,
+    "anonymous_entitlement_routes": {
+      "epublisher": "free",
+      "creative_studio": "free",
+      "sync_vision": "free",
+      "youtube_optimizer": "free"
+    }
+  },
+  "recovery": {
+    "caddy_forced_failure_observed_http": 502,
+    "caddy_autonomous_recovery_http": 200,
+    "caddy_autonomous_recovery_passed": true,
+    "creative_forced_failure_observed_http": 502,
+    "creative_recovery_seconds": 16.5,
+    "creative_autonomous_recovery_passed": true,
+    "recovery_workers_remaining": 0,
+    "semantic_acceptance": "13/13"
+  },
+  "boot": {
+    "bootstrap_validation_exit": 0,
+    "public_edge_verification_exit": 0,
+    "system_startup_task_installed": false,
+    "system_startup_installer_ready": true,
+    "pending_boundary": "Windows UAC elevation required to register SYSTEM AtStartup task",
+    "real_reboot_executed": false
+  },
+  "stt": {
+    "provider": "rons-local-faster-whisper",
+    "model": "large-v3",
+    "device": "cuda",
+    "compute_type": "int8_float16",
+    "functional_smoke_passed": true
+  },
+  "image": {
+    "provider": "rons-local-sd-turbo",
+    "model": "stabilityai/sd-turbo",
+    "cuda": true,
+    "fictional_face_generation_passed": true,
+    "generated_size": "512x512",
+    "temporary_asset_retained": false
+  },
+  "creative_source": {
+    "provider": "rons-local-url-reader",
+    "source": "https://reson8.life",
+    "success": true,
+    "title": "RONSAS | Resonance Open Nova Sovereign Application Suite",
+    "elapsed_ms": 550
+  },
+  "ai_broker": {
+    "provider": "rons-local",
+    "functional_response": "RONS_LOCAL_OK",
+    "cost_usd_all_time": 0,
+    "external_opt_in": false
+  },
+  "youtube_optimizer": {
+    "public_routes_http_200": 8,
+    "governed_unit_test_files_passed": 2,
+    "governed_unit_tests_passed": 9
+  },
+  "musetalk": {
+    "job_id": "7521dbb4f5c24401aa792ea97898bc80",
+    "status": "succeeded",
+    "engine": "MuseTalk",
+    "engine_version": "1.5",
+    "engine_revision": "0a89dec45a0192b824e3cf4daf96c239440c5ed8",
+    "network_runtime": "offline",
+    "precision": "fp16",
+    "input_kind": "synthetic_fictional_image",
+    "lip_sync": true,
+    "output": {
+      "sha256": "c07fc2b59dd7afcf3a638ca98160d88eaa8ce129a8bcec8b0466f00f7f647a52",
+      "bytes": 129933,
+      "video_codec": "h264",
+      "width": 720,
+      "height": 720,
+      "fps": 25,
+      "audio_codec": "aac",
+      "audio_sample_rate": 22050,
+      "audio_channels": 1,
+      "duration_seconds": 3.458776
+    }
+  },
+  "safety_scope": {
+    "paid_transactions_executed": false,
+    "real_user_auth_executed": false,
+    "paid_external_generation_calls_executed": false,
+    "temporary_smoke_inputs_removed": true
+  },
+  "result": "PASS_WITH_BOOT_TASK_ELEVATION_PENDING"
+}
