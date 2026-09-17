@@ -1,6 +1,6 @@
 {
     "schema":  "ronsas.ealiophin.ops-manifest.v1",
-    "captured_at_utc":  "2026-09-17T02:26:52.7146897Z",
+    "captured_at_utc":  "2026-09-17T02:34:54.9922380Z",
     "files":  [
                   {
                       "source":  "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Supervisor.ps1",
@@ -35,7 +35,7 @@
                   {
                       "source":  "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\syncvision-local-stt.py",
                       "repo_path":  "runtime\\syncvision-local-stt.py",
-                      "sha256":  "5eba89c81d1187006c78e6a43ea0b1186e8291780ea79c81f82d370b36a3eb83"
+                      "sha256":  "4e94ed8c47bc3cadec0ee9ecf9dcc404841e49da131b5eec677d781abf3da027"
                   },
                   {
                       "source":  "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\RONS-STT-FUNCTIONAL-SMOKE.ps1",

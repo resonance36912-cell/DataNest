@@ -176,10 +176,10 @@ def _profile_from_request(mode, profile=None):
     return MODE_TO_PROFILE.get((mode or '').lower(), 'production')
 
 
-def _normalize_audio(raw: bytes, suffix: str, workdir: Path):
+def _normalize_audio(raw: bytes, _suffix: str, workdir: Path):
     if not FFMPEG:
         raise RuntimeError('FFmpeg is not available')
-    src, wav = workdir / f'input{suffix}', workdir / 'audio.wav'
+    src, wav = workdir / 'input.media', workdir / 'audio.wav'
     src.write_bytes(raw)
     audio_filter = 'highpass=f=80,lowpass=f=7600,loudnorm=I=-16:TP=-1.5:LRA=11'
     cmd = [FFMPEG, '-y', '-i', str(src), '-vn', '-af', audio_filter,
@@ -249,6 +249,8 @@ def transcribe(raw: bytes, suffix: str, mode: str, profile=None):
 
 def _youtube_video_id(url_text: str):
     parsed = urlparse(url_text)
+    if parsed.scheme not in ('http', 'https'):
+        return None
     host = parsed.hostname.lower() if parsed.hostname else ''
     if host == 'youtu.be':
         vid = parsed.path.strip('/').split('/')[0]
@@ -262,32 +264,35 @@ def _youtube_video_id(url_text: str):
 
 
 def transcribe_youtube_url(url_text: str, mode: str, profile=None):
+    import yt_dlp
     video_id = _youtube_video_id(url_text)
-    if not video_id:
-        raise ValueError('Only direct public YouTube video URLs are accepted')
+    if not video_id or not re.fullmatch(r'[A-Za-z0-9_-]{11}', video_id):
+        raise ValueError('Only direct public YouTube video URLs with a valid video ID are accepted')
+    canonical_url = f'https://www.youtube.com/watch?v={video_id}'
     with tempfile.TemporaryDirectory(prefix='rons-youtube-stt-') as td:
         output = str(Path(td) / '%(id)s.%(ext)s')
-        cmd = [sys.executable, '-m', 'yt_dlp', '--no-playlist', '--js-runtimes', 'node',
-               '--socket-timeout', '15', '--retries', '2', '--fragment-retries', '2',
-               '--max-filesize', '220M', '--match-filter', f'duration <= {YOUTUBE_MAX_DURATION}',
-               '-f', 'bestaudio/best', '-o', output, url_text]
+        options = {
+            'noplaylist': True, 'js_runtimes': {'node': {}}, 'socket_timeout': 15,
+            'retries': 2, 'fragment_retries': 2, 'max_filesize': 220 * 1024 * 1024,
+            'match_filter': yt_dlp.utils.match_filter_func(f'duration <= {YOUTUBE_MAX_DURATION}'),
+            'format': 'bestaudio/best', 'outtmpl': output, 'quiet': True, 'no_warnings': True,
+        }
         try:
-            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
-        except subprocess.TimeoutExpired as exc:
-            raise SourceAcquisitionError(504, 'upstream_timeout', 'YouTube audio acquisition timed out', True) from exc
-        if proc.returncode != 0:
-            detail = (proc.stderr or proc.stdout or 'yt-dlp failed').strip().splitlines()[-1][:500]
+            with yt_dlp.YoutubeDL(options) as ydl:
+                ydl.extract_info(canonical_url, download=True)
+        except yt_dlp.utils.DownloadError as exc:
+            detail = str(exc).strip().splitlines()[-1][:500]
             low = detail.lower()
             if any(x in low for x in ('video unavailable', 'private video', 'members-only', 'sign in to confirm', 'not available')):
-                raise SourceAcquisitionError(422, 'source_unavailable', detail, False)
-            raise SourceAcquisitionError(502, 'upstream_acquisition_failed', detail, True)
+                raise SourceAcquisitionError(422, 'source_unavailable', detail, False) from exc
+            raise SourceAcquisitionError(502, 'upstream_acquisition_failed', detail, True) from exc
         candidates = [p for p in Path(td).iterdir() if p.is_file() and p.suffix not in ('.part', '.ytdl')]
         if not candidates:
             raise SourceAcquisitionError(502, 'upstream_empty_response', 'YouTube audio acquisition produced no media file', True)
         media = max(candidates, key=lambda p: p.stat().st_size)
         result = transcribe(media.read_bytes(), media.suffix.lower() or '.bin', mode, profile)
         transcript = (result.get('text') or '').strip()
-        result.update({'source_url': url_text, 'video_id': video_id, 'transcript_type': 'speech_to_text',
+        result.update({'source_url': canonical_url, 'video_id': video_id, 'transcript_type': 'speech_to_text',
                        'acquisition': 'yt-dlp-public-audio', 'retrieved_at': datetime.now(timezone.utc).isoformat(),
                        'content_hash': hashlib.sha256(transcript.encode('utf-8')).hexdigest() if transcript else None})
         result['quality'].update({'source_kind': 'youtube-video', 'evidence_status': 'stt-extracted-not-fact-verified'})
