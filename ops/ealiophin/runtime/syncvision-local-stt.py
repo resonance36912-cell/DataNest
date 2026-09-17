@@ -1,4 +1,4 @@
-import hashlib, importlib.metadata, json, os, shutil, subprocess, sys, tempfile, threading, traceback
+import hashlib, importlib.metadata, json, os, sys, tempfile, threading, traceback, wave
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -8,7 +8,6 @@ from urllib.parse import parse_qs, urlparse
 RUNTIME_ROOT = Path(__file__).resolve().parent
 MODELS_ROOT = Path(os.environ.get('RONS_STT_MODELS_ROOT', str(RUNTIME_ROOT / 'models')))
 PORT = int(os.environ.get('RONS_STT_PORT', '7864'))
-FFMPEG = os.environ.get('RONS_FFMPEG') or shutil.which('ffmpeg')
 YOUTUBE_MAX_DURATION = int(os.environ.get('RONS_YOUTUBE_STT_MAX_SECONDS', '3600'))
 MAX_ACTIVE_STT = max(1, int(os.environ.get('RONS_STT_MAX_ACTIVE', '1')))
 VALIDATION_PATH = Path(os.environ.get('RONS_STT_VALIDATION', str(MODELS_ROOT / 'epublisher-stt-validation.json')))
@@ -177,15 +176,33 @@ def _profile_from_request(mode, profile=None):
 
 
 def _normalize_audio(raw: bytes, _suffix: str, workdir: Path):
-    if not FFMPEG:
-        raise RuntimeError('FFmpeg is not available')
+    import av
     src, wav = workdir / 'input.media', workdir / 'audio.wav'
     src.write_bytes(raw)
-    audio_filter = 'highpass=f=80,lowpass=f=7600,loudnorm=I=-16:TP=-1.5:LRA=11'
-    cmd = [FFMPEG, '-y', '-i', str(src), '-vn', '-af', audio_filter,
-           '-ac', '1', '-ar', '16000', '-c:a', 'pcm_s16le', str(wav)]
-    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    return wav, {'sampleRate': 16000, 'channels': 1, 'filter': audio_filter, 'codec': 'pcm_s16le'}
+    resampler = av.AudioResampler(format='s16', layout='mono', rate=16000)
+    samples_written = 0
+    try:
+        with av.open(str(src)) as container, wave.open(str(wav), 'wb') as output:
+            audio_stream = next((stream for stream in container.streams if stream.type == 'audio'), None)
+            if audio_stream is None:
+                raise RuntimeError('Input media does not contain an audio stream')
+            output.setnchannels(1)
+            output.setsampwidth(2)
+            output.setframerate(16000)
+            for frame in container.decode(audio_stream):
+                for converted in resampler.resample(frame):
+                    pcm = converted.to_ndarray()
+                    output.writeframes(pcm.tobytes())
+                    samples_written += int(pcm.size)
+            for converted in resampler.resample(None):
+                pcm = converted.to_ndarray()
+                output.writeframes(pcm.tobytes())
+                samples_written += int(pcm.size)
+    except Exception as exc:
+        raise RuntimeError(f'Unable to decode audio locally: {exc}') from exc
+    if samples_written <= 0 or not wav.is_file() or wav.stat().st_size <= 44:
+        raise RuntimeError('Audio decode produced no PCM samples')
+    return wav, {'sampleRate': 16000, 'channels': 1, 'filter': 'pyav-resample', 'codec': 'pcm_s16le'}
 
 
 def transcribe(raw: bytes, suffix: str, mode: str, profile=None):
