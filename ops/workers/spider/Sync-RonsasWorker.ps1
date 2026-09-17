@@ -1,4 +1,4 @@
-﻿[CmdletBinding()]
+[CmdletBinding()]
 param()
 $ErrorActionPreference = 'Stop'
 $root = Join-Path $env:USERPROFILE 'Resonance\RONSAS'

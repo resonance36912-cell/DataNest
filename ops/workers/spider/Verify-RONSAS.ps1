@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'Stop'
 $root = Join-Path $env:USERPROFILE 'Resonance\RONSAS'
 $hub = Join-Path $root 'github\resonance-hub'
 $ctl = Join-Path $root 'github\control'
