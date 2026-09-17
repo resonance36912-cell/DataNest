@@ -10,6 +10,8 @@ New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 $SupervisorLog = Join-Path $LogDir ('supervisor-' + (Get-Date -Format 'yyyyMMdd') + '.log')
 $CommanderOut = Join-Path $LogDir 'desktop-commander.out.log'
 $CommanderErr = Join-Path $LogDir 'desktop-commander.err.log'
+$DropboxOut = Join-Path $LogDir 'dropbox.out.log'
+$DropboxErr = Join-Path $LogDir 'dropbox.err.log'
 
 function Log([string]$Message) {
     $dailyLog = Join-Path $LogDir ('supervisor-' + (Get-Date -Format 'yyyyMMdd') + '.log')
@@ -56,7 +58,7 @@ function Ensure-Dropbox {
     if (@(Get-Process -Name Dropbox -ErrorAction SilentlyContinue).Count) { return }
     if (Test-Path -LiteralPath $Config.dropboxExe -PathType Leaf) {
         Log 'Dropbox was not running; starting the installed client.'
-        Start-Process -FilePath $Config.dropboxExe -WindowStyle Hidden | Out-Null
+        Start-Process -FilePath $Config.dropboxExe -WorkingDirectory (Split-Path -Parent ([string]$Config.dropboxExe)) -WindowStyle Hidden -RedirectStandardOutput $DropboxOut -RedirectStandardError $DropboxErr | Out-Null
     } else { Log 'Dropbox executable is missing.' }
 }
 
