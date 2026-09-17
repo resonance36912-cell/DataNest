@@ -1,0 +1,12 @@
+.env
+.env.*
+secrets/
+credentials/
+*.key
+*.pem
+*.p12
+*.pfx
+*.token
+*.secret
+__pycache__/
+*.pyc

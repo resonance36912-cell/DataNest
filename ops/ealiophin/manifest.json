@@ -1,0 +1,76 @@
+{
+    "schema":  "ronsas.ealiophin.ops-manifest.v1",
+    "captured_at_utc":  "2026-09-17T02:40:58.5548468Z",
+    "files":  [
+                  {
+                      "source":  "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Supervisor.ps1",
+                      "repo_path":  "control-center\\RONS-Supervisor.ps1",
+                      "sha256":  "9f817b0ba185f921b4b5cc600a48d148c646c09feca7f88b0f0f563687160833"
+                  },
+                  {
+                      "source":  "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Recover-Suite.ps1",
+                      "repo_path":  "control-center\\RONS-Recover-Suite.ps1",
+                      "sha256":  "1ed21a78a655dd1e17a8d8619f8c78002606984c769711a123a2d077f1b8ee9d"
+                  },
+                  {
+                      "source":  "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Ensure-Public-Edge.ps1",
+                      "repo_path":  "control-center\\RONS-Ensure-Public-Edge.ps1",
+                      "sha256":  "4b4364911414009b3d4717321097e3b5a50a502cfc36a3a60c68d8e56be32d00"
+                  },
+                  {
+                      "source":  "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Verify-Public-Endpoints.ps1",
+                      "repo_path":  "control-center\\RONS-Verify-Public-Endpoints.ps1",
+                      "sha256":  "5fa0b6e441a4db2cd808588e6ec20f33b01be3712e0b88e6c5f1390cac397543"
+                  },
+                  {
+                      "source":  "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\FINAL-RONS-ACCEPTANCE.ps1",
+                      "repo_path":  "runtime\\FINAL-RONS-ACCEPTANCE.ps1",
+                      "sha256":  "f8102135ae81f0f8d685cfd33759483110f5e731dd84c0127e026caf3d4a791e"
+                  },
+                  {
+                      "source":  "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\launchers\\START-RONS-SOVEREIGN-SUITE.cmd",
+                      "repo_path":  "runtime\\START-RONS-SOVEREIGN-SUITE.cmd",
+                      "sha256":  "da2b03688ce3ffc38b5d0b123ac8dcb738c418dae1719fef90359cd9260bfff8"
+                  },
+                  {
+                      "source":  "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\syncvision-local-stt.py",
+                      "repo_path":  "runtime\\syncvision-local-stt.py",
+                      "sha256":  "c426c4d36e079941bf9a0b5ef68893793f9afae8845e383bd78561d65150d68f"
+                  },
+                  {
+                      "source":  "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\RONS-STT-FUNCTIONAL-SMOKE.ps1",
+                      "repo_path":  "runtime\\RONS-STT-FUNCTIONAL-SMOKE.ps1",
+                      "sha256":  "20ed588f568b18423e93879a3b5c0b912394361aacdfcbafdb1beb7318cd1a85"
+                  },
+                  {
+                      "source":  "C:\\Users\\Ashley\\Resonance\\OpenNova\\integrations\\rons-cluster\\START-RONSAS-ECOSYSTEM.ps1",
+                      "repo_path":  "cluster\\START-RONSAS-ECOSYSTEM.ps1",
+                      "sha256":  "bea5c8cef7c637a072ac293d7c62d2a98539183fafe46fcf913a3544faed8480"
+                  },
+                  {
+                      "source":  "C:\\Users\\Ashley\\Resonance\\OpenNova\\integrations\\rons-cluster\\START-RONS-ECOSYSTEM.ps1",
+                      "repo_path":  "cluster\\START-RONS-ECOSYSTEM.ps1",
+                      "sha256":  "7390753d6adac4311327c1d1aa365115334f7982fa76ab509ec0ce3d75d081e1"
+                  },
+                  {
+                      "source":  "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\production-edge\\Caddyfile.cgnat-edge",
+                      "repo_path":  "edge\\Caddyfile.cgnat-edge",
+                      "sha256":  "cc4702103953fbd0cedc04e1f98728d9fe5ae68b13b8b628d326cf827826b264"
+                  },
+                  {
+                      "source":  "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\models\\epublisher-stt-validation.json",
+                      "repo_path":  "evidence\\stt-validation.json",
+                      "sha256":  "95795a834e76aff6753e276c9ca7c831cddfe365ff5ab3e675c6aaccaedd44ec"
+                  }
+              ],
+    "model_artifacts":  [
+                            {
+                                "name":  "Systran/faster-whisper-large-v3",
+                                "live_path":  "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\models\\faster-whisper-large-v3\\model.bin",
+                                "bytes":  3087284237,
+                                "sha256":  "69f74147e3334731bc3a76048724833325d2ec74642fb52620eda87352e3d4f1",
+                                "tracked_in_git":  false,
+                                "validation_repo_path":  "evidence\\stt-validation.json"
+                            }
+                        ]
+}
