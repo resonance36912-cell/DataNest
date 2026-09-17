@@ -1,6 +1,6 @@
-{
+﻿{
   "schema": "ronsas.ealiophin.functional-smoke.v1",
-  "captured_at_utc": "2026-09-17T03:20:32.2859119Z",
+  "captured_at_utc": "2026-09-17T03:38:38.0125227Z",
   "authority": {
     "ronsas_main": "171db63e79967d96c79f96764d196e5e484cca57",
     "hub_production": "65443f2",
@@ -30,10 +30,13 @@
   "boot": {
     "bootstrap_validation_exit": 0,
     "public_edge_verification_exit": 0,
-    "system_startup_task_installed": false,
+    "system_startup_task_installed": true,
     "system_startup_installer_ready": true,
-    "pending_boundary": "Windows UAC elevation required to register SYSTEM AtStartup task",
-    "real_reboot_executed": false
+    "pending_boundary": "Real cold reboot not executed in this session",
+    "real_reboot_executed": false,
+    "system_startup_validation_last_result": 0,
+    "validated_identity": "SYSTEM (EALIOPHIN$)",
+    "validated_via_bootstrap_log": true
   },
   "stt": {
     "provider": "rons-local-faster-whisper",
@@ -97,5 +100,5 @@
     "paid_external_generation_calls_executed": false,
     "temporary_smoke_inputs_removed": true
   },
-  "result": "PASS_WITH_BOOT_TASK_ELEVATION_PENDING"
+  "result": "PASS_WITH_REAL_REBOOT_PENDING"
 }
