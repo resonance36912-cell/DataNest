@@ -1,0 +1,174 @@
+{
+  "schema": "ronsas-module-registry/v1",
+  "suite": "RONSAS",
+  "fullName": "Resonance Open Nova Sovereign Application Suite",
+  "hostRole": "Ealiophin production-master",
+  "authority": {
+    "controlRoot": "%USERPROFILE%\\Documents\\GitHub\\rons-sovereign-codebase",
+    "runtimeRoot": "%USERPROFILE%\\Resonance\\OpenNova",
+    "supervisor": "integrations\\rons-cluster\\START-RONSAS-ECOSYSTEM.ps1",
+    "status": "integrations\\rons-cluster\\STATUS-RONS-ECOSYSTEM.ps1",
+    "stop": "integrations\\rons-cluster\\STOP-RONS-ECOSYSTEM.ps1"
+  },
+  "policy": {
+    "singleSystem": true,
+    "localFirst": true,
+    "externalAiDefault": "denied",
+    "separateProcessesAreIsolationBoundariesOnly": true,
+    "independentRuntimeAuthority": false,
+    "governance": "RGP controlled continuous improvement"
+  },
+  "modules": [
+    {
+      "id": "hub",
+      "kind": "core-module",
+      "displayName": "RONSAS Hub",
+      "port": 4173,
+      "listenPort": 4173,
+      "health": "http://127.0.0.1:4173/",
+      "required": true
+    },
+    {
+      "id": "epublisher",
+      "kind": "application-module",
+      "displayName": "RONSAS ePublisher",
+      "entitlementAppId": "epublisher",
+      "port": 3101,
+      "listenPort": 3101,
+      "health": "http://127.0.0.1:3101/",
+      "source": "apps\\epublisher-sovereign-local-v0.1",
+      "required": true
+    },
+    {
+      "id": "creative-studio",
+      "kind": "application-module",
+      "displayName": "RONSAS Creative Studio",
+      "entitlementAppId": "creative_studio",
+      "port": 3201,
+      "listenPort": 3201,
+      "health": "http://127.0.0.1:3201/studio",
+      "source": "apps\\creative-studio-sovereign-local-v0.1",
+      "required": true
+    },
+    {
+      "id": "sync-vision",
+      "kind": "application-module",
+      "displayName": "RONSAS Sync Vision",
+      "entitlementAppId": "sync_vision",
+      "port": 3301,
+      "listenPort": 3301,
+      "health": "http://127.0.0.1:3301/",
+      "source": "apps\\sync-vision-sovereign-local-v0.1",
+      "required": true
+    },
+    {
+      "id": "youtube-optimizer",
+      "kind": "application-module",
+      "displayName": "RONSAS YouTube Optimizer",
+      "entitlementAppId": "youtube_optimizer",
+      "port": 3401,
+      "listenPort": 3401,
+      "health": "http://127.0.0.1:3401/",
+      "source": "runtime\\youtube-optimizer-stage",
+      "required": true
+    }
+  ],
+  "services": [
+    {
+      "id": "launch-broker",
+      "kind": "control-service",
+      "displayName": "RONSAS Launch Broker",
+      "port": 4450,
+      "listenPort": 4450,
+      "health": "http://127.0.0.1:4450/health",
+      "required": true
+    },
+    {
+      "id": "musetalk-bridge",
+      "kind": "media-service",
+      "displayName": "RONSAS MuseTalk Bridge",
+      "port": 7863,
+      "listenPort": 7863,
+      "health": "http://127.0.0.1:7863/health",
+      "required": true
+    },
+    {
+      "id": "local-stt",
+      "kind": "ai-service",
+      "displayName": "RONSAS Local Speech-to-Text",
+      "port": 7864,
+      "listenPort": 7864,
+      "health": "http://127.0.0.1:7864/health",
+      "required": true
+    },
+    {
+      "id": "local-image",
+      "kind": "ai-service",
+      "displayName": "RONSAS Local Image",
+      "port": 7865,
+      "listenPort": 7865,
+      "health": "http://127.0.0.1:7865/health",
+      "required": true
+    },
+    {
+      "id": "local-llm",
+      "kind": "ai-service",
+      "displayName": "RONSAS Local LLM",
+      "port": 7866,
+      "listenPort": 7866,
+      "health": "http://127.0.0.1:7866/health",
+      "required": true
+    },
+    {
+      "id": "creative-source",
+      "kind": "content-service",
+      "displayName": "RONSAS Creative Source",
+      "port": 7867,
+      "listenPort": 7867,
+      "health": "http://127.0.0.1:7867/health",
+      "required": true
+    },
+    {
+      "id": "ai-broker",
+      "kind": "ai-governance-service",
+      "displayName": "RONSAS AI Broker",
+      "port": 7868,
+      "listenPort": 7868,
+      "health": "http://127.0.0.1:7868/health",
+      "required": true
+    },
+    {
+      "id": "foundry",
+      "kind": "development-service",
+      "displayName": "RONSAS Foundry",
+      "port": 8787,
+      "listenPort": 8787,
+      "health": "http://127.0.0.1:8787/v1/apps",
+      "required": true
+    },
+    {
+      "id": "sovereign-backend",
+      "kind": "data-service",
+      "displayName": "RONSAS Sovereign Backend",
+      "port": 58600,
+      "listenPort": 8787,
+      "health": "http://127.0.0.1:8787/v1/backend/health",
+      "required": true
+    },
+    {
+      "id": "ollama",
+      "kind": "local-model-runtime",
+      "displayName": "RONSAS Ollama Runtime",
+      "port": 11434,
+      "listenPort": 11434,
+      "health": "http://127.0.0.1:11434/",
+      "required": true
+    }
+  ],
+  "externalIngress": {
+    "kind": "optional-public-transport",
+    "provider": "Cloudflare named tunnel",
+    "requiredForLocalGovernance": false,
+    "canonicalPublicOrigin": "https://reson8.life"
+  }
+}

@@ -10,6 +10,13 @@ $OwnershipPath = Join-Path $Runtime 'rons-cluster-owned.json'
 $AppDev = Join-Path $Root 'ResonanceAppDev_ZeroCredit_v1.5.8'
 $SecretRoot = Join-Path $Root 'runtime\secrets'
 $Node = (Get-Command node.exe -ErrorAction Stop).Source
+$RegistryPath = Join-Path $PSScriptRoot 'RONSAS-MODULES.json'
+if (-not (Test-Path -LiteralPath $RegistryPath -PathType Leaf)) { throw "RONSAS module registry missing: $RegistryPath" }
+$Registry = Get-Content -LiteralPath $RegistryPath -Raw | ConvertFrom-Json
+if ([string]$Registry.schema -ne 'ronsas-module-registry/v1') { throw "Unsupported RONSAS module registry schema: $($Registry.schema)" }
+$SttPython = Join-Path $Runtime 'python-envs\epublisher-stt\Scripts\python.exe'
+$MediaPython = Join-Path $Runtime 'python-envs\musetalk-0a89dec45a01\Scripts\python.exe'
+$SystemPython = (Get-Command python.exe -ErrorAction Stop).Source
 New-Item -ItemType Directory -Force -Path $LogRoot | Out-Null
 
 # Win32_Process.CommandLine is blank when a non-elevated launcher inspects a
@@ -22,6 +29,13 @@ $KnownEndpointIdentities = @{
     'sync-vision' = @{ url='http://127.0.0.1:3301/'; process='node.exe'; marker='Sync Vision'; contentType='text/html' }
     'musetalk-bridge' = @{ url='http://127.0.0.1:7863/health'; process='python.exe'; marker='resonance-musetalk-bridge'; contentType='application/json' }
     'launch-broker' = @{ url='http://127.0.0.1:4450/health'; process='python.exe'; marker='rons-launch-broker'; contentType='application/json' }
+    'youtube-optimizer' = @{ url='http://127.0.0.1:3401/'; process='node.exe'; marker='youtube-optimizer'; contentType='text/html' }
+    'local-stt' = @{ url='http://127.0.0.1:7864/health'; process='python.exe'; marker='epublisher-local-stt'; contentType='application/json' }
+    'local-image' = @{ url='http://127.0.0.1:7865/health'; process='python.exe'; marker='model_complete'; contentType='application/json' }
+    'local-llm' = @{ url='http://127.0.0.1:7866/health'; process='python.exe'; marker='model_ready'; contentType='application/json' }
+    'creative-source' = @{ url='http://127.0.0.1:7867/health'; process='python.exe'; marker='rons-creative-source'; contentType='application/json' }
+    'ai-broker' = @{ url='http://127.0.0.1:7868/health'; process='python.exe'; marker='rons-ai-broker'; contentType='application/json' }
+    'ollama' = @{ url='http://127.0.0.1:11434/'; process='ollama.exe'; marker='Ollama is running'; contentType='text/plain' }
 }
 
 function Test-Http([string]$Url) {
@@ -109,6 +123,52 @@ function Start-ViteApp([string]$Name, [string]$Dir, [int]$Port, [string]$Mode, [
     if ($cmd -notlike "*$Dir*") { throw "$Name listener identity mismatch after startup." }
     return [pscustomobject]@{name=$Name;port=$Port;url=$url;pid=$listenerPid;owned=$true;root=$Dir;launcherPid=$proc.Id}
 }
+function Start-PythonService([string]$Name, [int]$Port, [string]$Url, [string]$Script, [string]$Python, [string]$Expected, [hashtable]$Environment = @{}) {
+    $existing = Assert-KnownPort $Name $Port $Expected
+    if ($existing) {
+        if (-not (Test-Http $Url)) { throw "$Name owns port $Port but is unhealthy." }
+        return [pscustomobject]@{name=$Name;port=$Port;url=$Url;pid=$existing.pid;owned=$false;root=(Split-Path $Script -Parent)}
+    }
+    if (-not (Test-Path -LiteralPath $Script -PathType Leaf)) { throw "$Name script missing: $Script" }
+    if (-not (Test-Path -LiteralPath $Python -PathType Leaf)) { throw "$Name Python runtime missing: $Python" }
+    $outLog = Join-Path $LogRoot ($Name + '.out.log'); $errLog = Join-Path $LogRoot ($Name + '.err.log')
+    $prior = @{}
+    foreach ($key in $Environment.Keys) { $prior[$key] = [Environment]::GetEnvironmentVariable($key, 'Process'); [Environment]::SetEnvironmentVariable($key, [string]$Environment[$key], 'Process') }
+    try { $proc = Start-Process -FilePath $Python -ArgumentList @($Script) -WorkingDirectory (Split-Path $Script -Parent) -RedirectStandardOutput $outLog -RedirectStandardError $errLog -WindowStyle Hidden -PassThru }
+    finally { foreach ($key in $Environment.Keys) { [Environment]::SetEnvironmentVariable($key, $prior[$key], 'Process') } }
+    Wait-Http $Name $Url 90 | Out-Null
+    $listenerPid = Get-ListenerPid $Port; if (-not $listenerPid) { throw "$Name became reachable but has no listener PID." }
+    $cmd = Get-CommandLine $listenerPid; if ($cmd -and $cmd -notlike "*$Expected*") { throw "$Name listener identity mismatch after startup." }
+    return [pscustomobject]@{name=$Name;port=$Port;url=$Url;pid=$listenerPid;owned=$true;root=(Split-Path $Script -Parent);launcherPid=$proc.Id}
+}
+
+function Start-NodeService([string]$Name, [int]$Port, [string]$Url, [string]$Entry, [string]$WorkingDirectory, [string]$Expected, [hashtable]$Environment = @{}) {
+    $existing = Assert-KnownPort $Name $Port $Expected
+    if ($existing) { if (-not (Test-Http $Url)) { throw "$Name owns port $Port but is unhealthy." }; return [pscustomobject]@{name=$Name;port=$Port;url=$Url;pid=$existing.pid;owned=$false;root=$WorkingDirectory} }
+    if (-not (Test-Path -LiteralPath $Entry -PathType Leaf)) { throw "$Name entry missing: $Entry" }
+    $outLog = Join-Path $LogRoot ($Name + '.out.log'); $errLog = Join-Path $LogRoot ($Name + '.err.log'); $prior = @{}
+
+    foreach ($key in $Environment.Keys) { $prior[$key] = [Environment]::GetEnvironmentVariable($key, 'Process'); [Environment]::SetEnvironmentVariable($key, [string]$Environment[$key], 'Process') }
+    try { $proc = Start-Process -FilePath $Node -ArgumentList @($Entry) -WorkingDirectory $WorkingDirectory -RedirectStandardOutput $outLog -RedirectStandardError $errLog -WindowStyle Hidden -PassThru }
+    finally { foreach ($key in $Environment.Keys) { [Environment]::SetEnvironmentVariable($key, $prior[$key], 'Process') } }
+    Wait-Http $Name $Url 60 | Out-Null
+    $listenerPid = Get-ListenerPid $Port; if (-not $listenerPid) { throw "$Name became reachable but has no listener PID." }
+    $cmd = Get-CommandLine $listenerPid; if ($cmd -and $cmd -notlike "*$Expected*") { throw "$Name listener identity mismatch after startup." }
+    return [pscustomobject]@{name=$Name;port=$Port;url=$Url;pid=$listenerPid;owned=$true;root=$WorkingDirectory;launcherPid=$proc.Id}
+}
+
+function Start-OllamaService {
+    $name='ollama'; $port=11434; $url='http://127.0.0.1:11434/'
+    $existing = Assert-KnownPort $name $port 'ollama'
+    if ($existing) { if (-not (Test-Http $url)) { throw 'Ollama listener is unhealthy.' }; return [pscustomobject]@{name=$name;port=$port;url=$url;pid=$existing.pid;owned=$false;root='local-model-runtime'} }
+    $ollama = Get-Command ollama.exe -ErrorAction Stop
+    $outLog = Join-Path $LogRoot 'ollama.out.log'; $errLog = Join-Path $LogRoot 'ollama.err.log'
+    $proc = Start-Process -FilePath $ollama.Source -ArgumentList @('serve') -RedirectStandardOutput $outLog -RedirectStandardError $errLog -WindowStyle Hidden -PassThru
+    Wait-Http 'Ollama' $url 30 | Out-Null
+    $listenerPid = Get-ListenerPid $port; if (-not $listenerPid) { throw 'Ollama became reachable but has no listener PID.' }
+    return [pscustomobject]@{name=$name;port=$port;url=$url;pid=$listenerPid;owned=$true;root=(Split-Path $ollama.Source -Parent);launcherPid=$proc.Id}
+}
+
 function Start-LaunchBroker {
     $name = 'launch-broker'; $port = 4450; $url = 'http://127.0.0.1:4450/health'
     $script = Join-Path $Runtime 'rons-launch-broker.py'
@@ -182,8 +242,15 @@ if (-not (Test-BackendReady)) {
 $backendUrl = 'http://127.0.0.1:8787/v1/backend/health'
 $services += [pscustomobject]@{name='sovereign-backend';port=58600;url=$backendUrl;pid=(Get-ListenerPid 58600);owned=$false;root=$AppDev}
 $services += Start-LaunchBroker
+$services += Start-OllamaService
+$services += Start-PythonService 'local-llm' 7866 'http://127.0.0.1:7866/health' (Join-Path $Runtime 'rons-local-llm-service.py') $SystemPython 'rons-local-llm-service.py'
+$services += Start-PythonService 'local-stt' 7864 'http://127.0.0.1:7864/health' (Join-Path $Runtime 'syncvision-local-stt.py') $SttPython 'syncvision-local-stt.py' @{ HF_HUB_DISABLE_XET='1'; RONS_STT_MODELS_ROOT=(Join-Path $Runtime 'models') }
+$services += Start-PythonService 'local-image' 7865 'http://127.0.0.1:7865/health' (Join-Path $Runtime 'epublisher-image-service.py') $MediaPython 'epublisher-image-service.py'
+$services += Start-PythonService 'creative-source' 7867 'http://127.0.0.1:7867/health' (Join-Path $Runtime 'creative-source-service.py') $MediaPython 'creative-source-service.py'
+$services += Start-PythonService 'ai-broker' 7868 'http://127.0.0.1:7868/health' (Join-Path $Runtime 'ai-broker-service.py') $SystemPython 'ai-broker-service.py'
 
 $hub = 'C:\Resonance\Sources\ronsas-hub-canonical'
+
 $hubEntry = Join-Path $hub '.output-local\server\index.mjs'
 $hubEnvFile = Join-Path $hub '.env.local'
 if (-not (Test-Path -LiteralPath $hubEntry -PathType Leaf)) { throw "RONS Hub production build missing: $hubEntry" }
@@ -237,7 +304,11 @@ if ($hubExisting) {
 $services += Start-ViteApp 'epublisher' (Join-Path $Root 'apps\epublisher-sovereign-local-v0.1') 3101 'preview' '127.0.0.1'
 $services += Start-ViteApp 'creative-studio' (Join-Path $Root 'apps\creative-studio-sovereign-local-v0.1') 3201 'preview' '127.0.0.1'
 $services += Start-ViteApp 'sync-vision' (Join-Path $Root 'apps\sync-vision-sovereign-local-v0.1') 3301 'preview' '127.0.0.1'
+$youtubeDir = Join-Path $Runtime 'youtube-optimizer-stage'
+$youtubeEntry = Join-Path $youtubeDir '.output\server\index.mjs'
+$services += Start-NodeService 'youtube-optimizer' 3401 'http://127.0.0.1:3401/' $youtubeEntry $youtubeDir 'youtube-optimizer-stage' @{ PORT='3401'; HOST='127.0.0.1'; NODE_ENV='production'; RESONANCE_SOVEREIGN_GATEWAY_URL='http://127.0.0.1:58600' }
 $museUrl = 'http://127.0.0.1:7863/health'
+
 $museExisting = Assert-KnownPort 'musetalk-bridge' 7863 'musetalk_bridge.py'
 if ($museExisting) {
     if (-not (Test-Http $museUrl)) { throw 'MuseTalk bridge owns port 7863 but is unhealthy.' }
@@ -268,13 +339,16 @@ $ownedNow = @($services | Where-Object {$_.owned -and $_.pid} | ForEach-Object {
 [pscustomobject]@{schema='rons-cluster-ownership-v1';updatedAt=(Get-Date).ToUniversalTime().ToString('o');services=$ownedNow} |
     ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $OwnershipPath -Encoding UTF8
 $state = [pscustomobject]@{
-    schema='rons-cluster-state-v1'
+    schema='ronsas-cluster-state-v2'
+    suite='RONSAS'
     hubPc=$MachineName
+    registryPath=$RegistryPath
+    registrySchema=[string]$Registry.schema
     startedAt=(Get-Date).ToUniversalTime().ToString('o')
     services=$services
 }
 $state | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $StatePath -Encoding UTF8
 Write-Host ''
-Write-Host 'RONS ECOSYSTEM: READY' -ForegroundColor Green
+Write-Host 'RONSAS: READY' -ForegroundColor Green
 $services | Select-Object name,port,url,pid,owned | Format-Table -AutoSize
 Write-Host "State: $StatePath"
