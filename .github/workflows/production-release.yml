@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.3
@@ -45,7 +45,7 @@ jobs:
           bun x tsc --noEmit
           bun run build
       - name: Upload immutable worker bundle
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: production-worker-${{ github.sha }}
           path: .output/
@@ -61,7 +61,7 @@ jobs:
       name: production
       url: ${{ vars.PRODUCTION_BASE_URL }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.3
@@ -89,7 +89,7 @@ jobs:
           test -n "${CF_ACCOUNT}"
       - name: Apply pending Supabase migrations
         if: inputs.apply_migrations
-        uses: supabase/setup-cli@v1
+        uses: supabase/setup-cli@v2
         with:
           version: latest
       - name: Push linked database migrations

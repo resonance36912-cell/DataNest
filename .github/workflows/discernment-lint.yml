@@ -57,7 +57,7 @@ jobs:
       checks: write
     steps:
       - name: Checkout spoke
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -87,7 +87,7 @@ jobs:
 
       - name: Upload Discernment report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: discernment-usage-report
           path: reports/discernment-usage.md
@@ -95,7 +95,7 @@ jobs:
 
       - name: Post / update Discernment PR comment
         if: always() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const fs = require('fs');
@@ -132,7 +132,7 @@ jobs:
       - name: Publish Discernment check run
         id: check_run
         if: always()
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
 
         env:
           LINT_OUTCOME: ${{ steps.lint.outcome }}
@@ -213,7 +213,7 @@ jobs:
 
       - name: Post / update Discernment check-run PR summary
         if: always() && github.event_name == 'pull_request' && steps.check_run.outputs.check_url
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         env:
           CHECK_URL: ${{ steps.check_run.outputs.check_url }}
           CONCLUSION: ${{ steps.check_run.outputs.conclusion }}
@@ -275,12 +275,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout spoke
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: spoke
 
       - name: Checkout Hub (contract source of truth)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ inputs.hub-repo }}
           ref: ${{ inputs.hub-ref }}
