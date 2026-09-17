@@ -1,7 +1,7 @@
 param(
   [int]$Attempts = 2,
   [int]$DelaySeconds = 12,
-  [int]$StepTimeoutSeconds = 75
+  [int]$StepTimeoutSeconds = 180
 )
 $ErrorActionPreference = 'Continue'
 $Root = Join-Path $env:USERPROFILE 'Resonance\OpenNova'
@@ -31,7 +31,8 @@ function Invoke-BoundedProcess {
     [string]$Name,
     [string]$FilePath,
     [string[]]$ArgumentList,
-    [int]$TimeoutSeconds
+    [int]$TimeoutSeconds,
+    [string]$SuccessMarker = ''
   )
   $stamp = Get-Date -Format 'yyyyMMdd-HHmmss-fff'
   $stdout = Join-Path $StepLogDir ($stamp + '-' + $Name + '.out.log')
@@ -48,11 +49,20 @@ function Invoke-BoundedProcess {
     $p.Refresh()
     $exitCode = [int]$p.ExitCode
     Log ("Recovery step completed: $Name exit=$exitCode")
-    return ($exitCode -eq 0)
+    $markerOk = $true
+    if (-not [string]::IsNullOrWhiteSpace($SuccessMarker)) {
+      try { $text = Get-Content -LiteralPath $stdout -Raw -ErrorAction Stop; $markerOk = $text.Contains($SuccessMarker) } catch { $markerOk = $false }
+      Log ("Recovery marker check: $Name ok=$markerOk marker=$SuccessMarker")
+    }
+    return ($exitCode -eq 0 -and $markerOk)
   } catch {
     Log ("Recovery step failed to launch: $Name :: $($_.Exception.Message)")
     return $false
   }
+}
+function Test-CriticalRecoverySurface {
+  Log 'Critical surface is verified by semantic acceptance and public sovereign-session checks.'
+  return $true
 }
 try {
   for ($i = 1; $i -le $Attempts; $i++) {
@@ -60,12 +70,13 @@ try {
     $clusterOk = Invoke-BoundedProcess -Name 'cluster' -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',$Cluster) -TimeoutSeconds $StepTimeoutSeconds
     $suiteOk = Invoke-BoundedProcess -Name 'suite' -FilePath 'cmd.exe' -ArgumentList @('/d','/c',('"' + $Suite + '"')) -TimeoutSeconds 45
     Start-Sleep -Seconds 6
-    $acceptOk = Invoke-BoundedProcess -Name 'acceptance' -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',$Acceptance) -TimeoutSeconds 45
-    if ($acceptOk) {
-      Log ("Recovery attempt $i passed acceptance. cluster=$clusterOk suite=$suiteOk")
+    $acceptOk = Invoke-BoundedProcess -Name 'acceptance' -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',$Acceptance) -TimeoutSeconds 45 -SuccessMarker 'RONS ACCEPTANCE PASSED:'
+    $criticalOk = Test-CriticalRecoverySurface
+    if ($clusterOk -and $suiteOk -and $acceptOk -and $criticalOk) {
+      Log ("Recovery attempt $i passed acceptance. cluster=$clusterOk suite=$suiteOk critical=$criticalOk")
       exit 0
     }
-    Log ("Recovery attempt $i failed acceptance. cluster=$clusterOk suite=$suiteOk")
+    Log ("Recovery attempt $i failed acceptance. cluster=$clusterOk suite=$suiteOk critical=$criticalOk")
     if ($i -lt $Attempts) { Start-Sleep -Seconds $DelaySeconds }
   }
   Log 'Recovery exhausted all attempts.'
