@@ -9,7 +9,13 @@ $Endpoints = @(
   'https://epublisher.reson8.life',
   'https://creative.reson8.life',
   'https://sync.reson8.life',
-  'https://youtube.reson8.life'
+  'https://youtube.reson8.life',
+  'https://reson8.life/api/public/app-status/health',
+  'https://reson8.life/api/sovereign/auth/session',
+  'https://epublisher.reson8.life/_rons/session',
+  'https://creative.reson8.life/_rons/session',
+  'https://sync.reson8.life/_rons/session',
+  'https://youtube.reson8.life/_rons/session'
 )
 $Failures = 0
 foreach ($Url in $Endpoints) {

@@ -1,6 +1,6 @@
-﻿{
+{
   "schema": "ronsas.ealiophin.ops-manifest.v1",
-  "captured_at_utc": "2026-09-17T03:04:09.6891284Z",
+  "captured_at_utc": "2026-09-17T06:37:12.974996+00:00",
   "files": [
     {
       "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Supervisor.ps1",
@@ -10,7 +10,7 @@
     {
       "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Recover-Suite.ps1",
       "repo_path": "control-center\\RONS-Recover-Suite.ps1",
-      "sha256": "904bad8ce8d45a670aa18a194716a77cd39f2b7649fdf584d31eb09738781414"
+      "sha256": "1b54c7f14d54023558f905acce1f46ad42de1624afcc62d59e286381a138e360"
     },
     {
       "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Ensure-Public-Edge.ps1",
@@ -20,7 +20,7 @@
     {
       "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Verify-Public-Endpoints.ps1",
       "repo_path": "control-center\\RONS-Verify-Public-Endpoints.ps1",
-      "sha256": "5fa0b6e441a4db2cd808588e6ec20f33b01be3712e0b88e6c5f1390cac397543"
+      "sha256": "bda9877a2e64995b8152c8f5e420e3113ef68233e499bbeb9a1bc8e63f1aff72"
     },
     {
       "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\FINAL-RONS-ACCEPTANCE.ps1",
@@ -71,6 +71,11 @@
       "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\INSTALL-RONS-PUBLIC-BOOT-TASK.ps1",
       "repo_path": "control-center\\INSTALL-RONS-PUBLIC-BOOT-TASK.ps1",
       "sha256": "e7fe6e5682f1e5c6ff96c1462ebe60823a22e3f2e5f44a8f0e324fdb782994f4"
+    },
+    {
+      "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\REGISTER-RONS-SUPERVISOR-TASK.ps1",
+      "repo_path": "control-center\\REGISTER-RONS-SUPERVISOR-TASK.ps1",
+      "sha256": "2c88152b2ec19ae3143943ac05d708b97280d0cba363e643ec00ce4268e298a1"
     }
   ],
   "model_artifacts": [
