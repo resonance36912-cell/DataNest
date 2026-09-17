@@ -1,6 +1,6 @@
 {
   "schema": "ronsas.ealiophin.ops-manifest.v1",
-  "captured_at_utc": "2026-09-17T06:57:06.307229+00:00",
+  "captured_at_utc": "2026-09-17T11:06:38Z",
   "files": [
     {
       "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Supervisor.ps1",
@@ -10,7 +10,7 @@
     {
       "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Recover-Suite.ps1",
       "repo_path": "control-center\\RONS-Recover-Suite.ps1",
-      "sha256": "1b54c7f14d54023558f905acce1f46ad42de1624afcc62d59e286381a138e360"
+      "sha256": "6c5a397fbe1fc269d48d33c31f0103848e48e6cff55aed7322b351d9d21331cd"
     },
     {
       "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Ensure-Public-Edge.ps1",
