@@ -16,7 +16,10 @@ permissions:
 jobs:
   governance-db-runtime:
     name: Supabase governance migration + RPC runtime
-    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
+    # The full Supabase local stack requires Docker-compatible container semantics.
+    # Ealiophin CI is rootless Podman; keep this secret-free disposable DB runtime
+    # gate on a pinned hosted Docker runner until a rootful sovereign CI lane exists.
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - name: Check out repository
