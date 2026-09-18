@@ -18,6 +18,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Test-RonsasTopolog
 - `scripts\Test-RonsasTopology.ps1` performs a read-only local topology check.
 - `scripts\Capture-RonsasGitReconciliation.ps1` captures local-only reconciliation evidence.
 - `docs\architecture\GIT-RECONCILIATION-20260914.md` records patch overlap and import order.
+- `docs\operations\CHATGPT-GITHUB-CI-MONITORING-PROTOCOL.md` is the required ChatGPT handoff for RONSAS GitHub CI monitoring and safe repair.
+- `scripts\Watch-RonsasGitHubCI.ps1` emits the read-only current-head CI state consumed by that protocol.
 
 Do not add runtime state, secrets, models, dependencies, build output, or Dropbox evidence bundles to Git.
 
