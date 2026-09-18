@@ -86,7 +86,6 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
         with:
-          no-cache: true
           bun-version: latest
           no-cache: true
 
