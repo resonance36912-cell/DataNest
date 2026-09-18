@@ -29,6 +29,7 @@ Only `active` grants access.
 ### ePublisher — `epublisher`
 
 - Domain: `https://epublisher.reson8.life`
+- Source repository: `resonance36912-cell/rons-epublisher-sovereign-source`
 - Use case: Turn written stories into immersive audiovisual books.
 
 | Tier     | SKU                              | Hub price (ZAR/mo) | Min tier for…                |
@@ -46,6 +47,7 @@ Feature flags:
 ### Creative Studio — `creative_studio`
 
 - Domain: `https://creative.reson8.life`
+- Source repository: `resonance36912-cell/rons-creative-studio-sovereign-source`
 - Use case: Design posters, ads, and marketing media.
 
 | Tier     | SKU                                  | Hub price (ZAR/mo) | Min tier for…           |
@@ -70,6 +72,7 @@ Endpoint → tier mapping (illustrative; spoke owns final list):
 ### Sync Vision — `sync_vision`
 
 - Domain: `https://sync.reson8.life`
+- Source repository: `resonance36912-cell/rons-sync-vision-sovereign-source`
 - Use case: Plan AI-driven music videos and cinematic storyboards.
 
 | Tier     | SKU                                  | Min tier for…                          |
@@ -86,6 +89,7 @@ Feature flags: `storyboards`, `hdRenders`, `characterPerformance`, `priorityQueu
 ### YouTube Optimizer — `youtube_optimizer`
 
 - Domain: `https://youtube.reson8.life`
+- Source repository: `resonance36912-cell/rons-youtube-optimizer-sovereign-source`
 - Use case: Audit, optimise, and scale YouTube channels.
 
 | Tier     | SKU                                       | Min tier for…           |
