@@ -116,6 +116,7 @@ jobs:
         id: semgrep
         continue-on-error: true
         run: |
+          export PATH="$HOME/.local/bin:$PATH"
           semgrep scan \
             --config p/owasp-top-ten \
             --config p/javascript \
