@@ -117,6 +117,7 @@ All-Access copy:
 
 - **The Resonance Podcast** — media surface only.
 - **Career Compass** — informational pilot.
+- **MYIFY · DataNest** — governed resource-recovery pilot inside the RONSAS Hub; no paid entitlement or SKU.
 
 ---
 
