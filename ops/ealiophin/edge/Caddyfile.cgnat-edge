@@ -34,8 +34,10 @@
 		}
 	}
 	handle {
-		reverse_proxy 127.0.0.1:3101 {
-			header_up Host 127.0.0.1:3101
+		# Pin ePublisher to the governed localhost IPv6 listener; IPv4 may be
+		# occupied by a stale process on Ealiophin during hot recovery.
+		reverse_proxy [::1]:3101 {
+			header_up Host localhost:3101
 			header_up X-Forwarded-Host epublisher.reson8.life
 			header_up X-Forwarded-Proto https
 		}
