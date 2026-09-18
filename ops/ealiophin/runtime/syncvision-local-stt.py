@@ -1,4 +1,4 @@
-import hashlib, importlib.metadata, json, os, sys, tempfile, threading, traceback, wave
+import hashlib, importlib.metadata, json, os, re, sys, tempfile, threading, traceback, wave
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
