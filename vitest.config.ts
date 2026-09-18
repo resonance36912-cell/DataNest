@@ -1,11 +1,10 @@
 import { defineConfig } from "vitest/config";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 // Vitest config lives here (not in vite.config.ts) so the `test` key is
 // properly typed. tests/e2e/* are Playwright specs driven by
 // playwright.ssr.config.ts — vitest must not collect them.
 export default defineConfig({
-  plugins: [tsconfigPaths()],
+  resolve: { tsconfigPaths: true },
   test: {
     environment: "node",
     // Only project unit tests under src/ — nothing else is collected.

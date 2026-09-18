@@ -4,7 +4,6 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import { nitro } from "nitro/vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 // @ts-expect-error -- .mjs script without types
 import { runBrandCheck } from "./scripts/check-brand-assets.mjs";
 // @ts-expect-error -- .mjs script without types
@@ -73,12 +72,12 @@ function canonicalCheck(): Plugin {
 
 export default defineConfig({
   resolve: {
+    tsconfigPaths: true,
     alias: { "@": `${process.cwd()}/src` },
     dedupe: ["react", "react-dom", "@tanstack/react-query", "@tanstack/query-core"],
   },
   plugins: [
     tailwindcss(),
-    tsconfigPaths({ projects: ["./tsconfig.json"] }),
     tanstackStart({ server: { entry: "server" } }),
     nitro({ preset: "node-server" }),
     react(),
