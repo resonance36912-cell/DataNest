@@ -393,7 +393,7 @@ const Index = () => {
                               <span className="h-2.5 w-2.5 rounded-full border border-success/40 bg-success/20" />
                             </div>
                             <div className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
-                              scanning_channel...
+                              illustrative_demo
                             </div>
                           </div>
 
@@ -410,14 +410,17 @@ const Index = () => {
 
                             <div className="grid grid-cols-2 gap-3">
                               <div className="rounded-xl border border-border/30 bg-secondary/30 p-4">
-                                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-mono">Velocity</p>
+                                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-mono">Example velocity</p>
                                 <p className="font-display font-bold text-2xl mt-1">+84%</p>
                               </div>
                               <div className="rounded-xl border border-border/30 bg-secondary/30 p-4">
-                                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-mono">Resonance</p>
-                                <p className="font-display font-bold text-2xl mt-1 gradient-resonance-text">9.2</p>
+                                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-mono">Example score</p>
+                                <p className="font-display font-bold text-2xl mt-1 gradient-resonance-text">9.2/10</p>
                               </div>
                             </div>
+                            <p className="text-[10px] font-mono text-muted-foreground/60 leading-relaxed">
+                              Illustrative example — not your channel results.
+                            </p>
                           </div>
                         </div>
 
@@ -425,7 +428,7 @@ const Index = () => {
                         <div className="absolute -top-6 -right-4 lg:-right-8 z-30 rounded-2xl border border-primary/30 bg-card/60 backdrop-blur-2xl p-3.5 w-40 shadow-xl">
                           <div className="flex items-center gap-2 mb-2">
                             <span className="h-2 w-2 rounded-full bg-accent animate-pulse" />
-                            <span className="text-[10px] font-mono font-bold uppercase tracking-widest">Live feed</span>
+                            <span className="text-[10px] font-mono font-bold uppercase tracking-widest">Example feed</span>
                           </div>
                           <div className="h-1.5 w-full rounded-full bg-muted/40 mb-1.5" />
                           <div className="h-1.5 w-2/3 rounded-full bg-muted/40" />

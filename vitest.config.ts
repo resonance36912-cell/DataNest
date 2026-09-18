@@ -1,10 +1,15 @@
+import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vitest/config";
 
 // Vitest config lives here (not in vite.config.ts) so the `test` key is
 // properly typed. tests/e2e/* are Playwright specs driven by
 // playwright.ssr.config.ts — vitest must not collect them.
 export default defineConfig({
-  resolve: { tsconfigPaths: true },
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
+  },
   test: {
     environment: "node",
     // Only project unit tests under src/ — nothing else is collected.
