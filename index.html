@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en-ZA">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resonance Creative Studio — AI Content for SA Brands</title>
+    <meta name="description" content="SA AI creative studio. Turn URLs, images, docs, or prompts into posters, ads, social posts and cinematic videos. English & Afrikaans-friendly." />
+    <meta name="author" content="Resonance Creative Studio" />
+    <meta name="geo.region" content="ZA" />
+    <meta name="geo.placename" content="South Africa" />
+    <meta name="google-site-verification" content="2lE0pAgMEbuv72esss2JbnRc5RMH7sYsVb0OVjBRgyM" />
+    <meta name="google-site-verification" content="o7TX55ekEce_xSHTd_mWMale6MS_-d-s0RlfAr1_DXo" />
+
+
+    <!-- Self-hosted fonts: preload latin woff2 for Sora (headings) + Manrope (body).
+         @font-face declarations live in src/index.css with font-display: swap and unicode-range
+         so latin-ext only loads on demand. No third-party font-CDN round-trip. -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/sora-latin.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/manrope-latin.woff2" crossorigin />
+
+    <!-- LCP preload: responsive hero image (AVIF first, WebP fallback). Browsers pick the best match before React mounts. -->
+    <link
+      rel="preload"
+      as="image"
+      type="image/avif"
+      imagesrcset="/hero/hero-640.avif 640w, /hero/hero-960.avif 960w, /hero/hero-1280.avif 1280w, /hero/hero-1600.avif 1600w, /hero/hero-1920.avif 1920w"
+      imagesizes="100vw"
+      fetchpriority="high"
+    />
+    <link rel="preload" as="image" href="/logo-icon.jpg" fetchpriority="high" />
+
+    <!-- SEO consolidation: this spoke canonicalises to the Resonance Hub so
+         search engines attribute all queries + link equity to www.reson8.life.
+         Per-route canonical is emitted by react-helmet-async (src/components/SEO.tsx). -->
+    <link rel="canonical" href="https://www.reson8.life/" />
+
+    <!-- hreflang: this spoke serves one English (South Africa) version and the
+         hub is the canonical target for every locale, so en-ZA, en and
+         x-default all resolve to the same hub URL. Per-route hreflang is
+         emitted by src/components/SEO.tsx. -->
+    <link rel="alternate" hreflang="en-za" href="https://www.reson8.life/" />
+    <link rel="alternate" hreflang="en" href="https://www.reson8.life/" />
+    <link rel="alternate" hreflang="x-default" href="https://www.reson8.life/" />
+    <meta name="theme-color" content="#0a0a1f" />
+
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="The Resonance" />
+    <meta property="og:locale" content="en_ZA" />
+    <meta property="og:locale:alternate" content="af_ZA" />
+    <meta property="og:title" content="Resonance Creative Studio — AI Content for SA Brands" />
+    <meta property="og:description" content="Turn URLs, images, docs, or prompts into AI-generated posters, ads, social posts and cinematic videos — made for South African creators. Part of The Resonance Hub." />
+    <meta property="og:url" content="https://www.reson8.life/" />
+    <!-- Ordered og:image chain, per-provider ratio variants first: crawlers use
+         the first URL that returns an image, and providers that prefer another
+         aspect ratio pick it up from their own tag family below.
+         wide 1200x630 (1.91:1) · square 1080x1080 (1:1) · vertical 1000x1500 (2:3) -->
+    <meta property="og:image" content="https://creativestudio.life/og-cover-wide.jpg" />
+    <meta property="og:image:secure_url" content="https://creativestudio.life/og-cover-wide.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Resonance Creative Studio — AI visual content for South African brands" />
+    <meta property="og:image" content="https://resonancestudio.lovable.app/og-cover-wide.jpg" />
+    <meta property="og:image:secure_url" content="https://resonancestudio.lovable.app/og-cover-wide.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Resonance Creative Studio — AI visual content for South African brands" />
+    <meta property="og:image" content="https://creativestudio.life/og-cover-square.jpg" />
+    <meta property="og:image:secure_url" content="https://creativestudio.life/og-cover-square.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1080" />
+    <meta property="og:image:height" content="1080" />
+    <meta property="og:image:alt" content="Resonance Creative Studio — AI visual content for South African brands" />
+    <meta property="og:image" content="https://creativestudio.life/og-cover-vertical.jpg" />
+    <meta property="og:image:secure_url" content="https://creativestudio.life/og-cover-vertical.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1000" />
+    <meta property="og:image:height" content="1500" />
+    <meta property="og:image:alt" content="Resonance Creative Studio — AI visual content for South African brands" />
+    <meta property="og:image" content="https://creativestudio.life/og-cover.jpg" />
+    <meta property="og:image:secure_url" content="https://creativestudio.life/og-cover.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1536" />
+    <meta property="og:image:height" content="1024" />
+    <meta property="og:image:alt" content="Resonance Creative Studio — AI visual content for South African brands" />
+    <meta property="og:image" content="https://creativestudio.life/logo-creative-studio.png" />
+    <meta property="og:image:secure_url" content="https://creativestudio.life/logo-creative-studio.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1024" />
+    <meta property="og:image:height" content="1024" />
+    <meta property="og:image:alt" content="Resonance Creative Studio — AI visual content for South African brands" />
+
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://www.reson8.life/" />
+    <meta name="twitter:domain" content="www.reson8.life" />
+    <meta name="twitter:title" content="Resonance Creative Studio — AI Content for SA Brands" />
+    <meta name="twitter:description" content="Turn URLs, images, docs, or prompts into AI-generated posters, ads, social posts and cinematic videos — made for South African creators. Part of The Resonance Hub." />
+    <meta name="twitter:image" content="https://creativestudio.life/og-cover-wide.jpg" />
+    <meta name="twitter:image:width" content="1200" />
+    <meta name="twitter:image:height" content="630" />
+    <meta name="twitter:image:alt" content="Resonance Creative Studio — AI visual content for South African brands" />
+    <!-- Slack / X labelled card rows -->
+    <meta name="twitter:label1" content="Part of" />
+    <meta name="twitter:data1" content="The Resonance" />
+    <meta name="twitter:label2" content="Made for" />
+    <meta name="twitter:data2" content="South Africa" />
+
+    <!-- Google / Gmail annotated cards (schema.org microdata) — 1.91:1 -->
+    <meta itemprop="name" content="Resonance Creative Studio — AI Content for SA Brands" />
+    <meta itemprop="description" content="Turn URLs, images, docs, or prompts into AI-generated posters, ads, social posts and cinematic videos — made for South African creators. Part of The Resonance Hub." />
+    <meta itemprop="image" content="https://creativestudio.life/og-cover-wide.jpg" />
+    <meta name="thumbnail" content="https://creativestudio.life/og-cover-wide.jpg" />
+
+    <!-- Pinterest rich pins — 2:3 vertical pin artwork -->
+    <meta name="pinterest-rich-pin" content="true" />
+    <meta name="pinterest:media" content="https://creativestudio.life/og-cover-vertical.jpg" />
+    <meta name="pinterest:description" content="Turn URLs, images, docs, or prompts into AI-generated posters, ads, social posts and cinematic videos — made for South African creators. Part of The Resonance Hub." />
+
+    <!-- Microsoft Teams / Windows tiles, WhatsApp & iMessage — 1:1 square -->
+    <meta name="msapplication-TileImage" content="https://creativestudio.life/og-cover-square.jpg" />
+    <meta name="msapplication-TileColor" content="#0a0a1f" />
+
+    <!-- Apple iMessage / iOS home screen + legacy scrapers -->
+    <link rel="apple-touch-icon" href="/logo-icon.png" />
+    <link rel="image_src" href="https://creativestudio.life/og-cover-wide.jpg" />
+
+
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "The Resonance",
+        "alternateName": "Resonance Hub",
+        "url": "https://www.reson8.life/",
+        "logo": "https://creativestudio.life/logo-creative-studio.png",
+        "description": "The Resonance Hub — official pricing, updates, checkout, and support for the Resonance ecosystem (including Creative Studio).",
+        "areaServed": "ZA",
+        "sameAs": ["https://reson8.life", "https://creativestudio.life", "https://www.resonanceonline.life"]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Resonance Creative Studio",
+        "applicationCategory": "DesignApplication",
+        "operatingSystem": "Web",
+        "url": "https://www.reson8.life/",
+        "image": "https://creativestudio.life/og-cover.jpg",
+        "description": "South African AI creative studio for posters, brochures, advertisements, social posts, and cinematic videos. Part of The Resonance Hub.",
+        "inLanguage": ["en-ZA", "af-ZA"],
+        "isPartOf": { "@type": "Organization", "name": "The Resonance", "url": "https://www.reson8.life/" },
+        "sameAs": ["https://reson8.life", "https://www.resonanceonline.life"]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "The Resonance",
+        "url": "https://www.reson8.life/",
+        "inLanguage": ["en-ZA", "af-ZA"],
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://www.reson8.life/?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+    <style>
+      /* Crawlable fallback content removed once React mounts. */
+      #seo-fallback { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+    </style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <!-- Crawlable fallback for non-JS crawlers (LinkedIn, Slack, Facebook, basic bots).
+         Visually hidden via CSS; React removes #seo-fallback on mount so JS users never see it. -->
+    <div id="seo-fallback">
+      <h1>Resonance Creative Studio — AI Visual Content Generation for South African Brands</h1>
+      <p>Turn product images, screenshots, briefs, and prompts into AI-generated posters, ads, social posts, product visuals, YouTube thumbnails, podcast episode covers, and cinematic video concepts. Upload an image, paste product details, or complete a guided brief — a reference link is optional. Built for South African creators, English and Afrikaans-friendly, ZAR-first pricing.</p>
+      <h2>What you can create</h2>
+      <ul>
+        <li>Brief to Creative — upload a product image, complete a guided brief, or add a reference link to generate a campaign-ready creative brief</li>
+        <li>Product Ad Generator — Takealot-ready product creatives</li>
+        <li>Podcast Episode Poster Generator</li>
+        <li>YouTube Thumbnail Generator</li>
+        <li>Social Media Hub — Instagram, Facebook, TikTok, LinkedIn</li>
+        <li>Brand DNA Builder — reusable brand identity per domain</li>
+        <li>Cinematic Video Concepts powered by Kling 2.1</li>
+        <li>Voiceovers and jingles via ElevenLabs</li>
+      </ul>
+      <h2>Get started</h2>
+      <p>
+        <a href="/signup">Sign up &amp; sign in</a> ·
+        <a href="/studio">Open the studio</a> ·
+        <a href="https://www.reson8.life/pricing" rel="noopener noreferrer">View hub pricing</a> ·
+        <a href="/about">About Resonance Creative Studio</a>
+      </p>
+      <p>Part of <a href="https://reson8.life" target="_blank" rel="noopener noreferrer">The Resonance</a>.</p>
+    </div>
+
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
