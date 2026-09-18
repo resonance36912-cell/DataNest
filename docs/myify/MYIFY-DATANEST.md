@@ -6,16 +6,23 @@ MYIFY means **May Your Intentions Find You**. It is a governed RONSAS module tha
 
 A mobile or fixed-wireless data package is a carrier entitlement, not a file that can be copied into storage. DataNest therefore stores **rights, reservations, settlement evidence, and participation accounting** rather than pretending to warehouse raw gigabytes.
 
+## Universal Time alignment
+
+MYIFY uses **Coordinated Universal Time (UTC)** as the canonical operational timeline. Carrier expiry, transfer-window opening and closing, reallocation priority, reservations, settlements, and ledger evidence are normalized to UTC. Local time may be shown for human convenience, but it does not control ordering or settlement.
+
+Each package receives a 72-hour sovereign transfer window ending at the carrier-reported expiry. The system also records the expiry as Unix epoch seconds so different routers, devices, regions, and future carrier adapters can compare the same instant without timezone ambiguity.
+
 The MYIFY flow is:
 
-1. A subscriber records an operator-reported data package and expiry.
+1. A subscriber records an operator-reported data package and expiry; the expiry is normalized to UTC.
 2. Eligibility is recorded explicitly: rollover, carrier transfer, and/or Wi-Fi/router sharing permission.
 3. A RONSAS Mirror Router is registered.
-4. MYIFY recommends reservation amounts using first-expiry attention.
-5. A reservation places eligible capacity into the DataNest allocation queue.
-6. Settlement occurs only after eligible usage or transfer is actually verified.
-7. Settled contribution earns DataNest Participation Units (DPU) in the append-only ledger.
-8. Unsettled reservations can be released without earning DPU.
+4. MYIFY calculates an expiry-aware UTC priority score and opens a sovereign transfer window 72 hours before expiry.
+5. An eligible bundle may be queued for DataNest, subscriber, or business-pool reallocation only while that UTC window is open.
+6. Queueing atomically reserves the requested MB against the source package.
+7. Settlement occurs only after eligible usage or transfer is actually verified.
+8. Verified non-simulation settlement may earn DataNest Participation Units (DPU) in the append-only ledger.
+9. Unsettled reservations can be released without earning DPU.
 
 ## DataNest Participation Units
 
@@ -66,6 +73,18 @@ Tracks reserved and settled MB against a specific package and Mirror Router.
 
 Append-only reservation/settlement/release evidence. UPDATE and DELETE are blocked by a database trigger.
 
+### myify_reallocation_queue
+
+Stores UTC-bounded sovereign reallocation reservations. Queue order is based on expiry pressure, rollover status, transfer eligibility, verification state, and available MB. Priority is an operational scheduling score, not a price or investment valuation.
+
+The queue supports three target scopes:
+
+- datanest — reallocation inside the contributor's own DataNest;
+- subscriber — an eligible carrier-supported subscriber transfer path;
+- business_pool — internal DataNest pooling for later governed allocation.
+
+A target scope does not override carrier terms and does not itself execute a carrier transfer.
+
 ## Security model
 
 - Public and authenticated database clients receive no table access.
@@ -75,11 +94,13 @@ Append-only reservation/settlement/release evidence. UPDATE and DELETE are block
 - RLS is enabled on every MYIFY table as defense in depth.
 - The service-role key is never exposed to the browser.
 
-## Expiry logic
+## UTC expiry and reallocation logic
 
-The UI classifies packages as urgent at 24 hours or less, soon at more than 24 and up to 72 hours, safe above 72 hours, and expired after the expiry time.
+The UI classifies packages against UTC as urgent at 24 hours or less, soon at more than 24 and up to 72 hours, safe above 72 hours, and expired after the expiry instant.
 
-For eligible packages, urgent data recommends all available MB, soon recommends 75%, safe/non-rollover recommends 25%, and safe/rollover-eligible recommends no automatic reservation. This is a planning heuristic, not a carrier guarantee.
+The sovereign reallocation window opens 72 hours before expiry and closes exactly at expiry. The database rejects queue attempts before the window opens or after it closes. On dashboard refresh, expired queue entries are swept: unsettled reservations are released, the queue item is marked expired, and no DPU is earned.
+
+Within the window, priority increases as expiry approaches. Non-rollover capacity, carrier-transferable capacity, verified source data, and larger available balances receive additional operational priority. For eligible packages, urgent data recommends all available MB and soon data recommends 75%. This is a scheduling heuristic, not a carrier guarantee or financial valuation.
 
 ### UTC reallocation queue
 

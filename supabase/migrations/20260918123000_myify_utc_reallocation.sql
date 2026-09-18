@@ -269,4 +269,77 @@ CREATE TRIGGER myify_allocation_reallocation_sync
   AFTER UPDATE OF status ON public.myify_allocations
   FOR EACH ROW EXECUTE FUNCTION public.myify_sync_reallocation_status();
 
+CREATE OR REPLACE FUNCTION public.myify_sweep_reallocation_queue(_actor_user_id uuid)
+RETURNS integer
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+  item public.myify_reallocation_queue;
+  allocation public.myify_allocations;
+  outstanding_mb bigint;
+  swept integer := 0;
+BEGIN
+  FOR item IN
+    SELECT *
+    FROM public.myify_reallocation_queue
+    WHERE owner_user_id = _actor_user_id
+      AND status IN ('queued', 'claimed')
+      AND window_closes_at <= now()
+    ORDER BY window_closes_at
+    FOR UPDATE
+  LOOP
+    UPDATE public.myify_reallocation_queue
+    SET status = 'expired'
+    WHERE id = item.id;
+
+    SELECT * INTO allocation
+    FROM public.myify_allocations
+    WHERE id = item.allocation_id
+    FOR UPDATE;
+
+    IF allocation.id IS NOT NULL
+      AND allocation.status IN ('reserved', 'partially_settled') THEN
+      outstanding_mb := allocation.reserved_mb - allocation.settled_mb;
+
+      IF outstanding_mb > 0 THEN
+        UPDATE public.myify_data_packages
+        SET reserved_mb = greatest(0, reserved_mb - outstanding_mb),
+            status = CASE
+              WHEN expires_at <= now() AND status = 'active'
+                THEN 'expired'::public.myify_package_status
+              ELSE status
+            END
+        WHERE id = allocation.package_id;
+
+        UPDATE public.myify_allocations
+        SET status = 'released'
+        WHERE id = allocation.id;
+
+        INSERT INTO public.myify_interest_ledger (
+          owner_user_id, datanest_id, allocation_id, event_type,
+          mb_delta, units_delta, status, basis,
+          metadata
+        ) VALUES (
+          _actor_user_id, allocation.datanest_id, allocation.id, 'release',
+          -outstanding_mb, 0, 'released',
+          'UTC transfer window expired; unsettled sovereign reservation released with no participation units earned.',
+          jsonb_build_object('timeline_standard', 'UTC', 'queue_id', item.id)
+        );
+      END IF;
+    END IF;
+
+    swept := swept + 1;
+  END LOOP;
+
+  RETURN swept;
+END
+$$;
+
+REVOKE ALL ON FUNCTION public.myify_sweep_reallocation_queue(uuid)
+  FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.myify_sweep_reallocation_queue(uuid)
+  TO service_role;
+
 COMMIT;

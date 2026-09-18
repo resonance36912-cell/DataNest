@@ -32,6 +32,11 @@ export const getMyifyDashboard = createServerFn({ method: "GET" })
     const db = await myifyDb();
     const nest = await ensureDataNest(db, context.userId);
 
+    const { error: sweepError } = await db.rpc("myify_sweep_reallocation_queue", {
+      _actor_user_id: context.userId,
+    });
+    if (sweepError) throw new Error(sweepError.message);
+
     const [packages, routers, allocations, ledger, reallocationQueue] = await Promise.all([
       db
         .from("myify_data_packages")

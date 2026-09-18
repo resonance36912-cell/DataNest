@@ -364,8 +364,8 @@ function MyifyWorkspace() {
                 <section className="rounded-xl border bg-card p-5">
                   <h2 className="font-semibold">Mirror Router</h2>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Simulation is operational now. Hardware modes remain offline until a device
-                    adapter is paired; router credentials are never stored here.
+                    Simulation is operational now but earns zero DPU. Hardware modes remain offline
+                    until a device adapter is paired; router credentials are never stored here.
                   </p>
                   <form
                     className="mt-4 space-y-3"
@@ -533,7 +533,7 @@ function MyifyWorkspace() {
                   <h2 className="font-semibold">Allocation settlement</h2>
                   <p className="mt-1 text-xs text-muted-foreground">
                     Settlement means the reserved amount was actually consumed or transferred
-                    through an eligible path. Only settled MB earn DPU.
+                    through an eligible path. Only verified non-simulation settlement may earn DPU.
                   </p>
                   <form
                     className="mt-4 grid gap-3 md:grid-cols-[1fr_140px_auto]"
@@ -605,11 +605,14 @@ function MyifyWorkspace() {
                       <div key={item.id} className="rounded-lg border p-3 text-xs">
                         <div className="flex items-center justify-between gap-2">
                           <span className="font-medium">
-                            Priority {item.priority_score} · {item.target_scope.replaceAll("_", " ")}
+                            Priority {item.priority_score} ·{" "}
+                            {item.target_scope.replaceAll("_", " ")}
                           </span>
                           <Status value={item.status} />
                         </div>
-                        <p className="mt-2">{formatGb(item.requested_mb)} reserved for reallocation</p>
+                        <p className="mt-2">
+                          {formatGb(item.requested_mb)} reserved for reallocation
+                        </p>
                         <p className="mt-1 text-muted-foreground">
                           Closes {formatUtcDate(item.window_closes_at)}
                         </p>
@@ -642,7 +645,7 @@ function MyifyWorkspace() {
                         </p>
                         <p className="mt-1 text-muted-foreground">{entry.basis}</p>
                         <p className="mt-2 text-[10px] text-muted-foreground">
-                          {formatDate(entry.created_at)}
+                          {formatUtcDate(entry.created_at)}
                         </p>
                       </div>
                     ))}
@@ -652,9 +655,10 @@ function MyifyWorkspace() {
                 <section className="rounded-xl border bg-card p-5 text-sm leading-6">
                   <h2 className="font-semibold">Operating rule</h2>
                   <p className="mt-2 text-muted-foreground">
-                    MYIFY never treats an unverified reservation as an earned business interest.
-                    Hardware adapters must obey operator terms, subscriber consent, RONSAS
-                    governance, and network security.
+                    UTC is the canonical operational clock for package expiry, transfer windows,
+                    queue priority, and settlement evidence. MYIFY never treats an unverified or
+                    simulated reservation as earned participation. Hardware adapters must obey
+                    operator terms, subscriber consent, RONSAS governance, and network security.
                   </p>
                 </section>
               </aside>
@@ -756,9 +760,13 @@ function formatGb(mb: number) {
   return gb >= 10 ? gb.toFixed(1) + " GB" : gb.toFixed(2) + " GB";
 }
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
+function formatUtcDate(value: string) {
+  return (
+    new Intl.DateTimeFormat(undefined, {
+      dateStyle: "medium",
+      timeStyle: "short",
+      timeZone: "UTC",
+      hour12: false,
+    }).format(new Date(value)) + " UTC"
+  );
 }
