@@ -1,9 +1,7 @@
 import { expect, test } from "bun:test";
 
-const corePath =
-  "supabase/migrations/20260918110500_myify_datanest_core.sql";
-const utcPath =
-  "supabase/migrations/20260918123000_myify_utc_reallocation.sql";
+const corePath = "supabase/migrations/20260918110500_myify_datanest_core.sql";
+const utcPath = "supabase/migrations/20260918123000_myify_utc_reallocation.sql";
 
 const core = await Bun.file(corePath).text();
 const utc = await Bun.file(utcPath).text();
@@ -17,12 +15,8 @@ test("unverified packages cannot earn DataNest Participation Units", () => {
   expect(core).toContain(
     "verified_package := COALESCE(package.metadata->>'verification', '') = 'verified'",
   );
-  expect(core).toContain(
-    "WHEN router.mode = 'simulation' OR NOT verified_package THEN 0",
-  );
-  expect(core).toContain(
-    "IF router.mode <> 'simulation' AND verified_package THEN",
-  );
+  expect(core).toContain("WHEN router.mode = 'simulation' OR NOT verified_package THEN 0");
+  expect(core).toContain("IF router.mode <> 'simulation' AND verified_package THEN");
 });
 
 test("UTC queue is bounded by its transfer window", () => {
