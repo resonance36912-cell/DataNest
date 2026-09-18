@@ -1,31 +1,44 @@
-name: Production release
+name: DORMANT - Cloudflare Worker hosting migration
+
+run-name: DORMANT Worker migration @ ${{ github.sha }}
 
 on:
   workflow_dispatch:
     inputs:
       confirmation:
-        description: Type RELEASE reson8.life
+        description: Type MIGRATE reson8.life TO CLOUDFLARE WORKER
         required: true
         type: string
       apply_migrations:
-        description: Apply pending Supabase migrations
+        description: Apply reviewed Supabase migrations as part of the hosting migration
         required: true
-        default: true
+        default: false
         type: boolean
 
 permissions:
   contents: read
 
 concurrency:
-  group: production-reson8-life
+  group: production-reson8-life-worker-migration
   cancel-in-progress: false
 
 jobs:
   validate:
-    name: Validate release candidate
+    name: Validate dormant Worker migration candidate
     runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     timeout-minutes: 15
     steps:
+      - name: Require separately reviewed Worker-hosting migration
+        env:
+          MIGRATION_GATE: ${{ vars.ALLOW_CLOUDFLARE_WORKER_PRODUCTION_MIGRATION }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          if [ "${MIGRATION_GATE}" != "REVIEWED_MIGRATION_APPROVED" ]; then
+            echo "::error::This workflow is dormant while the sovereign Ealiophin named-tunnel/Caddy stack is production authority."
+            echo "::error::A separately reviewed hosting migration must set ALLOW_CLOUDFLARE_WORKER_PRODUCTION_MIGRATION=REVIEWED_MIGRATION_APPROVED before this workflow can proceed."
+            exit 78
+          fi
+          test "${CONFIRMATION}" = "MIGRATE reson8.life TO CLOUDFLARE WORKER"
       - uses: actions/checkout@v5
       - uses: oven-sh/setup-bun@v2
         with:
@@ -36,7 +49,7 @@ jobs:
           CONFIRMATION: ${{ inputs.confirmation }}
         run: |
           test "${GITHUB_REF}" = "refs/heads/main"
-          test "${CONFIRMATION}" = "RELEASE reson8.life"
+          test "${CONFIRMATION}" = "MIGRATE reson8.life TO CLOUDFLARE WORKER"
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Verify, test, typecheck, and build
@@ -54,7 +67,7 @@ jobs:
           retention-days: 30
 
   deploy:
-    name: Migrate and deploy production
+    name: Migrate and deploy Cloudflare Worker (migration only)
     needs: validate
     runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     timeout-minutes: 15
@@ -62,6 +75,13 @@ jobs:
       name: production
       url: ${{ vars.PRODUCTION_BASE_URL }}
     steps:
+      - name: Re-assert reviewed Worker-hosting migration gate
+        env:
+          MIGRATION_GATE: ${{ vars.ALLOW_CLOUDFLARE_WORKER_PRODUCTION_MIGRATION }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          test "${MIGRATION_GATE}" = "REVIEWED_MIGRATION_APPROVED"
+          test "${CONFIRMATION}" = "MIGRATE reson8.life TO CLOUDFLARE WORKER"
       - uses: actions/checkout@v5
       - uses: oven-sh/setup-bun@v2
         with:
