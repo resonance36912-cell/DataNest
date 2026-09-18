@@ -232,7 +232,6 @@ jobs:
           fi
 
       - name: Build production bundle
-        if: steps.smoke_target.outputs.needs_local == 'true'
         run: bun run build
 
       # The TanStack Start build emits a Cloudflare Worker at
@@ -245,7 +244,7 @@ jobs:
           bunx wrangler dev --config wrangler.json --port 8080 --ip 127.0.0.1 > /tmp/preview-server.log 2>&1 &
           echo $! > /tmp/preview-server.pid
           for i in {1..90}; do
-            if curl -sf http://127.0.0.1:8080/ > /dev/null; then
+            if grep -q "Ready on http://127.0.0.1:8080" /tmp/preview-server.log; then
               echo "Preview server ready after ${i}s"
               exit 0
             fi
@@ -261,7 +260,7 @@ jobs:
           BASE_URL: ${{ steps.smoke_target.outputs.base_url }}
         run: |
           for i in {1..30}; do
-            if curl -sfL "$BASE_URL/" > /dev/null; then
+            if curl -sfL --connect-timeout 5 --max-time 15 "$BASE_URL/" > /dev/null; then
               echo "Remote preview ready at $BASE_URL"
               exit 0
             fi
@@ -419,7 +418,7 @@ jobs:
           bunx wrangler dev --config wrangler.json --port 8080 --ip 127.0.0.1 > /tmp/preview-server.log 2>&1 &
           echo $! > /tmp/preview-server.pid
           for i in {1..90}; do
-            if curl -sf http://127.0.0.1:8080/ > /dev/null; then
+            if grep -q "Ready on http://127.0.0.1:8080" /tmp/preview-server.log; then
               echo "Preview server ready after ${i}s"
               exit 0
             fi
@@ -435,7 +434,7 @@ jobs:
           BASE_URL: ${{ steps.smoke_target.outputs.base_url }}
         run: |
           for i in {1..30}; do
-            if curl -sfL "$BASE_URL/" > /dev/null; then
+            if curl -sfL --connect-timeout 5 --max-time 15 "$BASE_URL/" > /dev/null; then
               echo "Remote preview ready at $BASE_URL"
               exit 0
             fi

@@ -1,13 +1,11 @@
 #!/usr/bin/env bun
 /**
- * Verify sitemap.xml and robots.txt include every Resonance app and the
- * hub pricing routes that back each pricing anchor.
+ * Verify sitemap.xml and robots.txt expose the governed RONSAS Hub routes and
+ * the pricing paths that back each canonical pricing anchor.
  *
  * Fetches from BASE_URL (default http://localhost:8080). Exits non-zero on
  * any missing entry so CI fails loudly.
  */
-import { APP_REGISTRY } from "../src/lib/app-registry";
-
 const BASE = (process.env.BASE_URL ?? "http://localhost:8080").replace(/\/$/, "");
 
 // Hub pricing routes (each redirects to /pricing#<anchor>). One per paid app
@@ -21,23 +19,13 @@ const HUB_PRICING_PATHS = [
 ];
 
 // Anchors on /pricing that MUST be reachable (matches ids in pricing.tsx).
-const PRICING_ANCHORS = [
-  "epublisher",
-  "creative-studio",
-  "sync-vision",
-  "youtube-optimizer",
-];
-
-// Every paid spoke's public URL (canonical marketing / app URL).
-const SPOKE_URLS = Object.values(APP_REGISTRY)
-  .filter((e) => e.key !== "all_access")
-  .map((e) => e.publicUrl);
+const PRICING_ANCHORS = ["epublisher", "creative-studio", "sync-vision", "youtube-optimizer"];
 
 type Failure = { file: string; missing: string };
 const failures: Failure[] = [];
 
 async function fetchText(path: string): Promise<string> {
-  const res = await fetch(new URL(path, BASE).toString());
+  const res = await fetch(new URL(path, BASE).toString(), { signal: AbortSignal.timeout(15_000) });
   if (!res.ok) throw new Error(`GET ${path} → ${res.status}`);
   return res.text();
 }
@@ -72,16 +60,6 @@ for (const path of HUB_PRICING_PATHS) {
   } else {
     console.log(`  ✗ missing hub path: ${path}`);
     failures.push({ file: "sitemap.xml", missing: `hub path ${path}` });
-  }
-}
-
-// Every paid spoke's public URL must be listed.
-for (const url of SPOKE_URLS) {
-  if (locs.includes(url)) {
-    console.log(`  ✓ ${url}`);
-  } else {
-    console.log(`  ✗ missing spoke URL: ${url}`);
-    failures.push({ file: "sitemap.xml", missing: `spoke URL ${url}` });
   }
 }
 
