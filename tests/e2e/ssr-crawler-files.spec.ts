@@ -33,7 +33,7 @@ function appRoutes(): string[] {
 }
 
 const INDEXABLE_ROUTES = appRoutes().filter(
-  (r) => !NON_INDEXABLE.has(r) && !r.includes("$"),
+  (r) => !NON_INDEXABLE.has(r) && !r.includes("$") && !r.startsWith("/api/"),
 );
 
 async function fetchText(path: string) {

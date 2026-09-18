@@ -91,15 +91,15 @@ const Features = () => {
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "SoftwareApplication",
-          "@id": "http://192.168.1.50:3401/features#software",
+          "@id": "https://youtubeoptimizer.life/features#software",
           name: "Resonance YouTube Optimizer",
           applicationCategory: "BusinessApplication",
           operatingSystem: "Web",
-          url: "http://192.168.1.50:3401/features",
+          url: "https://youtubeoptimizer.life/features",
           description:
             "AI channel audits, episode analysis, content ideas, monetization, scheduling and thumbnail tools for YouTube creators.",
           featureList: features.map((f) => f.title),
-          publisher: { "@id": "http://192.168.1.50:4173/#organization" },
+          publisher: { "@id": "https://reson8.life/#organization" },
           offers: { "@type": "Offer", priceCurrency: "ZAR", price: "0" },
         }}
       />

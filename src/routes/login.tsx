@@ -14,11 +14,11 @@ export const Route = createFileRoute("/login")({
       },
       { name: "robots", content: "noindex, follow" },
       { property: "og:title", content: "Sign in – Resonance YouTube Optimizer" },
-      { property: "og:url", content: "http://192.168.1.50:3401/login" },
+      { property: "og:url", content: "https://youtubeoptimizer.life/login" },
       // Root no longer emits og:image (leaf routes own it), so this auth route
       // declares the brand lockup itself for shared sign-in links.
-      { property: "og:image", content: "http://192.168.1.50:3401/og-image.png" },
-      { property: "og:image:secure_url", content: "http://192.168.1.50:3401/og-image.png" },
+      { property: "og:image", content: "https://youtubeoptimizer.life/og-image.png" },
+      { property: "og:image:secure_url", content: "https://youtubeoptimizer.life/og-image.png" },
       { property: "og:image:type", content: "image/png" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
@@ -26,12 +26,12 @@ export const Route = createFileRoute("/login")({
         property: "og:image:alt",
         content: "Resonance YouTube Optimizer — Tools in tune with you",
       },
-      { name: "twitter:image", content: "http://192.168.1.50:3401/og-image.png" },
+      { name: "twitter:image", content: "https://youtubeoptimizer.life/og-image.png" },
       {
         name: "twitter:image:alt",
         content: "Resonance YouTube Optimizer — Tools in tune with you",
       },
     ],
-    links: [{ rel: "canonical", href: "http://192.168.1.50:3401/login" }],
+    links: [{ rel: "canonical", href: "https://youtubeoptimizer.life/login" }],
   }),
 });

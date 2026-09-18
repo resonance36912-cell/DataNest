@@ -84,17 +84,17 @@ const Contact = () => {
           {
             "@context": "https://schema.org",
             "@type": "ContactPage",
-            "@id": "http://192.168.1.50:3401/contact#contactpage",
-            url: "http://192.168.1.50:3401/contact",
+            "@id": "https://youtubeoptimizer.life/contact#contactpage",
+            url: "https://youtubeoptimizer.life/contact",
             name: "Contact Resonance YouTube Optimizer",
             description:
               "Reach the Resonance team via WhatsApp, email, YouTube or Facebook.",
-            publisher: { "@id": "http://192.168.1.50:4173/#organization" },
+            publisher: { "@id": "https://reson8.life/#organization" },
           },
           {
           "@context": "https://schema.org",
           "@type": "FAQPage",
-          "@id": "http://192.168.1.50:3401/contact#faq",
+          "@id": "https://youtubeoptimizer.life/contact#faq",
           mainEntity: faqs.map((f) => ({
             "@type": "Question",
             name: f.q,

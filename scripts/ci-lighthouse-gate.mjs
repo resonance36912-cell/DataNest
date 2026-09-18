@@ -4,7 +4,7 @@
  * production build.
  *
  * 1. builds the app (skip with SKIP_BUILD=1)
- * 2. serves the built worker with wrangler
+ * 2. serves the built Nitro Node server
  * 3. runs Lighthouse on every route in lighthouse-thresholds.json
  * 4. fails when a category is below its absolute floor OR regressed more
  *    than `maxRegression` points against .lighthouse/baseline.json
@@ -18,6 +18,7 @@ import {
   mkdirSync,
   readFileSync,
   readdirSync,
+  rmSync,
   writeFileSync,
 } from "node:fs";
 import path from "node:path";
@@ -33,6 +34,7 @@ import { baselinePath, describeTrack, resolveTrack } from "./lh-track.mjs";
 
 const PORT = Number(process.env["LH_PORT"] ?? 8789);
 const BASE = `http://127.0.0.1:${PORT}`;
+const SERVER_ENTRY = path.join(".output", "server", "index.mjs");
 const CONFIG_PATH = "lighthouse-thresholds.json";
 /**
  * Baseline track: CI-runner numbers and local-machine numbers live in separate
@@ -148,8 +150,14 @@ async function auditRoute(route, chromePath) {
     import("chrome-launcher"),
   ]);
 
+  const routeKey = route === "/" ? "root" : route.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "");
+  const userDataDir = path.resolve(".lighthouse", ".chrome-profiles", `${process.pid}-${routeKey}`);
+  rmSync(userDataDir, { recursive: true, force: true, maxRetries: 10 });
+  mkdirSync(userDataDir, { recursive: true });
+
   const chrome = await chromeLauncher.launch({
     chromePath,
+    userDataDir,
     chromeFlags: [
       "--headless=new",
       "--no-sandbox",
@@ -185,6 +193,11 @@ async function auditRoute(route, chromePath) {
     }
   } finally {
     await chrome.kill();
+    try {
+      rmSync(userDataDir, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
+    } catch (err) {
+      log(`warning: could not remove Chrome profile ${userDataDir}: ${err.message}`);
+    }
   }
 }
 
@@ -312,8 +325,8 @@ async function main() {
     log("building production bundle…");
     await run("bun", ["run", "build"]);
   }
-  if (!existsSync("dist/server/wrangler.json")) {
-    throw new Error("dist/server/wrangler.json missing — run `bun run build` first");
+  if (!existsSync(SERVER_ENTRY)) {
+    throw new Error(`${SERVER_ENTRY} missing - run bun run build first`);
   }
 
   log(`baseline track: ${describeTrack(TRACK)}`);
@@ -326,23 +339,11 @@ async function main() {
   const chromePath = resolveChromePath();
   log(`chrome: ${chromePath ?? "system default"}`);
 
-  log(`starting production worker on ${BASE}…`);
-  const server = spawn(
-    "bunx",
-    [
-      "wrangler",
-      "dev",
-      "--config",
-      "dist/server/wrangler.json",
-      "--port",
-      String(PORT),
-      "--ip",
-      "127.0.0.1",
-      "--compatibility-flags",
-      "nodejs_compat",
-    ],
-    { stdio: ["ignore", "inherit", "inherit"], env: { ...process.env } },
-  );
+  log(`starting production Nitro server on ${BASE}...`);
+  const server = spawn(process.execPath, [SERVER_ENTRY], {
+    stdio: ["ignore", "inherit", "inherit"],
+    env: { ...process.env, HOST: "127.0.0.1", PORT: String(PORT) },
+  });
 
   let exitCode = 0;
   const results = {};

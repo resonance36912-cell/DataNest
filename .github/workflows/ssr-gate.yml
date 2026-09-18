@@ -153,7 +153,7 @@ jobs:
         run: bun run test:unit
 
       # Playwright e2e specs (tests/e2e/ssr-*.spec.ts) run against the production
-      # SSR worker started by scripts/ci-ssr-gate.mjs. HTTP-only, so no browser
+      # SSR production server started by scripts/ci-ssr-gate.mjs. HTTP-only, so no browser
       # download is needed. A failing assertion fails the build.
       - name: E2E specs (Playwright · SSR production build)
         run: bun run test:e2e
@@ -170,7 +170,7 @@ jobs:
           retention-days: ${{ env.RETENTION_REPORT }}
 
       # Console output of both test steps: Vitest run log plus the SSR gate log,
-      # production build log, wrangler worker stdout/stderr and the Playwright
+      # production build log, Nitro server stdout/stderr and the Playwright
       # runner output. Uploaded whenever a test step fails.
       - name: Upload test run logs on failure
         id: artifact-test-logs
@@ -290,7 +290,7 @@ jobs:
             row "playwright-report" "Playwright HTML report (\`playwright-report/index.html\`)" "$REPORT_URL"
             row "test-results" "Traces, screenshots, Vitest junit/json reports" "$RESULTS_URL"
             row "playwright-videos" "Screen recordings (\`*.webm\`) of failed specs" "$VIDEOS_URL"
-            row "test-logs" "Console output: vitest.log, ssr-gate.log, build.log, wrangler-server.log, playwright.log" "$LOGS_URL"
+            row "test-logs" "Console output: vitest.log, ssr-gate.log, build.log, ssr-server.log, playwright.log" "$LOGS_URL"
 
             echo
             echo "All artifacts: [$RUN_URL#artifacts]($RUN_URL#artifacts) · retained 7 days."
@@ -341,7 +341,7 @@ jobs:
 
               ['test-results', 'Traces, screenshots, Vitest junit/json reports', process.env.RESULTS_URL],
               ['playwright-videos', 'Screen recordings (`*.webm`) of failed specs', process.env.VIDEOS_URL],
-              ['test-logs', 'vitest.log, ssr-gate.log, build.log, wrangler-server.log, playwright.log', process.env.LOGS_URL],
+              ['test-logs', 'vitest.log, ssr-gate.log, build.log, ssr-server.log, playwright.log', process.env.LOGS_URL],
             ];
             const marker = '<!-- ssr-gate-failure-diagnostics -->';
             const body = [
