@@ -1,4 +1,4 @@
-import { installPreviewDiag } from "./lib/previewDiag";
+import { getDiagEntries, installPreviewDiag } from "./lib/previewDiag";
 import "./index.css";
 
 type BootTelemetry = typeof import("./lib/bootTelemetry");
@@ -136,10 +136,7 @@ async function reportBootStartupFailure(error: BootError, phase: "import" | "tim
   try {
     const message = error instanceof Error ? error.message : String(error ?? "Unknown startup error");
     const stack = error instanceof Error ? error.stack : undefined;
-    const [{ logClientError }, { getDiagEntries }] = await Promise.all([
-      import("./lib/errorLogger"),
-      import("./lib/previewDiag"),
-    ]);
+    const { logClientError } = await import("./lib/errorLogger");
     await logClientError({
       message: `[boot-startup] ${phase}: ${message}`,
       stack,
