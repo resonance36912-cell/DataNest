@@ -17,6 +17,7 @@ jobs:
       - run: bun run check:config
       - run: bun run check:escalation
       - run: bun run check:retention
+      - run: bun run check:public-metrics
       - run: bun run typecheck
       - run: bun run test
       - run: bun run build

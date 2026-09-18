@@ -14,6 +14,7 @@
     "check:config": "node scripts/check-config-keys.mjs",
     "check:escalation": "node scripts/check-escalation-config.mjs",
     "check:retention": "node scripts/check-artifact-retention.mjs",
+    "check:public-metrics": "node scripts/check-public-metric-labels.mjs",
     "diagnostics:manifest": "node scripts/diagnostics-manifest.mjs",
     "diagnostics:archive": "node scripts/archive-diagnostics.mjs",
     "test": "vitest run",
