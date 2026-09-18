@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { SavedScene } from "@/components/assembly/SceneTimeline";
 import type { SceneTrim } from "@/components/assembly/SceneTrimEditor";
 import type { MergeJobState } from "@/hooks/useAssemblyMerge";
+import { probeMergeMedia } from "@/lib/media-probe";
 import {
   buildMergeDebugReport,
   downloadMergeDebugReport,
@@ -133,7 +134,6 @@ export async function downloadMergeDebugZipFor(args: {
   trims: Record<number, SceneTrim>;
   mergeState: MergeJobState;
 }) {
-  const { probeMergeMedia } = await import("@/lib/media-probe");
   const [renderJobMeta, projectMeta, renderJobLogs, mediaProbe] = await Promise.all([
     fetchRenderJobMeta(args.mergeState.mergeJobId),
     fetchProjectMeta(args.projectId),
