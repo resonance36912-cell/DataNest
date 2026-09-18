@@ -291,6 +291,7 @@ DECLARE
   router public.myify_router_mirrors;
   outstanding_mb bigint;
   earned_units numeric(20,6);
+  verified_package boolean;
 BEGIN
   IF _settle_mb <= 0 THEN RAISE EXCEPTION 'invalid_settle_mb'; END IF;
 
@@ -305,6 +306,9 @@ BEGIN
   END IF;
   IF allocation.status NOT IN ('reserved', 'partially_settled') THEN
     RAISE EXCEPTION 'allocation_not_settleable';
+  END IF;
+  IF allocation.expires_at <= now() THEN
+    RAISE EXCEPTION 'allocation_expired';
   END IF;
 
   SELECT * INTO router
@@ -323,8 +327,10 @@ BEGIN
     RAISE EXCEPTION 'settle_exceeds_reported_package_balance';
   END IF;
 
+  verified_package := COALESCE(package.metadata->>'verification', '') = 'verified';
+
   earned_units := CASE
-    WHEN router.mode = 'simulation' THEN 0
+    WHEN router.mode = 'simulation' OR NOT verified_package THEN 0
     ELSE round((_settle_mb::numeric / 1024::numeric), 6)
   END;
 
@@ -346,7 +352,7 @@ BEGIN
       END
   WHERE id = package.id;
 
-  IF router.mode <> 'simulation' THEN
+  IF router.mode <> 'simulation' AND verified_package THEN
     UPDATE public.myify_datanests
     SET settled_mb = settled_mb + _settle_mb,
         participation_units = participation_units + earned_units
@@ -361,15 +367,22 @@ BEGIN
     _actor_user_id, allocation.datanest_id, allocation.id, 'settle',
     _settle_mb, earned_units,
     CASE
-      WHEN router.mode = 'simulation' THEN 'provisional'::public.myify_interest_status
+      WHEN router.mode = 'simulation' OR NOT verified_package
+        THEN 'provisional'::public.myify_interest_status
       ELSE 'earned'::public.myify_interest_status
     END,
     CASE
       WHEN router.mode = 'simulation'
         THEN 'Simulation settlement only; no DataNest Participation Units earned.'
+      WHEN NOT verified_package
+        THEN 'Unverified source package; settlement remains provisional and earns no DataNest Participation Units.'
       ELSE 'Internal DataNest Participation Units: 1 DPU per 1024 MB of verified settled contribution.'
     END,
-    jsonb_build_object('router_id', allocation.router_id, 'router_mode', router.mode)
+    jsonb_build_object(
+      'router_id', allocation.router_id,
+      'router_mode', router.mode,
+      'package_verification', COALESCE(package.metadata->>'verification', 'unverified')
+    )
   );
 
   RETURN allocation;
