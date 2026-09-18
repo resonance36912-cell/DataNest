@@ -73,7 +73,7 @@ export const getMyifyDashboard = createServerFn({ method: "GET" })
 
 export const createMyifyPackage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => CreatePackageInput.parse(input))
+  .validator((input: unknown) => CreatePackageInput.parse(input))
   .handler(async ({ data, context }) => {
     const db = await myifyDb();
     const nest = await ensureDataNest(db, context.userId);
@@ -106,7 +106,7 @@ export const createMyifyPackage = createServerFn({ method: "POST" })
 
 export const registerMyifyRouter = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => RegisterRouterInput.parse(input))
+  .validator((input: unknown) => RegisterRouterInput.parse(input))
   .handler(async ({ data, context }) => {
     const db = await myifyDb();
     const { data: router, error } = await db
@@ -131,7 +131,7 @@ export const registerMyifyRouter = createServerFn({ method: "POST" })
 
 export const reserveMyifyAllocation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => ReserveAllocationInput.parse(input))
+  .validator((input: unknown) => ReserveAllocationInput.parse(input))
   .handler(async ({ data, context }) => {
     const db = await myifyDb();
     const { data: allocation, error } = await db.rpc("myify_reserve_allocation", {
@@ -148,7 +148,7 @@ export const reserveMyifyAllocation = createServerFn({ method: "POST" })
 
 export const settleMyifyAllocation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => SettleAllocationInput.parse(input))
+  .validator((input: unknown) => SettleAllocationInput.parse(input))
   .handler(async ({ data, context }) => {
     const db = await myifyDb();
     const { data: allocation, error } = await db.rpc("myify_settle_allocation", {
@@ -163,7 +163,7 @@ export const settleMyifyAllocation = createServerFn({ method: "POST" })
 
 export const releaseMyifyAllocation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => ReleaseAllocationInput.parse(input))
+  .validator((input: unknown) => ReleaseAllocationInput.parse(input))
   .handler(async ({ data, context }) => {
     const db = await myifyDb();
     const { data: allocation, error } = await db.rpc("myify_release_allocation", {

@@ -323,7 +323,10 @@ BEGIN
     RAISE EXCEPTION 'settle_exceeds_reported_package_balance';
   END IF;
 
-  earned_units := round((_settle_mb::numeric / 1024::numeric), 6);
+  earned_units := CASE
+    WHEN router.mode = 'simulation' THEN 0
+    ELSE round((_settle_mb::numeric / 1024::numeric), 6)
+  END;
 
   UPDATE public.myify_allocations
   SET settled_mb = settled_mb + _settle_mb,
@@ -343,10 +346,12 @@ BEGIN
       END
   WHERE id = package.id;
 
-  UPDATE public.myify_datanests
-  SET settled_mb = settled_mb + _settle_mb,
-      participation_units = participation_units + earned_units
-  WHERE id = allocation.datanest_id;
+  IF router.mode <> 'simulation' THEN
+    UPDATE public.myify_datanests
+    SET settled_mb = settled_mb + _settle_mb,
+        participation_units = participation_units + earned_units
+    WHERE id = allocation.datanest_id;
+  END IF;
 
   INSERT INTO public.myify_interest_ledger (
     owner_user_id, datanest_id, allocation_id, event_type,
@@ -354,9 +359,17 @@ BEGIN
     metadata
   ) VALUES (
     _actor_user_id, allocation.datanest_id, allocation.id, 'settle',
-    _settle_mb, earned_units, 'earned',
-    'Internal DataNest Participation Units: 1 DPU per 1024 MB of verified settled contribution.',
-    jsonb_build_object('router_id', allocation.router_id)
+    _settle_mb, earned_units,
+    CASE
+      WHEN router.mode = 'simulation' THEN 'provisional'::public.myify_interest_status
+      ELSE 'earned'::public.myify_interest_status
+    END,
+    CASE
+      WHEN router.mode = 'simulation'
+        THEN 'Simulation settlement only; no DataNest Participation Units earned.'
+      ELSE 'Internal DataNest Participation Units: 1 DPU per 1024 MB of verified settled contribution.'
+    END,
+    jsonb_build_object('router_id', allocation.router_id, 'router_mode', router.mode)
   );
 
   RETURN allocation;

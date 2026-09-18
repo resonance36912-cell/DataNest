@@ -23,6 +23,7 @@ Current pilot accounting basis:
 
 - **1 DPU = 1024 MB of verified settled contribution.**
 - Reservations earn zero DPU.
+- Simulation settlements earn zero DPU and remain provisional evidence only.
 - Released reservations earn zero DPU.
 - DPU are an internal business-interest accounting measure.
 - DPU are **not** shares, cash, cryptocurrency, a deposit, debt, or a guaranteed return.
