@@ -167,8 +167,6 @@ const TemplateEditorDialog = ({
     };
   }, [data, valueProps, wordsUse, wordsAvoid]);
 
-  if (!template || !data) return null;
-
   const handleApply = () => {
     if (!current) return;
     setBusy("apply");
@@ -253,6 +251,8 @@ const TemplateEditorDialog = ({
   useEffect(() => {
     if (conflict) setMergePicks({});
   }, [conflict]);
+
+  if (!template || !data) return null;
 
   const setAllPicks = (side: "mine" | "theirs", fields: string[]) => {
     const next: Record<string, "mine" | "theirs"> = {};
