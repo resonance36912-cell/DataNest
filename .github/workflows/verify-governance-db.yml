@@ -31,6 +31,6 @@ jobs:
 
       - name: Verify governance migrations on sovereign PostgreSQL 17
         env:
-          PODMAN_API_URL: http://host.containers.internal:23750
+          PODMAN_API_URL: http://ronsas-podman-api:2375
           RUNNER_CONTAINER_NAME: ronsas-actions-ealiophin
         run: python scripts/verify-governance-runtime.py
