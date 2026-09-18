@@ -1,16 +1,56 @@
 {
-  "schema": "ronsas.ealiophin.ops-manifest.v1",
-  "captured_at_utc": "2026-09-17T12:25:49.099947+00:00",
+  "schema": "ronsas.ealiophin.ops-manifest.v2",
+  "captured_at_utc": "2026-09-17T17:37:22.780688+00:00",
   "files": [
     {
-      "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Supervisor.ps1",
-      "repo_path": "control-center\\RONS-Supervisor.ps1",
-      "sha256": "09cf1ce736959f63cc75610e99a25803a316f68ffbc32e03b0ad4f09d2e9ff88"
+      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\integrations\\rons-cluster\\RONSAS-MODULES.json",
+      "repo_path": "cluster\\RONSAS-MODULES.json",
+      "sha256": "ecb03e995e3323bc567a1c36fcb5639e69357594d3620f76beb6798bfe987297"
     },
     {
-      "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Recover-Suite.ps1",
-      "repo_path": "control-center\\RONS-Recover-Suite.ps1",
-      "sha256": "6c5a397fbe1fc269d48d33c31f0103848e48e6cff55aed7322b351d9d21331cd"
+      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\integrations\\rons-cluster\\START-RONS-ECOSYSTEM.ps1",
+      "repo_path": "cluster\\START-RONS-ECOSYSTEM.ps1",
+      "sha256": "ccc752f33758a036c618899102cc01c95e64fd26d79a670d6059893c37fe0bd0"
+    },
+    {
+      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\integrations\\rons-cluster\\START-RONSAS-ECOSYSTEM.ps1",
+      "repo_path": "cluster\\START-RONSAS-ECOSYSTEM.ps1",
+      "sha256": "440f59bea7817fa27454bc22bcaac6c206e2d99955e37387f43d790fe06bdbc0"
+    },
+    {
+      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\integrations\\rons-cluster\\STATUS-RONS-ECOSYSTEM.ps1",
+      "repo_path": "cluster\\STATUS-RONS-ECOSYSTEM.ps1",
+      "sha256": "cad04accb36e2f5b190051938133cc85f64eb3606bb4c674d639fd98cdffb448"
+    },
+    {
+      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\integrations\\rons-cluster\\STATUS-RONSAS-ECOSYSTEM.ps1",
+      "repo_path": "cluster\\STATUS-RONSAS-ECOSYSTEM.ps1",
+      "sha256": "d77c06265a9699779cc9737cd0b9b89b77acb93eb8e6580e6d8f5c20096948e4"
+    },
+    {
+      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\integrations\\rons-cluster\\STOP-RONS-ECOSYSTEM.ps1",
+      "repo_path": "cluster\\STOP-RONS-ECOSYSTEM.ps1",
+      "sha256": "e3544bdece311533a0d99fc58a79f318b1b152bea85cf290f92d071fd4201a03"
+    },
+    {
+      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\integrations\\rons-cluster\\STOP-RONSAS-ECOSYSTEM.ps1",
+      "repo_path": "cluster\\STOP-RONSAS-ECOSYSTEM.ps1",
+      "sha256": "a4c4acffb549bafd38c5727ace42f930d780df55ec8b28de30aa392b8afd24d2"
+    },
+    {
+      "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\INSTALL-RONS-PUBLIC-BOOT-TASK.ps1",
+      "repo_path": "control-center\\INSTALL-RONS-PUBLIC-BOOT-TASK.ps1",
+      "sha256": "e7fe6e5682f1e5c6ff96c1462ebe60823a22e3f2e5f44a8f0e324fdb782994f4"
+    },
+    {
+      "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\REGISTER-RONS-SUPERVISOR-TASK.ps1",
+      "repo_path": "control-center\\REGISTER-RONS-SUPERVISOR-TASK.ps1",
+      "sha256": "2c88152b2ec19ae3143943ac05d708b97280d0cba363e643ec00ce4268e298a1"
+    },
+    {
+      "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Bootstrap-Public.ps1",
+      "repo_path": "control-center\\RONS-Bootstrap-Public.ps1",
+      "sha256": "14f345fe6ea734fbac13cb03aa5192265ba87fce459e04a6a3be9366702595c5"
     },
     {
       "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Ensure-Public-Edge.ps1",
@@ -18,39 +58,19 @@
       "sha256": "4b4364911414009b3d4717321097e3b5a50a502cfc36a3a60c68d8e56be32d00"
     },
     {
+      "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Recover-Suite.ps1",
+      "repo_path": "control-center\\RONS-Recover-Suite.ps1",
+      "sha256": "6c5a397fbe1fc269d48d33c31f0103848e48e6cff55aed7322b351d9d21331cd"
+    },
+    {
+      "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Supervisor.ps1",
+      "repo_path": "control-center\\RONS-Supervisor.ps1",
+      "sha256": "09cf1ce736959f63cc75610e99a25803a316f68ffbc32e03b0ad4f09d2e9ff88"
+    },
+    {
       "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Verify-Public-Endpoints.ps1",
       "repo_path": "control-center\\RONS-Verify-Public-Endpoints.ps1",
       "sha256": "bda9877a2e64995b8152c8f5e420e3113ef68233e499bbeb9a1bc8e63f1aff72"
-    },
-    {
-      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\FINAL-RONS-ACCEPTANCE.ps1",
-      "repo_path": "runtime\\FINAL-RONS-ACCEPTANCE.ps1",
-      "sha256": "f8102135ae81f0f8d685cfd33759483110f5e731dd84c0127e026caf3d4a791e"
-    },
-    {
-      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\launchers\\START-RONS-SOVEREIGN-SUITE.cmd",
-      "repo_path": "runtime\\START-RONS-SOVEREIGN-SUITE.cmd",
-      "sha256": "da2b03688ce3ffc38b5d0b123ac8dcb738c418dae1719fef90359cd9260bfff8"
-    },
-    {
-      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\syncvision-local-stt.py",
-      "repo_path": "runtime\\syncvision-local-stt.py",
-      "sha256": "c426c4d36e079941bf9a0b5ef68893793f9afae8845e383bd78561d65150d68f"
-    },
-    {
-      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\RONS-STT-FUNCTIONAL-SMOKE.ps1",
-      "repo_path": "runtime\\RONS-STT-FUNCTIONAL-SMOKE.ps1",
-      "sha256": "20ed588f568b18423e93879a3b5c0b912394361aacdfcbafdb1beb7318cd1a85"
-    },
-    {
-      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\integrations\\rons-cluster\\START-RONSAS-ECOSYSTEM.ps1",
-      "repo_path": "cluster\\START-RONSAS-ECOSYSTEM.ps1",
-      "sha256": "59b6bce055e33103f3a636ef0874e3dae8aa57b7bc750aaf86fd3413f183d638"
-    },
-    {
-      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\integrations\\rons-cluster\\START-RONS-ECOSYSTEM.ps1",
-      "repo_path": "cluster\\START-RONS-ECOSYSTEM.ps1",
-      "sha256": "7390753d6adac4311327c1d1aa365115334f7982fa76ab509ec0ce3d75d081e1"
     },
     {
       "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\production-edge\\Caddyfile.cgnat-edge",
@@ -63,19 +83,39 @@
       "sha256": "95795a834e76aff6753e276c9ca7c831cddfe365ff5ab3e675c6aaccaedd44ec"
     },
     {
-      "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Bootstrap-Public.ps1",
-      "repo_path": "control-center\\RONS-Bootstrap-Public.ps1",
-      "sha256": "14f345fe6ea734fbac13cb03aa5192265ba87fce459e04a6a3be9366702595c5"
+      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\FINAL-RONS-ACCEPTANCE.ps1",
+      "repo_path": "runtime\\FINAL-RONS-ACCEPTANCE.ps1",
+      "sha256": "a9b9621f725b37ab6e6883775661bf9f721ab54690149b5499b7dfef5060936c"
     },
     {
-      "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\INSTALL-RONS-PUBLIC-BOOT-TASK.ps1",
-      "repo_path": "control-center\\INSTALL-RONS-PUBLIC-BOOT-TASK.ps1",
-      "sha256": "e7fe6e5682f1e5c6ff96c1462ebe60823a22e3f2e5f44a8f0e324fdb782994f4"
+      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\RONS-STT-FUNCTIONAL-SMOKE.ps1",
+      "repo_path": "runtime\\RONS-STT-FUNCTIONAL-SMOKE.ps1",
+      "sha256": "20ed588f568b18423e93879a3b5c0b912394361aacdfcbafdb1beb7318cd1a85"
     },
     {
-      "source": "C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\REGISTER-RONS-SUPERVISOR-TASK.ps1",
-      "repo_path": "control-center\\REGISTER-RONS-SUPERVISOR-TASK.ps1",
-      "sha256": "2c88152b2ec19ae3143943ac05d708b97280d0cba363e643ec00ce4268e298a1"
+      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\launchers\\START-RONS-SOVEREIGN-SUITE.cmd",
+      "repo_path": "runtime\\START-RONS-SOVEREIGN-SUITE.cmd",
+      "sha256": "ee2ef0887092669ea7f81ea3ea9192fff962bc70bb4a3bfc35d1a7a153e9bc97"
+    },
+    {
+      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\launchers\\STATUS-RONS-SOVEREIGN-SUITE.cmd",
+      "repo_path": "runtime\\STATUS-RONS-SOVEREIGN-SUITE.cmd",
+      "sha256": "b394dca3c1425e3938b7d85ca3a45cb7db813104a9feab68b1ede89e722d7b89"
+    },
+    {
+      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\launchers\\STOP-RONS-SOVEREIGN-SUITE.cmd",
+      "repo_path": "runtime\\STOP-RONS-SOVEREIGN-SUITE.cmd",
+      "sha256": "9cf14db3a8ac934f2747cb0da154eb84b06275471475e41138e7a1dedbf8822b"
+    },
+    {
+      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\rons-launch-broker.py",
+      "repo_path": "runtime\\rons-launch-broker.py",
+      "sha256": "5f81d4410ca1fb72eee942ec19802dcc3dd135752d1c759e3e51420e7f908845"
+    },
+    {
+      "source": "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\syncvision-local-stt.py",
+      "repo_path": "runtime\\syncvision-local-stt.py",
+      "sha256": "c426c4d36e079941bf9a0b5ef68893793f9afae8845e383bd78561d65150d68f"
     }
   ],
   "model_artifacts": [
@@ -87,5 +127,7 @@
       "tracked_in_git": false,
       "validation_repo_path": "evidence\\stt-validation.json"
     }
-  ]
+  ],
+  "module_registry": "cluster\\RONSAS-MODULES.json",
+  "control_authority": "START/STATUS/STOP-RONSAS-ECOSYSTEM.ps1"
 }

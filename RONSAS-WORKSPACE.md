@@ -20,3 +20,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Test-RonsasTopolog
 - `docs\architecture\GIT-RECONCILIATION-20260914.md` records patch overlap and import order.
 
 Do not add runtime state, secrets, models, dependencies, build output, or Dropbox evidence bundles to Git.
+
+## Unified module authority
+
+All application surfaces and local AI/media helpers are governed RONSAS modules/services. Separate ports are isolation boundaries only; they are not independent runtime authorities. The canonical composition contract is `ops\ealiophin\cluster\RONSAS-MODULES.json`, with operating rules in `docs\architecture\RONSAS-MODULE-CONTROL.md`.
+
+Legacy launcher names must delegate to the canonical RONSAS start/status/stop controls rather than maintaining their own service lists.

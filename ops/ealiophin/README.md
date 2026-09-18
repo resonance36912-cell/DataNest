@@ -30,3 +30,7 @@ No `.env` files, API keys, tunnel credentials, auth exchange keys, device creden
 Large model weights are installed under the live runtime model directory and are verified separately by hash.
 
 Windows requires administrator elevation to register the SYSTEM startup task. The bootstrap itself is non-secret and can be validated without elevation.
+
+## Unified RONSAS runtime contract
+
+The module registry in `cluster\RONSAS-MODULES.json` is the single Ealiophin composition contract. Hub and the four application surfaces are RONSAS modules; launch broker, local AI/media services, Foundry/backend, and Ollama are governed RONSAS services. The canonical supervisor starts/reuses them, status evaluates them, and final acceptance consumes the same contract. Legacy suite launchers are aliases only.

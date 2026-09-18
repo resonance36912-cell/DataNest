@@ -52,33 +52,213 @@
     }
   ],
   "paths": [
-    { "id": "suite-root", "role": "live-suite-root", "local_path": "%USERPROFILE%\\Resonance\\OpenNova", "authority": "local-runtime", "required": true },
-    { "id": "epublisher", "role": "application-source-and-runtime", "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\epublisher-sovereign-local-v0.1", "authority": "local-runtime", "required": true },
-    { "id": "creative-studio", "role": "application-source-and-runtime", "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\creative-studio-sovereign-local-v0.1", "authority": "local-runtime", "required": true },
-    { "id": "syncvision", "role": "application-source-and-runtime", "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\sync-vision-sovereign-local-v0.1", "authority": "local-runtime", "required": true },
-    { "id": "youtube-optimizer", "role": "application-source-and-runtime", "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\runtime\\youtube-optimizer-stage", "authority": "local-runtime", "required": true },
-    { "id": "foundry", "role": "sealed-appdev-release", "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\ResonanceAppDev_ZeroCredit_v1.5.8", "authority": "sealed-local-release", "required": true },
-    { "id": "integrations", "role": "suite-integrations", "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\integrations", "authority": "local-runtime", "required": true },
-    { "id": "engines", "role": "pinned-local-engines", "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\engines", "authority": "local-runtime", "required": true },
-    { "id": "runtime", "role": "mutable-runtime-state", "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\runtime", "authority": "local-only-never-git", "required": true },
-    { "id": "control-center", "role": "machine-local-control-plane", "local_path": "%LOCALAPPDATA%\\Resonance\\RONS-ControlCenter", "authority": "local-only", "required": true },
-    { "id": "audit-blueprint-local", "role": "latest-local-blueprint", "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\audit\\RONS-RGP-SYSTEM-BLUEPRINT-v1.0.0-20260912", "authority": "local-audit-candidate", "required": true },
-    { "id": "dropbox-audit-mirror", "role": "audit-and-release-evidence", "local_path": "%USERPROFILE%\\Dropbox\\RONS-Audit\\RONS-AI-AUDIT-REPOSITORY", "cloud_path": "/RONS-Audit/RONS-AI-AUDIT-REPOSITORY", "authority": "dropbox-cloud", "required": true }
+    {
+      "id": "suite-root",
+      "role": "live-suite-root",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova",
+      "authority": "local-runtime",
+      "required": true
+    },
+    {
+      "id": "epublisher",
+      "role": "ronsas-application-module-source-and-runtime",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\epublisher-sovereign-local-v0.1",
+      "authority": "local-runtime",
+      "required": true
+    },
+    {
+      "id": "creative-studio",
+      "role": "ronsas-application-module-source-and-runtime",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\creative-studio-sovereign-local-v0.1",
+      "authority": "local-runtime",
+      "required": true
+    },
+    {
+      "id": "syncvision",
+      "role": "ronsas-application-module-source-and-runtime",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\sync-vision-sovereign-local-v0.1",
+      "authority": "local-runtime",
+      "required": true
+    },
+    {
+      "id": "youtube-optimizer",
+      "role": "ronsas-application-module-source-and-runtime",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\runtime\\youtube-optimizer-stage",
+      "authority": "local-runtime",
+      "required": true
+    },
+    {
+      "id": "foundry",
+      "role": "sealed-appdev-release",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\ResonanceAppDev_ZeroCredit_v1.5.8",
+      "authority": "sealed-local-release",
+      "required": true
+    },
+    {
+      "id": "integrations",
+      "role": "suite-integrations",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\integrations",
+      "authority": "local-runtime",
+      "required": true
+    },
+    {
+      "id": "engines",
+      "role": "pinned-local-engines",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\engines",
+      "authority": "local-runtime",
+      "required": true
+    },
+    {
+      "id": "runtime",
+      "role": "mutable-runtime-state",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\runtime",
+      "authority": "local-only-never-git",
+      "required": true
+    },
+    {
+      "id": "control-center",
+      "role": "machine-local-control-plane",
+      "local_path": "%LOCALAPPDATA%\\Resonance\\RONS-ControlCenter",
+      "authority": "local-only",
+      "required": true
+    },
+    {
+      "id": "audit-blueprint-local",
+      "role": "latest-local-blueprint",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\audit\\RONS-RGP-SYSTEM-BLUEPRINT-v1.0.0-20260912",
+      "authority": "local-audit-candidate",
+      "required": true
+    },
+    {
+      "id": "dropbox-audit-mirror",
+      "role": "audit-and-release-evidence",
+      "local_path": "%USERPROFILE%\\Dropbox\\RONS-Audit\\RONS-AI-AUDIT-REPOSITORY",
+      "cloud_path": "/RONS-Audit/RONS-AI-AUDIT-REPOSITORY",
+      "authority": "dropbox-cloud",
+      "required": true
+    }
   ],
   "services": [
-    { "id": "hub", "name": "RONS Hub", "port": 4173, "listen_port": 4173, "uri": "http://127.0.0.1:4173/", "required": true },
-    { "id": "epublisher", "name": "ePublisher", "port": 3101, "listen_port": 3101, "uri": "http://127.0.0.1:3101/", "required": true },
-    { "id": "creative", "name": "Creative Studio", "port": 3201, "listen_port": 3201, "uri": "http://127.0.0.1:3201/studio", "required": true },
-    { "id": "syncvision", "name": "Sync Vision", "port": 3301, "listen_port": 3301, "uri": "http://127.0.0.1:3301/", "required": true },
-    { "id": "youtube", "name": "YouTube Optimizer", "port": 3401, "listen_port": 3401, "uri": "http://127.0.0.1:3401/", "required": true },
-    { "id": "musetalk", "name": "MuseTalk Bridge", "port": 7863, "listen_port": 7863, "uri": "http://127.0.0.1:7863/health", "required": true },
-    { "id": "stt", "name": "Local Speech-to-Text", "port": 7864, "listen_port": 7864, "uri": "http://127.0.0.1:7864/health", "required": true },
-    { "id": "image", "name": "Local Image Service", "port": 7865, "listen_port": 7865, "uri": "http://127.0.0.1:7865/health", "required": false },
-    { "id": "llm", "name": "Local LLM", "port": 7866, "listen_port": 7866, "uri": "http://127.0.0.1:7866/health", "required": false },
-    { "id": "source", "name": "Creative Source", "port": 7867, "listen_port": 7867, "uri": "http://127.0.0.1:7867/health", "required": false },
-    { "id": "broker", "name": "RONS AI Broker", "port": 7868, "listen_port": 7868, "uri": "http://127.0.0.1:7868/health", "required": true },
-    { "id": "foundry", "name": "Foundry", "port": 8787, "listen_port": 8787, "uri": "http://127.0.0.1:8787/v1/apps", "required": true },
-    { "id": "backend", "name": "Sovereign Gateway", "port": 58600, "listen_port": 8787, "uri": "http://127.0.0.1:8787/v1/backend/health", "required": true },
-    { "id": "ollama", "name": "Ollama", "port": 11434, "listen_port": 11434, "uri": "http://127.0.0.1:11434/", "required": false }
-  ]
+    {
+      "id": "hub",
+      "name": "RONS Hub",
+      "port": 4173,
+      "listen_port": 4173,
+      "uri": "http://127.0.0.1:4173/",
+      "required": true
+    },
+    {
+      "id": "epublisher",
+      "name": "RONSAS ePublisher",
+      "port": 3101,
+      "listen_port": 3101,
+      "uri": "http://127.0.0.1:3101/",
+      "required": true
+    },
+    {
+      "id": "creative",
+      "name": "RONSAS Creative Studio",
+      "port": 3201,
+      "listen_port": 3201,
+      "uri": "http://127.0.0.1:3201/studio",
+      "required": true
+    },
+    {
+      "id": "syncvision",
+      "name": "RONSAS Sync Vision",
+      "port": 3301,
+      "listen_port": 3301,
+      "uri": "http://127.0.0.1:3301/",
+      "required": true
+    },
+    {
+      "id": "youtube",
+      "name": "RONSAS YouTube Optimizer",
+      "port": 3401,
+      "listen_port": 3401,
+      "uri": "http://127.0.0.1:3401/",
+      "required": true
+    },
+    {
+      "id": "launch-broker",
+      "name": "RONSAS Launch Broker",
+      "port": 4450,
+      "listen_port": 4450,
+      "uri": "http://127.0.0.1:4450/health",
+      "required": true
+    },
+    {
+      "id": "musetalk",
+      "name": "MuseTalk Bridge",
+      "port": 7863,
+      "listen_port": 7863,
+      "uri": "http://127.0.0.1:7863/health",
+      "required": true
+    },
+    {
+      "id": "stt",
+      "name": "Local Speech-to-Text",
+      "port": 7864,
+      "listen_port": 7864,
+      "uri": "http://127.0.0.1:7864/health",
+      "required": true
+    },
+    {
+      "id": "image",
+      "name": "Local Image Service",
+      "port": 7865,
+      "listen_port": 7865,
+      "uri": "http://127.0.0.1:7865/health",
+      "required": true
+    },
+    {
+      "id": "llm",
+      "name": "Local LLM",
+      "port": 7866,
+      "listen_port": 7866,
+      "uri": "http://127.0.0.1:7866/health",
+      "required": true
+    },
+    {
+      "id": "source",
+      "name": "Creative Source",
+      "port": 7867,
+      "listen_port": 7867,
+      "uri": "http://127.0.0.1:7867/health",
+      "required": true
+    },
+    {
+      "id": "broker",
+      "name": "RONS AI Broker",
+      "port": 7868,
+      "listen_port": 7868,
+      "uri": "http://127.0.0.1:7868/health",
+      "required": true
+    },
+    {
+      "id": "foundry",
+      "name": "Foundry",
+      "port": 8787,
+      "listen_port": 8787,
+      "uri": "http://127.0.0.1:8787/v1/apps",
+      "required": true
+    },
+    {
+      "id": "backend",
+      "name": "Sovereign Gateway",
+      "port": 58600,
+      "listen_port": 8787,
+      "uri": "http://127.0.0.1:8787/v1/backend/health",
+      "required": true
+    },
+    {
+      "id": "ollama",
+      "name": "Ollama",
+      "port": 11434,
+      "listen_port": 11434,
+      "uri": "http://127.0.0.1:11434/",
+      "required": true
+    }
+  ],
+  "module_registry": "ops\\ealiophin\\cluster\\RONSAS-MODULES.json"
 }

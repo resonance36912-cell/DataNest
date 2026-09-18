@@ -29,7 +29,7 @@
  *         context,
  *         app: "creative_studio",      // <- your app key from the registry
  *         required: "creator",
- *         returnTo: "https://creativestudio.life/generate/poster",
+ *         returnTo: "https://creative.reson8.life/generate/poster",
  *       });
  *       // …do the paid work only after the gate passes…
  *     });
@@ -88,10 +88,7 @@ type Entitlement = {
 // ---------------------------------------------------------------------------
 const CACHE_TTL_MS = 60_000;
 
-const entitlementCache = new Map<
-  string,
-  { ent: Entitlement; expiresAt: number }
->();
+const entitlementCache = new Map<string, { ent: Entitlement; expiresAt: number }>();
 
 function cacheKey(userId: string, app: string): string {
   return `${userId}:${app}`;
@@ -124,7 +121,12 @@ const HUB_URL = process.env.HUB_URL ?? "https://reson8.life";
 
 export type RequireTierArgs = {
   /** TanStack Start handler context (must contain `supabase` + `userId`). */
-  context: { supabase: { auth: { getSession: () => Promise<{ data: { session: { access_token: string } | null } }> } }; userId?: string };
+  context: {
+    supabase: {
+      auth: { getSession: () => Promise<{ data: { session: { access_token: string } | null } }> };
+    };
+    userId?: string;
+  };
   /** App key from `spoke-app-registry.md`. */
   app: string;
   /** Minimum tier the user must hold. */
@@ -141,9 +143,7 @@ export type RequireTierArgs = {
  * Throws a Response on failure so TanStack Start surfaces it as the
  * canonical 402 `upgrade_required` shape every spoke must return.
  */
-export async function requireTier(
-  args: RequireTierArgs,
-): Promise<Entitlement> {
+export async function requireTier(args: RequireTierArgs): Promise<Entitlement> {
   const { context, app, required, returnTo = "" } = args;
 
   // 1. Extract the access token from the Supabase session in context.
@@ -158,13 +158,13 @@ export async function requireTier(
   }
 
   // Some middleware implementations attach userId directly to context.
-  userId = (context as unknown as Record<string, unknown>).userId as string ?? null;
+  userId = ((context as unknown as Record<string, unknown>).userId as string) ?? null;
 
   if (!accessToken) {
-    throw new Response(
-      JSON.stringify({ error: "unauthorized", message: "Sign in required" }),
-      { status: 401, headers: { "content-type": "application/json" } },
-    );
+    throw new Response(JSON.stringify({ error: "unauthorized", message: "Sign in required" }), {
+      status: 401,
+      headers: { "content-type": "application/json" },
+    });
   }
 
   // 2. Check cache (if we know the user id).
@@ -172,21 +172,18 @@ export async function requireTier(
 
   if (!ent) {
     // 3. Call the hub entitlement endpoint.
-    const res = await fetch(
-      `${HUB_URL}/api/public/entitlement?app=${encodeURIComponent(app)}`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          Accept: "application/json",
-        },
+    const res = await fetch(`${HUB_URL}/api/public/entitlement?app=${encodeURIComponent(app)}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json",
       },
-    );
+    });
 
     if (res.status === 401) {
-      throw new Response(
-        JSON.stringify({ error: "unauthorized", message: "Sign in required" }),
-        { status: 401, headers: { "content-type": "application/json" } },
-      );
+      throw new Response(JSON.stringify({ error: "unauthorized", message: "Sign in required" }), {
+        status: 401,
+        headers: { "content-type": "application/json" },
+      });
     }
 
     // Any non-200 from the hub is treated as "no access" (fail closed).
@@ -214,8 +211,7 @@ export async function requireTier(
 
   // 4. Evaluate access.
   const ok =
-    ent.status === "active" &&
-    (ent.source === "all_access" || hasAtLeast(ent.tier, required));
+    ent.status === "active" && (ent.source === "all_access" || hasAtLeast(ent.tier, required));
 
   if (!ok) {
     throw new Response(

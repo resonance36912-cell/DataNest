@@ -10,7 +10,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { BANNED_LEGACY_URLS } from "../src/lib/app-registry";
 
-const ROOTS = ["src/routes", "src/components", "src/lib"];
+const ROOTS = ["src/routes", "src/components", "src/lib", "scripts", "docs", "public"];
 const SKIP_FILES = new Set([
   "src/lib/app-registry.ts", // canonical declarations live here
 ]);
@@ -21,7 +21,10 @@ function* walk(dir: string): Generator<string> {
     const full = join(dir, entry);
     const stat = statSync(full);
     if (stat.isDirectory()) yield* walk(full);
-    else if (/\.(ts|tsx|js|jsx)$/.test(full) && ![...SKIP_DIRS].some((s) => full.endsWith(s))) {
+    else if (
+      /\.(ts|tsx|js|jsx|md|json|txt|sql)$/.test(full) &&
+      ![...SKIP_DIRS].some((s) => full.endsWith(s))
+    ) {
       yield full;
     }
   }

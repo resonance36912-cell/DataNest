@@ -50,7 +50,7 @@ permissions:
 jobs:
   lint:
     name: Generation-route lint
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     permissions:
       contents: read
       pull-requests: write
@@ -63,6 +63,7 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+          no-cache: true
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -272,7 +273,7 @@ jobs:
 
   parity:
     name: Contract file parity vs Hub
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     steps:
       - name: Checkout spoke
         uses: actions/checkout@v5

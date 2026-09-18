@@ -26,8 +26,11 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { SKU_CATALOG, PACK_CATALOG } from "../src/lib/checkout.functions";
-import { stripComments, extractFieldLiteral, validateCheckoutParams } from "./lib/checkout-link-verify";
-
+import {
+  stripComments,
+  extractFieldLiteral,
+  validateCheckoutParams,
+} from "./lib/checkout-link-verify";
 
 const ROOT = "src";
 const SCAN_EXT = /\.(ts|tsx)$/;
@@ -37,9 +40,7 @@ const SKIP_FILE = new Set(["routeTree.gen.ts"]);
 // Files allowed to emit absolute hub checkout URLs (server-side responses
 // served to spoke apps on other origins, where a relative URL would resolve
 // to the wrong domain).
-const ABSOLUTE_URL_ALLOWLIST = new Set<string>([
-  "src/lib/requireTier-request.ts",
-]);
+const ABSOLUTE_URL_ALLOWLIST = new Set<string>(["src/lib/requireTier-request.ts"]);
 
 // Files allowed to emit dynamic `${app}` / `${plan}` interpolations into a
 // /checkout URL. Each entry tells the verifier how to resolve the dynamic
@@ -62,9 +63,7 @@ const DYNAMIC_CTA_CONTRACTS: Record<string, DynamicContract> = {
 // (they iterate PACK_CATALOG at render time, so every emitted id is valid
 // by construction). Literal `pack=<id>` values elsewhere are still checked
 // against PACK_CATALOG.
-const DYNAMIC_PACK_ALLOWLIST = new Set<string>([
-  "src/routes/pricing.tsx",
-]);
+const DYNAMIC_PACK_ALLOWLIST = new Set<string>(["src/routes/pricing.tsx"]);
 
 // Per-file allowlist of params whose `${…}` interpolations are permitted
 // even though their ParamSpec is `dynamicSafe: false`. Use sparingly — each
@@ -94,9 +93,6 @@ function* walk(dir: string): Generator<string> {
   }
 }
 
-
-
-
 const failures: string[] = [];
 const allFiles = [...walk(ROOT)];
 
@@ -105,7 +101,7 @@ let linkCount = 0;
 let dynamicLinks = 0;
 
 for (const path of allFiles) {
-  const rel = relative(".", path);
+  const rel = relative(".", path).replace(/\\/g, "/");
   const src = stripComments(readFileSync(path, "utf8"));
   let m: RegExpExecArray | null;
   while ((m = linkRegex.exec(src))) {
@@ -114,9 +110,7 @@ for (const path of allFiles) {
 
     const isAbsolute = /^https?:\/\//i.test(url);
     if (isAbsolute && !ABSOLUTE_URL_ALLOWLIST.has(rel)) {
-      failures.push(
-        `${rel}: absolute checkout URL "${url}" — must be relative /checkout?...`,
-      );
+      failures.push(`${rel}: absolute checkout URL "${url}" — must be relative /checkout?...`);
       continue;
     }
     if (!isAbsolute && !url.includes("/checkout?")) {
@@ -128,11 +122,7 @@ for (const path of allFiles) {
     const rawQuery = url.slice(qStart);
 
     // Shape-check every param (unknown params, bad values, unsafe dynamics).
-    const paramErrors = validateCheckoutParams(
-      rawQuery,
-      rel,
-      DYNAMIC_PARAM_ALLOWLIST[rel],
-    );
+    const paramErrors = validateCheckoutParams(rawQuery, rel, DYNAMIC_PARAM_ALLOWLIST[rel]);
     for (const e of paramErrors) failures.push(e);
 
     const params = new URLSearchParams(rawQuery.replace(/&amp;/g, "&"));
@@ -192,14 +182,11 @@ for (const [contractFile, contract] of Object.entries(DYNAMIC_CTA_CONTRACTS)) {
   const fn = contract.callerExport;
   // Match e.g. `requireTierFromRequest({ ... })` with a balanced-ish arg block.
   // We scan a window and parse the literal values of appArg / planArg.
-  const callRegex = new RegExp(
-    `\\b${fn}\\s*\\(\\s*\\{([\\s\\S]*?)\\}\\s*\\)`,
-    "g",
-  );
+  const callRegex = new RegExp(`\\b${fn}\\s*\\(\\s*\\{([\\s\\S]*?)\\}\\s*\\)`, "g");
 
   let foundAnyCall = false;
   for (const path of allFiles) {
-    const rel = relative(".", path);
+    const rel = relative(".", path).replace(/\\/g, "/");
     if (rel === contractFile) continue; // skip the definition itself
     const src = stripComments(readFileSync(path, "utf8"));
     let m: RegExpExecArray | null;
@@ -211,8 +198,14 @@ for (const [contractFile, contract] of Object.entries(DYNAMIC_CTA_CONTRACTS)) {
       const appLit = extractFieldLiteral(argBlock, contract.appArg, src, rel);
       const planLit = extractFieldLiteral(argBlock, contract.planArg, src, rel);
 
-      if (appLit.error) { failures.push(appLit.error); continue; }
-      if (planLit.error) { failures.push(planLit.error); continue; }
+      if (appLit.error) {
+        failures.push(appLit.error);
+        continue;
+      }
+      if (planLit.error) {
+        failures.push(planLit.error);
+        continue;
+      }
 
       const sku = `${appLit.value}:${planLit.value}:monthly`;
       if (!SKU_CATALOG[sku]) {
@@ -232,9 +225,6 @@ for (const [contractFile, contract] of Object.entries(DYNAMIC_CTA_CONTRACTS)) {
     );
   }
 }
-
-
-
 
 // ── Report ──────────────────────────────────────────────────────────────────
 if (linkCount === 0) {

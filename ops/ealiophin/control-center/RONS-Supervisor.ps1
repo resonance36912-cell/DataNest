@@ -53,6 +53,29 @@ function Ensure-RonsSuite {
     Log ('Required services missing: ' + ($downNames -join ', ') + '. Requesting governed restart.')
     Start-Process -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File','C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Recover-Suite.ps1') -WindowStyle Hidden | Out-Null
 }
+function Ensure-GitHubRunner {
+    if (-not ($Config.autonomy.PSObject.Properties.Name -contains 'ensureGitHubRunner')) { return }
+    if (-not [bool]$Config.autonomy.ensureGitHubRunner) { return }
+    if (-not ($Config.PSObject.Properties.Name -contains 'githubRunner')) {
+        Log 'GitHub runner configuration is missing; recovery skipped.'
+        return
+    }
+    $startup = [string]$Config.githubRunner.startupScript
+    if (-not $startup -or -not (Test-Path -LiteralPath $startup -PathType Leaf)) {
+        Log 'GitHub runner startup script is missing; recovery skipped.'
+        return
+    }
+    try {
+        $output = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $startup 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            $tail = @($output | Select-Object -Last 3) -join ' | '
+            Log ('GitHub runner recovery failed: ' + $tail)
+        }
+    } catch {
+        Log ('GitHub runner recovery failed: ' + $_.Exception.Message)
+    }
+}
+
 function Ensure-Dropbox {
     if (-not [bool]$Config.autonomy.ensureDropbox) { return }
     if (@(Get-Process -Name Dropbox -ErrorAction SilentlyContinue).Count) { return }
@@ -117,6 +140,7 @@ function Ensure-DesktopCommander {
 try {
     Log 'Supervisor started.'
     do {
+        Ensure-GitHubRunner
         Ensure-Dropbox
         Ensure-ChromeRemoteDesktop
         Ensure-DesktopCommander
