@@ -10,6 +10,7 @@
 //   - "info"  → successful boot perf timings (sampled at 10%)
 
 import { logClientError } from "./errorLogger";
+import { getDiagEntries } from "./previewDiag";
 
 // ---------------------------------------------------------------------------
 // React mount marker
@@ -83,10 +84,8 @@ export function installBlankScreenWatchdog(): void {
       const empty = !root || root.childElementCount === 0;
       if (!empty) return;
 
-      // Pull a short tail of diagnostics for context (lazy import to avoid
-      // hard-coupling this module to previewDiag at boot).
-      void import("./previewDiag")
-        .then(({ getDiagEntries }) => {
+      // Pull a short tail of diagnostics from the startup-loaded buffer.
+      void Promise.resolve().then(() => {
           const tail = getDiagEntries().slice(-15).map((e) => ({
             kind: e.kind,
             message: e.message,
