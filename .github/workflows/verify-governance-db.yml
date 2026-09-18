@@ -16,7 +16,10 @@ permissions:
 jobs:
   governance-db-runtime:
     name: Supabase governance migration + RPC runtime
-    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
+    # Local Supabase requires nested/rootful container features that the sovereign
+    # rootless runner intentionally does not expose. Use an ephemeral hosted runner
+    # for this isolated migration/RPC certification job.
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - name: Check out repository
