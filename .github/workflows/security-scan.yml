@@ -112,14 +112,13 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check semgrep
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          export PATH="$HOME/.local/bin:$PATH"
-          semgrep --version
+          test -x "$HOME/.local/bin/pysemgrep"
+          "$HOME/.local/bin/pysemgrep" --version
       - name: Run Semgrep
         id: semgrep
         continue-on-error: true
         run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          semgrep scan \
+          "$HOME/.local/bin/pysemgrep" scan \
             --config p/owasp-top-ten \
             --config p/javascript \
             --config p/typescript \
