@@ -1,304 +1,312 @@
 {
-  "schema": "ronsas-topology/v1",
-  "host": "Ealiophin",
-  "suite": "Resonance Open Nova Sovereign Application Suite",
-  "short_name": "RONSAS",
-  "strategy": "manifest-driven-superepository",
-  "control_root": "%USERPROFILE%\\Documents\\GitHub\\rons-sovereign-codebase",
-  "cloud": {
-    "github": {
-      "destination_remote": "https://github.com/resonance36912-cell/RONSAS.git",
-      "note": "Authenticated private GitHub source authority created and verified 2026-09-14."
-    },
-    "dropbox": {
-      "local_root": "%USERPROFILE%\\Dropbox\\RONS-Audit\\RONS-AI-AUDIT-REPOSITORY",
-      "cloud_root": "/RONS-Audit/RONS-AI-AUDIT-REPOSITORY",
-      "authority": "immutable-audit-and-release-evidence"
-    }
-  },
-  "repositories": [
-    {
-      "id": "ronsas-control",
-      "role": "target-superepository",
-      "local_path": "%USERPROFILE%\\Documents\\GitHub\\rons-sovereign-codebase",
-      "required": true,
-      "configured_remote": "https://github.com/resonance36912-cell/RONSAS.git"
-    },
-    {
-      "id": "hub-developer",
-      "role": "github-linked-development",
-      "local_path": "%USERPROFILE%\\Documents\\GitHub\\resonance-hub",
-      "required": true,
-      "configured_remote": "https://github.com/resonance36912-cell/resonance-hub.git"
-    },
-    {
-      "id": "hub-production",
-      "role": "local-production-source",
-      "local_path": "%SystemDrive%\\Resonance\\Sources\\ronsas-hub-canonical",
-      "required": true
-    },
-    {
-      "id": "rcgf",
-      "role": "governance-upstream",
-      "local_path": "%USERPROFILE%\\Documents\\GitHub\\RCGF",
-      "required": true,
-      "configured_remote": "https://github.com/resonance36912-cell/RCGF.git"
-    },
-    {
-      "id": "epublisher-source",
-      "role": "application-source-authority",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\epublisher-sovereign-local-v0.1",
-      "required": true,
-      "configured_remote": "https://github.com/resonance36912-cell/rons-epublisher-sovereign-source.git"
-    },
-    {
-      "id": "creative-studio-source",
-      "role": "application-source-authority",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\creative-studio-sovereign-local-v0.1",
-      "required": true,
-      "configured_remote": "https://github.com/resonance36912-cell/rons-creative-studio-sovereign-source.git"
-    },
-    {
-      "id": "sync-vision-source",
-      "role": "application-source-authority",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\sync-vision-sovereign-local-v0.1",
-      "required": true,
-      "configured_remote": "https://github.com/resonance36912-cell/rons-sync-vision-sovereign-source.git"
-    },
-    {
-      "id": "youtube-optimizer-source",
-      "role": "application-source-authority",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\youtube-optimizer-sovereign-local-v0.1",
-      "required": true,
-      "configured_remote": "https://github.com/resonance36912-cell/rons-youtube-optimizer-sovereign-source.git"
-    }
-  ],
-  "paths": [
-    {
-      "id": "suite-root",
-      "role": "live-suite-root",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova",
-      "authority": "local-runtime",
-      "required": true
-    },
-    {
-      "id": "hub-runtime-stage",
-      "role": "runtime-stage",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\runtime\\hub-sovereign-stage",
-      "authority": "local-runtime-never-git",
-      "required": true
-    },
-    {
-      "id": "epublisher",
-      "role": "ronsas-application-module-source-and-runtime",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\epublisher-sovereign-local-v0.1",
-      "authority": "github-backed-source-and-runtime",
-      "required": true,
-      "configured_remote": "https://github.com/resonance36912-cell/rons-epublisher-sovereign-source.git"
-    },
-    {
-      "id": "creative-studio",
-      "role": "ronsas-application-module-source-and-runtime",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\creative-studio-sovereign-local-v0.1",
-      "authority": "github-backed-source-and-runtime",
-      "required": true,
-      "configured_remote": "https://github.com/resonance36912-cell/rons-creative-studio-sovereign-source.git"
-    },
-    {
-      "id": "syncvision",
-      "role": "ronsas-application-module-source-and-runtime",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\sync-vision-sovereign-local-v0.1",
-      "authority": "github-backed-source-and-runtime",
-      "required": true,
-      "configured_remote": "https://github.com/resonance36912-cell/rons-sync-vision-sovereign-source.git"
-    },
-    {
-      "id": "youtube-optimizer-source",
-      "role": "ronsas-application-module-source",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\youtube-optimizer-sovereign-local-v0.1",
-      "authority": "github-backed-source",
-      "configured_remote": "https://github.com/resonance36912-cell/rons-youtube-optimizer-sovereign-source.git",
-      "required": true
-    },
-    {
-      "id": "youtube-optimizer-runtime",
-      "role": "runtime-stage",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\runtime\\youtube-optimizer-stage",
-      "authority": "local-runtime-never-git",
-      "required": true
-    },
-    {
-      "id": "foundry",
-      "role": "sealed-appdev-release",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\ResonanceAppDev_ZeroCredit_v1.5.8",
-      "authority": "sealed-local-release",
-      "required": true
-    },
-    {
-      "id": "integrations",
-      "role": "suite-integrations",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\integrations",
-      "authority": "local-runtime",
-      "required": true
-    },
-    {
-      "id": "engines",
-      "role": "pinned-local-engines",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\engines",
-      "authority": "local-runtime",
-      "required": true
-    },
-    {
-      "id": "runtime",
-      "role": "mutable-runtime-state",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\runtime",
-      "authority": "local-only-never-git",
-      "required": true
-    },
-    {
-      "id": "control-center",
-      "role": "machine-local-control-plane",
-      "local_path": "%LOCALAPPDATA%\\Resonance\\RONS-ControlCenter",
-      "authority": "local-only",
-      "required": true
-    },
-    {
-      "id": "audit-blueprint-local",
-      "role": "latest-local-blueprint",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\audit\\RONS-RGP-SYSTEM-BLUEPRINT-v1.0.0-20260912",
-      "authority": "local-audit-candidate",
-      "required": true
-    },
-    {
-      "id": "dropbox-audit-mirror",
-      "role": "audit-and-release-evidence",
-      "local_path": "%USERPROFILE%\\Dropbox\\RONS-Audit\\RONS-AI-AUDIT-REPOSITORY",
-      "cloud_path": "/RONS-Audit/RONS-AI-AUDIT-REPOSITORY",
-      "authority": "dropbox-cloud",
-      "required": true
-    }
-  ],
-  "services": [
-    {
-      "id": "hub",
-      "name": "RONS Hub",
-      "port": 4173,
-      "listen_port": 4173,
-      "uri": "http://127.0.0.1:4173/",
-      "required": true
-    },
-    {
-      "id": "epublisher",
-      "name": "RONSAS ePublisher",
-      "port": 3101,
-      "listen_port": 3101,
-      "uri": "http://127.0.0.1:3101/",
-      "required": true
-    },
-    {
-      "id": "creative",
-      "name": "RONSAS Creative Studio",
-      "port": 3201,
-      "listen_port": 3201,
-      "uri": "http://127.0.0.1:3201/studio",
-      "required": true
-    },
-    {
-      "id": "syncvision",
-      "name": "RONSAS Sync Vision",
-      "port": 3301,
-      "listen_port": 3301,
-      "uri": "http://127.0.0.1:3301/",
-      "required": true
-    },
-    {
-      "id": "youtube",
-      "name": "RONSAS YouTube Optimizer",
-      "port": 3401,
-      "listen_port": 3401,
-      "uri": "http://127.0.0.1:3401/",
-      "required": true
-    },
-    {
-      "id": "launch-broker",
-      "name": "RONSAS Launch Broker",
-      "port": 4450,
-      "listen_port": 4450,
-      "uri": "http://127.0.0.1:4450/health",
-      "required": true
-    },
-    {
-      "id": "musetalk",
-      "name": "MuseTalk Bridge",
-      "port": 7863,
-      "listen_port": 7863,
-      "uri": "http://127.0.0.1:7863/health",
-      "required": true
-    },
-    {
-      "id": "stt",
-      "name": "Local Speech-to-Text",
-      "port": 7864,
-      "listen_port": 7864,
-      "uri": "http://127.0.0.1:7864/health",
-      "required": true
-    },
-    {
-      "id": "image",
-      "name": "Local Image Service",
-      "port": 7865,
-      "listen_port": 7865,
-      "uri": "http://127.0.0.1:7865/health",
-      "required": true
-    },
-    {
-      "id": "llm",
-      "name": "Local LLM",
-      "port": 7866,
-      "listen_port": 7866,
-      "uri": "http://127.0.0.1:7866/health",
-      "required": true
-    },
-    {
-      "id": "source",
-      "name": "Creative Source",
-      "port": 7867,
-      "listen_port": 7867,
-      "uri": "http://127.0.0.1:7867/health",
-      "required": true
-    },
-    {
-      "id": "broker",
-      "name": "RONS AI Broker",
-      "port": 7868,
-      "listen_port": 7868,
-      "uri": "http://127.0.0.1:7868/health",
-      "required": true
-    },
-    {
-      "id": "foundry",
-      "name": "Foundry",
-      "port": 8787,
-      "listen_port": 8787,
-      "uri": "http://127.0.0.1:8787/v1/apps",
-      "required": true
-    },
-    {
-      "id": "backend",
-      "name": "Sovereign Gateway",
-      "port": 58600,
-      "listen_port": 8787,
-      "uri": "http://127.0.0.1:8787/v1/backend/health",
-      "required": true
-    },
-    {
-      "id": "ollama",
-      "name": "Ollama",
-      "port": 11434,
-      "listen_port": 11434,
-      "uri": "http://127.0.0.1:11434/",
-      "required": true
-    }
-  ],
-  "module_registry": "ops\\ealiophin\\cluster\\RONSAS-MODULES.json"
+    "schema":  "ronsas-topology/v1",
+    "host":  "Ealiophin",
+    "suite":  "Resonance Open Nova Sovereign Application Suite",
+    "short_name":  "RONSAS",
+    "strategy":  "manifest-driven-superepository",
+    "control_root":  "%USERPROFILE%\\Documents\\GitHub\\rons-sovereign-codebase",
+    "cloud":  {
+                  "github":  {
+                                 "destination_remote":  "https://github.com/resonance36912-cell/RONSAS.git",
+                                 "note":  "Authenticated private GitHub source authority created and verified 2026-09-14."
+                             },
+                  "dropbox":  {
+                                  "local_root":  "%USERPROFILE%\\Dropbox\\RONS-Audit\\RONS-AI-AUDIT-REPOSITORY",
+                                  "cloud_root":  "/RONS-Audit/RONS-AI-AUDIT-REPOSITORY",
+                                  "authority":  "immutable-audit-and-release-evidence"
+                              }
+              },
+    "repositories":  [
+                         {
+                             "id":  "ronsas-control",
+                             "role":  "target-superepository",
+                             "local_path":  "%USERPROFILE%\\Documents\\GitHub\\rons-sovereign-codebase",
+                             "required":  true,
+                             "configured_remote":  "https://github.com/resonance36912-cell/RONSAS.git"
+                         },
+                         {
+                             "id":  "hub-developer",
+                             "role":  "github-linked-development",
+                             "local_path":  "%USERPROFILE%\\Documents\\GitHub\\resonance-hub",
+                             "required":  true,
+                             "configured_remote":  "https://github.com/resonance36912-cell/resonance-hub.git"
+                         },
+                         {
+                             "id":  "hub-production",
+                             "role":  "local-production-source",
+                             "local_path":  "%SystemDrive%\\Resonance\\Sources\\ronsas-hub-canonical",
+                             "required":  true,
+                             "configured_remote":  "https://github.com/resonance36912-cell/resonance-hub.git"
+                         },
+                         {
+                             "id":  "rcgf",
+                             "role":  "governance-upstream",
+                             "local_path":  "%USERPROFILE%\\Documents\\GitHub\\RCGF",
+                             "required":  true,
+                             "configured_remote":  "https://github.com/resonance36912-cell/RCGF.git"
+                         },
+                         {
+                             "id":  "epublisher-source",
+                             "role":  "application-source-authority",
+                             "local_path":  "%USERPROFILE%\\Resonance\\OpenNova\\apps\\epublisher-sovereign-local-v0.1",
+                             "required":  true,
+                             "configured_remote":  "https://github.com/resonance36912-cell/rons-epublisher-sovereign-source.git"
+                         },
+                         {
+                             "id":  "creative-studio-source",
+                             "role":  "application-source-authority",
+                             "local_path":  "%USERPROFILE%\\Resonance\\OpenNova\\apps\\creative-studio-sovereign-local-v0.1",
+                             "required":  true,
+                             "configured_remote":  "https://github.com/resonance36912-cell/rons-creative-studio-sovereign-source.git"
+                         },
+                         {
+                             "id":  "sync-vision-source",
+                             "role":  "application-source-authority",
+                             "local_path":  "%USERPROFILE%\\Resonance\\OpenNova\\apps\\sync-vision-sovereign-local-v0.1",
+                             "required":  true,
+                             "configured_remote":  "https://github.com/resonance36912-cell/rons-sync-vision-sovereign-source.git"
+                         },
+                         {
+                             "id":  "youtube-optimizer-source",
+                             "role":  "application-source-authority",
+                             "local_path":  "%USERPROFILE%\\Resonance\\OpenNova\\apps\\youtube-optimizer-sovereign-local-v0.1",
+                             "required":  true,
+                             "configured_remote":  "https://github.com/resonance36912-cell/rons-youtube-optimizer-sovereign-source.git"
+                         }
+                     ],
+    "paths":  [
+                  {
+                      "id":  "suite-root",
+                      "role":  "live-suite-root",
+                      "local_path":  "%USERPROFILE%\\Resonance\\OpenNova",
+                      "authority":  "local-runtime",
+                      "required":  true
+                  },
+                  {
+                      "id":  "hub-candidate-build",
+                      "role":  "generated-hub-candidate",
+                      "local_path":  "%SystemDrive%\\Resonance\\Sources\\ronsas-hub-canonical\\.output-candidate-local",
+                      "authority":  "generated-candidate-runtime",
+                      "required":  false
+                  },
+                  {
+                      "id":  "hub-runtime-build",
+                      "role":  "live-hub-runtime",
+                      "local_path":  "%SystemDrive%\\Resonance\\Sources\\ronsas-hub-canonical\\.output-local",
+                      "authority":  "generated-live-runtime",
+                      "required":  true
+                  },
+                  {
+                      "id":  "epublisher",
+                      "role":  "ronsas-application-module-source-and-runtime",
+                      "local_path":  "%USERPROFILE%\\Resonance\\OpenNova\\apps\\epublisher-sovereign-local-v0.1",
+                      "authority":  "github-backed-source-and-runtime",
+                      "required":  true,
+                      "configured_remote":  "https://github.com/resonance36912-cell/rons-epublisher-sovereign-source.git"
+                  },
+                  {
+                      "id":  "creative-studio",
+                      "role":  "ronsas-application-module-source-and-runtime",
+                      "local_path":  "%USERPROFILE%\\Resonance\\OpenNova\\apps\\creative-studio-sovereign-local-v0.1",
+                      "authority":  "github-backed-source-and-runtime",
+                      "required":  true,
+                      "configured_remote":  "https://github.com/resonance36912-cell/rons-creative-studio-sovereign-source.git"
+                  },
+                  {
+                      "id":  "syncvision",
+                      "role":  "ronsas-application-module-source-and-runtime",
+                      "local_path":  "%USERPROFILE%\\Resonance\\OpenNova\\apps\\sync-vision-sovereign-local-v0.1",
+                      "authority":  "github-backed-source-and-runtime",
+                      "required":  true,
+                      "configured_remote":  "https://github.com/resonance36912-cell/rons-sync-vision-sovereign-source.git"
+                  },
+                  {
+                      "id":  "youtube-optimizer-source",
+                      "role":  "ronsas-application-module-source",
+                      "local_path":  "%USERPROFILE%\\Resonance\\OpenNova\\apps\\youtube-optimizer-sovereign-local-v0.1",
+                      "authority":  "github-backed-source",
+                      "configured_remote":  "https://github.com/resonance36912-cell/rons-youtube-optimizer-sovereign-source.git",
+                      "required":  true
+                  },
+                  {
+                      "id":  "youtube-optimizer-runtime",
+                      "role":  "runtime-stage",
+                      "local_path":  "%USERPROFILE%\\Resonance\\OpenNova\\runtime\\youtube-optimizer-stage",
+                      "authority":  "local-runtime-never-git",
+                      "required":  true
+                  },
+                  {
+                      "id":  "foundry",
+                      "role":  "sealed-appdev-release",
+                      "local_path":  "%USERPROFILE%\\Resonance\\OpenNova\\ResonanceAppDev_ZeroCredit_v1.5.8",
+                      "authority":  "sealed-local-release",
+                      "required":  true
+                  },
+                  {
+                      "id":  "integrations",
+                      "role":  "suite-integrations",
+                      "local_path":  "%USERPROFILE%\\Resonance\\OpenNova\\integrations",
+                      "authority":  "local-runtime",
+                      "required":  true
+                  },
+                  {
+                      "id":  "engines",
+                      "role":  "pinned-local-engines",
+                      "local_path":  "%USERPROFILE%\\Resonance\\OpenNova\\engines",
+                      "authority":  "local-runtime",
+                      "required":  true
+                  },
+                  {
+                      "id":  "runtime",
+                      "role":  "mutable-runtime-state",
+                      "local_path":  "%USERPROFILE%\\Resonance\\OpenNova\\runtime",
+                      "authority":  "local-only-never-git",
+                      "required":  true
+                  },
+                  {
+                      "id":  "control-center",
+                      "role":  "machine-local-control-plane",
+                      "local_path":  "%LOCALAPPDATA%\\Resonance\\RONS-ControlCenter",
+                      "authority":  "local-only",
+                      "required":  true
+                  },
+                  {
+                      "id":  "audit-blueprint-local",
+                      "role":  "latest-local-blueprint",
+                      "local_path":  "%USERPROFILE%\\Resonance\\OpenNova\\audit\\RONS-RGP-SYSTEM-BLUEPRINT-v1.0.0-20260912",
+                      "authority":  "local-audit-candidate",
+                      "required":  true
+                  },
+                  {
+                      "id":  "dropbox-audit-mirror",
+                      "role":  "audit-and-release-evidence",
+                      "local_path":  "%USERPROFILE%\\Dropbox\\RONS-Audit\\RONS-AI-AUDIT-REPOSITORY",
+                      "cloud_path":  "/RONS-Audit/RONS-AI-AUDIT-REPOSITORY",
+                      "authority":  "dropbox-cloud",
+                      "required":  true
+                  }
+              ],
+    "services":  [
+                     {
+                         "id":  "hub",
+                         "name":  "RONS Hub",
+                         "port":  4173,
+                         "listen_port":  4173,
+                         "uri":  "http://127.0.0.1:4173/",
+                         "required":  true
+                     },
+                     {
+                         "id":  "epublisher",
+                         "name":  "RONSAS ePublisher",
+                         "port":  3101,
+                         "listen_port":  3101,
+                         "uri":  "http://127.0.0.1:3101/",
+                         "required":  true
+                     },
+                     {
+                         "id":  "creative",
+                         "name":  "RONSAS Creative Studio",
+                         "port":  3201,
+                         "listen_port":  3201,
+                         "uri":  "http://127.0.0.1:3201/studio",
+                         "required":  true
+                     },
+                     {
+                         "id":  "syncvision",
+                         "name":  "RONSAS Sync Vision",
+                         "port":  3301,
+                         "listen_port":  3301,
+                         "uri":  "http://127.0.0.1:3301/",
+                         "required":  true
+                     },
+                     {
+                         "id":  "youtube",
+                         "name":  "RONSAS YouTube Optimizer",
+                         "port":  3401,
+                         "listen_port":  3401,
+                         "uri":  "http://127.0.0.1:3401/",
+                         "required":  true
+                     },
+                     {
+                         "id":  "launch-broker",
+                         "name":  "RONSAS Launch Broker",
+                         "port":  4450,
+                         "listen_port":  4450,
+                         "uri":  "http://127.0.0.1:4450/health",
+                         "required":  true
+                     },
+                     {
+                         "id":  "musetalk",
+                         "name":  "MuseTalk Bridge",
+                         "port":  7863,
+                         "listen_port":  7863,
+                         "uri":  "http://127.0.0.1:7863/health",
+                         "required":  true
+                     },
+                     {
+                         "id":  "stt",
+                         "name":  "Local Speech-to-Text",
+                         "port":  7864,
+                         "listen_port":  7864,
+                         "uri":  "http://127.0.0.1:7864/health",
+                         "required":  true
+                     },
+                     {
+                         "id":  "image",
+                         "name":  "Local Image Service",
+                         "port":  7865,
+                         "listen_port":  7865,
+                         "uri":  "http://127.0.0.1:7865/health",
+                         "required":  true
+                     },
+                     {
+                         "id":  "llm",
+                         "name":  "Local LLM",
+                         "port":  7866,
+                         "listen_port":  7866,
+                         "uri":  "http://127.0.0.1:7866/health",
+                         "required":  true
+                     },
+                     {
+                         "id":  "source",
+                         "name":  "Creative Source",
+                         "port":  7867,
+                         "listen_port":  7867,
+                         "uri":  "http://127.0.0.1:7867/health",
+                         "required":  true
+                     },
+                     {
+                         "id":  "broker",
+                         "name":  "RONS AI Broker",
+                         "port":  7868,
+                         "listen_port":  7868,
+                         "uri":  "http://127.0.0.1:7868/health",
+                         "required":  true
+                     },
+                     {
+                         "id":  "foundry",
+                         "name":  "Foundry",
+                         "port":  8787,
+                         "listen_port":  8787,
+                         "uri":  "http://127.0.0.1:8787/v1/apps",
+                         "required":  true
+                     },
+                     {
+                         "id":  "backend",
+                         "name":  "Sovereign Gateway",
+                         "port":  58600,
+                         "listen_port":  8787,
+                         "uri":  "http://127.0.0.1:8787/v1/backend/health",
+                         "required":  true
+                     },
+                     {
+                         "id":  "ollama",
+                         "name":  "Ollama",
+                         "port":  11434,
+                         "listen_port":  11434,
+                         "uri":  "http://127.0.0.1:11434/",
+                         "required":  true
+                     }
+                 ],
+    "module_registry":  "ops\\ealiophin\\cluster\\RONSAS-MODULES.json"
 }

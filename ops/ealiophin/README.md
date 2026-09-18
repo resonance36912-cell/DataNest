@@ -34,3 +34,10 @@ Windows requires administrator elevation to register the SYSTEM startup task. Th
 ## Unified RONSAS runtime contract
 
 The module registry in `cluster\RONSAS-MODULES.json` is the single Ealiophin composition contract. Hub and the four application surfaces are RONSAS modules; launch broker, local AI/media services, Foundry/backend, and Ollama are governed RONSAS services. The canonical supervisor starts/reuses them, status evaluates them, and final acceptance consumes the same contract. Legacy suite launchers are aliases only.
+
+## Governed Hub promotion
+
+The Hub build contract separates candidate and live Node artifacts. `RONS_LOCAL_OUTPUT_DIR=.output-candidate-local bun run build:local` produces `.output-candidate-local`; production runs only from `.output-local`. Use `cluster\PROMOTE-RONSAS-HUB.ps1` to health-check the candidate on isolated port 4175 before promoting it to live port 4174; port 4173 remains the fallback. The script holds a cross-session lock, swaps builds only after validation, records a SHA-256 receipt, updates supervisor ownership state, retains up to three rollback builds, and restores the previous live build if production health fails.
+
+For a non-destructive check, run the promotion script with `-ValidateOnly`. Validation never stops or replaces the production listener.
+
