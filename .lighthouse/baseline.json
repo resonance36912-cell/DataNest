@@ -1,0 +1,722 @@
+{
+  "__meta": {
+    "updatedAt": "2026-08-06T15:45:54.231919Z",
+    "reason": "seed provenance for existing committed baseline (lazy motion + critical CSS run)",
+    "acceptedRegression": false,
+    "routes": "all",
+    "commit": "a2f7499",
+    "by": "lovable",
+    "previousUpdatedAt": null
+  },
+  "/": {
+    "performance": 56,
+    "seo": 100,
+    "best-practices": 100,
+    "metrics": {
+      "first-contentful-paint": {
+        "value": 4621.973,
+        "display": "4.6\u00a0s"
+      },
+      "largest-contentful-paint": {
+        "value": 5956.199,
+        "display": "6.0\u00a0s"
+      },
+      "total-blocking-time": {
+        "value": 73.5,
+        "display": "70\u00a0ms"
+      },
+      "cumulative-layout-shift": {
+        "value": 0.001,
+        "display": "0.001"
+      },
+      "speed-index": {
+        "value": 4621.973,
+        "display": "4.6\u00a0s"
+      }
+    },
+    "audits": {
+      "is-on-https": {
+        "score": 100,
+        "title": "Uses HTTPS"
+      },
+      "first-contentful-paint": {
+        "score": 0,
+        "title": "First Contentful Paint"
+      },
+      "largest-contentful-paint": {
+        "score": 4,
+        "title": "Largest Contentful Paint"
+      },
+      "speed-index": {
+        "score": 5,
+        "title": "Speed Index"
+      },
+      "total-blocking-time": {
+        "score": 99,
+        "title": "Total Blocking Time"
+      },
+      "max-potential-fid": {
+        "score": 94,
+        "title": "Max Potential First Input Delay"
+      },
+      "cumulative-layout-shift": {
+        "score": 100,
+        "title": "Cumulative Layout Shift"
+      },
+      "errors-in-console": {
+        "score": 100,
+        "title": "No browser errors logged to the console"
+      },
+      "server-response-time": {
+        "score": 100,
+        "title": "Initial server response time was short"
+      },
+      "interactive": {
+        "score": 27,
+        "title": "Time to Interactive"
+      },
+      "redirects": {
+        "score": 100,
+        "title": "Avoid multiple page redirects"
+      },
+      "image-aspect-ratio": {
+        "score": 100,
+        "title": "Displays images with correct aspect ratio"
+      },
+      "image-size-responsive": {
+        "score": 100,
+        "title": "Serves images with appropriate resolution"
+      },
+      "deprecations": {
+        "score": 100,
+        "title": "Avoids deprecated APIs"
+      },
+      "third-party-cookies": {
+        "score": 100,
+        "title": "Avoids third-party cookies"
+      },
+      "mainthread-work-breakdown": {
+        "score": 0,
+        "title": "Minimize main-thread work"
+      },
+      "bootup-time": {
+        "score": 100,
+        "title": "JavaScript execution time"
+      },
+      "unsized-images": {
+        "score": 100,
+        "title": "Image elements have explicit `width` and `height`"
+      },
+      "valid-source-maps": {
+        "score": 100,
+        "title": "Page has valid source maps"
+      },
+      "document-title": {
+        "score": 100,
+        "title": "Document has a `<title>` element"
+      },
+      "image-alt": {
+        "score": 100,
+        "title": "Image elements have `[alt]` attributes"
+      },
+      "total-byte-weight": {
+        "score": 100,
+        "title": "Avoids enormous network payloads"
+      },
+      "unminified-css": {
+        "score": 100,
+        "title": "Minify CSS"
+      },
+      "unminified-javascript": {
+        "score": 100,
+        "title": "Minify JavaScript"
+      },
+      "unused-css-rules": {
+        "score": 100,
+        "title": "Reduce unused CSS"
+      },
+      "unused-javascript": {
+        "score": 0,
+        "title": "Reduce unused JavaScript"
+      },
+      "doctype": {
+        "score": 100,
+        "title": "Page has the HTML doctype"
+      },
+      "charset": {
+        "score": 100,
+        "title": "Properly defines charset"
+      },
+      "geolocation-on-start": {
+        "score": 100,
+        "title": "Avoids requesting the geolocation permission on page load"
+      },
+      "inspector-issues": {
+        "score": 100,
+        "title": "No issues in the `Issues` panel in Chrome Devtools"
+      },
+      "notification-on-start": {
+        "score": 100,
+        "title": "Avoids requesting the notification permission on page load"
+      },
+      "paste-preventing-inputs": {
+        "score": 100,
+        "title": "Allows users to paste into input fields"
+      },
+      "meta-description": {
+        "score": 100,
+        "title": "Document has a meta description"
+      },
+      "http-status-code": {
+        "score": 100,
+        "title": "Page has successful HTTP status code"
+      },
+      "link-text": {
+        "score": 100,
+        "title": "Links have descriptive text"
+      },
+      "crawlable-anchors": {
+        "score": 100,
+        "title": "Links are crawlable"
+      },
+      "is-crawlable": {
+        "score": 100,
+        "title": "Page isn\u2019t blocked from indexing"
+      },
+      "robots-txt": {
+        "score": 100,
+        "title": "robots.txt is valid"
+      },
+      "hreflang": {
+        "score": 100,
+        "title": "Document has a valid `hreflang`"
+      },
+      "canonical": {
+        "score": 100,
+        "title": "Document has a valid `rel=canonical`"
+      },
+      "bf-cache": {
+        "score": 100,
+        "title": "Page didn't prevent back/forward cache restoration"
+      },
+      "cache-insight": {
+        "score": 0,
+        "title": "Use efficient cache lifetimes"
+      },
+      "document-latency-insight": {
+        "score": 100,
+        "title": "Document request latency"
+      },
+      "duplicated-javascript-insight": {
+        "score": 100,
+        "title": "Duplicated JavaScript"
+      },
+      "font-display-insight": {
+        "score": 100,
+        "title": "Font display"
+      },
+      "forced-reflow-insight": {
+        "score": 100,
+        "title": "Forced reflow"
+      },
+      "image-delivery-insight": {
+        "score": 50,
+        "title": "Improve image delivery"
+      },
+      "legacy-javascript-insight": {
+        "score": 100,
+        "title": "Legacy JavaScript"
+      },
+      "modern-http-insight": {
+        "score": 100,
+        "title": "Modern HTTP"
+      },
+      "network-dependency-tree-insight": {
+        "score": 0,
+        "title": "Network dependency tree"
+      },
+      "render-blocking-insight": {
+        "score": 50,
+        "title": "Render-blocking requests"
+      },
+      "viewport-insight": {
+        "score": 100,
+        "title": "Optimize viewport for mobile"
+      }
+    }
+  },
+  "/pricing": {
+    "performance": 57,
+    "seo": 100,
+    "best-practices": 100,
+    "metrics": {
+      "first-contentful-paint": {
+        "value": 3572.152,
+        "display": "3.6\u00a0s"
+      },
+      "largest-contentful-paint": {
+        "value": 4944.496,
+        "display": "4.9\u00a0s"
+      },
+      "total-blocking-time": {
+        "value": 131.239,
+        "display": "130\u00a0ms"
+      },
+      "cumulative-layout-shift": {
+        "value": 0.024,
+        "display": "0.024"
+      },
+      "speed-index": {
+        "value": 3572.152,
+        "display": "3.6\u00a0s"
+      }
+    },
+    "audits": {
+      "is-on-https": {
+        "score": 100,
+        "title": "Uses HTTPS"
+      },
+      "first-contentful-paint": {
+        "score": 2,
+        "title": "First Contentful Paint"
+      },
+      "largest-contentful-paint": {
+        "score": 9,
+        "title": "Largest Contentful Paint"
+      },
+      "speed-index": {
+        "score": 15,
+        "title": "Speed Index"
+      },
+      "total-blocking-time": {
+        "score": 93,
+        "title": "Total Blocking Time"
+      },
+      "max-potential-fid": {
+        "score": 94,
+        "title": "Max Potential First Input Delay"
+      },
+      "cumulative-layout-shift": {
+        "score": 100,
+        "title": "Cumulative Layout Shift"
+      },
+      "errors-in-console": {
+        "score": 100,
+        "title": "No browser errors logged to the console"
+      },
+      "server-response-time": {
+        "score": 100,
+        "title": "Initial server response time was short"
+      },
+      "interactive": {
+        "score": 40,
+        "title": "Time to Interactive"
+      },
+      "redirects": {
+        "score": 100,
+        "title": "Avoid multiple page redirects"
+      },
+      "image-aspect-ratio": {
+        "score": 100,
+        "title": "Displays images with correct aspect ratio"
+      },
+      "image-size-responsive": {
+        "score": 100,
+        "title": "Serves images with appropriate resolution"
+      },
+      "deprecations": {
+        "score": 100,
+        "title": "Avoids deprecated APIs"
+      },
+      "third-party-cookies": {
+        "score": 100,
+        "title": "Avoids third-party cookies"
+      },
+      "mainthread-work-breakdown": {
+        "score": 0,
+        "title": "Minimize main-thread work"
+      },
+      "bootup-time": {
+        "score": 100,
+        "title": "JavaScript execution time"
+      },
+      "unsized-images": {
+        "score": 100,
+        "title": "Image elements have explicit `width` and `height`"
+      },
+      "valid-source-maps": {
+        "score": 100,
+        "title": "Page has valid source maps"
+      },
+      "document-title": {
+        "score": 100,
+        "title": "Document has a `<title>` element"
+      },
+      "image-alt": {
+        "score": 100,
+        "title": "Image elements have `[alt]` attributes"
+      },
+      "total-byte-weight": {
+        "score": 100,
+        "title": "Avoids enormous network payloads"
+      },
+      "unminified-css": {
+        "score": 100,
+        "title": "Minify CSS"
+      },
+      "unminified-javascript": {
+        "score": 100,
+        "title": "Minify JavaScript"
+      },
+      "unused-css-rules": {
+        "score": 100,
+        "title": "Reduce unused CSS"
+      },
+      "unused-javascript": {
+        "score": 0,
+        "title": "Reduce unused JavaScript"
+      },
+      "doctype": {
+        "score": 100,
+        "title": "Page has the HTML doctype"
+      },
+      "charset": {
+        "score": 100,
+        "title": "Properly defines charset"
+      },
+      "geolocation-on-start": {
+        "score": 100,
+        "title": "Avoids requesting the geolocation permission on page load"
+      },
+      "inspector-issues": {
+        "score": 100,
+        "title": "No issues in the `Issues` panel in Chrome Devtools"
+      },
+      "notification-on-start": {
+        "score": 100,
+        "title": "Avoids requesting the notification permission on page load"
+      },
+      "paste-preventing-inputs": {
+        "score": 100,
+        "title": "Allows users to paste into input fields"
+      },
+      "meta-description": {
+        "score": 100,
+        "title": "Document has a meta description"
+      },
+      "http-status-code": {
+        "score": 100,
+        "title": "Page has successful HTTP status code"
+      },
+      "link-text": {
+        "score": 100,
+        "title": "Links have descriptive text"
+      },
+      "crawlable-anchors": {
+        "score": 100,
+        "title": "Links are crawlable"
+      },
+      "is-crawlable": {
+        "score": 100,
+        "title": "Page isn\u2019t blocked from indexing"
+      },
+      "robots-txt": {
+        "score": 100,
+        "title": "robots.txt is valid"
+      },
+      "hreflang": {
+        "score": 100,
+        "title": "Document has a valid `hreflang`"
+      },
+      "canonical": {
+        "score": 100,
+        "title": "Document has a valid `rel=canonical`"
+      },
+      "bf-cache": {
+        "score": 100,
+        "title": "Page didn't prevent back/forward cache restoration"
+      },
+      "cache-insight": {
+        "score": 50,
+        "title": "Use efficient cache lifetimes"
+      },
+      "document-latency-insight": {
+        "score": 100,
+        "title": "Document request latency"
+      },
+      "duplicated-javascript-insight": {
+        "score": 100,
+        "title": "Duplicated JavaScript"
+      },
+      "font-display-insight": {
+        "score": 100,
+        "title": "Font display"
+      },
+      "forced-reflow-insight": {
+        "score": 0,
+        "title": "Forced reflow"
+      },
+      "image-delivery-insight": {
+        "score": 50,
+        "title": "Improve image delivery"
+      },
+      "legacy-javascript-insight": {
+        "score": 100,
+        "title": "Legacy JavaScript"
+      },
+      "modern-http-insight": {
+        "score": 100,
+        "title": "Modern HTTP"
+      },
+      "network-dependency-tree-insight": {
+        "score": 0,
+        "title": "Network dependency tree"
+      },
+      "render-blocking-insight": {
+        "score": 50,
+        "title": "Render-blocking requests"
+      },
+      "viewport-insight": {
+        "score": 100,
+        "title": "Optimize viewport for mobile"
+      }
+    }
+  },
+  "/features": {
+    "performance": 59,
+    "seo": 100,
+    "best-practices": 100,
+    "metrics": {
+      "first-contentful-paint": {
+        "value": 3566.677,
+        "display": "3.6\u00a0s"
+      },
+      "largest-contentful-paint": {
+        "value": 5091.373,
+        "display": "5.1\u00a0s"
+      },
+      "total-blocking-time": {
+        "value": 47,
+        "display": "50\u00a0ms"
+      },
+      "cumulative-layout-shift": {
+        "value": 0,
+        "display": "0"
+      },
+      "speed-index": {
+        "value": 3566.677,
+        "display": "3.6\u00a0s"
+      }
+    },
+    "audits": {
+      "is-on-https": {
+        "score": 100,
+        "title": "Uses HTTPS"
+      },
+      "first-contentful-paint": {
+        "score": 2,
+        "title": "First Contentful Paint"
+      },
+      "largest-contentful-paint": {
+        "score": 8,
+        "title": "Largest Contentful Paint"
+      },
+      "speed-index": {
+        "score": 15,
+        "title": "Speed Index"
+      },
+      "total-blocking-time": {
+        "score": 100,
+        "title": "Total Blocking Time"
+      },
+      "max-potential-fid": {
+        "score": 99,
+        "title": "Max Potential First Input Delay"
+      },
+      "cumulative-layout-shift": {
+        "score": 100,
+        "title": "Cumulative Layout Shift"
+      },
+      "errors-in-console": {
+        "score": 100,
+        "title": "No browser errors logged to the console"
+      },
+      "server-response-time": {
+        "score": 100,
+        "title": "Initial server response time was short"
+      },
+      "interactive": {
+        "score": 39,
+        "title": "Time to Interactive"
+      },
+      "redirects": {
+        "score": 100,
+        "title": "Avoid multiple page redirects"
+      },
+      "image-aspect-ratio": {
+        "score": 100,
+        "title": "Displays images with correct aspect ratio"
+      },
+      "image-size-responsive": {
+        "score": 100,
+        "title": "Serves images with appropriate resolution"
+      },
+      "deprecations": {
+        "score": 100,
+        "title": "Avoids deprecated APIs"
+      },
+      "third-party-cookies": {
+        "score": 100,
+        "title": "Avoids third-party cookies"
+      },
+      "mainthread-work-breakdown": {
+        "score": 0,
+        "title": "Minimize main-thread work"
+      },
+      "bootup-time": {
+        "score": 100,
+        "title": "JavaScript execution time"
+      },
+      "unsized-images": {
+        "score": 100,
+        "title": "Image elements have explicit `width` and `height`"
+      },
+      "valid-source-maps": {
+        "score": 100,
+        "title": "Page has valid source maps"
+      },
+      "document-title": {
+        "score": 100,
+        "title": "Document has a `<title>` element"
+      },
+      "image-alt": {
+        "score": 100,
+        "title": "Image elements have `[alt]` attributes"
+      },
+      "total-byte-weight": {
+        "score": 100,
+        "title": "Avoids enormous network payloads"
+      },
+      "unminified-css": {
+        "score": 100,
+        "title": "Minify CSS"
+      },
+      "unminified-javascript": {
+        "score": 100,
+        "title": "Minify JavaScript"
+      },
+      "unused-css-rules": {
+        "score": 100,
+        "title": "Reduce unused CSS"
+      },
+      "unused-javascript": {
+        "score": 0,
+        "title": "Reduce unused JavaScript"
+      },
+      "doctype": {
+        "score": 100,
+        "title": "Page has the HTML doctype"
+      },
+      "charset": {
+        "score": 100,
+        "title": "Properly defines charset"
+      },
+      "geolocation-on-start": {
+        "score": 100,
+        "title": "Avoids requesting the geolocation permission on page load"
+      },
+      "inspector-issues": {
+        "score": 100,
+        "title": "No issues in the `Issues` panel in Chrome Devtools"
+      },
+      "notification-on-start": {
+        "score": 100,
+        "title": "Avoids requesting the notification permission on page load"
+      },
+      "paste-preventing-inputs": {
+        "score": 100,
+        "title": "Allows users to paste into input fields"
+      },
+      "meta-description": {
+        "score": 100,
+        "title": "Document has a meta description"
+      },
+      "http-status-code": {
+        "score": 100,
+        "title": "Page has successful HTTP status code"
+      },
+      "link-text": {
+        "score": 100,
+        "title": "Links have descriptive text"
+      },
+      "crawlable-anchors": {
+        "score": 100,
+        "title": "Links are crawlable"
+      },
+      "is-crawlable": {
+        "score": 100,
+        "title": "Page isn\u2019t blocked from indexing"
+      },
+      "robots-txt": {
+        "score": 100,
+        "title": "robots.txt is valid"
+      },
+      "hreflang": {
+        "score": 100,
+        "title": "Document has a valid `hreflang`"
+      },
+      "canonical": {
+        "score": 100,
+        "title": "Document has a valid `rel=canonical`"
+      },
+      "bf-cache": {
+        "score": 100,
+        "title": "Page didn't prevent back/forward cache restoration"
+      },
+      "cache-insight": {
+        "score": 0,
+        "title": "Use efficient cache lifetimes"
+      },
+      "document-latency-insight": {
+        "score": 100,
+        "title": "Document request latency"
+      },
+      "duplicated-javascript-insight": {
+        "score": 100,
+        "title": "Duplicated JavaScript"
+      },
+      "font-display-insight": {
+        "score": 100,
+        "title": "Font display"
+      },
+      "forced-reflow-insight": {
+        "score": 0,
+        "title": "Forced reflow"
+      },
+      "image-delivery-insight": {
+        "score": 50,
+        "title": "Improve image delivery"
+      },
+      "legacy-javascript-insight": {
+        "score": 100,
+        "title": "Legacy JavaScript"
+      },
+      "modern-http-insight": {
+        "score": 100,
+        "title": "Modern HTTP"
+      },
+      "network-dependency-tree-insight": {
+        "score": 0,
+        "title": "Network dependency tree"
+      },
+      "render-blocking-insight": {
+        "score": 50,
+        "title": "Render-blocking requests"
+      },
+      "viewport-insight": {
+        "score": 100,
+        "title": "Optimize viewport for mobile"
+      }
+    }
+  }
+}

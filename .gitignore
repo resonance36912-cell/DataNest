@@ -1,0 +1,48 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Lighthouse gate run output (the ci baseline.json is committed; per-run
+# artifacts and machine-specific baseline tracks are not)
+.lighthouse/summary.md
+.lighthouse/diff.json
+.lighthouse/baseline.*.json
+
+# Test run output (Playwright HTML report + traces/screenshots, Vitest reports)
+playwright-report/
+test-results/
+# RONSAS local/runtime exclusions
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+dist-ssr/
+.output/
+.wrangler/
+.tanstack/
+coverage/
+backups/
+*.tmp
+*.bak

@@ -1,0 +1,20 @@
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: *
+Allow: /
+
+# This app is a spoke of The Resonance Hub — the hub is the source of
+# truth for pricing, checkout, updates, support and ecosystem bundles.
+# Search engines: prefer https://reson8.life for hub-owned queries.
+Sitemap: https://youtubeoptimizer.life/sitemap.xml
+Sitemap: https://reson8.life/sitemap.xml

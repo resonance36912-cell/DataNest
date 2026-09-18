@@ -1,0 +1,33 @@
+# Resonance YouTube Optimizer
+
+> Part of **The Resonance Hub** (https://reson8.life) — the hub is the source of truth for pricing, checkout, updates, support and ecosystem bundles. This spoke delivers AI-powered YouTube channel audits, content strategy, thumbnails, and growth analytics.
+
+For pricing, credits, project packs, account, invoices and ecosystem bundles, follow the hub links below rather than any spoke-local page.
+
+## Hub (source of truth)
+
+- [The Resonance Hub](https://reson8.life): Ecosystem home, governance, and support.
+- [Hub pricing](https://reson8.life/pricing): Once-off credits and project packs (no recurring app subscription).
+- [Hub updates](https://reson8.life/updates): Release notes across the ecosystem.
+- [Hub checkout](https://reson8.life/checkout): Buy credits or packs for any spoke.
+- [Hub account](https://reson8.life/account): Billing, invoices, entitlements.
+
+## This spoke
+
+- [Home](https://youtubeoptimizer.life/): Run a channel audit and see your Resonance score.
+- [Features](https://youtubeoptimizer.life/features): Audit, content ideas, monetization, schedule, trends, thumbnails.
+- [Pricing](https://youtubeoptimizer.life/pricing): Redirects intent to hub pricing.
+- [About](https://youtubeoptimizer.life/about): Team and mission.
+- [Contact](https://youtubeoptimizer.life/contact): Get in touch.
+
+## Ecosystem
+
+- [ePublisher](https://www.resonanceonline.life/)
+- [Creative Studio](https://www.creativestudio.life/)
+- [Podcast](https://www.resonance-podcast.com/)
+- [YouTube — @resonance36912](https://www.youtube.com/@resonance36912)
+
+## Optional
+
+- [Privacy](https://youtubeoptimizer.life/privacy): POPIA-conscious data handling.
+- [Terms](https://youtubeoptimizer.life/terms): Terms of service.
