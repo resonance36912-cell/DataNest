@@ -87,6 +87,7 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+          no-cache: true
 
       - name: Verify bun.lock consistency (shared script)
         id: lockfile_consistency
