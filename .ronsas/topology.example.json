@@ -38,17 +38,39 @@
       "required": true
     },
     {
-      "id": "hub-runtime-stage",
-      "role": "runtime-stage",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\runtime\\hub-sovereign-stage",
-      "required": true
-    },
-    {
       "id": "rcgf",
       "role": "governance-upstream",
       "local_path": "%USERPROFILE%\\Documents\\GitHub\\RCGF",
       "required": true,
       "configured_remote": "https://github.com/resonance36912-cell/RCGF.git"
+    },
+    {
+      "id": "epublisher-source",
+      "role": "application-source-authority",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\epublisher-sovereign-local-v0.1",
+      "required": true,
+      "configured_remote": "https://github.com/resonance36912-cell/rons-epublisher-sovereign-source.git"
+    },
+    {
+      "id": "creative-studio-source",
+      "role": "application-source-authority",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\creative-studio-sovereign-local-v0.1",
+      "required": true,
+      "configured_remote": "https://github.com/resonance36912-cell/rons-creative-studio-sovereign-source.git"
+    },
+    {
+      "id": "sync-vision-source",
+      "role": "application-source-authority",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\sync-vision-sovereign-local-v0.1",
+      "required": true,
+      "configured_remote": "https://github.com/resonance36912-cell/rons-sync-vision-sovereign-source.git"
+    },
+    {
+      "id": "youtube-optimizer-source",
+      "role": "application-source-authority",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\youtube-optimizer-sovereign-local-v0.1",
+      "required": true,
+      "configured_remote": "https://github.com/resonance36912-cell/rons-youtube-optimizer-sovereign-source.git"
     }
   ],
   "paths": [
@@ -60,31 +82,49 @@
       "required": true
     },
     {
+      "id": "hub-runtime-stage",
+      "role": "runtime-stage",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\runtime\\hub-sovereign-stage",
+      "authority": "local-runtime-never-git",
+      "required": true
+    },
+    {
       "id": "epublisher",
       "role": "ronsas-application-module-source-and-runtime",
       "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\epublisher-sovereign-local-v0.1",
-      "authority": "local-runtime",
-      "required": true
+      "authority": "github-backed-source-and-runtime",
+      "required": true,
+      "configured_remote": "https://github.com/resonance36912-cell/rons-epublisher-sovereign-source.git"
     },
     {
       "id": "creative-studio",
       "role": "ronsas-application-module-source-and-runtime",
       "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\creative-studio-sovereign-local-v0.1",
-      "authority": "local-runtime",
-      "required": true
+      "authority": "github-backed-source-and-runtime",
+      "required": true,
+      "configured_remote": "https://github.com/resonance36912-cell/rons-creative-studio-sovereign-source.git"
     },
     {
       "id": "syncvision",
       "role": "ronsas-application-module-source-and-runtime",
       "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\sync-vision-sovereign-local-v0.1",
-      "authority": "local-runtime",
+      "authority": "github-backed-source-and-runtime",
+      "required": true,
+      "configured_remote": "https://github.com/resonance36912-cell/rons-sync-vision-sovereign-source.git"
+    },
+    {
+      "id": "youtube-optimizer-source",
+      "role": "ronsas-application-module-source",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\youtube-optimizer-sovereign-local-v0.1",
+      "authority": "github-backed-source",
+      "configured_remote": "https://github.com/resonance36912-cell/rons-youtube-optimizer-sovereign-source.git",
       "required": true
     },
     {
-      "id": "youtube-optimizer",
-      "role": "ronsas-application-module-source-and-runtime",
+      "id": "youtube-optimizer-runtime",
+      "role": "runtime-stage",
       "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\runtime\\youtube-optimizer-stage",
-      "authority": "local-runtime",
+      "authority": "local-runtime-never-git",
       "required": true
     },
     {
