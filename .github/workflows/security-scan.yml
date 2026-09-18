@@ -61,8 +61,17 @@ jobs:
           # No license required for public repos. For private repos add
           # GITLEAKS_LICENSE in repo secrets and uncomment:
           # GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
-          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "true"
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "false"
           GITLEAKS_ENABLE_SUMMARY: "true"
+
+      - name: Upload gitleaks SARIF artifact
+        if: always() && hashFiles('results.sarif') != ''
+        uses: actions/upload-artifact@v6
+        with:
+          name: gitleaks-sarif-${{ github.run_id }}-${{ github.sha }}
+          path: results.sarif
+          if-no-files-found: warn
+          retention-days: ${{ env.SARIF_RETENTION_DAYS }}
 
   dependency-audit:
     name: Dependency audit (npm advisories)

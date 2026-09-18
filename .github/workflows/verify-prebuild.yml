@@ -34,8 +34,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # No GITLEAKS_LICENSE — required only for org-owned private repos
           # under the paid tier. Public repos and personal repos run free.
-          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "true"
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "false"
           GITLEAKS_ENABLE_SUMMARY: "true"
+
+      - name: Upload gitleaks SARIF artifact
+        if: always() && hashFiles('results.sarif') != ''
+        uses: actions/upload-artifact@v6
+        with:
+          name: gitleaks-sarif-${{ github.run_id }}-${{ github.sha }}
+          path: results.sarif
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
