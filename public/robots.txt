@@ -1,0 +1,26 @@
+# GENERATED FILE — edit scripts/generate-sitemap.ts, not this file.
+# Regenerated on every `bun run dev` / `bun run build` (predev/prebuild).
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+
+# SEO source-of-truth is The Resonance Hub. All canonical URLs point to reson8.life.
+# Stable entry point (always current):
+Sitemap: https://www.reson8.life/sitemap.xml
+# Content-addressed index — the filename changes whenever the sitemap set
+# changes, so caches can never serve a stale copy:
+Sitemap: https://www.reson8.life/sitemap-index.c638ef50.xml
