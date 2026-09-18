@@ -16,7 +16,7 @@ permissions:
 jobs:
   governance-db-runtime:
     name: Supabase governance migration + RPC runtime
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     timeout-minutes: 20
     steps:
       - name: Check out repository

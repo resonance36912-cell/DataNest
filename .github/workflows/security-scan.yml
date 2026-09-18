@@ -34,7 +34,7 @@ concurrency:
 jobs:
   invariants:
     name: Project security invariants
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v5
@@ -48,7 +48,7 @@ jobs:
 
   secret-scan:
     name: Secret scan (gitleaks)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
@@ -66,7 +66,7 @@ jobs:
 
   dependency-audit:
     name: Dependency audit (npm advisories)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
@@ -89,7 +89,7 @@ jobs:
 
   sast-semgrep:
     name: SAST (semgrep)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
@@ -194,7 +194,7 @@ jobs:
     # failed — reviewers still want the SARIF download link for triage.
     if: always() && github.event_name == 'pull_request'
     needs: [sast-semgrep]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     timeout-minutes: 5
     permissions:
       pull-requests: write

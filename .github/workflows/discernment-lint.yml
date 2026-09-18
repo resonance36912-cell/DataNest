@@ -50,7 +50,7 @@ permissions:
 jobs:
   lint:
     name: Generation-route lint
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     permissions:
       contents: read
       pull-requests: write
@@ -272,7 +272,7 @@ jobs:
 
   parity:
     name: Contract file parity vs Hub
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     steps:
       - name: Checkout spoke
         uses: actions/checkout@v5

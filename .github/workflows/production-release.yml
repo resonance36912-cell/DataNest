@@ -23,7 +23,7 @@ concurrency:
 jobs:
   validate:
     name: Validate release candidate
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
@@ -55,7 +55,7 @@ jobs:
   deploy:
     name: Migrate and deploy production
     needs: validate
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     timeout-minutes: 15
     environment:
       name: production

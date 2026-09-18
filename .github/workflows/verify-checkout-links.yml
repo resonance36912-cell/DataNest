@@ -9,7 +9,7 @@ on:
 jobs:
   verify:
     name: Pricing pages → /checkout SKU links
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     timeout-minutes: 5
     steps:
       - name: Check out repository

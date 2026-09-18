@@ -59,7 +59,7 @@ jobs:
   sync-lockfile:
     name: sync-lockfile
     if: github.event_name == 'workflow_dispatch' || github.actor == 'dependabot[bot]'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     timeout-minutes: 10
     # Surface drift + artifact metadata to the drift-gate job so it can render
     # a workflow-run summary without re-parsing summary.json.
@@ -388,7 +388,7 @@ jobs:
     name: drift-gate
     needs: [sync-lockfile]
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     timeout-minutes: 1
     env:
       RESULT: ${{ needs.sync-lockfile.result }}
