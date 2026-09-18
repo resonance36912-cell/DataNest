@@ -14,11 +14,10 @@ import RoleRoute from "@/components/RoleRoute";
 import HubRedirect from "@/components/HubRedirect";
 import AuthErrorHashWatcher from "@/components/AuthErrorHashWatcher";
 
-// Eager: landing + login (critical path)
-import Index from "./pages/Index";
-import Login from "./pages/Login";
-
-// Lazy: everything else
+// Route-level code splitting keeps the public shell small and defers page payloads
+// until the user actually navigates to them.
+const Index = lazy(() => import("./pages/Index"));
+const Login = lazy(() => import("./pages/Login"));
 const About = lazy(() => import("./pages/About"));
 const Ecosystem = lazy(() => import("./pages/Ecosystem"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
