@@ -5,7 +5,9 @@ on:
     branches: [main]
     paths:
       - "supabase/migrations/**"
+      - "scripts/verify-governance-bootstrap.sql"
       - "scripts/verify-governance-db.sql"
+      - "scripts/verify-governance-runtime.py"
       - ".github/workflows/verify-governance-db.yml"
       - "src/lib/governance/**"
   workflow_dispatch:
@@ -25,20 +27,12 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v5
 
-      - name: Set up Supabase CLI
-        uses: supabase/setup-cli@v2
-        with:
-          version: 2.117.0
-
-      - name: Start local Supabase and apply migrations
-        run: supabase start
-
-      - name: Verify governance schema, RLS, RPCs, and transaction flow
+      - name: Verify sovereign runner Python 3.12
         run: |
-          DB_CONTAINER="$(docker ps --filter 'name=supabase_db_' --format '{{.ID}}' | head -n 1)"
-          test -n "$DB_CONTAINER"
-          docker exec -i "$DB_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres < scripts/verify-governance-db.sql
+          python --version
+          python -c 'import sys; assert sys.version_info[:2] == (3, 12), sys.version'
 
-      - name: Stop local Supabase
-        if: always()
-        run: supabase stop --no-backup
+      - name: Verify governance migrations on sovereign PostgreSQL 17
+        env:
+          PODMAN_API_URL: http://ronsas-podman-api:2375
+        run: python scripts/verify-governance-runtime.py

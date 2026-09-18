@@ -88,6 +88,7 @@ jobs:
         with:
           no-cache: true
           bun-version: latest
+          no-cache: true
 
       - name: Verify bun.lock consistency (shared script)
         id: lockfile_consistency

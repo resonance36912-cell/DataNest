@@ -42,6 +42,7 @@ jobs:
         with:
           no-cache: true
           bun-version: 1.3.3
+          no-cache: true
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Run verify-security-invariants
@@ -84,6 +85,7 @@ jobs:
         with:
           no-cache: true
           bun-version: 1.3.3
+          no-cache: true
       - name: Verify pinned dependency versions
         # Fails if package.json uses range specifiers (^, ~, >=) or if
         # bun.lock resolved a different version than package.json declares.
@@ -118,11 +120,13 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check semgrep
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          "$HOME/.local/bin/semgrep" --version
+          export PATH="$HOME/.local/bin:$PATH"
+          semgrep --version
       - name: Run Semgrep
         id: semgrep
         continue-on-error: true
         run: |
+          export PATH="$HOME/.local/bin:$PATH"
           semgrep scan \
             --config p/owasp-top-ten \
             --config p/javascript \
@@ -139,6 +143,7 @@ jobs:
         with:
           no-cache: true
           bun-version: 1.3.3
+          no-cache: true
       - name: Summarize Semgrep findings
         if: always() && hashFiles('semgrep.sarif') != ''
         run: bun run scripts/summarize-sarif.ts semgrep.sarif --label "Semgrep" --top "$SARIF_SUMMARY_TOP_N"

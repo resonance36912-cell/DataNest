@@ -14,7 +14,7 @@
 //   {
 //     "slug"        : "syncvision",
 //     "name"        : "SyncVision",
-//     "origin_url"  : "https://syncvision.life",
+//     "origin_url"  : "https://sync.reson8.life",
 //     "workspace_id": "reson8" (optional),
 //     "owner_user_id": "<auth.users.id>" (optional; grants app_owner access)
 //   }

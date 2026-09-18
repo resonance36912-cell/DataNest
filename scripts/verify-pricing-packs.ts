@@ -15,7 +15,7 @@
  */
 import { readFileSync } from "node:fs";
 import { PACK_CATALOG } from "../src/lib/checkout.functions";
-import { APP_META } from "../src/routes/pricing";
+import { APP_META } from "../src/lib/pricing-meta";
 import {
   verifyPackCatalogAgainstAppMeta,
   verifyPricingSourceUsesCatalogLoop,

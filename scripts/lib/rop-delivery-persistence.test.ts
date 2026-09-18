@@ -35,7 +35,7 @@ function persistenceFragments(source: string): string[] {
 describe("ROP delivery persistence policy", () => {
   test("persists body summaries without raw request or response content", async () => {
     const record = await buildDeliveryPersistenceRecord({
-      destinationOrigin: "https://syncvision.life",
+      destinationOrigin: "https://sync.reson8.life",
       method: "post",
       requestBody: "request-secret-value",
       responseBody: "response-secret-value",
@@ -44,7 +44,7 @@ describe("ROP delivery persistence policy", () => {
       durationMs: 41.4,
     });
 
-    expect(record.destination_origin).toBe("https://syncvision.life");
+    expect(record.destination_origin).toBe("https://sync.reson8.life");
     expect(record.method).toBe("POST");
     expect(record.request.bytes).toBe(20);
     expect(record.response?.bytes).toBe(21);
@@ -76,18 +76,18 @@ describe("ROP delivery persistence policy", () => {
 
   test("rejects malformed or unbounded delivery metadata", async () => {
     const base = {
-      destinationOrigin: "https://syncvision.life",
+      destinationOrigin: "https://sync.reson8.life",
       method: "POST",
       requestBody: "{}",
       outcome: "accepted",
     };
     await expect(
-      buildDeliveryPersistenceRecord({ ...base, destinationOrigin: "http://syncvision.life" }),
+      buildDeliveryPersistenceRecord({ ...base, destinationOrigin: "http://sync.reson8.life" }),
     ).rejects.toThrow();
     await expect(
       buildDeliveryPersistenceRecord({
         ...base,
-        destinationOrigin: "https://syncvision.life/path",
+        destinationOrigin: "https://sync.reson8.life/path",
       }),
     ).rejects.toThrow();
     await expect(

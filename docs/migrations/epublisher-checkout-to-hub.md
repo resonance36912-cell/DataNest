@@ -1,10 +1,10 @@
-# Migrate ePublisher (resonanceonline.life) checkout to the Hub
+# Migrate ePublisher (epublisher.reson8.life) checkout to the Hub
 
 **Status:** Hub side is ready. `reson8.life/checkout` already validates the
 ePublisher SKUs listed below via the byte-identical `SKU_CATALOG` shared by
 `src/lib/checkout.functions.ts` and `src/routes/api/public/payfast/itn.ts`
 (enforced in CI by `scripts/verify-catalog-parity.ts`). The only remaining
-work lives in the **resonanceonline.life** Lovable project.
+work lives in the **epublisher.reson8.life** Lovable project.
 
 ## Money flow (unchanged)
 
@@ -14,10 +14,10 @@ Customer → reson8.life/checkout → PayFast → Resonance PayFast merchant →
 
 `reson8.life` is the billing authority. PayFast credentials
 (`PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY`, `PAYFAST_PASSPHRASE`) live
-only in the Hub project. They should be removed from resonanceonline.life
+only in the Hub project. They should be removed from epublisher.reson8.life
 once the CTAs below are swapped.
 
-## What resonanceonline.life must do
+## What epublisher.reson8.life must do
 
 ### 1. Replace every "Subscribe / Upgrade" CTA on its pricing page
 
@@ -34,12 +34,12 @@ identifiers:
 Optional query params the Hub honours:
 - `cycle=monthly` — currently the only supported cycle.
 - `return_to=<absolute https URL>` — where checkout success redirects. Must
-  be on an allowlisted origin; add resonanceonline.life origins to
+  be on an allowlisted origin; add epublisher.reson8.life origins to
   `src/lib/return-to-allowlist.ts` on the Hub side before relying on this.
 
 ### 2. Delete the local PayFast checkout code
 
-In the resonanceonline.life project, remove:
+In the epublisher.reson8.life project, remove:
 - Any `create-payfast-checkout` / signing logic.
 - The local ITN endpoint (Hub owns `/api/public/payfast/itn`).
 - `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY`, `PAYFAST_PASSPHRASE`
@@ -57,7 +57,7 @@ for auth is the same as the Hub's, so the bearer works across both.
 
 ### 4. Redirect legacy `/pricing` deep links (optional but recommended)
 
-If resonanceonline.life keeps a pricing page for SEO, each CTA should be a
+If epublisher.reson8.life keeps a pricing page for SEO, each CTA should be a
 plain `<a href="https://reson8.life/checkout?...">`. Do not rebuild a local
 checkout form.
 
@@ -65,7 +65,7 @@ checkout form.
 
 - [ ] Hub CI green (`verify-catalog-parity`, `verify-checkout-links`,
       `verify-epublisher`, `verify-all-apps`, `verify-back-to-hub`).
-- [ ] resonanceonline.life pricing CTAs updated to the URLs above.
+- [ ] epublisher.reson8.life pricing CTAs updated to the URLs above.
 - [ ] Local ePublisher PayFast code + secrets deleted.
 - [ ] Feature gates on ePublisher call the Hub's `/api/public/entitlement`.
 - [ ] One end-to-end sandbox purchase per plan via the new URL, confirmed

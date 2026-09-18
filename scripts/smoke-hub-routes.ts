@@ -17,7 +17,7 @@ type Check = {
   path: string;
   expectStatus?: number;
   expectRedirectTo?: string; // substring match on final URL
-  expectBody?: string;       // substring match on response body
+  expectBody?: string; // substring match on response body
 };
 
 const CHECKS: Check[] = [
@@ -25,10 +25,26 @@ const CHECKS: Check[] = [
   { name: "Pricing hub", path: "/pricing", expectStatus: 200, expectBody: "youtube-optimizer" },
 
   // Per-app pricing routes are server redirects to /pricing#<anchor>.
-  { name: "ePublisher pricing redirect", path: "/epublisher/pricing", expectRedirectTo: "/pricing#epublisher" },
-  { name: "Creative Studio pricing redirect", path: "/creative-studio/pricing", expectRedirectTo: "/pricing#creative-studio" },
-  { name: "Sync Vision pricing redirect", path: "/sync-vision/pricing", expectRedirectTo: "/pricing#sync-vision" },
-  { name: "YouTube Optimizer pricing redirect", path: "/youtube-optimizer/pricing", expectRedirectTo: "/pricing#youtube-optimizer" },
+  {
+    name: "ePublisher pricing redirect",
+    path: "/epublisher/pricing",
+    expectRedirectTo: "/pricing#epublisher",
+  },
+  {
+    name: "Creative Studio pricing redirect",
+    path: "/creative-studio/pricing",
+    expectRedirectTo: "/pricing#creative-studio",
+  },
+  {
+    name: "Sync Vision pricing redirect",
+    path: "/sync-vision/pricing",
+    expectRedirectTo: "/pricing#sync-vision",
+  },
+  {
+    name: "YouTube Optimizer pricing redirect",
+    path: "/youtube-optimizer/pricing",
+    expectRedirectTo: "/pricing#youtube-optimizer",
+  },
 ];
 
 type Result = { check: Check; ok: boolean; detail: string };
@@ -36,7 +52,7 @@ type Result = { check: Check; ok: boolean; detail: string };
 async function run(check: Check): Promise<Result> {
   const url = new URL(check.path, BASE).toString();
   try {
-    const res = await fetch(url, { redirect: "follow" });
+    const res = await fetch(url, { redirect: "follow", signal: AbortSignal.timeout(15_000) });
     const body = check.expectBody ? await res.text() : "";
     const finalUrl = res.url;
 
@@ -44,7 +60,11 @@ async function run(check: Check): Promise<Result> {
       return { check, ok: false, detail: `status ${res.status} (want ${check.expectStatus})` };
     }
     if (check.expectRedirectTo && !finalUrl.includes(check.expectRedirectTo)) {
-      return { check, ok: false, detail: `final URL ${finalUrl} missing "${check.expectRedirectTo}"` };
+      return {
+        check,
+        ok: false,
+        detail: `final URL ${finalUrl} missing "${check.expectRedirectTo}"`,
+      };
     }
     if (check.expectBody && !body.includes(check.expectBody)) {
       return { check, ok: false, detail: `body missing "${check.expectBody}"` };
@@ -71,7 +91,9 @@ let sitemapChecked = 0;
 let sitemapFailed = 0;
 
 try {
-  const smRes = await fetch(new URL("/sitemap.xml", BASE).toString());
+  const smRes = await fetch(new URL("/sitemap.xml", BASE).toString(), {
+    signal: AbortSignal.timeout(15_000),
+  });
   if (!smRes.ok) throw new Error(`sitemap.xml → ${smRes.status}`);
   const smXml = await smRes.text();
   const locs = Array.from(smXml.matchAll(/<loc>([^<]+)<\/loc>/g)).map((m) => m[1].trim());
@@ -91,7 +113,7 @@ try {
       const path = new URL(loc).pathname;
       const url = new URL(path, BASE).toString();
       try {
-        const r = await fetch(url, { redirect: "follow" });
+        const r = await fetch(url, { redirect: "follow", signal: AbortSignal.timeout(15_000) });
         return { loc, path, ok: r.ok, status: r.status };
       } catch (err) {
         return { loc, path, ok: false, status: 0, err: (err as Error).message };
@@ -115,4 +137,3 @@ const total = results.length + sitemapChecked;
 const totalFailed = failed + sitemapFailed;
 console.log(`\n${total - totalFailed}/${total} passed (base: ${BASE})`);
 if (totalFailed > 0) process.exit(1);
-
