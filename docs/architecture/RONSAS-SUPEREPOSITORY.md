@@ -116,13 +116,19 @@ All declared service listener ports except the intentionally indirect gateway po
 
 ## GitHub map
 
-| Repository | Local path | Configured remote | State |
+| Repository | Local source path | Configured remote | State |
 | --- | --- | --- | --- |
-| RCGF | `C:\Users\Ashley\Documents\GitHub\RCGF` | `https://github.com/resonance36912-cell/RCGF.git` | clean; cached `main` aligned |
-| Resonance Hub | `C:\Users\Ashley\Documents\GitHub\resonance-hub` | `https://github.com/resonance36912-cell/resonance-hub.git` | developer history retained; local working-tree drift remains to reconcile |
-| RONS sovereign codebase | `C:\Users\Ashley\Documents\GitHub\rons-sovereign-codebase` | `https://github.com/resonance36912-cell/RONSAS.git` | private GitHub source authority; `main` baseline and reconciliation review branch published |
+| RCGF | `C:\Users\Ashley\Documents\GitHub\RCGF` | `https://github.com/resonance36912-cell/RCGF.git` | governance upstream; `main` verified |
+| Resonance Hub | `C:\Resonance\Sources\ronsas-hub-canonical` | `https://github.com/resonance36912-cell/resonance-hub.git` | production source branch `ronsas/ealiophin-production` verified at `5470b50` |
+| RONS sovereign codebase | `C:\Users\Ashley\Documents\GitHub\rons-sovereign-codebase` | `https://github.com/resonance36912-cell/RONSAS.git` | private sovereign control authority |
+| ePublisher | `C:\Users\Ashley\Resonance\OpenNova\apps\epublisher-sovereign-local-v0.1` | `https://github.com/resonance36912-cell/rons-epublisher-sovereign-source.git` | source authority on `main` at `34f7bbd`; optimized tag `ronsas-source-optimized-2026-09-18`; GitHub Actions green |
+| Creative Studio | `C:\Users\Ashley\Resonance\OpenNova\apps\creative-studio-sovereign-local-v0.1` | `https://github.com/resonance36912-cell/rons-creative-studio-sovereign-source.git` | private source authority on `main` at `663b4f7`; optimized tag `ronsas-source-optimized-2026-09-18`; local pricing/tests/build green |
+| Sync Vision | `C:\Users\Ashley\Resonance\OpenNova\apps\sync-vision-sovereign-local-v0.1` | `https://github.com/resonance36912-cell/rons-sync-vision-sovereign-source.git` | private source authority on `main` at `fbb29b3`; optimized tag `ronsas-source-optimized-2026-09-18`; local typecheck/meta/tests/build green |
+| YouTube Optimizer | `C:\Users\Ashley\Resonance\OpenNova\apps\youtube-optimizer-sovereign-local-v0.1` | `https://github.com/resonance36912-cell/rons-youtube-optimizer-sovereign-source.git` | private source authority on `main` at `2290568`; optimized tag `ronsas-source-optimized-2026-09-18`; local config/typecheck/tests/build green |
 
-GitHub CLI authentication is restored as `resonance36912-cell`. The private `resonance36912-cell/RONSAS` repository is the verified source authority, with `main` and the reconciliation review branch published and PR #1 open. Native GitHub branch protection for this private repository is unavailable on the current plan (GitHub returned HTTP 403 requiring Pro or public visibility), so the repository remains private and RONSAS enforces PR-based promotion by policy plus a versioned local pre-push guard that blocks direct `main` pushes on configured workstations.
+GitHub CLI authentication is active as `resonance36912-cell`. RONSAS and the three newly-created spoke repositories remain private. Native branch protection for private repositories is unavailable on the current GitHub plan, so RONSAS continues to enforce review-branch promotion by policy and tracked local pre-push guards.
+
+As of 2026-09-18, GitHub-hosted Actions for the three new private spoke repositories are blocked before runner allocation by an account billing/spending-limit condition reported by GitHub. Those red runs are infrastructure-blocked, not code failures: Creative Studio, Sync Vision, and YouTube Optimizer passed their declared validation gates locally before publication. ePublisher is public and its GitHub Actions CI is green. See [SPOKE-SOURCE-AUTHORITY.md](./SPOKE-SOURCE-AUTHORITY.md) for the validation and promotion model.
 
 ## Dropbox map
 
