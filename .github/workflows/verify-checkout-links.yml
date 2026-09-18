@@ -6,6 +6,10 @@ on:
     branches: [main]
   merge_group:
 
+concurrency:
+  group: verify-checkout-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
     name: Pricing pages → /checkout SKU links
