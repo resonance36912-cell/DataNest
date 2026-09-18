@@ -26,12 +26,15 @@
       "port": 4173,
       "listenPort": 4173,
       "health": "http://127.0.0.1:4173/",
-      "required": true
+      "required": true,
+      "source": "C:\\Resonance\\Sources\\ronsas-hub-canonical",
+      "candidateBuild": ".output",
+      "runtimeBuild": ".output-local"
     },
     {
       "id": "myify",
       "kind": "hub-application-module",
-      "displayName": "RONSAS MYIFY · DataNest",
+      "displayName": "RONSAS MYIFY \u00b7 DataNest",
       "port": 4173,
       "listenPort": 4173,
       "health": "http://127.0.0.1:4173/myify",
@@ -48,7 +51,8 @@
       "listenPort": 3101,
       "health": "http://127.0.0.1:3101/",
       "source": "apps\\epublisher-sovereign-local-v0.1",
-      "required": true
+      "required": true,
+      "repository": "resonance36912-cell/rons-epublisher-sovereign-source"
     },
     {
       "id": "creative-studio",
@@ -59,7 +63,8 @@
       "listenPort": 3201,
       "health": "http://127.0.0.1:3201/studio",
       "source": "apps\\creative-studio-sovereign-local-v0.1",
-      "required": true
+      "required": true,
+      "repository": "resonance36912-cell/rons-creative-studio-sovereign-source"
     },
     {
       "id": "sync-vision",
@@ -70,7 +75,8 @@
       "listenPort": 3301,
       "health": "http://127.0.0.1:3301/",
       "source": "apps\\sync-vision-sovereign-local-v0.1",
-      "required": true
+      "required": true,
+      "repository": "resonance36912-cell/rons-sync-vision-sovereign-source"
     },
     {
       "id": "youtube-optimizer",
@@ -80,8 +86,10 @@
       "port": 3401,
       "listenPort": 3401,
       "health": "http://127.0.0.1:3401/",
-      "source": "runtime\\youtube-optimizer-stage",
-      "required": true
+      "source": "apps\\youtube-optimizer-sovereign-local-v0.1",
+      "required": true,
+      "repository": "resonance36912-cell/rons-youtube-optimizer-sovereign-source",
+      "runtime": "runtime\\youtube-optimizer-stage"
     }
   ],
   "services": [

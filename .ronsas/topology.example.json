@@ -7,8 +7,9 @@
   "control_root": "%USERPROFILE%\\Documents\\GitHub\\rons-sovereign-codebase",
   "cloud": {
     "github": {
+      "status": "authenticated-source-authority",
       "destination_remote": "https://github.com/resonance36912-cell/RONSAS.git",
-      "note": "Authenticated private GitHub source authority created and verified 2026-09-14."
+      "note": "Authenticated GitHub source authority; application spokes retain independent history and governed PR promotion."
     },
     "dropbox": {
       "local_root": "%USERPROFILE%\\Dropbox\\RONS-Audit\\RONS-AI-AUDIT-REPOSITORY",
@@ -35,13 +36,8 @@
       "id": "hub-production",
       "role": "local-production-source",
       "local_path": "%SystemDrive%\\Resonance\\Sources\\ronsas-hub-canonical",
-      "required": true
-    },
-    {
-      "id": "hub-runtime-stage",
-      "role": "runtime-stage",
-      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\runtime\\hub-sovereign-stage",
-      "required": true
+      "required": true,
+      "configured_remote": "https://github.com/resonance36912-cell/resonance-hub.git"
     },
     {
       "id": "rcgf",
@@ -49,6 +45,34 @@
       "local_path": "%USERPROFILE%\\Documents\\GitHub\\RCGF",
       "required": true,
       "configured_remote": "https://github.com/resonance36912-cell/RCGF.git"
+    },
+    {
+      "id": "epublisher-source",
+      "role": "application-source-upstream",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\epublisher-sovereign-local-v0.1",
+      "required": true,
+      "configured_remote": "https://github.com/resonance36912-cell/rons-epublisher-sovereign-source.git"
+    },
+    {
+      "id": "creative-studio-source",
+      "role": "application-source-upstream",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\creative-studio-sovereign-local-v0.1",
+      "required": true,
+      "configured_remote": "https://github.com/resonance36912-cell/rons-creative-studio-sovereign-source.git"
+    },
+    {
+      "id": "sync-vision-source",
+      "role": "application-source-upstream",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\sync-vision-sovereign-local-v0.1",
+      "required": true,
+      "configured_remote": "https://github.com/resonance36912-cell/rons-sync-vision-sovereign-source.git"
+    },
+    {
+      "id": "youtube-optimizer-source",
+      "role": "application-source-upstream",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\youtube-optimizer-sovereign-local-v0.1",
+      "required": true,
+      "configured_remote": "https://github.com/resonance36912-cell/rons-youtube-optimizer-sovereign-source.git"
     }
   ],
   "paths": [
@@ -60,31 +84,52 @@
       "required": true
     },
     {
+      "id": "hub-candidate-build",
+      "role": "generated-hub-candidate",
+      "local_path": "%SystemDrive%\\Resonance\\Sources\\ronsas-hub-canonical\\.output",
+      "authority": "generated-candidate-runtime",
+      "required": false
+    },
+    {
+      "id": "hub-runtime-build",
+      "role": "live-hub-runtime",
+      "local_path": "%SystemDrive%\\Resonance\\Sources\\ronsas-hub-canonical\\.output-local",
+      "authority": "generated-live-runtime",
+      "required": true
+    },
+    {
       "id": "epublisher",
       "role": "ronsas-application-module-source-and-runtime",
       "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\epublisher-sovereign-local-v0.1",
-      "authority": "local-runtime",
+      "authority": "git-linked-source-and-local-runtime",
       "required": true
     },
     {
       "id": "creative-studio",
       "role": "ronsas-application-module-source-and-runtime",
       "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\creative-studio-sovereign-local-v0.1",
-      "authority": "local-runtime",
+      "authority": "git-linked-source-and-local-runtime",
       "required": true
     },
     {
       "id": "syncvision",
       "role": "ronsas-application-module-source-and-runtime",
       "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\sync-vision-sovereign-local-v0.1",
-      "authority": "local-runtime",
+      "authority": "git-linked-source-and-local-runtime",
       "required": true
     },
     {
       "id": "youtube-optimizer",
-      "role": "ronsas-application-module-source-and-runtime",
+      "role": "ronsas-application-module-source",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\youtube-optimizer-sovereign-local-v0.1",
+      "authority": "git-linked-source",
+      "required": true
+    },
+    {
+      "id": "youtube-optimizer-runtime-stage",
+      "role": "generated-application-runtime-stage",
       "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\runtime\\youtube-optimizer-stage",
-      "authority": "local-runtime",
+      "authority": "generated-local-runtime",
       "required": true
     },
     {

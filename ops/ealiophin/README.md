@@ -1,4 +1,4 @@
-# Ealiophin Runtime Operations
+﻿# Ealiophin Runtime Operations
 
 This directory captures the governed, non-secret runtime sources used to keep the RONSAS public stack available on Ealiophin.
 
@@ -34,3 +34,10 @@ Windows requires administrator elevation to register the SYSTEM startup task. Th
 ## Unified RONSAS runtime contract
 
 The module registry in `cluster\RONSAS-MODULES.json` is the single Ealiophin composition contract. Hub and the four application surfaces are RONSAS modules; launch broker, local AI/media services, Foundry/backend, and Ollama are governed RONSAS services. The canonical supervisor starts/reuses them, status evaluates them, and final acceptance consumes the same contract. Legacy suite launchers are aliases only.
+
+## Governed Hub promotion
+
+The Hub build contract separates candidate and live artifacts. `vite build` produces `.output`; production runs only from `.output-local`. Use `cluster\PROMOTE-RONSAS-HUB.ps1` to health-check the candidate on an isolated loopback port before promotion. The script holds a cross-session lock, swaps builds only after validation, records a SHA-256 receipt, updates supervisor ownership state, retains up to three rollback builds, and restores the previous live build if production health fails.
+
+For a non-destructive check, run the promotion script with `-ValidateOnly`. Validation never stops or replaces the production listener.
+

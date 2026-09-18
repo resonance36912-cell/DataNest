@@ -1,6 +1,6 @@
 {
   "schema": "ronsas-github-authority/v1",
-  "snapshot_date": "2026-09-15",
+  "snapshot_date": "2026-09-18",
   "canonical_owner": "resonance36912-cell",
   "development_identity": "ResonanceAppDev",
   "control_repository": "resonance36912-cell/RONSAS",
@@ -13,7 +13,7 @@
       "repository": "resonance36912-cell/RONSAS",
       "role": "sovereign-control-authority",
       "default_branch": "main",
-      "verified_head": "8ddce3ff3e26ba9e584b64af96e616c631de70bc"
+      "verified_head": "a1217e8035e7e05f9e0532e528064c34e4987f33"
     },
     {
       "id": "resonance-hub",
@@ -34,7 +34,28 @@
       "repository": "resonance36912-cell/rons-epublisher-sovereign-source",
       "role": "application-source-upstream",
       "default_branch": "main",
-      "verified_head": "bf4b2b88b6e0f3f77fe4e17e9c9070eea5a712cf"
+      "verified_head": "d5b9bd2381102a5eaa0c14f9829f33f24d763d21"
+    },
+    {
+      "id": "creative-studio-source",
+      "repository": "resonance36912-cell/rons-creative-studio-sovereign-source",
+      "role": "application-source-upstream",
+      "default_branch": "main",
+      "verified_head": "69da6de37891c247ce12b4ae93dd46e7969b4e1c"
+    },
+    {
+      "id": "sync-vision-source",
+      "repository": "resonance36912-cell/rons-sync-vision-sovereign-source",
+      "role": "application-source-upstream",
+      "default_branch": "main",
+      "verified_head": "20d34bca8f7751b68d4bdf86d8217cc8378f6ed3"
+    },
+    {
+      "id": "youtube-optimizer-source",
+      "repository": "resonance36912-cell/rons-youtube-optimizer-sovereign-source",
+      "role": "application-source-upstream",
+      "default_branch": "main",
+      "verified_head": "1689e9a105b1b08877ca6c2fe63818a566dcffa6"
     }
   ]
 }
