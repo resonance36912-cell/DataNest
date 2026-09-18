@@ -3,7 +3,7 @@
  * CI gate: production SSR serve check + crawler meta/redirect assertions.
  *
  * 1. builds the app (skip with SKIP_BUILD=1)
- * 2. serves the built worker with wrangler
+ * 2. serves the built Nitro Node server
  * 3. serve check — every public route must answer with the expected status
  * 4. Playwright HTTP assertions (canonical / robots / og:url / real 301s)
  *
@@ -30,6 +30,8 @@ const stamp = () => new Date().toISOString();
 
 const PORT = Number(process.env["SSR_PORT"] ?? 8788);
 const BASE = `http://127.0.0.1:${PORT}`;
+const SERVER_ENTRY = join(".output", "server", "index.mjs");
+const PUBLIC_DIR = join(".output", "public");
 
 /** path → expected HTTP status in the production build. */
 const SERVE_CHECK = {
@@ -131,14 +133,12 @@ async function main() {
     await run("bun", ["run", "build"], { logTo: "build.log" });
   }
 
-  if (!existsSync("dist/server/wrangler.json")) {
-    throw new Error(
-      "dist/server/wrangler.json missing — run `bun run build` first",
-    );
+  if (!existsSync(SERVER_ENTRY)) {
+    throw new Error(`${SERVER_ENTRY} missing - run bun run build first`);
   }
 
-  // Crawler files must be emitted into the client bundle, not just public/.
-  for (const artifact of ["dist/client/robots.txt", "dist/client/sitemap.xml"]) {
+  // Crawler files must be emitted into the production public bundle.
+  for (const artifact of [join(PUBLIC_DIR, "robots.txt"), join(PUBLIC_DIR, "sitemap.xml")]) {
     if (!existsSync(artifact)) {
       throw new Error(`${artifact} missing from the production build`);
     }
@@ -146,28 +146,14 @@ async function main() {
   }
 
 
-  log(`starting production worker on ${BASE}…`);
-  const server = spawn(
-    "bunx",
-    [
-      "wrangler",
-      "dev",
-      "--config",
-      "dist/server/wrangler.json",
-      "--port",
-      String(PORT),
-      "--ip",
-      "127.0.0.1",
-      // The platform enables nodejs_compat at deploy time; the built
-      // wrangler.json ships without it, so add it for the local run.
-      "--compatibility-flags",
-      "nodejs_compat",
-    ],
-    { stdio: ["ignore", "pipe", "pipe"], env: { ...process.env } },
-  );
+  log(`starting production Nitro server on ${BASE}...`);
+  const server = spawn(process.execPath, [SERVER_ENTRY], {
+    stdio: ["ignore", "pipe", "pipe"],
+    env: { ...process.env, HOST: "127.0.0.1", PORT: String(PORT) },
+  });
 
-  // Worker stdout/stderr (SSR runtime errors, request logs) → artifact file.
-  const serverLog = logFile("wrangler-server.log");
+  // Server stdout/stderr (SSR runtime errors, request logs) -> artifact file.
+  const serverLog = logFile("ssr-server.log");
   server.stdout?.on("data", (d) => {
     process.stdout.write(d);
     serverLog.write(d);
@@ -180,13 +166,13 @@ async function main() {
   let exitCode = 0;
   try {
     await waitForServer();
-    log("worker is up — running serve check");
+    log("production server is up - running serve check");
     await serveCheck();
 
     log("running Playwright crawler assertions");
     await run(
-      "bunx",
-      ["playwright", "test", "--config", "playwright.ssr.config.ts"],
+      process.execPath,
+      [join("node_modules", "@playwright", "test", "cli.js"), "test", "--config", "playwright.ssr.config.ts"],
       {
         env: { ...process.env, SSR_BASE_URL: BASE },
         logTo: "playwright.log",

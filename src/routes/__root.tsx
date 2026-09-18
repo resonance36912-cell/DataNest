@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import type { QueryClient } from "@tanstack/react-query";
 import { QueryClientProvider } from "@tanstack/react-query";
 import {
@@ -25,13 +24,13 @@ import appCss from "../styles.css?url";
 const ORGANIZATION_JSONLD = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "Organization",
-  "@id": "http://192.168.1.50:4173/#organization",
+  "@id": "https://reson8.life/#organization",
   name: "The Resonance Hub",
-  url: "http://192.168.1.50:4173",
+  url: "https://reson8.life",
   sameAs: [
-    "http://192.168.1.50:4173",
-    "http://192.168.1.50:3101/",
-    "http://192.168.1.50:3201/",
+    "https://reson8.life",
+    "https://epublisher.reson8.life/",
+    "https://creative.reson8.life/",
     "https://www.resonance-podcast.com/",
     "https://www.youtube.com/@resonance36912",
   ],
@@ -40,11 +39,11 @@ const ORGANIZATION_JSONLD = JSON.stringify({
 const WEBSITE_JSONLD = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "@id": "http://192.168.1.50:3401/#website",
+  "@id": "https://youtubeoptimizer.life/#website",
   name: "Resonance YouTube Optimizer",
-  url: "http://192.168.1.50:3401/",
-  publisher: { "@id": "http://192.168.1.50:4173/#organization" },
-  isPartOf: { "@id": "http://192.168.1.50:4173/#organization" },
+  url: "https://youtubeoptimizer.life/",
+  publisher: { "@id": "https://reson8.life/#organization" },
+  isPartOf: { "@id": "https://reson8.life/#organization" },
 });
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
@@ -67,7 +66,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "The Resonance" },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "The Resonance · YouTube Optimizer" },
-      { property: "og:see_also", content: "http://192.168.1.50:4173" },
+      { property: "og:see_also", content: "https://reson8.life" },
       { name: "twitter:card", content: "summary_large_image" },
 
 
@@ -121,12 +120,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  useEffect(() => {
-    const host = window.location.hostname;
-    document.querySelectorAll<HTMLAnchorElement>('a[href^="http://192.168.1.50:"]').forEach((a) => {
-      a.href = a.href.replace("192.168.1.50", host);
-    });
-  });
   return (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
@@ -165,7 +158,7 @@ function NotFoundComponent() {
           Go home
         </Link>
         <a
-          href="http://192.168.1.50:4173"
+          href="https://reson8.life"
           target="_blank"
           rel="noopener noreferrer"
           className="rounded-full border border-glass-border px-6 py-2.5 font-medium text-foreground transition-colors hover:bg-secondary"

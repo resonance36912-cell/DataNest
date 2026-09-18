@@ -115,14 +115,14 @@ const Index = () => {
             "@context": "https://schema.org",
             "@type": "Organization",
             name: "Resonance YouTube Optimizer",
-            url: "http://192.168.1.50:3401/",
+            url: "https://youtubeoptimizer.life/",
             parentOrganization: {
               "@type": "Organization",
               name: "The Resonance",
-              url: "http://192.168.1.50:4173",
+              url: "https://reson8.life",
             },
             sameAs: [
-              "http://192.168.1.50:4173",
+              "https://reson8.life",
               "https://www.youtube.com/@resonance36912",
               "https://www.facebook.com/people/The-Resonance-Podcast/61574983737484/",
             ],
@@ -130,22 +130,22 @@ const Index = () => {
           {
             "@context": "https://schema.org",
             "@type": "WebSite",
-            "@id": "http://192.168.1.50:3401/#website",
-            url: "http://192.168.1.50:3401/",
+            "@id": "https://youtubeoptimizer.life/#website",
+            url: "https://youtubeoptimizer.life/",
             name: "Resonance YouTube Optimizer",
             description:
               "AI-powered YouTube channel audits, titles, thumbnails and growth analytics — part of The Resonance Hub.",
             inLanguage: "en",
-            publisher: { "@id": "http://192.168.1.50:4173/#organization" },
+            publisher: { "@id": "https://reson8.life/#organization" },
           },
           {
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            "@id": "http://192.168.1.50:3401/#software",
+            "@id": "https://youtubeoptimizer.life/#software",
             name: "Resonance YouTube Optimizer",
             applicationCategory: "BusinessApplication",
             operatingSystem: "Web",
-            url: "http://192.168.1.50:3401/",
+            url: "https://youtubeoptimizer.life/",
             offers: {
               "@type": "Offer",
               priceCurrency: "ZAR",
@@ -312,7 +312,7 @@ const Index = () => {
                         Master the algorithm with data-driven audits and{" "}
                         <span className="font-serif italic text-foreground">resonant strategies</span>{" "}
                         designed for the modern creator ecosystem. Part of{" "}
-                        <a href="http://192.168.1.50:4173" className="text-foreground underline-offset-4 hover:underline" rel="noopener">
+                        <a href="https://reson8.life" className="text-foreground underline-offset-4 hover:underline" rel="noopener">
                           The Resonance
                         </a>.
                       </motion.p>
@@ -470,9 +470,9 @@ const Index = () => {
                       </div>
                       <div className="flex flex-wrap justify-center gap-2">
                         {[
-                          { label: "reson8.life", href: "http://192.168.1.50:4173" },
-                          { label: "ePublisher", href: "http://192.168.1.50:3101/" },
-                          { label: "Creative Studio", href: "http://192.168.1.50:3201/" },
+                          { label: "reson8.life", href: "https://reson8.life" },
+                          { label: "ePublisher", href: "https://epublisher.reson8.life/" },
+                          { label: "Creative Studio", href: "https://creative.reson8.life/" },
                           { label: "Podcast", href: "https://www.resonance-podcast.com/" },
                         ].map((l) => (
                           <a
@@ -644,9 +644,9 @@ const Index = () => {
             </p>
             <div className="flex flex-wrap gap-2">
               {[
-                { label: "🧠 Hub · reson8.life", href: "http://192.168.1.50:4173" },
-                { label: "📚 ePublisher", href: "http://192.168.1.50:3101/" },
-                { label: "🎨 Creative Studio", href: "http://192.168.1.50:3201/" },
+                { label: "🧠 Hub · reson8.life", href: "https://reson8.life" },
+                { label: "📚 ePublisher", href: "https://epublisher.reson8.life/" },
+                { label: "🎨 Creative Studio", href: "https://creative.reson8.life/" },
                 { label: "🎙️ Podcast", href: "https://www.resonance-podcast.com/" },
                 { label: "▶ @resonance36912", href: "https://www.youtube.com/@resonance36912" },
               ].map((l) => (
@@ -666,7 +666,7 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row items-center gap-3">
               <BrandLogo size="sm" />
               <a
-                href="http://192.168.1.50:4173"
+                href="https://reson8.life"
                 className="text-[11px] font-mono uppercase tracking-[0.22em] text-muted-foreground/70 hover:text-foreground transition-colors"
                 rel="noopener"
               >

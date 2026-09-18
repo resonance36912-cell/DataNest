@@ -5,8 +5,8 @@ import { HUB_URL, HUB_PRICING_URL, HUB_UPDATES_URL, HUB_DOCS_URL, HUB_SUPPORT_UR
 
 const ECOSYSTEM = [
   { label: "🧠 Hub · reson8.life", href: HUB_URL },
-  { label: "📚 ePublisher", href: HUB_URL.replace(":4173", ":3101/") },
-  { label: "🎨 Creative Studio", href: HUB_URL.replace(":4173", ":3201/") },
+  { label: "📚 ePublisher", href: "https://epublisher.reson8.life/" },
+  { label: "🎨 Creative Studio", href: "https://creative.reson8.life/" },
   { label: "🎙️ Podcast", href: "https://www.resonance-podcast.com/" },
   { label: "▶ @resonance36912", href: "https://www.youtube.com/@resonance36912" },
 ];

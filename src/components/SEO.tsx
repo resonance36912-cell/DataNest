@@ -8,7 +8,7 @@ const DEFAULT_OG_IMAGE = `${SITE}/og-image.png`;
 // support and ecosystem bundles. Every page on this spoke advertises the
 // hub as publisher / owning Organization so search engines and link
 // previews attribute the app to reson8.life.
-const HUB_URL = "http://192.168.1.50:4173";
+const HUB_URL = "https://reson8.life";
 const HUB_ORG_ID = `${HUB_URL}/#organization`;
 
 const HUB_ORGANIZATION = {
@@ -19,8 +19,8 @@ const HUB_ORGANIZATION = {
   url: HUB_URL,
   sameAs: [
     HUB_URL,
-    "http://192.168.1.50:3101/",
-    "http://192.168.1.50:3201/",
+    "https://epublisher.reson8.life/",
+    "https://creative.reson8.life/",
     "https://www.resonance-podcast.com/",
     "https://www.youtube.com/@resonance36912",
   ],

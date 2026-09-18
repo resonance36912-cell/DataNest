@@ -7,9 +7,9 @@ export type Entitlement = {
 };
 
 export const APP_KEY = "youtube_optimizer" as const;
-const localHost = typeof window !== "undefined" ? window.location.hostname : "127.0.0.1";
-const isLocal = localHost === "127.0.0.1" || localHost === "localhost";
-export const HUB_URL = isLocal ? `http://${localHost}:4173` : "https://reson8.life";
+const browserHost = typeof window !== "undefined" ? window.location.hostname : null;
+const isLocal = browserHost === "127.0.0.1" || browserHost === "localhost";
+export const HUB_URL = isLocal && browserHost ? `http://${browserHost}:4173` : "https://reson8.life";
 
 export function hubUrl(path: string = "/") {
   if (/^https?:\/\//i.test(path)) return path;
@@ -60,7 +60,7 @@ export function tierMeets(have: Tier, need: Exclude<Tier, null | "free">) {
   return (order as readonly string[]).indexOf(have) >= (order as readonly string[]).indexOf(need);
 }
 
-export const APP_START_URL = isLocal ? `http://${localHost}:3401/` : "/";
+export const APP_START_URL = isLocal && browserHost ? `http://${browserHost}:3401/` : "/";
 
 export function checkoutUrl(plan: string = "credits", returnTo?: string) {
   if (plan === "free") return APP_START_URL;

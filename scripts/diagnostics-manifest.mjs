@@ -202,7 +202,7 @@ Contents
   playwright-report/   Playwright HTML report — open index.html
   test-results/        traces (trace.zip), screenshots, *.webm videos,
                        logs/ (vitest.log, ssr-gate.log, build.log,
-                       wrangler-server.log, playwright.log) and the
+                       ssr-server.log, playwright.log) and the
                        Vitest junit/json reports
   environment.json     this context, machine-readable (schema v1)
   README.txt           this file

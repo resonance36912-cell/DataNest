@@ -25,13 +25,13 @@ const About = () => {
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "AboutPage",
-          "@id": "http://192.168.1.50:3401/about#aboutpage",
-          url: "http://192.168.1.50:3401/about",
+          "@id": "https://youtubeoptimizer.life/about#aboutpage",
+          url: "https://youtubeoptimizer.life/about",
           name: "About Resonance YouTube Optimizer",
           description:
             "A South African–built AI growth engine for YouTube creators, podcasters and brands, part of The Resonance Hub.",
-          about: { "@id": "http://192.168.1.50:4173/#organization" },
-          publisher: { "@id": "http://192.168.1.50:4173/#organization" },
+          about: { "@id": "https://reson8.life/#organization" },
+          publisher: { "@id": "https://reson8.life/#organization" },
         }}
       />
       <SiteHeader active="About" />
