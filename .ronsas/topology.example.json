@@ -85,7 +85,7 @@
                   {
                       "id":  "hub-candidate-build",
                       "role":  "generated-hub-candidate",
-                      "local_path":  "%SystemDrive%\\Resonance\\Sources\\ronsas-hub-canonical\\.output",
+                      "local_path":  "%SystemDrive%\\Resonance\\Sources\\ronsas-hub-canonical\\.output-candidate-local",
                       "authority":  "generated-candidate-runtime",
                       "required":  false
                   },

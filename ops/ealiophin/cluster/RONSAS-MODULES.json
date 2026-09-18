@@ -28,7 +28,7 @@
       "health": "http://127.0.0.1:4173/",
       "required": true,
       "source": "C:\\Resonance\\Sources\\ronsas-hub-canonical",
-      "candidateBuild": ".output",
+      "candidateBuild": ".output-candidate-local",
       "runtimeBuild": ".output-local"
     },
     {

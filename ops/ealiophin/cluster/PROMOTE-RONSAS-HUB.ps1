@@ -2,9 +2,10 @@
 param(
     [string]$Root = (Join-Path $env:USERPROFILE 'Resonance\OpenNova'),
     [string]$HubSource = 'C:\Resonance\Sources\ronsas-hub-canonical',
-    [string]$CandidateDirName = '.output',
+    [string]$CandidateDirName = '.output-candidate-local',
     [string]$LiveDirName = '.output-local',
-    [int]$CandidatePort = 4174,
+    [int]$CandidatePort = 4175,
+    [int]$LivePort = 4174,
     [switch]$ValidateOnly
 )
 
@@ -103,7 +104,7 @@ function Update-State([int]$ProcessId) {
         $state = Get-Content -LiteralPath $StatePath -Raw | ConvertFrom-Json
         $hub = @($state.services | Where-Object { $_.name -eq 'hub' }) | Select-Object -First 1
         if ($hub) {
-            $hub.pid = $ProcessId; $hub.owned = $true; $hub.root = $HubSource; $hub.url = 'http://127.0.0.1:4173/'
+            $hub.pid = $ProcessId; $hub.owned = $true; $hub.root = $HubSource; $hub.url = ("http://127.0.0.1:$LivePort/")
             $state | ConvertTo-Json -Depth 7 | Set-Content -LiteralPath $StatePath -Encoding UTF8
         }
     }
@@ -132,16 +133,16 @@ try {
         exit 0
     }
 
-    Stop-VerifiedHub 4173 | Out-Null
+    Stop-VerifiedHub $LivePort | Out-Null
     if (Test-Path -LiteralPath $Live) {
         $rollback = Join-Path $HubSource ('.output-rollback-' + $stamp)
         Move-Item -LiteralPath $Live -Destination $rollback
     }
     Move-Item -LiteralPath $Candidate -Destination $Live
 
-    $newProcess = Start-Hub $LiveEntry 4173
-    if (-not (Wait-Http 'http://127.0.0.1:4173/' 45)) { throw 'Promoted Hub failed production health validation.' }
-    $newPid = Get-ListenerPid 4173
+    $newProcess = Start-Hub $LiveEntry $LivePort
+    if (-not (Wait-Http ("http://127.0.0.1:$LivePort/") 45)) { throw 'Promoted Hub failed production health validation.' }
+    $newPid = Get-ListenerPid $LivePort
     if (-not $newPid) { throw 'Promoted Hub is reachable but listener PID was not found.' }
     Update-State $newPid
 
@@ -156,14 +157,14 @@ try {
     $failure = $_.Exception.Message
     if ($candidateProcess -and -not $candidateProcess.HasExited) { Stop-Process -Id $candidateProcess.Id -Force -ErrorAction SilentlyContinue }
     if (-not $ValidateOnly) {
-        $failedPid = Get-ListenerPid 4173
-        if ($failedPid -and (Test-Http 'http://127.0.0.1:4173/' 'RONSAS')) { Stop-Process -Id $failedPid -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 1 }
+        $failedPid = Get-ListenerPid $LivePort
+        if ($failedPid -and (Test-Http ("http://127.0.0.1:$LivePort/") 'RONSAS')) { Stop-Process -Id $failedPid -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 1 }
         if ($rollback -and (Test-Path -LiteralPath $rollback)) {
             if (Test-Path -LiteralPath $Live) { Move-Item -LiteralPath $Live -Destination (Join-Path $HubSource ('.output-failed-' + $stamp)) }
             Move-Item -LiteralPath $rollback -Destination $Live
-            $restored = Start-Hub $LiveEntry 4173
-            if (Wait-Http 'http://127.0.0.1:4173/' 45) {
-                $restoredPid = Get-ListenerPid 4173
+            $restored = Start-Hub $LiveEntry $LivePort
+            if (Wait-Http ("http://127.0.0.1:$LivePort/") 45) {
+                $restoredPid = Get-ListenerPid $LivePort
                 if ($restoredPid) { Update-State $restoredPid }
             }
         }
