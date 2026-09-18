@@ -8,10 +8,10 @@ RONSAS uses independent Git repositories for application source history and keep
 
 | App | Repository | Ealiophin source path | Production | Verified baseline |
 | --- | --- | --- | --- | --- |
-| ePublisher | `resonance36912-cell/rons-epublisher-sovereign-source` | `%USERPROFILE%\Resonance\OpenNova\apps\epublisher-sovereign-local-v0.1` | `https://epublisher.reson8.life` | `d5b9bd2` |
-| Creative Studio | `resonance36912-cell/rons-creative-studio-sovereign-source` | `%USERPROFILE%\Resonance\OpenNova\apps\creative-studio-sovereign-local-v0.1` | `https://creative.reson8.life` | `69da6de` |
-| Sync Vision | `resonance36912-cell/rons-sync-vision-sovereign-source` | `%USERPROFILE%\Resonance\OpenNova\apps\sync-vision-sovereign-local-v0.1` | `https://sync.reson8.life` | `20d34bc` |
-| YouTube Optimizer | `resonance36912-cell/rons-youtube-optimizer-sovereign-source` | `%USERPROFILE%\Resonance\OpenNova\apps\youtube-optimizer-sovereign-local-v0.1` | `https://youtube.reson8.life` | `1689e9a` |
+| ePublisher | `resonance36912-cell/rons-epublisher-sovereign-source` | `%USERPROFILE%\Resonance\OpenNova\apps\epublisher-sovereign-local-v0.1` | `https://epublisher.reson8.life` | `34f7bbd` |
+| Creative Studio | `resonance36912-cell/rons-creative-studio-sovereign-source` | `%USERPROFILE%\Resonance\OpenNova\apps\creative-studio-sovereign-local-v0.1` | `https://creative.reson8.life` | `663b4f7` |
+| Sync Vision | `resonance36912-cell/rons-sync-vision-sovereign-source` | `%USERPROFILE%\Resonance\OpenNova\apps\sync-vision-sovereign-local-v0.1` | `https://sync.reson8.life` | `fbb29b3` |
+| YouTube Optimizer | `resonance36912-cell/rons-youtube-optimizer-sovereign-source` | `%USERPROFILE%\Resonance\OpenNova\apps\youtube-optimizer-sovereign-local-v0.1` | `https://youtube.reson8.life` | `2290568` |
 
 YouTube Optimizer's live mutable stage remains at `%USERPROFILE%\Resonance\OpenNova\runtime\youtube-optimizer-stage`. It intentionally contains no `.git` directory.
 
@@ -64,6 +64,24 @@ Local validation passed:
 - TypeScript;
 - 9 Vitest tests;
 - production build.
+
+## Local cross-repository verification
+
+From the private RONSAS control repository on Ealiophin:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Test-RonsasSpokeSources.ps1
+```
+
+This verifies that every canonical spoke source tree exists, is a clean Git repository on `main`, is synchronized with `origin/main`, points to the expected GitHub remote, carries matching `RONSAS-SOURCE-AUTHORITY.json` metadata, has its declared loopback port listening, and returns HTTP 200 from its public endpoint.
+
+For deeper source validation without mutating production build output:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Test-RonsasSpokeSources.ps1 -Deep
+```
+
+The verifier writes a machine-local JSON status receipt to `.ronsas/state/spoke-source-status.json`, which remains outside source history.
 
 ## GitHub Actions infrastructure condition
 

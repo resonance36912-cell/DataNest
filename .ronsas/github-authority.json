@@ -13,7 +13,7 @@
       "repository": "resonance36912-cell/RONSAS",
       "role": "sovereign-control-authority",
       "default_branch": "main",
-      "verified_head": "96c473c14d5e82ee92318683a9a443df190b1999"
+      "verified_head": "a1217e8035e7e05f9e0532e528064c34e4987f33"
     },
     {
       "id": "resonance-hub",
@@ -37,11 +37,12 @@
       "role": "application-source-authority",
       "visibility": "public",
       "default_branch": "main",
-      "verified_head": "d5b9bd2381102a5eaa0c14f9829f33f24d763d21",
+      "verified_head": "34f7bbd0b5d0d886f16938784d6b333880bb361f",
       "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\epublisher-sovereign-local-v0.1",
       "production_url": "https://epublisher.reson8.life",
       "loopback_port": 3101,
-      "validation": "github-actions-green-2026-09-18"
+      "validation": "local-and-github-actions-green-2026-09-18",
+      "optimized_tag": "ronsas-source-optimized-2026-09-18"
     },
     {
       "id": "creative-studio-source",
@@ -49,12 +50,13 @@
       "role": "application-source-authority",
       "visibility": "private",
       "default_branch": "main",
-      "verified_head": "69da6de37891c247ce12b4ae93dd46e7969b4e1c",
+      "verified_head": "663b4f7f4aa5f48389e6261d53ba9258520bb68b",
       "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\creative-studio-sovereign-local-v0.1",
       "production_url": "https://creative.reson8.life",
       "loopback_port": 3201,
       "validation": "local-pricing-tests-build-green-2026-09-18",
-      "github_actions": "blocked-before-runner-account-billing"
+      "github_actions": "blocked-before-runner-account-billing",
+      "optimized_tag": "ronsas-source-optimized-2026-09-18"
     },
     {
       "id": "sync-vision-source",
@@ -62,12 +64,13 @@
       "role": "application-source-authority",
       "visibility": "private",
       "default_branch": "main",
-      "verified_head": "20d34bca8f7751b68d4bdf86d8217cc8378f6ed3",
+      "verified_head": "fbb29b373851f6e029ef822856e6f03723878b42",
       "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\sync-vision-sovereign-local-v0.1",
       "production_url": "https://sync.reson8.life",
       "loopback_port": 3301,
       "validation": "local-typecheck-metadata-tests-build-green-2026-09-18",
-      "github_actions": "blocked-before-runner-account-billing"
+      "github_actions": "blocked-before-runner-account-billing",
+      "optimized_tag": "ronsas-source-optimized-2026-09-18"
     },
     {
       "id": "youtube-optimizer-source",
@@ -75,13 +78,14 @@
       "role": "application-source-authority",
       "visibility": "private",
       "default_branch": "main",
-      "verified_head": "1689e9a105b1b08877ca6c2fe63818a566dcffa6",
+      "verified_head": "2290568859f92ba35619b969fc03afb6d0e17d07",
       "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\apps\\youtube-optimizer-sovereign-local-v0.1",
       "runtime_stage": "%USERPROFILE%\\Resonance\\OpenNova\\runtime\\youtube-optimizer-stage",
       "production_url": "https://youtube.reson8.life",
       "loopback_port": 3401,
       "validation": "local-config-retention-typecheck-tests-build-green-2026-09-18",
-      "github_actions": "blocked-before-runner-account-billing"
+      "github_actions": "blocked-before-runner-account-billing",
+      "optimized_tag": "ronsas-source-optimized-2026-09-18"
     }
   ]
 }
