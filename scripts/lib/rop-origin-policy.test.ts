@@ -13,31 +13,31 @@ const read = (rel: string) => readFileSync(resolve(ROOT, rel), "utf8");
 
 describe("ROP outbound origin policy", () => {
   test("allows only exact normalized HTTPS origins", () => {
-    expect(normalizeOutboundOrigin("https://syncvision.life")).toBe("https://syncvision.life");
-    expect(normalizeOutboundOrigin("https://syncvision.life:443")).toBe("https://syncvision.life");
+    expect(normalizeOutboundOrigin("https://sync.reson8.life")).toBe("https://sync.reson8.life");
+    expect(normalizeOutboundOrigin("https://sync.reson8.life:443")).toBe("https://sync.reson8.life");
     expect(
       requireAllowedOutboundOrigin(
-        "https://syncvision.life",
-        "https://syncvision.life https://reson8.life:443",
+        "https://sync.reson8.life",
+        "https://sync.reson8.life https://reson8.life:443",
       ),
-    ).toBe("https://syncvision.life");
+    ).toBe("https://sync.reson8.life");
   });
 
   test("rejects scheme, port, and subdomain confusion", () => {
-    const allowed = "https://syncvision.life";
-    expect(() => requireAllowedOutboundOrigin("http://syncvision.life", allowed)).toThrow();
-    expect(() => requireAllowedOutboundOrigin("https://syncvision.life:8443", allowed)).toThrow();
-    expect(() => requireAllowedOutboundOrigin("https://evil.syncvision.life", allowed)).toThrow();
+    const allowed = "https://sync.reson8.life";
+    expect(() => requireAllowedOutboundOrigin("http://sync.reson8.life", allowed)).toThrow();
+    expect(() => requireAllowedOutboundOrigin("https://sync.reson8.life:8443", allowed)).toThrow();
+    expect(() => requireAllowedOutboundOrigin("https://evil.sync.reson8.life", allowed)).toThrow();
     expect(() =>
-      requireAllowedOutboundOrigin("https://syncvision.life.evil.test", allowed),
+      requireAllowedOutboundOrigin("https://sync.reson8.life.evil.test", allowed),
     ).toThrow();
   });
   test("rejects credentials, non-origin paths, and local or literal hosts", () => {
     const cases = [
-      "https://user:pass@syncvision.life",
-      "https://syncvision.life/path",
-      "https://syncvision.life?x=1",
-      "https://syncvision.life/#fragment",
+      "https://user:pass@sync.reson8.life",
+      "https://sync.reson8.life/path",
+      "https://sync.reson8.life?x=1",
+      "https://sync.reson8.life/#fragment",
       "https://localhost",
       "https://service.local",
       "https://127.0.0.1",
@@ -49,7 +49,7 @@ describe("ROP outbound origin policy", () => {
 
   test("fails closed when the allowlist is not configured", () => {
     try {
-      requireAllowedOutboundOrigin("https://syncvision.life", "");
+      requireAllowedOutboundOrigin("https://sync.reson8.life", "");
       throw new Error("expected allowlist failure");
     } catch (error) {
       expect(error).toBeInstanceOf(OutboundOriginPolicyError);
@@ -59,8 +59,8 @@ describe("ROP outbound origin policy", () => {
 
   test("normalizes allowlist entries and portable policy stays in parity", () => {
     expect([
-      ...parseAllowedOutboundOrigins("https://reson8.life:443, https://syncvision.life"),
-    ]).toEqual(["https://reson8.life", "https://syncvision.life"]);
+      ...parseAllowedOutboundOrigins("https://reson8.life:443, https://sync.reson8.life"),
+    ]).toEqual(["https://reson8.life", "https://sync.reson8.life"]);
     expect(read("docs/hub/functions/_shared/rop-origin-policy.ts")).toBe(
       read("src/lib/rop/origin-policy.ts"),
     );

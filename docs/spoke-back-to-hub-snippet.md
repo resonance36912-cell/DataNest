@@ -1,8 +1,8 @@
 # Back to Hub — Spoke App Snippet
 
 Drop one of the snippets below into each Resonance spoke app
-(`resonanceonline.life`, `resonancestudio.life`, `resonancesyncvision.life`,
-`optimizer.resonance.life`, etc.) so users can always return to the hub
+(`epublisher.reson8.life`, `creative.reson8.life`, `sync.reson8.life`,
+`youtube.reson8.life`) so users can always return to the hub
 (`https://reson8.life`).
 
 Place it in the app's top nav, near the logo / account menu.

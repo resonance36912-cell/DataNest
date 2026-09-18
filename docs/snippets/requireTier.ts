@@ -29,7 +29,7 @@
  *         context,
  *         app: "creative_studio",      // <- your app key from the registry
  *         required: "creator",
- *         returnTo: "https://creativestudio.life/generate/poster",
+ *         returnTo: "https://creative.reson8.life/generate/poster",
  *       });
  *       // …do the paid work only after the gate passes…
  *     });

@@ -89,9 +89,9 @@ export const Route = createFileRoute("/")({
                 url: `${origin}/`,
                 logo: `${origin}/og-logo.png`,
                 sameAs: [
-                  "https://www.resonanceonline.life",
-                  "https://www.creativestudio.life",
-                  "https://www.syncvision.life",
+                  "https://epublisher.reson8.life",
+                  "https://creative.reson8.life",
+                  "https://sync.reson8.life",
                   "https://www.resonance-podcast.com",
                   "https://www.career-compass.org",
                 ],
@@ -106,7 +106,7 @@ export const Route = createFileRoute("/")({
                 name: "Resonance ePublisher",
                 applicationCategory: "MultimediaApplication",
                 operatingSystem: "Web",
-                url: "https://www.resonanceonline.life",
+                url: "https://epublisher.reson8.life",
                 offers: { "@type": "Offer", price: "99", priceCurrency: "ZAR" },
               },
               {
@@ -114,7 +114,7 @@ export const Route = createFileRoute("/")({
                 name: "Creative Studio",
                 applicationCategory: "DesignApplication",
                 operatingSystem: "Web",
-                url: "https://www.creativestudio.life",
+                url: "https://creative.reson8.life",
                 offers: { "@type": "Offer", price: "149", priceCurrency: "ZAR" },
               },
               {
@@ -122,7 +122,7 @@ export const Route = createFileRoute("/")({
                 name: "Sync Vision",
                 applicationCategory: "MultimediaApplication",
                 operatingSystem: "Web",
-                url: "https://www.syncvision.life",
+                url: "https://sync.reson8.life",
                 offers: { "@type": "Offer", price: "549", priceCurrency: "ZAR" },
               },
               {
@@ -130,7 +130,7 @@ export const Route = createFileRoute("/")({
                 name: "YouTube Optimizer",
                 applicationCategory: "BusinessApplication",
                 operatingSystem: "Web",
-                url: "https://www.youtubeoptimizer.life",
+                url: "https://youtube.reson8.life",
                 offers: { "@type": "Offer", price: "149", priceCurrency: "ZAR" },
               },
               {
@@ -179,8 +179,8 @@ const apps: App[] = [
     name: "Resonance ePublisher",
     tagline:
       "Turn topics, manuscripts, PDFs, and research into polished audiovisual eBooks.",
-    domain: "resonanceonline.life",
-    href: "https://www.resonanceonline.life",
+    domain: "epublisher.reson8.life",
+    href: "https://epublisher.reson8.life",
     subscribeHref: "/pricing#epublisher",
     priceLabel: "from R99 once-off",
     priceNote: "Once-off credit / project packs · no recurring app fees",
@@ -198,8 +198,8 @@ const apps: App[] = [
     name: "Creative Studio",
     tagline:
       "Design posters, ads, product visuals, brochures, and campaign media instantly.",
-    domain: "creativestudio.life",
-    href: "https://www.creativestudio.life",
+    domain: "creative.reson8.life",
+    href: "https://creative.reson8.life",
     subscribeHref: "/pricing#creative-studio",
     priceLabel: "from R149 once-off",
     priceNote: "Once-off creative credit packs · no recurring app fees",
@@ -216,8 +216,8 @@ const apps: App[] = [
     name: "Sync Vision",
     tagline:
       "Turn songs into cinematic storyboards, character concepts, captions, and video-generation prompts.",
-    domain: "syncvision.life",
-    href: "https://www.syncvision.life",
+    domain: "sync.reson8.life",
+    href: "https://sync.reson8.life",
     subscribeHref: "/pricing#sync-vision",
     priceLabel: "from R349 once-off",
     priceNote: "Once-off music-video packs · no recurring app fees",
@@ -270,8 +270,8 @@ const apps: App[] = [
     name: "YouTube Optimizer",
     tagline:
       "Audit channels, improve thumbnails, titles, content strategy, and growth planning.",
-    domain: "youtubeoptimizer.life",
-    href: "https://www.youtubeoptimizer.life",
+    domain: "youtube.reson8.life",
+    href: "https://youtube.reson8.life",
     subscribeHref: "/pricing#youtube-optimizer",
     priceLabel: "from R149 once-off",
     priceNote: "Once-off audit and growth packs · no recurring app fees",
@@ -589,7 +589,7 @@ function Index() {
           </div>
           <div className="flex items-center gap-2">
             <a
-              href="https://www.resonanceonline.life"
+              href="https://epublisher.reson8.life"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex text-[10px] sm:text-[11px] font-bold tracking-[0.15em] uppercase px-3 sm:px-4 py-2 rounded-full bg-gradient-brand text-white shadow-[0_0_30px_-5px_hsl(295_90%_60%/0.7)] hover:shadow-[0_0_40px_-5px_hsl(295_90%_60%/0.9)] transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
@@ -825,19 +825,19 @@ function Index() {
               {
                 title: "Authors & Publishers",
                 body: "Turn manuscripts, PDFs, and stories into polished audiovisual books.",
-                href: "https://www.resonanceonline.life",
+                href: "https://epublisher.reson8.life",
                 cta: "Open ePublisher",
               },
               {
                 title: "Creators & Small Businesses",
                 body: "Generate posters, ads, brochures, videos, and product campaigns.",
-                href: "https://www.creativestudio.life",
+                href: "https://creative.reson8.life",
                 cta: "Open Creative Studio",
               },
               {
                 title: "Musicians & Artists",
                 body: "Build music-video storyboards, character concepts, and AI-ready scene prompts.",
-                href: "https://www.syncvision.life",
+                href: "https://sync.reson8.life",
                 cta: "Open Sync Vision",
               },
               {
@@ -1327,13 +1327,13 @@ function Index() {
             <a href="https://www.resonance-podcast.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
               Podcast
             </a>
-            <a href="https://www.resonanceonline.life" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+            <a href="https://epublisher.reson8.life" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
               ePublisher
             </a>
-            <a href="https://www.creativestudio.life" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+            <a href="https://creative.reson8.life" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
               Studio
             </a>
-            <a href="https://www.syncvision.life" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+            <a href="https://sync.reson8.life" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
               SyncVision
             </a>
           </div>
@@ -1367,7 +1367,7 @@ const FALLBACK_UPDATES: UpdateItem[] = [
   { app: "Resonance ePublisher", status: "Live", tone: "live", change: "Once-off credit and project packs replace the old monthly plan. New R149 starter pack for first-time authors.", date: "May 2026", href: "/pricing#epublisher", cta: "View packs" },
   { app: "Creative Studio", status: "Live", tone: "live", change: "Creative credit packs launched with faster poster + social-kit generation via the Hub proxy.", date: "Apr 2026", href: "/pricing#creative-studio", cta: "View packs" },
   { app: "Sync Vision", status: "Live", tone: "live", change: "Music-video packs live with a new storyboarding flow and ZAR PayFast checkout on the Hub.", date: "Mar 2026", href: "/pricing#sync-vision", cta: "View packs" },
-  { app: "YouTube Optimizer", status: "Updating", tone: "updating", change: "Migrating to youtubeoptimizer.life with new audit, thumbnail, and growth packs. Existing users keep access.", date: "Jun 2026", href: "/pricing#youtube-optimizer", cta: "View packs" },
+  { app: "YouTube Optimizer", status: "Updating", tone: "updating", change: "Migrating to youtube.reson8.life with new audit, thumbnail, and growth packs. Existing users keep access.", date: "Jun 2026", href: "/pricing#youtube-optimizer", cta: "View packs" },
   { app: "Career Compass", status: "Free Pilot", tone: "pilot", change: "Free pilot open to schools and learners. Per-report and district packages arrive later in 2026.", date: "Feb 2026", href: "https://www.career-compass.org/#how", cta: "Join pilot" },
   { app: "The Resonance Podcast", status: "Live", tone: "live", change: "New season live — free episodes, media kits, and shop. Never a subscription.", date: "Jun 2026", href: "https://www.resonance-podcast.com", cta: "Listen" },
   { app: "Reson8 Governance", status: "New", tone: "new", change: "Resonance Constitutional Governance Framework v1.0 published — how we build, price, and evolve every app.", date: "May 2026", href: "/governance", cta: "Read RCGF" },
