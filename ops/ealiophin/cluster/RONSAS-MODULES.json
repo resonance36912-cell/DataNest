@@ -29,6 +29,17 @@
       "required": true
     },
     {
+      "id": "myify",
+      "kind": "hub-application-module",
+      "displayName": "RONSAS MYIFY · DataNest",
+      "port": 4173,
+      "listenPort": 4173,
+      "health": "http://127.0.0.1:4173/myify",
+      "source": "src\\routes\\myify.tsx",
+      "phase": "candidate",
+      "required": false
+    },
+    {
       "id": "epublisher",
       "kind": "application-module",
       "displayName": "RONSAS ePublisher",
