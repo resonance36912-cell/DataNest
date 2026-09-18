@@ -288,21 +288,31 @@ def transcribe_youtube_url(url_text: str, mode: str, profile=None):
     canonical_url = f'https://www.youtube.com/watch?v={video_id}'
     with tempfile.TemporaryDirectory(prefix='rons-youtube-stt-') as td:
         output = str(Path(td) / '%(id)s.%(ext)s')
-        options = {
+        base_options = {
             'noplaylist': True, 'js_runtimes': {'node': {}}, 'socket_timeout': 15,
             'retries': 2, 'fragment_retries': 2, 'max_filesize': 220 * 1024 * 1024,
             'match_filter': yt_dlp.utils.match_filter_func(f'duration <= {YOUTUBE_MAX_DURATION}'),
-            'format': 'bestaudio/best', 'outtmpl': output, 'quiet': True, 'no_warnings': True,
+            'outtmpl': output, 'quiet': True, 'no_warnings': True,
         }
-        try:
-            with yt_dlp.YoutubeDL(options) as ydl:
-                ydl.extract_info(canonical_url, download=True)
-        except yt_dlp.utils.DownloadError as exc:
-            detail = str(exc).strip().splitlines()[-1][:500]
+        acquisition_error = None
+        for format_selector in ('bestaudio/best', '140/139/234/233/bestaudio/best'):
+            options = {**base_options, 'format': format_selector}
+            try:
+                with yt_dlp.YoutubeDL(options) as ydl:
+                    ydl.extract_info(canonical_url, download=True)
+                acquisition_error = None
+                break
+            except yt_dlp.utils.DownloadError as exc:
+                acquisition_error = exc
+                for partial in Path(td).iterdir():
+                    if partial.is_file():
+                        partial.unlink(missing_ok=True)
+        if acquisition_error is not None:
+            detail = str(acquisition_error).strip().splitlines()[-1][:500]
             low = detail.lower()
             if any(x in low for x in ('video unavailable', 'private video', 'members-only', 'sign in to confirm', 'not available')):
-                raise SourceAcquisitionError(422, 'source_unavailable', detail, False) from exc
-            raise SourceAcquisitionError(502, 'upstream_acquisition_failed', detail, True) from exc
+                raise SourceAcquisitionError(422, 'source_unavailable', detail, False) from acquisition_error
+            raise SourceAcquisitionError(502, 'upstream_acquisition_failed', detail, True) from acquisition_error
         candidates = [p for p in Path(td).iterdir() if p.is_file() and p.suffix not in ('.part', '.ytdl')]
         if not candidates:
             raise SourceAcquisitionError(502, 'upstream_empty_response', 'YouTube audio acquisition produced no media file', True)
