@@ -81,6 +81,12 @@ The UI classifies packages as urgent at 24 hours or less, soon at more than 24 a
 
 For eligible packages, urgent data recommends all available MB, soon recommends 75%, safe/non-rollover recommends 25%, and safe/rollover-eligible recommends no automatic reservation. This is a planning heuristic, not a carrier guarantee.
 
+### UTC reallocation queue
+
+MYIFY normalizes package expiry to UTC and derives a canonical 72-hour transfer window before expiry. Eligible packages can enter `myify_reallocation_queue`, where priority is increased for nearer expiry, non-rollover scarcity, carrier-transfer eligibility, verified source evidence, and usable volume.
+
+Queueing creates a governed reservation through the existing allocation RPC; it does not itself earn DPU. `business_pool` is an accounting target scope for the DataNest business-interest pool, not a legal transfer of ownership or a carrier-side transfer unless a compatible operator/router adapter verifies that event.
+
 ## South African regulatory context
 
 The 2026 ICASA End-User and Subscriber Service Charter amendments strengthen bundle rollover, transfer, out-of-bundle consent, and first-expiry-first-use protections. MYIFY must still apply the exact terms of the subscriber's carrier, package type, and account. Carrier capability is never inferred merely from the existence of a regulation.
@@ -96,3 +102,11 @@ Before MYIFY is made a required live RONSAS module:
 5. Verify authenticated isolation with at least two test identities.
 6. Add a real router adapter only after its protocol, permissions, and secret storage are reviewed.
 7. Promote the module registry entry from candidate / non-required only after the live route and database are healthy.
+
+## UTC reallocation layer
+
+MYIFY normalizes package expiry to UTC and derives a 72-hour transfer window before expiry. Eligible capacity can enter a governed reallocation queue targeting the owner's DataNest, an eligible subscriber flow, or a business-pool accounting scope.
+
+Queue priority increases as expiry approaches and can also reflect non-rollover scarcity, transfer/router eligibility, verified package evidence, and available volume. Queueing reserves capacity but does not by itself create DPU or a financial instrument.
+
+The business-pool scope is an accounting and allocation target only. It does not authorize carrier transfer, resale, securities issuance, or settlement outside operator terms and the applicable RONSAS governance gate.

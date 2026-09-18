@@ -6,12 +6,19 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   createMyifyPackage,
   getMyifyDashboard,
+  queueMyifyReallocation,
   registerMyifyRouter,
   releaseMyifyAllocation,
-  reserveMyifyAllocation,
   settleMyifyAllocation,
 } from "@/lib/myify/functions";
-import { availableMb, expiryBand, recommendReserveMb } from "@/lib/myify/core";
+import {
+  availableMb,
+  expiryBand,
+  hoursUntilUtc,
+  reallocationPriorityScore,
+  recommendReserveMb,
+  transferWindowUtc,
+} from "@/lib/myify/core";
 
 export const Route = createFileRoute("/myify")({
   head: () => ({
@@ -47,6 +54,10 @@ type DataPackage = {
   transferable: boolean;
   router_share_permitted: boolean;
   status: string;
+  transfer_window_opens_at: string;
+  transfer_window_closes_at: string;
+  expires_epoch_seconds: number;
+  metadata?: { verification?: string };
 };
 
 type RouterMirror = {
@@ -74,6 +85,19 @@ type Dashboard = {
   packages: DataPackage[];
   routers: RouterMirror[];
   allocations: Allocation[];
+  reallocationQueue: Array<{
+    id: string;
+    allocation_id: string;
+    package_id: string;
+    target_scope: "datanest" | "subscriber" | "business_pool";
+    requested_mb: number;
+    priority_score: number;
+    window_opens_at: string;
+    window_closes_at: string;
+    status: string;
+    interest_basis: string;
+    created_at: string;
+  }>;
   ledger: Array<{
     id: number;
     event_type: string;
@@ -90,7 +114,7 @@ function MyifyWorkspace() {
   const loadDashboard = useServerFn(getMyifyDashboard);
   const createPackage = useServerFn(createMyifyPackage);
   const registerRouter = useServerFn(registerMyifyRouter);
-  const reserveAllocation = useServerFn(reserveMyifyAllocation);
+  const queueReallocation = useServerFn(queueMyifyReallocation);
   const settleAllocation = useServerFn(settleMyifyAllocation);
   const releaseAllocation = useServerFn(releaseMyifyAllocation);
 
@@ -104,6 +128,9 @@ function MyifyWorkspace() {
   const [routerSharePermitted, setRouterSharePermitted] = useState(false);
   const [routerLabel, setRouterLabel] = useState("DataNest Mirror");
   const [routerMode, setRouterMode] = useState<RouterMirror["mode"]>("simulation");
+  const [targetScope, setTargetScope] = useState<"datanest" | "subscriber" | "business_pool">(
+    "business_pool",
+  );
   const [settleAllocationId, setSettleAllocationId] = useState("");
   const [settleMb, setSettleMb] = useState("256");
 
@@ -148,15 +175,17 @@ function MyifyWorkspace() {
     [dashboardQ.data?.routers],
   );
 
-  const reserveMutation = useMutation({
-    mutationFn: ({ packageId, reserveMb }: { packageId: string; reserveMb: number }) => {
+  const queueMutation = useMutation({
+    mutationFn: ({ packageId, requestedMb }: { packageId: string; requestedMb: number }) => {
       if (!readyRouter) throw new Error("Create or connect a ready Mirror Router first.");
-      return reserveAllocation({
+      return queueReallocation({
         data: {
           package_id: packageId,
           router_id: readyRouter.id,
-          reserve_mb: reserveMb,
-          intent: "Preserve eligible expiring value in DataNest through the MYIFY Mirror Router.",
+          requested_mb: requestedMb,
+          target_scope: targetScope,
+          intent:
+            "Reallocate eligible expiring sovereign data through the UTC-aligned DataNest transfer window.",
         },
       });
     },
@@ -194,7 +223,7 @@ function MyifyWorkspace() {
   const mutationError =
     packageMutation.error ||
     routerMutation.error ||
-    reserveMutation.error ||
+    queueMutation.error ||
     settleMutation.error ||
     releaseMutation.error;
 
@@ -209,9 +238,9 @@ function MyifyWorkspace() {
             <h1 className="mt-2 text-4xl font-semibold tracking-tight">MYIFY</h1>
             <p className="mt-1 text-sm font-medium text-primary">May Your Intentions Find You</p>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-              DataNest preserves the accountable value of eligible unused data. A Mirror Router
-              reserves expiring capacity, records settlement, and credits participation only after
-              the contribution is verified.
+              DataNest preserves the accountable value of eligible unused data on a canonical UTC
+              timeline. A Mirror Router places eligible capacity into a sovereign transfer window,
+              records settlement, and credits participation only after verification.
             </p>
           </div>
           <div className="flex items-center gap-3 text-sm">
@@ -245,7 +274,7 @@ function MyifyWorkspace() {
 
         {dashboard && (
           <>
-            <section className="mb-6 grid gap-4 md:grid-cols-4">
+            <section className="mb-6 grid gap-4 md:grid-cols-5">
               <Metric label="Settled contribution" value={formatGb(dashboard.nest.settled_mb)} />
               <Metric
                 label="Participation units"
@@ -256,6 +285,14 @@ function MyifyWorkspace() {
                 label="Ready Mirror Routers"
                 value={String(dashboard.routers.filter((r) => r.status === "ready").length)}
               />
+              <Metric
+                label="UTC reallocation queue"
+                value={String(
+                  dashboard.reallocationQueue.filter((item) =>
+                    ["queued", "claimed"].includes(item.status),
+                  ).length,
+                )}
+              />
             </section>
 
             <div className="grid gap-5 xl:grid-cols-[360px_minmax(0,1fr)_360px]">
@@ -263,7 +300,8 @@ function MyifyWorkspace() {
                 <section className="rounded-xl border bg-card p-5">
                   <h2 className="font-semibold">Add data package</h2>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Record the operator-reported balance and permissions that apply.
+                    Record the operator-reported balance and permissions that apply. Expiry is
+                    normalized to UTC when saved.
                   </p>
                   <form
                     className="mt-4 space-y-3"
@@ -351,6 +389,23 @@ function MyifyWorkspace() {
                       <option value="openwrt">OpenWrt</option>
                       <option value="mikrotik">MikroTik</option>
                     </select>
+                    <select
+                      value={targetScope}
+                      onChange={(e) =>
+                        setTargetScope(
+                          e.target.value as "datanest" | "subscriber" | "business_pool",
+                        )
+                      }
+                      className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                    >
+                      <option value="business_pool">DataNest business pool</option>
+                      <option value="datanest">Own DataNest reallocation</option>
+                      <option value="subscriber">Eligible subscriber transfer</option>
+                    </select>
+                    <p className="text-[11px] leading-5 text-muted-foreground">
+                      Target scope is an allocation instruction. It does not override carrier
+                      transfer permissions or create a financial security.
+                    </p>
                     <button
                       disabled={routerMutation.isPending}
                       className="w-full rounded-md border px-3 py-2 text-sm hover:bg-accent disabled:opacity-50"
@@ -390,6 +445,18 @@ function MyifyWorkspace() {
                     {dashboard.packages.map((item) => {
                       const band = expiryBand(item.expires_at);
                       const available = availableMb(item.remaining_mb, item.reserved_mb);
+                      const hoursLeft = hoursUntilUtc(item.expires_at);
+                      const transferOpen = hoursLeft > 0 && hoursLeft <= 72;
+                      const verified = item.metadata?.verification === "verified";
+                      const priority = reallocationPriorityScore({
+                        remainingMb: item.remaining_mb,
+                        reservedMb: item.reserved_mb,
+                        expiresAt: item.expires_at,
+                        transferable: item.transferable,
+                        routerSharePermitted: item.router_share_permitted,
+                        rolloverEligible: item.rollover_eligible,
+                        verified,
+                      });
                       const recommended = recommendReserveMb({
                         remainingMb: item.remaining_mb,
                         reservedMb: item.reserved_mb,
@@ -397,6 +464,7 @@ function MyifyWorkspace() {
                         transferable: item.transferable || item.router_share_permitted,
                         rolloverEligible: item.rollover_eligible,
                       });
+                      const window = transferWindowUtc(item.expires_at);
                       return (
                         <article key={item.id} className="rounded-xl border p-4">
                           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -406,37 +474,49 @@ function MyifyWorkspace() {
                             </div>
                             <Status value={band} />
                           </div>
-                          <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                          <div className="mt-3 grid grid-cols-4 gap-2 text-xs">
                             <Mini label="Remaining" value={formatGb(item.remaining_mb)} />
                             <Mini label="Reserved" value={formatGb(item.reserved_mb)} />
                             <Mini label="Available" value={formatGb(available)} />
+                            <Mini label="Priority" value={String(priority)} />
                           </div>
-                          <p className="mt-3 text-xs text-muted-foreground">
-                            Expires {formatDate(item.expires_at)}
-                          </p>
+                          <div className="mt-3 space-y-1 text-xs text-muted-foreground">
+                            <p>Expires {formatUtcDate(item.expires_at)}</p>
+                            <p>
+                              UTC window {formatUtcDate(window.opensAtUtc)} →{" "}
+                              {formatUtcDate(window.closesAtUtc)}
+                            </p>
+                            <p>UTC epoch {item.expires_epoch_seconds}</p>
+                          </div>
                           <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
                             <Tag ok={item.rollover_eligible}>rollover</Tag>
                             <Tag ok={item.transferable}>carrier transfer</Tag>
                             <Tag ok={item.router_share_permitted}>router share</Tag>
+                            <Tag ok={verified}>verified source</Tag>
+                            <Tag ok={transferOpen}>UTC transfer window</Tag>
                           </div>
                           <button
                             disabled={
                               recommended <= 0 ||
+                              priority <= 0 ||
+                              !transferOpen ||
                               !readyRouter ||
-                              reserveMutation.isPending ||
+                              queueMutation.isPending ||
                               item.status !== "active"
                             }
                             onClick={() =>
-                              reserveMutation.mutate({
+                              queueMutation.mutate({
                                 packageId: item.id,
-                                reserveMb: recommended,
+                                requestedMb: recommended,
                               })
                             }
                             className="mt-4 rounded-md bg-primary px-3 py-2 text-xs text-primary-foreground disabled:opacity-40"
                           >
-                            {recommended > 0
-                              ? "Reserve recommended " + formatGb(recommended)
-                              : "No reservation recommended"}
+                            {transferOpen && recommended > 0
+                              ? "Queue UTC reallocation " + formatGb(recommended)
+                              : hoursLeft > 72
+                                ? "Transfer window opens " + formatUtcDate(window.opensAtUtc)
+                                : "No eligible reallocation"}
                           </button>
                         </article>
                       );
@@ -514,6 +594,36 @@ function MyifyWorkspace() {
               </main>
 
               <aside className="space-y-5">
+                <section className="rounded-xl border bg-card p-5">
+                  <h2 className="font-semibold">UTC reallocation queue</h2>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Sovereign bundle reservations ranked by UTC expiry priority. Queue position is
+                    operational only; it is not a financial valuation.
+                  </p>
+                  <div className="mt-4 space-y-2">
+                    {dashboard.reallocationQueue.slice(0, 20).map((item) => (
+                      <div key={item.id} className="rounded-lg border p-3 text-xs">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-medium">
+                            Priority {item.priority_score} · {item.target_scope.replaceAll("_", " ")}
+                          </span>
+                          <Status value={item.status} />
+                        </div>
+                        <p className="mt-2">{formatGb(item.requested_mb)} reserved for reallocation</p>
+                        <p className="mt-1 text-muted-foreground">
+                          Closes {formatUtcDate(item.window_closes_at)}
+                        </p>
+                        <p className="mt-1 text-muted-foreground">{item.interest_basis}</p>
+                      </div>
+                    ))}
+                    {dashboard.reallocationQueue.length === 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        No sovereign bundle is currently queued for UTC reallocation.
+                      </p>
+                    )}
+                  </div>
+                </section>
+
                 <section className="rounded-xl border bg-card p-5">
                   <h2 className="font-semibold">DataNest interest ledger</h2>
                   <p className="mt-1 text-xs text-muted-foreground">

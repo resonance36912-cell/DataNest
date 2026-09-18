@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   CreatePackageInput,
+  QueueReallocationInput,
   RegisterRouterInput,
   ReleaseAllocationInput,
   ReserveAllocationInput,
@@ -31,7 +32,7 @@ export const getMyifyDashboard = createServerFn({ method: "GET" })
     const db = await myifyDb();
     const nest = await ensureDataNest(db, context.userId);
 
-    const [packages, routers, allocations, ledger] = await Promise.all([
+    const [packages, routers, allocations, ledger, reallocationQueue] = await Promise.all([
       db
         .from("myify_data_packages")
         .select("*")
@@ -56,9 +57,16 @@ export const getMyifyDashboard = createServerFn({ method: "GET" })
         .eq("owner_user_id", context.userId)
         .order("created_at", { ascending: false })
         .limit(100),
+      db
+        .from("myify_reallocation_queue")
+        .select("*")
+        .eq("owner_user_id", context.userId)
+        .order("priority_score", { ascending: false })
+        .order("window_closes_at", { ascending: true })
+        .limit(100),
     ]);
 
-    for (const result of [packages, routers, allocations, ledger]) {
+    for (const result of [packages, routers, allocations, ledger, reallocationQueue]) {
       if (result.error) throw new Error(result.error.message);
     }
 
@@ -68,6 +76,7 @@ export const getMyifyDashboard = createServerFn({ method: "GET" })
       routers: routers.data ?? [],
       allocations: allocations.data ?? [],
       ledger: ledger.data ?? [],
+      reallocationQueue: reallocationQueue.data ?? [],
     };
   });
 
@@ -144,6 +153,24 @@ export const reserveMyifyAllocation = createServerFn({ method: "POST" })
 
     if (error) throw new Error(error.message);
     return { allocation };
+  });
+
+export const queueMyifyReallocation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((input: unknown) => QueueReallocationInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const db = await myifyDb();
+    const { data: queueItem, error } = await db.rpc("myify_queue_reallocation", {
+      _actor_user_id: context.userId,
+      _package_id: data.package_id,
+      _router_id: data.router_id,
+      _requested_mb: data.requested_mb,
+      _target_scope: data.target_scope,
+      _intent: data.intent,
+    });
+
+    if (error) throw new Error(error.message);
+    return { queueItem };
   });
 
 export const settleMyifyAllocation = createServerFn({ method: "POST" })

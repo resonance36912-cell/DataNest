@@ -40,3 +40,11 @@ export const SettleAllocationInput = z.object({
 export const ReleaseAllocationInput = z.object({
   allocation_id: Uuid,
 });
+
+export const QueueReallocationInput = z.object({
+  package_id: Uuid,
+  router_id: Uuid,
+  requested_mb: PositiveMb,
+  target_scope: z.enum(["datanest", "subscriber", "business_pool"]),
+  intent: z.string().trim().min(3).max(500),
+});
