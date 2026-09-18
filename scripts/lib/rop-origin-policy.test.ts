@@ -14,7 +14,9 @@ const read = (rel: string) => readFileSync(resolve(ROOT, rel), "utf8");
 describe("ROP outbound origin policy", () => {
   test("allows only exact normalized HTTPS origins", () => {
     expect(normalizeOutboundOrigin("https://sync.reson8.life")).toBe("https://sync.reson8.life");
-    expect(normalizeOutboundOrigin("https://sync.reson8.life:443")).toBe("https://sync.reson8.life");
+    expect(normalizeOutboundOrigin("https://sync.reson8.life:443")).toBe(
+      "https://sync.reson8.life",
+    );
     expect(
       requireAllowedOutboundOrigin(
         "https://sync.reson8.life",

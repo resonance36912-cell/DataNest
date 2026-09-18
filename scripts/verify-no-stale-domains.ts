@@ -21,7 +21,10 @@ function* walk(dir: string): Generator<string> {
     const full = join(dir, entry);
     const stat = statSync(full);
     if (stat.isDirectory()) yield* walk(full);
-    else if (/\.(ts|tsx|js|jsx|md|json|txt|sql)$/.test(full) && ![...SKIP_DIRS].some((s) => full.endsWith(s))) {
+    else if (
+      /\.(ts|tsx|js|jsx|md|json|txt|sql)$/.test(full) &&
+      ![...SKIP_DIRS].some((s) => full.endsWith(s))
+    ) {
       yield full;
     }
   }

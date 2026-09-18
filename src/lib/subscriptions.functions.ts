@@ -22,28 +22,48 @@ export type SubscriptionRow = {
 };
 
 export const APP_META: Record<AppKey, { label: string; accent: string; url: string }> = {
-  epublisher:        { label: "Resonance ePublisher",      accent: "#c026d3", url: "https://epublisher.reson8.life" },
-  creative_studio:   { label: "Resonance Creative Studio", accent: "#a855f7", url: "https://creative.reson8.life" },
-  sync_vision:       { label: "Resonance Sync Vision",     accent: "#ec4899", url: "https://sync.reson8.life" },
-  youtube_optimizer: { label: "YouTube Optimizer",         accent: "#06b6d4", url: "https://youtube.reson8.life" },
-  all_access:        { label: "All-Access Bundle",         accent: "#f59e0b", url: "/pricing" },
+  epublisher: {
+    label: "Resonance ePublisher",
+    accent: "#c026d3",
+    url: "https://epublisher.reson8.life",
+  },
+  creative_studio: {
+    label: "Resonance Creative Studio",
+    accent: "#a855f7",
+    url: "https://creative.reson8.life",
+  },
+  sync_vision: {
+    label: "Resonance Sync Vision",
+    accent: "#ec4899",
+    url: "https://sync.reson8.life",
+  },
+  youtube_optimizer: {
+    label: "YouTube Optimizer",
+    accent: "#06b6d4",
+    url: "https://youtube.reson8.life",
+  },
+  all_access: { label: "All-Access Bundle", accent: "#f59e0b", url: "/pricing" },
 };
 
 export const getMySubscriptions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ subscriptions: SubscriptionRow[]; email: string | null }> => {
-    const { supabase, userId, claims } = context;
+  .handler(
+    async ({ context }): Promise<{ subscriptions: SubscriptionRow[]; email: string | null }> => {
+      const { supabase, userId, claims } = context;
 
-    const { data, error } = await supabase
-      .from("subscriptions")
-      .select("id,app,tier,status,billing_cycle,amount_cents,currency,current_period_end,cancelled_at,updated_at")
-      .eq("user_id", userId)
-      .order("updated_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("subscriptions")
+        .select(
+          "id,app,tier,status,billing_cycle,amount_cents,currency,current_period_end,cancelled_at,updated_at",
+        )
+        .eq("user_id", userId)
+        .order("updated_at", { ascending: false });
 
-    if (error) throw new Error(error.message);
+      if (error) throw new Error(error.message);
 
-    return {
-      subscriptions: (data ?? []) as SubscriptionRow[],
-      email: (claims as { email?: string } | null)?.email ?? null,
-    };
-  });
+      return {
+        subscriptions: (data ?? []) as SubscriptionRow[],
+        email: (claims as { email?: string } | null)?.email ?? null,
+      };
+    },
+  );

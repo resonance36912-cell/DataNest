@@ -65,8 +65,7 @@ const REQUIRED_TIER = "creator" as const;
 export const Route = createFileRoute("/api/public/generate/creative-studio/poster")({
   server: {
     handlers: {
-      OPTIONS: async () =>
-        new Response(null, { status: 204, headers: CORS }),
+      OPTIONS: async () => new Response(null, { status: 204, headers: CORS }),
 
       POST: async ({ request }) => {
         // 1. Parse + validate body BEFORE the gate so we 400 cheaply on
@@ -137,7 +136,10 @@ export const Route = createFileRoute("/api/public/generate/creative-studio/poste
         if (aiRes.status === 402) {
           // Gateway credit exhaustion — surface as 429 so the spoke does not
           // confuse it with a tier-gate 402.
-          return json({ error: "credits_exhausted", message: "AI credits exhausted on the hub." }, 429);
+          return json(
+            { error: "credits_exhausted", message: "AI credits exhausted on the hub." },
+            429,
+          );
         }
         if (!aiRes.ok) {
           const detail = await aiRes.text().catch(() => "");

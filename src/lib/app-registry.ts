@@ -64,7 +64,16 @@ export type AppRegistryEntry = {
 };
 
 function entry(
-  e: Omit<AppRegistryEntry, "publicUrl" | "appUrl" | "hasBilling" | "includedInSuite" | "pricingPath" | "manageBillingPath" | "backToHubPath">,
+  e: Omit<
+    AppRegistryEntry,
+    | "publicUrl"
+    | "appUrl"
+    | "hasBilling"
+    | "includedInSuite"
+    | "pricingPath"
+    | "manageBillingPath"
+    | "backToHubPath"
+  >,
 ): AppRegistryEntry {
   return {
     ...e,

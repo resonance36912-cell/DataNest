@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PACK_CATALOG } from "@/lib/checkout.functions";
+import { APP_META } from "@/lib/pricing-meta";
 import resonanceLockup from "@/assets/resonance-lockup.png";
 
 export const Route = createFileRoute("/pricing")({
@@ -21,37 +22,6 @@ export const Route = createFileRoute("/pricing")({
   }),
   component: PricingPage,
 });
-
-export const APP_META: Record<string, { name: string; accent: string; anchor: string; visit: string; visitLabel: string }> = {
-  epublisher: {
-    name: "Resonance ePublisher",
-    accent: "295 90% 60%",
-    anchor: "epublisher",
-    visit: "https://epublisher.reson8.life",
-    visitLabel: "Visit ePublisher",
-  },
-  creative_studio: {
-    name: "Creative Studio",
-    accent: "265 85% 65%",
-    anchor: "creative-studio",
-    visit: "https://creative.reson8.life",
-    visitLabel: "Visit Creative Studio",
-  },
-  sync_vision: {
-    name: "Sync Vision",
-    accent: "325 90% 65%",
-    anchor: "sync-vision",
-    visit: "https://sync.reson8.life",
-    visitLabel: "Visit Sync Vision",
-  },
-  youtube_optimizer: {
-    name: "YouTube Optimizer",
-    accent: "10 90% 60%",
-    anchor: "youtube-optimizer",
-    visit: "https://youtube.reson8.life",
-    visitLabel: "Visit YouTube Optimizer",
-  },
-};
 
 const PASSES = [
   {
@@ -104,19 +74,22 @@ const PASSES = [
 ];
 
 function PricingPage() {
-  const packsByApp = Object.values(PACK_CATALOG).reduce<Record<string, typeof PACK_CATALOG[string][]>>(
-    (acc, pack) => {
-      (acc[pack.app] ??= []).push(pack);
-      return acc;
-    },
-    {},
-  );
+  const packsByApp = Object.values(PACK_CATALOG).reduce<
+    Record<string, (typeof PACK_CATALOG)[string][]>
+  >((acc, pack) => {
+    (acc[pack.app] ??= []).push(pack);
+    return acc;
+  }, {});
 
   return (
     <div className="min-h-screen text-foreground selection:bg-[hsl(295_90%_60%/0.3)]">
       <nav className="fixed top-0 w-full z-50 px-6 py-4 flex justify-between items-center backdrop-blur-xl bg-background/60 border-b border-white/5">
         <Link to="/" className="flex items-center gap-2.5 min-w-0">
-          <img src={resonanceLockup} alt="The Resonance" className="h-6 sm:h-7 w-auto brightness-0 invert" />
+          <img
+            src={resonanceLockup}
+            alt="The Resonance"
+            className="h-6 sm:h-7 w-auto brightness-0 invert"
+          />
         </Link>
         <Link
           to="/"
@@ -258,8 +231,8 @@ function PricingPage() {
               </div>
               <h3 className="text-xl font-bold mb-2">The Resonance Podcast</h3>
               <p className="text-sm text-white/65 mb-4">
-                Free episodes, clips, and community content. No subscription — the shop is a
-                bonus, not the product.
+                Free episodes, clips, and community content. No subscription — the shop is a bonus,
+                not the product.
               </p>
               <a
                 href="https://www.resonance-podcast.com"
@@ -283,9 +256,9 @@ function PricingPage() {
               For creators & teams using multiple tools every month
             </h2>
             <p className="text-white/70 leading-relaxed">
-              The Hub offers optional monthly ecosystem passes with shared allowances across
-              apps. These are the <span className="text-white">only</span> Resonance
-              subscriptions — individual apps stay once-off.
+              The Hub offers optional monthly ecosystem passes with shared allowances across apps.
+              These are the <span className="text-white">only</span> Resonance subscriptions —
+              individual apps stay once-off.
             </p>
           </header>
 
