@@ -48,7 +48,9 @@ for (const app of manifest.apps) {
     failures.push(`${app.id}: expected >= ${minimum} JSON fixtures, found ${files.length}`);
   }
   if (app.id === "hub-billing" && files.length < 10) {
-    failures.push(`${app.id}: expected at least 10 billing/recovery scenarios, found ${files.length}`);
+    failures.push(
+      `${app.id}: expected at least 10 billing/recovery scenarios, found ${files.length}`,
+    );
   }
 
   const categoryCounts = new Map<string, number>();
@@ -86,11 +88,20 @@ for (const app of manifest.apps) {
     if (!fixture.review_basis || fixture.review_basis.trim().length < 30) {
       failures.push(`${rel}: review_basis is missing or too weak`);
     }
-    if (!fixture.provenance || fixture.provenance.length === 0 || fixture.provenance.some((p) => !p.trim())) {
+    if (
+      !fixture.provenance ||
+      fixture.provenance.length === 0 ||
+      fixture.provenance.some((p) => !p.trim())
+    ) {
       failures.push(`${rel}: at least one source/test provenance path is required`);
     }
     const inputText = JSON.stringify(fixture.input ?? null);
-    if (inputText === "null" || inputText === "{}" || inputText === "\"\"" || prohibited.test(inputText)) {
+    if (
+      inputText === "null" ||
+      inputText === "{}" ||
+      inputText === '""' ||
+      prohibited.test(inputText)
+    ) {
       failures.push(`${rel}: input is empty or looks like placeholder content`);
     }
     if (!Array.isArray(fixture.expected_checks) || fixture.expected_checks.length === 0) {
