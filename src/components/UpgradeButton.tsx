@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Sparkles, ExternalLink } from "lucide-react";
-import { checkoutUrl, HUB_PRICING_URL } from "@/lib/entitlement";
+import { APP_START_URL, checkoutUrl, HUB_PRICING_URL } from "@/lib/entitlement";
+import { FREE_PROMOTION_ACTIVE } from "@/lib/promotion";
 
 interface UpgradeButtonProps {
   /**
@@ -29,9 +30,11 @@ const UpgradeButton = ({
   className,
   size = "default",
 }: UpgradeButtonProps) => {
-  const href = browse ? HUB_PRICING_URL : checkoutUrl(plan);
-  const external = plan !== "free";
-  const defaultLabel =
+  const href = FREE_PROMOTION_ACTIVE ? APP_START_URL : browse ? HUB_PRICING_URL : checkoutUrl(plan);
+  const external = !FREE_PROMOTION_ACTIVE && plan !== "free";
+  const defaultLabel = FREE_PROMOTION_ACTIVE
+    ? "Use free during promotion"
+    :
     plan === "free"
       ? "Start free"
       : browse
@@ -48,7 +51,7 @@ const UpgradeButton = ({
         {...(external ? { target: "_blank" } : {})}
       >
         <Sparkles className="h-4 w-4 mr-1.5" />
-        {label ?? defaultLabel}
+        {FREE_PROMOTION_ACTIVE ? defaultLabel : (label ?? defaultLabel)}
         {external && <ExternalLink className="h-3.5 w-3.5 ml-1" />}
       </a>
     </Button>

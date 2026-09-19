@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "@/lib/router-compat";
 import { HUB_PRICING_URL } from "@/lib/entitlement";
+import { FREE_PROMOTION_ACTIVE } from "@/lib/promotion";
 
 interface LockedSectionProps {
   title: string;
@@ -72,16 +73,18 @@ const LockedSection = ({ title, description, showThumbnailHint = false }: Locked
           className="gap-2"
           onClick={() => navigate("/login")}
         >
-          Sign up to unlock <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          {FREE_PROMOTION_ACTIVE ? "Sign in for free access" : "Sign up to unlock"} <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Button>
-        <a
-          href={HUB_PRICING_URL}
-          target="_blank"
-          rel="noopener"
-          className="mt-3 text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground/70 hover:text-foreground inline-flex items-center gap-1 outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded"
-        >
-          View hub pricing <ExternalLink className="h-3 w-3" aria-hidden="true" />
-        </a>
+        {!FREE_PROMOTION_ACTIVE && (
+          <a
+            href={HUB_PRICING_URL}
+            target="_blank"
+            rel="noopener"
+            className="mt-3 text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground/70 hover:text-foreground inline-flex items-center gap-1 outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded"
+          >
+            View hub pricing <ExternalLink className="h-3 w-3" aria-hidden="true" />
+          </a>
+        )}
       </div>
     </motion.div>
   );

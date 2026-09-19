@@ -16,6 +16,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(fileURLToPath(import.meta.url), "../..");
 const PRICING_PATH = join(ROOT, "src/pages/Pricing.tsx");
+const PROMOTION_PATH = join(ROOT, "src/lib/promotion.ts");
 
 // Source of truth: reson8.life/pricing → YouTube Optimizer packs.
 // Prices are lower-bound "From R…" values; only names + ids are strict.
@@ -113,6 +114,22 @@ export function runPricingCheck() {
     return [`Missing ${relative(ROOT, PRICING_PATH)}`];
   }
   const src = readFileSync(PRICING_PATH, "utf8");
+  const promotionSource = existsSync(PROMOTION_PATH) ? readFileSync(PROMOTION_PATH, "utf8") : "";
+  const promotionActive = /FREE_PROMOTION_ACTIVE\s*=\s*true\s+as\s+const/.test(promotionSource);
+
+  if (promotionActive) {
+    if (!/FREE_PROMOTION_ACTIVE/.test(src)) {
+      errors.push("Pricing.tsx must be gated by FREE_PROMOTION_ACTIVE while the promotion is enabled");
+    }
+    if (!/Free promotional access|free during our promotion|Free access/i.test(src)) {
+      errors.push("Pricing.tsx must clearly present the free-access promotion");
+    }
+    if (/href=.*\/checkout|Buy pack|Buy credits/i.test(src)) {
+      errors.push("Pricing.tsx exposes a purchase CTA while the free-access promotion is enabled");
+    }
+    return errors;
+  }
+
   const actual = parsePacks(src);
 
   for (const exp of EXPECTED_PACKS) {
@@ -140,7 +157,7 @@ export function runMarketingCopyCheck() {
     for (const hit of findForbidden(src)) {
       errors.push(
         `${rel}:${hit.line} — forbidden phrase "${hit.match}" (matches ${hit.pattern}). ` +
-          `This app sells once-off packs via reson8.life; remove subscription/monthly-plan wording.`,
+          `Remove recurring subscription/monthly-plan wording from this app surface.`,
       );
     }
   }

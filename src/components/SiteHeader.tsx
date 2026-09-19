@@ -4,19 +4,19 @@ import { AnimatePresence, m as motion } from "@/lib/lazy-motion";
 import { ArrowLeft, ExternalLink, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BrandLogo from "@/components/BrandLogo";
-import { HUB_URL, HUB_PRICING_URL, HUB_UPDATES_URL, HUB_DOCS_URL } from "@/lib/entitlement";
+import { HUB_URL, HUB_UPDATES_URL, HUB_DOCS_URL } from "@/lib/entitlement";
 
 type NavLink =
   | { key: "Features"; kind: "internal"; path: string }
   | { key: "About"; kind: "internal"; path: string }
   | { key: "Contact"; kind: "internal"; path: string }
-  | { key: "Pricing"; kind: "external"; href: string }
+  | { key: "Free Access"; kind: "internal"; path: string }
   | { key: "Docs"; kind: "external"; href: string }
   | { key: "Updates"; kind: "external"; href: string };
 
 const NAV_LINKS: readonly NavLink[] = [
   { key: "Features", kind: "internal", path: "/features" },
-  { key: "Pricing", kind: "external", href: HUB_PRICING_URL },
+  { key: "Free Access", kind: "internal", path: "/pricing" },
   { key: "Docs", kind: "external", href: HUB_DOCS_URL },
   { key: "Updates", kind: "external", href: HUB_UPDATES_URL },
   { key: "About", kind: "internal", path: "/about" },
@@ -30,8 +30,8 @@ interface SiteHeaderProps {
 
 /**
  * Shared top navigation. This app is a spoke of The Resonance Hub:
- * "Pricing" and "Updates" link out to reson8.life (source of truth for
- * pricing, checkout, changelog, support & ecosystem bundles).
+ * Promotion details stay local to the spoke; shared docs, updates, support,
+ * and ecosystem navigation remain owned by reson8.life.
  */
 const SiteHeader = ({ active, showBack = true }: SiteHeaderProps) => {
   const navigate = useNavigate();

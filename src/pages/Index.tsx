@@ -21,7 +21,7 @@ import { usePageTracking, trackFeature } from "@/hooks/useTracking";
 import BrandLogo from "@/components/BrandLogo";
 import SEO from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
-import { HUB_URL, HUB_PRICING_URL, HUB_DOCS_URL } from "@/lib/entitlement";
+import { HUB_URL, HUB_DOCS_URL } from "@/lib/entitlement";
 import { ExternalLink } from "lucide-react";
 
 const tabs = [
@@ -46,7 +46,7 @@ type TopNavLink =
 
 const NAV_LINKS: readonly TopNavLink[] = [
   { key: "Features", kind: "internal", path: "/features" },
-  { key: "Pricing", kind: "hub", href: HUB_PRICING_URL },
+  { key: "Free Access", kind: "internal", path: "/pricing" },
   { key: "Docs", kind: "hub", href: HUB_DOCS_URL },
   { key: "About", kind: "internal", path: "/about" },
   { key: "Contact", kind: "internal", path: "/contact" },
@@ -326,8 +326,8 @@ const Index = () => {
                         <ChannelInput onAnalyze={handleAnalyze} isLoading={isLoading} />
                         <div className="flex flex-wrap items-center gap-3">
                           <Button asChild variant="pillOutline" size="pill">
-                            <a href={HUB_PRICING_URL} target="_blank" rel="noopener">
-                              View hub pricing <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                            <a href="/pricing" target="_blank" rel="noopener">
+                              Free access promotion <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                             </a>
                           </Button>
                           <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.22em] text-muted-foreground/60">
@@ -678,12 +678,12 @@ const Index = () => {
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
               <a
-                href={HUB_PRICING_URL}
+                href="/pricing"
                 target="_blank"
                 rel="noopener"
                 className="text-[11px] text-muted-foreground/60 hover:text-foreground transition-colors inline-flex items-center gap-1"
               >
-                Hub pricing <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                Free access promotion <ExternalLink className="h-3 w-3" aria-hidden="true" />
               </a>
               <a
                 href={HUB_URL}

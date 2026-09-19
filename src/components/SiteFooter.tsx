@@ -1,7 +1,7 @@
 import { useNavigate } from "@/lib/router-compat";
 import { ExternalLink } from "lucide-react";
 import BrandLogo from "@/components/BrandLogo";
-import { HUB_URL, HUB_PRICING_URL, HUB_UPDATES_URL, HUB_DOCS_URL, HUB_SUPPORT_URL } from "@/lib/entitlement";
+import { HUB_URL, HUB_UPDATES_URL, HUB_DOCS_URL, HUB_SUPPORT_URL } from "@/lib/entitlement";
 
 const ECOSYSTEM = [
   { label: "🧠 Hub · reson8.life", href: HUB_URL },
@@ -12,7 +12,7 @@ const ECOSYSTEM = [
 ];
 
 const HUB_LINKS = [
-  { label: "View hub pricing", href: HUB_PRICING_URL },
+  { label: "Free access promotion", href: "/pricing" },
   { label: "Hub docs & guides", href: HUB_DOCS_URL },
   { label: "View updates", href: HUB_UPDATES_URL },
   { label: "Hub support", href: HUB_SUPPORT_URL },
@@ -26,8 +26,8 @@ const LEGAL = [
 ];
 
 /**
- * Shared footer. This app is part of The Resonance Hub — official pricing,
- * checkout, updates, support, and ecosystem bundles all live on reson8.life.
+ * Shared footer. This app is part of The Resonance Hub. During the free-access
+ * promotion, checkout is paused while usage and provider costs are measured.
  */
 const SiteFooter = () => {
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ const SiteFooter = () => {
             ✦ Part of The Resonance Hub
           </p>
           <p className="text-sm text-foreground/85 leading-relaxed max-w-3xl">
-            Official pricing, updates, checkout, support, and ecosystem bundles are managed by{" "}
+            The free-access promotion is active. Shared updates, support, and ecosystem navigation are managed by{" "}
             <a
               href={HUB_URL}
               target="_blank"
@@ -98,7 +98,7 @@ const SiteFooter = () => {
             </a>
           </div>
           <p className="text-[11px] text-muted-foreground/50 order-last md:order-none">
-            © 2026 The Resonance · ZAR · POPIA-conscious · Once-off packs
+            © 2026 The Resonance · POPIA-conscious · Free access promotion
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
             {LEGAL.map((link) => (
