@@ -37,7 +37,7 @@ function Test-RonsasEntry($Entry) {
                 elseif ($payload.PSObject.Properties['status']) {
                     $semantic = [string]$payload.status -in @('healthy','up','ready','ok')
                 }
-                if ([string]$Entry.id -eq 'local-stt') {
+                if ([string]$Entry.id -in @('local-stt', 'epublisher-stt')) {
                     $detail = "model=$($payload.defaultResolvedModel); productionReady=$($payload.productionReady); cuda=$($payload.cudaRuntimeReady)"
                 }
                 elseif ([string]$Entry.id -eq 'local-image') {

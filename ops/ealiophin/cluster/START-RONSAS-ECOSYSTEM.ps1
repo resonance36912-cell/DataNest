@@ -31,6 +31,7 @@ $KnownEndpointIdentities = @{
     'launch-broker' = @{ url='http://127.0.0.1:4450/health'; process='python.exe'; marker='rons-launch-broker'; contentType='application/json' }
     'youtube-optimizer' = @{ url='http://127.0.0.1:3401/'; process='node.exe'; marker='youtube-optimizer'; contentType='text/html' }
     'local-stt' = @{ url='http://127.0.0.1:7864/health'; process='python.exe'; marker='epublisher-local-stt'; contentType='application/json' }
+    'epublisher-stt' = @{ url='http://127.0.0.1:7869/health'; process='python.exe'; marker='127.0.0.1:7869'; contentType='application/json' }
     'local-image' = @{ url='http://127.0.0.1:7865/health'; process='python.exe'; marker='model_complete'; contentType='application/json' }
     'local-llm' = @{ url='http://127.0.0.1:7866/health'; process='python.exe'; marker='model_ready'; contentType='application/json' }
     'creative-source' = @{ url='http://127.0.0.1:7867/health'; process='python.exe'; marker='rons-creative-source'; contentType='application/json' }
@@ -245,6 +246,7 @@ $services += Start-LaunchBroker
 $services += Start-OllamaService
 $services += Start-PythonService 'local-llm' 7866 'http://127.0.0.1:7866/health' (Join-Path $Runtime 'rons-local-llm-service.py') $SystemPython 'rons-local-llm-service.py'
 $services += Start-PythonService 'local-stt' 7864 'http://127.0.0.1:7864/health' (Join-Path $Runtime 'syncvision-local-stt.py') $SttPython 'syncvision-local-stt.py' @{ HF_HUB_DISABLE_XET='1'; RONS_STT_MODELS_ROOT=(Join-Path $Runtime 'models') }
+$services += Start-PythonService 'epublisher-stt' 7869 'http://127.0.0.1:7869/health' (Join-Path $Runtime 'syncvision-local-stt.py') $SttPython 'syncvision-local-stt.py' @{ HF_HUB_DISABLE_XET='1'; RONS_STT_MODELS_ROOT=(Join-Path $Runtime 'models'); RONS_STT_PORT='7869' }
 $services += Start-PythonService 'local-image' 7865 'http://127.0.0.1:7865/health' (Join-Path $Runtime 'epublisher-image-service.py') $MediaPython 'epublisher-image-service.py'
 $services += Start-PythonService 'creative-source' 7867 'http://127.0.0.1:7867/health' (Join-Path $Runtime 'creative-source-service.py') $MediaPython 'creative-source-service.py'
 $services += Start-PythonService 'ai-broker' 7868 'http://127.0.0.1:7868/health' (Join-Path $Runtime 'ai-broker-service.py') $SystemPython 'ai-broker-service.py'

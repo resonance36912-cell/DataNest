@@ -17,6 +17,7 @@ $expected = @{
     'musetalk-bridge'='musetalk_bridge.py'
     'launch-broker'='rons-launch-broker.py'
     'local-stt'='syncvision-local-stt.py'
+    'epublisher-stt'='syncvision-local-stt.py'
     'local-image'='epublisher-image-service.py'
     'local-llm'='rons-local-llm-service.py'
     'creative-source'='creative-source-service.py'

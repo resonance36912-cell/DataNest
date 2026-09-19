@@ -157,6 +157,15 @@
       "required": true
     },
     {
+      "id": "epublisher-stt",
+      "kind": "ai-service",
+      "displayName": "RONSAS ePublisher Speech-to-Text",
+      "port": 7869,
+      "listenPort": 7869,
+      "health": "http://127.0.0.1:7869/health",
+      "required": true
+    },
+    {
       "id": "foundry",
       "kind": "development-service",
       "displayName": "RONSAS Foundry",
