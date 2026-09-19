@@ -22,6 +22,10 @@ try:
 except ImportError:
     import checkout_audit as checkout_ops
 try:
+    from . import payfast_settlement as payfast_settlement_ops
+except ImportError:
+    import payfast_settlement as payfast_settlement_ops
+try:
     from . import governance as governance_ops
 except ImportError:
     import governance as governance_ops
@@ -31,7 +35,7 @@ try:
 except Exception:  # allows static/unit validation before local wheel provisioning
     psycopg=None; sql=None
 
-app=FastAPI(title="Resonance Sovereign Gateway",version="0.10.0")
+app=FastAPI(title="Resonance Sovereign Gateway",version="0.11.0")
 DATABASE_URL=os.getenv("DATABASE_URL","postgresql://resonance@postgres:5432/resonance")
 DB_PASSWORD_FILE=os.getenv("POSTGRES_PASSWORD_FILE","/run/secrets/postgres-password")
 PROCEDURE_KEY_FILE=os.getenv("GATEWAY_PROCEDURE_KEY_FILE","/run/secrets/gateway-procedure-key")
@@ -64,8 +68,8 @@ GOVERNANCE_PROCEDURES={
     "governance_create_proposal","governance_submit_proposal","governance_add_evidence",
     "governance_add_review","governance_record_decision","governance_register_agent",
 }
-ALLOWED_PROCEDURES={"transaction_probe","mirror_user_roles","read_subscription_mirror","read_subscription_account","mirror_subscriptions","read_account_invoices","read_admin_invoices","read_billing_account","read_billing_admin","record_payfast_launch"} | GOVERNANCE_PROCEDURES | (BOOTSTRAP_PROCEDURES if BOOTSTRAP_PROCEDURES_ENABLED else set())
-PROTECTED_TABLES={"admin_bootstrap_state","admin_bootstrap_email_challenges","invoices","credit_wallets","credit_ledger","billing_receipts","payfast_launch_logs","governance_participants","governance_proposals","governance_evidence","governance_reviews","governance_decisions","governance_events"}
+ALLOWED_PROCEDURES={"transaction_probe","mirror_user_roles","read_subscription_mirror","read_subscription_account","mirror_subscriptions","read_account_invoices","read_admin_invoices","read_billing_account","read_billing_admin","record_payfast_launch","record_payfast_itn_attempt","settle_payfast_itn"} | GOVERNANCE_PROCEDURES | (BOOTSTRAP_PROCEDURES if BOOTSTRAP_PROCEDURES_ENABLED else set())
+PROTECTED_TABLES={"admin_bootstrap_state","admin_bootstrap_email_challenges","invoices","credit_wallets","credit_ledger","billing_receipts","payfast_launch_logs","payfast_itn_logs","webhook_events","plan_changes","subscription_email_sends","email_suppression_list","governance_participants","governance_proposals","governance_evidence","governance_reviews","governance_decisions","governance_events"}
 PROTECTED_WRITE_TABLES={"user_roles","subscriptions"}
 SUBSCRIPTION_ENTITLEMENT_COLUMNS={"app","tier","status","current_period_end"}
 
@@ -264,6 +268,22 @@ def procedure(body:ProcedureCall,request:Request):
             try: result=checkout_ops.record_launch(conn,body.args["row"])
             except ValueError as exc: raise HTTPException(400,str(exc))
         return {"procedure":"record_payfast_launch",**result}
+    if body.name=="record_payfast_itn_attempt":
+        if set(body.args)!={"row"} or not isinstance(body.args.get("row"),dict):
+            raise HTTPException(400,"record_payfast_itn_attempt requires row")
+        password=Path(DB_PASSWORD_FILE).read_text(encoding="utf-8").strip() if Path(DB_PASSWORD_FILE).exists() else None
+        with psycopg.connect(DATABASE_URL,password=password) as conn:
+            try: result=payfast_settlement_ops.record_attempt(conn,body.args["row"])
+            except ValueError as exc: raise HTTPException(400,str(exc))
+        return {"procedure":"record_payfast_itn_attempt",**result}
+    if body.name=="settle_payfast_itn":
+        if set(body.args)!={"event"} or not isinstance(body.args.get("event"),dict):
+            raise HTTPException(400,"settle_payfast_itn requires event")
+        password=Path(DB_PASSWORD_FILE).read_text(encoding="utf-8").strip() if Path(DB_PASSWORD_FILE).exists() else None
+        with psycopg.connect(DATABASE_URL,password=password) as conn:
+            try: result=payfast_settlement_ops.settle(conn,body.args["event"])
+            except ValueError as exc: raise HTTPException(400,str(exc))
+        return {"procedure":"settle_payfast_itn",**result}
     if body.name=="mirror_subscriptions":
         if set(body.args)!={"rows"}: raise HTTPException(400,"mirror_subscriptions requires rows")
         password=Path(DB_PASSWORD_FILE).read_text(encoding="utf-8").strip() if Path(DB_PASSWORD_FILE).exists() else None
