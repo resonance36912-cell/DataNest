@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useEntitlement, tierMeets, type Tier } from "@/lib/entitlement";
 import { CheckoutButton } from "./CheckoutButton";
+import { FREE_PROMOTION_ACTIVE } from "@/lib/promotion";
 
 /**
  * <PaywallGate app="creative_studio" minTier="creator" upgradeSku="creative_studio:bundle:payg-poster-pack">
@@ -26,6 +27,7 @@ export function PaywallGate({
 }) {
   const { entitlement, isLoading, error } = useEntitlement(app);
 
+  if (FREE_PROMOTION_ACTIVE) return <>{children}</>;
   if (isLoading) return <>{loading ?? null}</>;
   if (error) {
     return (

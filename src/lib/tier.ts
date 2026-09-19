@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import { useEntitlement, tierMeets, type Tier } from "./entitlement";
 import { useToast } from "@/hooks/use-toast";
 import { checkoutUrl } from "./entitlement";
+import { FREE_PROMOTION_ACTIVE } from "./promotion";
 
 export const PREMIUM_SKU = "creative_studio:premium:monthly";
 
@@ -33,8 +34,8 @@ export function useTier() {
   return useMemo(() => {
     const tier = (entitlement?.tier ?? "free") as Tier;
     const isPremium =
-      !!entitlement?.hasAccess && tierMeets(tier, "starter");
-    return { tier, isPremium, isLoading };
+      FREE_PROMOTION_ACTIVE || (!!entitlement?.hasAccess && tierMeets(tier, "starter"));
+    return { tier, isPremium, isLoading: FREE_PROMOTION_ACTIVE ? false : isLoading };
   }, [entitlement, isLoading]);
 }
 

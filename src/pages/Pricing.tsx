@@ -10,6 +10,7 @@ import {
   HUB_PRICING_URL,
   HUB_UPDATES_URL,
 } from "@/lib/entitlement";
+import { FREE_PROMOTION_ACTIVE, FREE_PROMOTION } from "@/lib/promotion";
 
 // v3 alignment: Creative Studio is a spoke of The Resonance Hub. There is no
 // monthly app subscription on this page. Users buy once-off credits and
@@ -62,6 +63,42 @@ const offerJsonLd = [...projectPacks, ...creditPacks].map((p) => ({
 }));
 
 const Pricing = () => {
+  if (FREE_PROMOTION_ACTIVE) {
+    return (
+      <div className="min-h-screen bg-background overflow-x-hidden">
+        <SEO
+          title="Free Access Promotion — Resonance Creative Studio"
+          description={FREE_PROMOTION.description}
+          path="/pricing"
+        />
+        <MobileNavMenu />
+        <main className="container mx-auto px-4 sm:px-6 py-20">
+          <div className="max-w-3xl mx-auto text-center rounded-3xl border border-primary/25 bg-card/60 backdrop-blur-xl p-8 sm:p-12">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-mono uppercase tracking-[0.22em] text-primary mb-5">
+              <Sparkles className="w-3 h-3" /> {FREE_PROMOTION.shortLabel}
+            </div>
+            <h1 className="text-4xl sm:text-6xl font-display font-bold tracking-tight">
+              {FREE_PROMOTION.headline}
+            </h1>
+            <p className="mt-5 text-lg text-muted-foreground">{FREE_PROMOTION.description}</p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Sign in so creative generations and provider usage can be measured for future costing.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Link to="/studio" className="rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground">
+                Open Creative Studio free
+              </Link>
+              <a href={HUB_URL} className="rounded-full border border-white/15 px-6 py-3 font-semibold">
+                Back to Resonance Hub
+              </a>
+            </div>
+          </div>
+        </main>
+        <ResonanceFooter />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       <SEO

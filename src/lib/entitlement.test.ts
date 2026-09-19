@@ -1,165 +1,32 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { checkoutUrl, APP_KEY, HUB_URL } from "@/lib/entitlement";
+import { checkoutUrl } from "@/lib/entitlement";
 
 /**
- * Validates that checkoutUrl() always routes through the Resonance Hub
- * (reson8.life) with a properly-encoded `sku` and `return_to`, no matter
- * which spoke or plan shape it's called with.
+ * Promotion contract: billing URLs must fail closed while full access is free.
  */
-
-const ORIGINAL_WINDOW_LOCATION = window.location.href;
-
-function parseCheckout(url: string) {
-  const u = new URL(url);
-  return {
-    origin: u.origin,
-    pathname: u.pathname,
-    sku: u.searchParams.get("sku"),
-    returnTo: u.searchParams.get("return_to"),
-  };
-}
-
-describe("checkoutUrl()", () => {
-  beforeEach(() => {
-    // Pin window.location so the default return_to is deterministic.
-    Object.defineProperty(window, "location", {
-      writable: true,
-      value: new URL("https://creativestudio.life/pricing"),
-    });
-  });
-
-  afterEach(() => {
-    Object.defineProperty(window, "location", {
-      writable: true,
-      value: new URL(ORIGINAL_WINDOW_LOCATION),
-    });
-  });
-
-  it("always points at the Resonance Hub", () => {
-    const { origin, pathname } = parseCheckout(checkoutUrl("creator"));
-    expect(origin).toBe("https://reson8.life");
-    expect(HUB_URL).toBe("https://reson8.life");
-    expect(pathname).toBe("/checkout");
-  });
-
-  it("expands a bare plan key to <APP_KEY>:<plan>:monthly", () => {
-    const { sku } = parseCheckout(checkoutUrl("creator"));
-    expect(sku).toBe(`${APP_KEY}:creator:monthly`);
-  });
-
-  it("preserves a fully-qualified SKU verbatim", () => {
-    const { sku } = parseCheckout(checkoutUrl("creative_studio:pro:monthly"));
-    expect(sku).toBe("creative_studio:pro:monthly");
-  });
-
-  it("uses window.location.href as default return_to", () => {
-    const { returnTo } = parseCheckout(checkoutUrl("starter"));
-    expect(returnTo).toBe("https://creativestudio.life/pricing");
-  });
-
-  it("uses an explicit returnTo when provided", () => {
-    const { returnTo } = parseCheckout(
-      checkoutUrl("creator", "https://creativestudio.life/studio?ref=upgrade"),
-    );
-    expect(returnTo).toBe("https://creativestudio.life/studio?ref=upgrade");
-  });
-
-  it("URL-encodes the sku (colons → %3A)", () => {
-    const raw = checkoutUrl("creative_studio:business:monthly");
-    expect(raw).toContain("sku=creative_studio%3Abusiness%3Amonthly");
-  });
-
-  it("URL-encodes the return_to (no raw ?, &, or =)", () => {
-    const raw = checkoutUrl(
-      "creator",
-      "https://creativestudio.life/x?a=1&b=2",
-    );
-    // The encoded return_to lives inside the query string and must not
-    // contain raw separators that would break the parent URL.
-    const afterReturn = raw.split("return_to=")[1];
-    expect(afterReturn).not.toContain("?");
-    expect(afterReturn).not.toMatch(/&(?!amp;)/);
-    expect(decodeURIComponent(afterReturn)).toBe(
-      "https://creativestudio.life/x?a=1&b=2",
-    );
-  });
-
-  it("handles PayG / topup bundle SKUs", () => {
-    const { sku } = parseCheckout(
-      checkoutUrl("creative_studio:bundle:cinematic-10"),
-    );
-    expect(sku).toBe("creative_studio:bundle:cinematic-10");
-  });
-
-  it("handles the cross-app All-Access SKU", () => {
-    const { sku } = parseCheckout(checkoutUrl("all_access:all_access:monthly"));
-    expect(sku).toBe("all_access:all_access:monthly");
-  });
-
-  // ---------------------------------------------------------------------
-  // Cross-spoke matrix — every SKU mirrored in docs/brand/README.md must
-  // round-trip cleanly through checkoutUrl(), proving the helper is
-  // spoke-agnostic.
-  // ---------------------------------------------------------------------
-  const SPOKE_MATRIX: Array<[string, string]> = [
-    // [label, sku]
-    ["creative studio starter",   "creative_studio:starter:monthly"],
-    ["creative studio creator",   "creative_studio:creator:monthly"],
-    ["creative studio pro",       "creative_studio:pro:monthly"],
-    ["creative studio business",  "creative_studio:business:monthly"],
-    ["epublisher starter",        "epublisher:starter:monthly"],
-    ["epublisher author",         "epublisher:author:monthly"],
-    ["epublisher studio",         "epublisher:studio:monthly"],
-    ["epublisher publisher",      "epublisher:publisher:monthly"],
-    ["sync vision starter",       "syncvision:starter:monthly"],
-    ["sync vision creator",       "syncvision:creator:monthly"],
-    ["sync vision studio",        "syncvision:studio:monthly"],
-    ["youtube optimizer creator", "youtube_optimizer:creator:monthly"],
-    ["youtube optimizer pro",     "youtube_optimizer:pro:monthly"],
-    ["youtube optimizer agency",  "youtube_optimizer:agency:monthly"],
-    ["all access bundle",         "all_access:all_access:monthly"],
+describe("checkoutUrl() — free promotion", () => {
+  const skuCases: Array<[string, string]> = [
+    ["creative starter", "creative_studio:starter:monthly"],
+    ["creative business", "creative_studio:business:monthly"],
+    ["ePublisher", "epublisher:creator:monthly"],
+    ["Sync Vision", "syncvision:creator:monthly"],
+    ["YouTube Optimizer", "youtube_optimizer:pro:monthly"],
+    ["All Access", "all_access:all_access:monthly"],
+    ["credit bundle", "creative_studio:bundle:topup-50"],
   ];
 
-  it.each(SPOKE_MATRIX)(
-    "builds a valid Hub checkout URL for %s",
-    (_label, sku) => {
-      const url = checkoutUrl(sku, "https://example.test/back");
-      const parsed = parseCheckout(url);
-      expect(parsed.origin).toBe("https://reson8.life");
-      expect(parsed.pathname).toBe("/checkout");
-      expect(parsed.sku).toBe(sku);
-      expect(parsed.returnTo).toBe("https://example.test/back");
-      // SKU shape: <app>:<plan>:<cadence>
-      expect(sku.split(":")).toHaveLength(3);
-    },
-  );
-
-  it("never emits a non-Hub origin, no matter the input", () => {
-    const inputs = [
-      "creator",
-      "creative_studio:pro:monthly",
-      "epublisher:publisher:monthly",
-      "syncvision:studio:monthly",
-      "youtube_optimizer:agency:monthly",
-      "all_access:all_access:monthly",
-      "creative_studio:bundle:topup-50",
-    ];
-    for (const sku of inputs) {
-      const { origin } = parseCheckout(checkoutUrl(sku));
-      expect(origin).toBe("https://reson8.life");
-    }
+  it.each(skuCases)("routes %s into Creative Studio instead of checkout", (_label, sku) => {
+    const url = checkoutUrl(sku, "https://example.test/back");
+    expect(url).toBe("/studio");
+    expect(url).not.toContain("checkout");
+    expect(url).not.toContain("reson8.life");
   });
-});
 
-describe("checkoutUrl() — SSR safety", () => {
-  it("falls back to '/' when window is undefined and no returnTo given", () => {
+  it("stays promotion-safe when window is unavailable", () => {
     const originalWindow = globalThis.window;
     delete (globalThis as { window?: unknown }).window;
     try {
-      const url = checkoutUrl("creator");
-      // We can't URL-parse a relative return_to, so assert directly.
-      expect(url).toContain("return_to=%2F");
-      expect(url.startsWith("https://reson8.life/checkout?")).toBe(true);
+      expect(checkoutUrl("creator")).toBe("/studio");
     } finally {
       globalThis.window = originalWindow;
     }

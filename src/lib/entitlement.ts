@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { logHubEntitlementFailure } from "./hubDiagLogger";
+import { FREE_PROMOTION_ACTIVE, FREE_PROMOTION_TIER } from "./promotion";
 
 export const APP_KEY = "creative_studio" as const;
 export const HUB_URL = "https://reson8.life";
@@ -50,6 +51,7 @@ export type Entitlement = {
 
 const ORDER = ["free", "starter", "creator", "pro", "business", "all_access"] as const;
 export function tierMeets(have: Tier, need: Exclude<Tier, null>): boolean {
+  if (FREE_PROMOTION_ACTIVE) return true;
   if (!have) return false;
   return ORDER.indexOf(have) >= ORDER.indexOf(need);
 }
@@ -60,6 +62,7 @@ export function hasFeature(
   feature: string,
   minTier?: Exclude<Tier, null>,
 ): boolean {
+  if (FREE_PROMOTION_ACTIVE) return true;
   if (!entitlement || !entitlement.hasAccess) return false;
   const explicit = entitlement.features?.[feature];
   if (typeof explicit === "boolean") return explicit;
@@ -678,6 +681,41 @@ export function useEntitlement(app: string = APP_KEY, hubUrl: string = HUB_URL) 
       if (!opts.silent) setLoading(true);
       setError(null);
 
+      if (FREE_PROMOTION_ACTIVE) {
+        if (!cancelled) {
+          setEntitlement(
+            normalizeEntitlement(
+              {
+                app,
+                userId: "promotion-user",
+                tier: FREE_PROMOTION_TIER,
+                status: "active",
+                source: "trial",
+                features: {
+                  posters: true,
+                  videos: true,
+                  teamSeats: true,
+                  whiteLabel: true,
+                },
+              },
+              app,
+            ),
+          );
+          setDiagnostic({
+            endpoint: "promotion://free-access",
+            httpStatus: 200,
+            reason: "ok",
+            lastCheckedAt: new Date().toISOString(),
+            message: "Free promotion access active",
+          });
+          setAttemptCount(0);
+          setRetryAvailableAt(0);
+          clearPersistedBackoff(app);
+          setLoading(false);
+        }
+        return;
+      }
+
       // Sovereign-local builds never call the public Hub for billing state.
       // The local owner workspace is intentionally unlocked; public/server-side
       // billing remains a separate deployment concern.
@@ -906,6 +944,7 @@ export function useEntitlement(app: string = APP_KEY, hubUrl: string = HUB_URL) 
  * as a plan key for this app — kept for backward-compatibility.
  */
 export function checkoutUrl(skuOrPlan: string, returnTo?: string): string {
+  if (FREE_PROMOTION_ACTIVE) return "/studio";
   const back =
     returnTo ?? (typeof window !== "undefined" ? window.location.href : "/");
   const sku = skuOrPlan.includes(":")
