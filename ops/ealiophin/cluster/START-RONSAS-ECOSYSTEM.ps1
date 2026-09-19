@@ -241,11 +241,32 @@ if (-not (Test-BackendReady)) {
 }
 $backendUrl = 'http://127.0.0.1:8787/v1/backend/health'
 $services += [pscustomobject]@{name='sovereign-backend';port=58600;url=$backendUrl;pid=(Get-ListenerPid 58600);owned=$false;root=$AppDev}
+$opsRuntime = Join-Path (Split-Path $PSScriptRoot -Parent) 'runtime'
+foreach ($runtimeName in @('rons-local-llm-service.py','epublisher-premium-image-service.py')) {
+    $sourceRuntime = Join-Path $opsRuntime $runtimeName
+    if (-not (Test-Path -LiteralPath $sourceRuntime -PathType Leaf)) { throw "Premium runtime source missing: $sourceRuntime" }
+    Copy-Item -LiteralPath $sourceRuntime -Destination (Join-Path $Runtime $runtimeName) -Force
+}
+
 $services += Start-LaunchBroker
 $services += Start-OllamaService
-$services += Start-PythonService 'local-llm' 7866 'http://127.0.0.1:7866/health' (Join-Path $Runtime 'rons-local-llm-service.py') $SystemPython 'rons-local-llm-service.py'
+$localLlmModel = 'qwen2.5:0.5b'
+try {
+    $ollamaText = (& (Get-Command ollama.exe -ErrorAction Stop).Source list | Out-String)
+    if ($ollamaText -match 'qwen3:8b') { $localLlmModel = 'qwen3:8b' }
+} catch { }
+$brokerConfig = Join-Path $Runtime 'ai-broker\providers.json'
+if (Test-Path -LiteralPath $brokerConfig -PathType Leaf) {
+    try {
+        $broker = Get-Content -LiteralPath $brokerConfig -Raw | ConvertFrom-Json
+        $broker.providers.'rons-local'.model = $localLlmModel
+        $broker | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $brokerConfig -Encoding UTF8
+    } catch { Write-Warning "Could not update local AI broker model label: $($_.Exception.Message)" }
+}
+$services += Start-PythonService 'local-llm' 7866 'http://127.0.0.1:7866/health' (Join-Path $Runtime 'rons-local-llm-service.py') $SystemPython 'rons-local-llm-service.py' @{ RONS_LLM_MODEL=$localLlmModel }
 $services += Start-PythonService 'local-stt' 7864 'http://127.0.0.1:7864/health' (Join-Path $Runtime 'syncvision-local-stt.py') $SttPython 'syncvision-local-stt.py' @{ HF_HUB_DISABLE_XET='1'; RONS_STT_MODELS_ROOT=(Join-Path $Runtime 'models') }
 $services += Start-PythonService 'local-image' 7865 'http://127.0.0.1:7865/health' (Join-Path $Runtime 'epublisher-image-service.py') $MediaPython 'epublisher-image-service.py'
+$services += Start-PythonService 'premium-image' 7870 'http://127.0.0.1:7870/health' (Join-Path $Runtime 'epublisher-premium-image-service.py') $MediaPython 'epublisher-premium-image-service.py' @{ RONS_EPUBLISHER_IMAGE_PORT='7870'; RONS_IMAGE_MAX_ACTIVE='1'; RONS_EPUBLISHER_MODELS_ROOT=(Join-Path $Runtime 'models') }
 $services += Start-PythonService 'creative-source' 7867 'http://127.0.0.1:7867/health' (Join-Path $Runtime 'creative-source-service.py') $MediaPython 'creative-source-service.py'
 $services += Start-PythonService 'ai-broker' 7868 'http://127.0.0.1:7868/health' (Join-Path $Runtime 'ai-broker-service.py') $SystemPython 'ai-broker-service.py'
 
