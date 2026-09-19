@@ -112,7 +112,7 @@ env:
 jobs:
   ssr-gate:
     name: Production build · SSR serve + meta/redirect assertions
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin, sovereign]
     timeout-minutes: 20
     permissions:
       contents: read
@@ -410,7 +410,7 @@ jobs:
 
   lighthouse-gate:
     name: Production build · Lighthouse performance/SEO/best-practices
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin, sovereign]
     timeout-minutes: 25
     permissions:
       contents: read
