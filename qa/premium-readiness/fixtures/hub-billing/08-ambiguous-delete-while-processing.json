@@ -1,0 +1,32 @@
+{
+  "schema": "ronsas.premium-fixture.v1",
+  "id": "hub-billing-08-delete-while-processing",
+  "app": "hub-billing",
+  "category": "ambiguous",
+  "review_status": "source-derived-reviewed",
+  "review_basis": "Mapped to existing PayFast/checkout verification and September 2026 premium-readiness audit scenarios.",
+  "input": {
+    "event": "project deletion requested while generation active",
+    "expected": "defined state transition and no orphan charge"
+  },
+  "expected_checks": [
+    "advertised-entitlements",
+    "no-duplicate-debit",
+    "recoverable-failure",
+    "transaction-history",
+    "concurrent-final-credit",
+    "payment-replay-idempotency"
+  ],
+  "provenance": [
+    "scripts/test-payfast-itn.ts",
+    "scripts/verify-all-apps-checkout.ts",
+    "scripts/verify-checkout-links.ts",
+    "docs/spoke-payment-gate-bridge.md"
+  ],
+  "critical_failure_classes": [
+    "duplicate-charge",
+    "incorrect-billing",
+    "cross-account-access",
+    "unrecoverable-paid-job-failure"
+  ]
+}

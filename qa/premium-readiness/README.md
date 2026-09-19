@@ -2,7 +2,9 @@
 
 This directory contains the acceptance manifest for the RONSAS premium-readiness gate.
 
-The app fixture directories are intentionally not pre-populated. A fixture counts only when it is a reviewed, representative input with documented expected checks. Do not add synthetic placeholder files merely to satisfy the minimum count.
+A fixture counts only when it is a reviewed, representative input with documented expected checks and source/test provenance. Do not add synthetic placeholder files merely to satisfy the minimum count.
+
+The checked-in corpus contains source-derived reviewed cases mapped to the current spoke implementations and tests. Run `bun run verify:premium-fixtures` before assessment. The validator rejects duplicate IDs, unreviewed entries, missing provenance, placeholder content, weak category coverage, and missing required-check coverage.
 
 Expected directories:
 
