@@ -38,5 +38,7 @@ describe("guarded CI autofix policy", () => {
     expect(installer).toContain("-AutoRemediate");
     expect(installer).toContain("RONSAS GitHub CI Monitor");
     expect(installer).toContain("EveryMinutes = 15");
+    expect(installer).toContain("Register-ScheduledTask");
+    expect(installer).not.toContain("schtasks.exe");
   });
 });
