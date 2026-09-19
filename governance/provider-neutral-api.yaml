@@ -8,13 +8,13 @@ routes:
     supported_operations: [select, insert, update, upsert, delete]
     supported_filters: [eq, neq, gt, gte, lt, lte]
     procedure: POST /v1/db/procedure
-    allowlisted_procedures: [transaction_probe, mirror_user_roles, read_subscription_mirror, read_subscription_account, mirror_subscriptions, read_account_invoices, read_admin_invoices, read_billing_account, read_billing_admin, record_payfast_launch, record_payfast_itn_attempt, settle_payfast_itn, governance_list_participants, governance_list_proposals, governance_get_proposal, governance_create_proposal, governance_submit_proposal, governance_add_evidence, governance_add_review, governance_record_decision, governance_register_agent]
+    allowlisted_procedures: [transaction_probe, mirror_user_roles, read_subscription_mirror, read_subscription_account, mirror_subscriptions, read_account_invoices, read_admin_invoices, read_billing_account, read_billing_admin, record_payfast_launch, record_payfast_itn_attempt, settle_payfast_itn, record_cost_usage, read_cost_usage_summary, governance_list_participants, governance_list_proposals, governance_get_proposal, governance_create_proposal, governance_submit_proposal, governance_add_evidence, governance_add_review, governance_record_decision, governance_register_agent]
     protected_reads: [invoices, credit_wallets, credit_ledger, billing_receipts]
-    protected_audits: [payfast_launch_logs, payfast_itn_logs, webhook_events, plan_changes, subscription_email_sends, email_suppression_list]
+    protected_audits: [payfast_launch_logs, payfast_itn_logs, webhook_events, plan_changes, subscription_email_sends, email_suppression_list, cost_usage_events]
     staged_procedures: [create_admin_bootstrap_challenge, cancel_admin_bootstrap_challenge, bootstrap_first_admin]
     staged_bootstrap_enable_env: RONS_BOOTSTRAP_PROCEDURES_ENABLED
     staged_bootstrap_default: false
-    protected_writes: [user_roles, subscriptions, invoices, billing_receipts, payfast_itn_logs, webhook_events, plan_changes, subscription_email_sends, email_suppression_list]
+    protected_writes: [user_roles, subscriptions, invoices, billing_receipts, payfast_itn_logs, webhook_events, plan_changes, subscription_email_sends, email_suppression_list, cost_usage_events]
     subscription_entitlement_columns: [app, tier, status, current_period_end]
     subscription_entitlement_filter: user_id eq UUID
     subscription_entitlement_limit_max: 100

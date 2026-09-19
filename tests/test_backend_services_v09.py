@@ -36,6 +36,7 @@ def test_gateway_health_reports_driver_state():
     assert result.status_code == 200
     body = result.json()
     assert body["service"] == "gateway"
+    assert body["version"] == "0.12.0"
     assert "postgres_driver" in body
 
 
@@ -191,7 +192,7 @@ def test_gateway_procedure_contract_is_allowlisted_not_raw_sql():
 
 def test_bootstrap_procedures_are_staged_and_disabled_by_default(tmp_path: Path, monkeypatch):
     assert gateway_mod.BOOTSTRAP_PROCEDURES_ENABLED is False
-    baseline={"transaction_probe", "mirror_user_roles", "read_subscription_mirror", "read_subscription_account", "mirror_subscriptions", "read_account_invoices", "read_admin_invoices", "read_billing_account", "read_billing_admin", "record_payfast_launch", "record_payfast_itn_attempt", "settle_payfast_itn"}
+    baseline={"transaction_probe", "mirror_user_roles", "read_subscription_mirror", "read_subscription_account", "mirror_subscriptions", "read_account_invoices", "read_admin_invoices", "read_billing_account", "read_billing_admin", "record_payfast_launch", "record_payfast_itn_attempt", "settle_payfast_itn", "record_cost_usage", "read_cost_usage_summary"}
     assert gateway_mod.ALLOWED_PROCEDURES == baseline | gateway_mod.GOVERNANCE_PROCEDURES
     assert gateway_mod.BOOTSTRAP_PROCEDURES.isdisjoint(gateway_mod.ALLOWED_PROCEDURES)
     for table in {"governance_participants","governance_proposals","governance_evidence","governance_reviews","governance_decisions","governance_events"}:

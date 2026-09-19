@@ -30,12 +30,16 @@ try:
 except ImportError:
     import governance as governance_ops
 try:
+    from . import cost_usage as cost_usage_ops
+except ImportError:
+    import cost_usage as cost_usage_ops
+try:
     import psycopg
     from psycopg import sql
 except Exception:  # allows static/unit validation before local wheel provisioning
     psycopg=None; sql=None
 
-app=FastAPI(title="Resonance Sovereign Gateway",version="0.11.0")
+app=FastAPI(title="Resonance Sovereign Gateway",version="0.12.0")
 DATABASE_URL=os.getenv("DATABASE_URL","postgresql://resonance@postgres:5432/resonance")
 DB_PASSWORD_FILE=os.getenv("POSTGRES_PASSWORD_FILE","/run/secrets/postgres-password")
 PROCEDURE_KEY_FILE=os.getenv("GATEWAY_PROCEDURE_KEY_FILE","/run/secrets/gateway-procedure-key")
@@ -56,6 +60,8 @@ class Query(BaseModel):
 class Chat(BaseModel):
     messages:list[dict[str,str]]
     model:str|None=None
+    app:str|None=None
+    operation:str|None=None
 
 class ProcedureCall(BaseModel):
     name:str=Field(pattern=r"^[a-z][a-z0-9_]{0,63}$")
@@ -68,8 +74,8 @@ GOVERNANCE_PROCEDURES={
     "governance_create_proposal","governance_submit_proposal","governance_add_evidence",
     "governance_add_review","governance_record_decision","governance_register_agent",
 }
-ALLOWED_PROCEDURES={"transaction_probe","mirror_user_roles","read_subscription_mirror","read_subscription_account","mirror_subscriptions","read_account_invoices","read_admin_invoices","read_billing_account","read_billing_admin","record_payfast_launch","record_payfast_itn_attempt","settle_payfast_itn"} | GOVERNANCE_PROCEDURES | (BOOTSTRAP_PROCEDURES if BOOTSTRAP_PROCEDURES_ENABLED else set())
-PROTECTED_TABLES={"admin_bootstrap_state","admin_bootstrap_email_challenges","invoices","credit_wallets","credit_ledger","billing_receipts","payfast_launch_logs","payfast_itn_logs","webhook_events","plan_changes","subscription_email_sends","email_suppression_list","governance_participants","governance_proposals","governance_evidence","governance_reviews","governance_decisions","governance_events"}
+ALLOWED_PROCEDURES={"transaction_probe","mirror_user_roles","read_subscription_mirror","read_subscription_account","mirror_subscriptions","read_account_invoices","read_admin_invoices","read_billing_account","read_billing_admin","record_payfast_launch","record_payfast_itn_attempt","settle_payfast_itn","record_cost_usage","read_cost_usage_summary"} | GOVERNANCE_PROCEDURES | (BOOTSTRAP_PROCEDURES if BOOTSTRAP_PROCEDURES_ENABLED else set())
+PROTECTED_TABLES={"admin_bootstrap_state","admin_bootstrap_email_challenges","invoices","credit_wallets","credit_ledger","billing_receipts","payfast_launch_logs","payfast_itn_logs","webhook_events","plan_changes","subscription_email_sends","email_suppression_list","cost_usage_events","governance_participants","governance_proposals","governance_evidence","governance_reviews","governance_decisions","governance_events"}
 PROTECTED_WRITE_TABLES={"user_roles","subscriptions"}
 SUBSCRIPTION_ENTITLEMENT_COLUMNS={"app","tier","status","current_period_end"}
 
@@ -104,7 +110,7 @@ def validate_subscription_entitlement_query(body:Query):
     if not isinstance(limit,int) or isinstance(limit,bool) or not 1<=limit<=100: raise HTTPException(400,"Subscription read limit must be 1..100")
 
 @app.get("/health")
-def health(): return {"ok":True,"service":"gateway","postgres_driver":psycopg is not None}
+def health(): return {"ok":True,"service":"gateway","version":app.version,"postgres_driver":psycopg is not None}
 
 @app.post("/v1/db/query")
 def query(body:Query):
@@ -284,6 +290,21 @@ def procedure(body:ProcedureCall,request:Request):
             try: result=payfast_settlement_ops.settle(conn,body.args["event"])
             except ValueError as exc: raise HTTPException(400,str(exc))
         return {"procedure":"settle_payfast_itn",**result}
+    if body.name=="record_cost_usage":
+        if set(body.args)!={"event"} or not isinstance(body.args.get("event"),dict):
+            raise HTTPException(400,"record_cost_usage requires event")
+        password=Path(DB_PASSWORD_FILE).read_text(encoding="utf-8").strip() if Path(DB_PASSWORD_FILE).exists() else None
+        with psycopg.connect(DATABASE_URL,password=password) as conn:
+            try: result=cost_usage_ops.record_event(conn,body.args["event"])
+            except ValueError as exc: raise HTTPException(400,str(exc))
+        return {"procedure":"record_cost_usage",**result}
+    if body.name=="read_cost_usage_summary":
+        if body.args:
+            raise HTTPException(400,"read_cost_usage_summary takes no arguments")
+        password=Path(DB_PASSWORD_FILE).read_text(encoding="utf-8").strip() if Path(DB_PASSWORD_FILE).exists() else None
+        with psycopg.connect(DATABASE_URL,password=password) as conn:
+            result=cost_usage_ops.read_summary(conn)
+        return {"procedure":"read_cost_usage_summary","summary":result}
     if body.name=="mirror_subscriptions":
         if set(body.args)!={"rows"}: raise HTTPException(400,"mirror_subscriptions requires rows")
         password=Path(DB_PASSWORD_FILE).read_text(encoding="utf-8").strip() if Path(DB_PASSWORD_FILE).exists() else None
@@ -350,8 +371,61 @@ async def auth_proxy(path:str,request:Request): return await proxy(request,f"{AU
 async def storage_proxy(path:str,request:Request): return await proxy(request,f"{STORAGE_URL}/v1/storage/{path}")
 @app.post("/v1/ai/chat")
 async def ai_chat(body:Chat):
+    try:
+        app_id=cost_usage_ops.normalize_app(body.app)
+        operation=cost_usage_ops.normalize_operation(body.operation)
+    except ValueError as exc:
+        raise HTTPException(400,str(exc))
     payload={"model":body.model or os.getenv("SOVEREIGN_MODEL","qwen3-coder:30b"),"stream":False,"messages":body.messages}
     async with httpx.AsyncClient(timeout=300) as client:
         try: r=await client.post(f"{OLLAMA_URL}/api/chat",json=payload); r.raise_for_status()
         except Exception as exc: raise HTTPException(503,f"Local AI unavailable: {exc}")
-    data=r.json(); return {"message":data.get("message"),"model":data.get("model"),"external_ai_used":False}
+    data=r.json()
+    usage_event={
+        "app":app_id,
+        "operation":operation,
+        "provider":"ollama-local",
+        "model":str(data.get("model") or payload["model"]),
+        "provider_api_cost_usd":0,
+        "infrastructure_cost_status":"unmeasured",
+        "input_units":data.get("prompt_eval_count"),
+        "output_units":data.get("eval_count"),
+        "unit_kind":"tokens",
+        "duration_ms":cost_usage_ops.ns_to_ms(data.get("total_duration")),
+        "evidence_source":"ollama_response",
+        "external_provider":False,
+        "request_id":None,
+        "metadata":{
+            "load_duration_ms":cost_usage_ops.ns_to_ms(data.get("load_duration")),
+            "input_eval_duration_ms":cost_usage_ops.ns_to_ms(data.get("prompt_eval_duration")),
+            "eval_duration_ms":cost_usage_ops.ns_to_ms(data.get("eval_duration")),
+        },
+    }
+    usage_receipt=None
+    usage_recorded=False
+    if psycopg is not None:
+        try:
+            password=Path(DB_PASSWORD_FILE).read_text(encoding="utf-8").strip() if Path(DB_PASSWORD_FILE).exists() else None
+            with psycopg.connect(DATABASE_URL,password=password) as conn:
+                usage_receipt=cost_usage_ops.record_event(conn,usage_event)
+            usage_recorded=True
+        except Exception:
+            usage_recorded=False
+    return {
+        "message":data.get("message"),
+        "model":data.get("model"),
+        "external_ai_used":False,
+        "usage":{
+            "app":app_id,
+            "operation":operation,
+            "provider":"ollama-local",
+            "provider_api_cost_usd":0,
+            "infrastructure_cost_status":"unmeasured",
+            "input_units":usage_event["input_units"],
+            "output_units":usage_event["output_units"],
+            "unit_kind":"tokens",
+            "duration_ms":usage_event["duration_ms"],
+        },
+        "usage_recorded":usage_recorded,
+        "usage_receipt_id":usage_receipt.get("id") if usage_receipt else None,
+    }

@@ -159,7 +159,7 @@ def test_provider_contract_and_container_expose_only_named_itn_procedures():
     assert "payfast_itn_logs" in contract and "webhook_events" in contract
     assert "payfast_itn_logs" in compat and "webhook_events" in compat
     assert "COPY services/gateway/payfast_settlement.py /app/payfast_settlement.py" in container
-    assert 'version="0.11.0"' in app
+    assert 'version="0.12.0"' in app
 
 def test_canonical_deploy_targets_gateway_v011():
     compose=Path("deploy/compose.backend.yml").read_text(encoding="utf-8")
