@@ -3,6 +3,26 @@ import { existsSync, readFileSync } from "node:fs";
 
 type Check = { label: string; ok: boolean; detail?: string };
 
+type FixtureApp = {
+  id?: string;
+  generative?: boolean;
+  minimum_fixtures?: number;
+  fixture_directory?: string;
+};
+
+type FixtureManifest = {
+  apps?: FixtureApp[];
+  minimum_representative_fixtures_per_generative_app?: number;
+  repeat_runs_per_generative_case?: number;
+  representative_categories?: string[];
+  pass_targets?: {
+    critical_failures_max?: number;
+    representative_run_pass_rate_min?: number;
+    ordinary_api_p95_ms_max?: number;
+    unexpected_error_rate_max?: number;
+  };
+};
+
 const read = (path: string) => readFileSync(path, "utf8");
 const manifestPath = "qa/premium-readiness/fixture-manifest.json";
 const prereqScriptPath = "scripts/Test-RonsasPremiumReadiness.ps1";
@@ -15,13 +35,13 @@ const checks: Check[] = [
 ];
 
 if (checks.every((check) => check.ok)) {
-  const manifest = JSON.parse(read(manifestPath));
+  const manifest = JSON.parse(read(manifestPath)) as FixtureManifest;
   const prereq = read(prereqScriptPath);
   const k6 = read(k6Path);
 
   const requiredApps = ["epublisher", "creative-studio", "sync-vision", "youtube-optimizer"];
   const apps = Array.isArray(manifest.apps) ? manifest.apps : [];
-  const appMap = new Map(apps.map((app: any) => [app.id, app]));
+  const appMap = new Map(apps.map((app) => [app.id, app]));
 
   checks.push(
     {
@@ -34,8 +54,10 @@ if (checks.every((check) => check.ok)) {
     },
     {
       label: "representative categories cover normal/boundary/malformed/multilingual/ambiguous",
-      ok: ["normal", "boundary", "malformed", "multilingual", "ambiguous"].every((value) =>
-        Array.isArray(manifest.representative_categories) && manifest.representative_categories.includes(value),
+      ok: ["normal", "boundary", "malformed", "multilingual", "ambiguous"].every(
+        (value) =>
+          Array.isArray(manifest.representative_categories) &&
+          manifest.representative_categories.includes(value),
       ),
     },
     {
@@ -57,10 +79,13 @@ if (checks.every((check) => check.ok)) {
   );
 
   for (const id of requiredApps) {
-    const app: any = appMap.get(id);
+    const app = appMap.get(id);
     checks.push({
       label: `${id} fixture gate is configured at 30 or more`,
-      ok: Boolean(app?.generative) && Number(app?.minimum_fixtures) >= 30 && typeof app?.fixture_directory === "string",
+      ok:
+        Boolean(app?.generative) &&
+        Number(app?.minimum_fixtures) >= 30 &&
+        typeof app?.fixture_directory === "string",
     });
   }
 
@@ -100,14 +125,16 @@ if (checks.every((check) => check.ok)) {
     },
     {
       label: "k6 profiles do not invent non-smoke concurrency",
-      ok: /requirePositiveInt\("RONSAS_BASELINE_VUS"\)/.test(k6)
-        && /requirePositiveInt\("RONSAS_PEAK_VUS"\)/.test(k6)
-        && /requirePositiveInt\("RONSAS_SPIKE_VUS"\)/.test(k6),
+      ok:
+        /requirePositiveInt\("RONSAS_BASELINE_VUS"\)/.test(k6) &&
+        /requirePositiveInt\("RONSAS_PEAK_VUS"\)/.test(k6) &&
+        /requirePositiveInt\("RONSAS_SPIKE_VUS"\)/.test(k6),
     },
     {
       label: "load thresholds enforce audit targets",
-      ok: /http_req_failed:\s*\["rate<0\.01"\]/.test(k6)
-        && /http_req_duration:\s*\["p\(95\)<750"\]/.test(k6),
+      ok:
+        /http_req_failed:\s*\["rate<0\.01"\]/.test(k6) &&
+        /http_req_duration:\s*\["p\(95\)<750"\]/.test(k6),
     },
   );
 }
@@ -118,7 +145,9 @@ for (const check of checks) {
 }
 
 if (failed.length) {
-  console.error(`\nverify-premium-readiness-harness failed: ${failed.length} invariant(s) violated.`);
+  console.error(
+    `\nverify-premium-readiness-harness failed: ${failed.length} invariant(s) violated.`,
+  );
   process.exit(1);
 }
 
