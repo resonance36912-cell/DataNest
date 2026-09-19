@@ -1,0 +1,65 @@
+{
+  "schema": "ronsas.premium-fixture.v1",
+  "id": "epublisher-boundary-02-many-sections",
+  "app": "epublisher",
+  "category": "boundary",
+  "review_status": "source-derived-reviewed",
+  "review_basis": "Mapped to existing app source/tests and checked against the premium-readiness required_checks manifest on 2026-09-19.",
+  "input": {
+    "title": "Thirty Sections",
+    "sections": [
+      "Section 1",
+      "Section 2",
+      "Section 3",
+      "Section 4",
+      "Section 5",
+      "Section 6",
+      "Section 7",
+      "Section 8",
+      "Section 9",
+      "Section 10",
+      "Section 11",
+      "Section 12",
+      "Section 13",
+      "Section 14",
+      "Section 15",
+      "Section 16",
+      "Section 17",
+      "Section 18",
+      "Section 19",
+      "Section 20",
+      "Section 21",
+      "Section 22",
+      "Section 23",
+      "Section 24",
+      "Section 25",
+      "Section 26",
+      "Section 27",
+      "Section 28",
+      "Section 29",
+      "Section 30"
+    ]
+  },
+  "expected_checks": [
+    "source-fidelity",
+    "toc-navigation",
+    "narration-fidelity",
+    "export-reopen",
+    "epubcheck-when-epub"
+  ],
+  "provenance": [
+    "src/lib/__tests__/book-structure.test.ts",
+    "src/lib/__tests__/canonical-storyboard.test.ts",
+    "src/lib/__tests__/chapter-source-notes.test.ts",
+    "src/lib/__tests__/publication-readiness.test.ts",
+    "src/lib/__tests__/research-source-quality.test.ts",
+    "tests/e2e/export-matrix.spec.ts",
+    "tests/e2e/narration-gating.spec.ts"
+  ],
+  "critical_failure_classes": [
+    "cross-account-access",
+    "incorrect-billing",
+    "unusable-paid-artifact",
+    "fabricated-source-attribution"
+  ]
+}

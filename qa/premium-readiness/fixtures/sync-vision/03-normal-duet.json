@@ -1,0 +1,37 @@
+{
+  "schema": "ronsas.premium-fixture.v1",
+  "id": "sync-vision-normal-03-duet",
+  "app": "sync-vision",
+  "category": "normal",
+  "review_status": "source-derived-reviewed",
+  "review_basis": "Mapped to existing app source/tests and checked against the premium-readiness required_checks manifest on 2026-09-19.",
+  "input": {
+    "duration_sec": 210,
+    "characters": [
+      "Singer A",
+      "Singer B"
+    ],
+    "target": "continuity storyboard"
+  },
+  "expected_checks": [
+    "audio-timing",
+    "character-continuity",
+    "scene-continuity",
+    "prompt-usability",
+    "deliverable-match"
+  ],
+  "provenance": [
+    "src/lib/sample-project.ts",
+    "src/lib/transcript-normalizer.ts",
+    "src/lib/video-prompt.ts",
+    "src/lib/prompt-sanitizer.ts",
+    "src/lib/storyboard-style-presets.ts",
+    "src/components/storyboard/ScenePromptEditor.tsx"
+  ],
+  "critical_failure_classes": [
+    "cross-account-access",
+    "incorrect-billing",
+    "unusable-paid-artifact",
+    "fabricated-source-attribution"
+  ]
+}
