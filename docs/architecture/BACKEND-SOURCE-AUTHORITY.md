@@ -8,8 +8,9 @@ The local RONSAS backend now has an independent private Git source authority:
 - Ealiophin source: `%USERPROFILE%\Resonance\OpenNova\sources\rons-sovereign-backend-source`
 - Extraction baseline commit: `c36a808`
 - Extraction baseline tag: `ronsas-source-baseline-2026-09-19`
-- Current validated head: `791196e`
-- Current validated tag: `ronsas-backend-v0.11-staging-validated`
+- Current production head: `fe43f31`
+- Current production tag: `ronsas-backend-v0.11-production-live-2026-09-19`
+- Staging-validated tag: `ronsas-backend-v0.11-staging-validated`
 - Staging gateway image: `resonance-service-gateway:0.11`
 - Extracted from: `ResonanceAppDev_ZeroCredit_v1.5.8`
 
@@ -45,12 +46,12 @@ The first GitHub Actions run did not allocate a runner. GitHub annotated the run
 
 The active local backend remains loopback-only:
 
-| Service | Endpoint |
-| --- | --- |
-| PostgreSQL | `127.0.0.1:55432` |
-| Gateway | `http://127.0.0.1:58600` |
-| Auth | `http://127.0.0.1:58680` |
-| Storage | `http://127.0.0.1:59000` |
+| Service    | Endpoint                 |
+| ---------- | ------------------------ |
+| PostgreSQL | `127.0.0.1:55432`        |
+| Gateway    | `http://127.0.0.1:58600` |
+| Auth       | `http://127.0.0.1:58680` |
+| Storage    | `http://127.0.0.1:59000` |
 
 Source promotion and runtime promotion are separate. Changes must merge through the private backend source repository, build new versioned service images, deploy to isolated staging first, pass backend/billing/recovery tests, and only then move to the live loopback stack.
 
@@ -58,8 +59,17 @@ Source promotion and runtime promotion are separate. Changes must merge through 
 
 Issue #55 uses the separate `resonance-sovereign-staging-v2` Podman project for destructive/disposable validation. It has independent secrets and volumes and is never exposed through the public edge.
 
-## Billing migration rule
+| Staging service | Loopback endpoint        |
+| --------------- | ------------------------ |
+| PostgreSQL      | `127.0.0.1:60432`        |
+| Gateway         | `http://127.0.0.1:60600` |
+| Auth            | `http://127.0.0.1:60680` |
+| Storage         | `127.0.0.1:60900`        |
 
-Checkout launch/read paths already support the sovereign provider adapter. PayFast ITN settlement still contains direct hosted-Supabase writes and must be migrated behind a named, transaction-safe gateway procedure before PayFast sandbox payment/entitlement tests can be marked isolated.
+## Billing isolation rule
 
-Do not test PayFast settlement against live billing data to work around that migration.
+The canonical Hub PayFast ITN handler now branches before settlement writes. In `RESONANCE_BACKEND_PROVIDER=sovereign` mode, validated ITNs call the keyed `record_payfast_itn_attempt` and `settle_payfast_itn` procedures and return without entering the hosted Supabase settlement path. Direct hosted-Supabase settlement writes remain only as the hosted compatibility fallback.
+
+For issue #55, sandbox payment/entitlement testing must therefore run the Hub in sovereign mode against the isolated staging gateway and use PayFast sandbox credentials. The architecture boundary is ready, but the sandbox-payment prerequisite remains false until those credentials and an end-to-end sandbox transaction are actually available and evidenced.
+
+Do not test PayFast settlement against live billing data or the hosted compatibility path to work around missing sandbox credentials.
