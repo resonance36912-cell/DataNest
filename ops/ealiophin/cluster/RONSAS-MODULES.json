@@ -130,6 +130,15 @@
       "required": true
     },
     {
+      "id": "premium-image",
+      "kind": "ai-service",
+      "displayName": "RONSAS Premium ePublisher Image",
+      "port": 7870,
+      "listenPort": 7870,
+      "health": "http://127.0.0.1:7870/health",
+      "required": true
+    },
+    {
       "id": "local-llm",
       "kind": "ai-service",
       "displayName": "RONSAS Local LLM",

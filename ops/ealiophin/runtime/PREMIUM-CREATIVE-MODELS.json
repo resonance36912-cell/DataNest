@@ -1,0 +1,29 @@
+﻿{
+  "schema": "ronsas-premium-creative-models/v1",
+  "hardwareProfile": "ealiophin-rtx4060-8gb",
+  "storyboard": {
+    "preferred": "qwen3:8b",
+    "fallback": "qwen2.5:0.5b",
+    "runtime": "ollama",
+    "license": "Apache-2.0",
+    "gpuReleasePolicy": "keep_alive=0"
+  },
+  "image": {
+    "fast": {
+      "model": "stabilityai/sd-turbo",
+      "runtime": "diffusers",
+      "steps": 1
+    },
+    "premium": {
+      "base": "stabilityai/stable-diffusion-xl-base-1.0",
+      "accelerator": "ByteDance/SDXL-Lightning",
+      "acceleratorFile": "sdxl_lightning_4step_lora.safetensors",
+      "runtime": "diffusers",
+      "scheduler": "EulerDiscreteScheduler/trailing",
+      "steps": 4,
+      "license": "OpenRAIL++",
+      "cpuOffload": true
+    }
+  },
+  "ports": {"legacyImage": 7865, "premiumImage": 7870, "localLlm": 7866, "aiBroker": 7868}
+}
