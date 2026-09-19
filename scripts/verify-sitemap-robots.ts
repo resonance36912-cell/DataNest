@@ -18,8 +18,14 @@ const HUB_PRICING_PATHS = [
   "/youtube-optimizer/pricing",
 ];
 
-// Anchors on /pricing that MUST be reachable (matches ids in pricing.tsx).
-const PRICING_ANCHORS = ["epublisher", "creative-studio", "sync-vision", "youtube-optimizer"];
+// Public deep-link routes MUST redirect to the canonical pricing hash.
+// Hash fragments are client-side state and are not required to appear in raw SSR HTML.
+const PRICING_REDIRECTS = [
+  { path: "/epublisher/pricing", location: "/pricing#epublisher" },
+  { path: "/creative-studio/pricing", location: "/pricing#creative-studio" },
+  { path: "/sync-vision/pricing", location: "/pricing#sync-vision" },
+  { path: "/youtube-optimizer/pricing", location: "/pricing#youtube-optimizer" },
+] as const;
 
 type Failure = { file: string; missing: string };
 const failures: Failure[] = [];
@@ -63,17 +69,28 @@ for (const path of HUB_PRICING_PATHS) {
   }
 }
 
-// ---- pricing anchors ---------------------------------------------------
-console.log("\npricing anchors on /pricing:");
-const pricingHtml = await fetchText("/pricing");
-for (const id of PRICING_ANCHORS) {
-  // id="anchor" appears in the rendered SSR HTML.
-  const re = new RegExp(`id=["']${id}["']`);
-  if (re.test(pricingHtml)) {
-    console.log(`  ✓ #${id}`);
+// ---- pricing deep-link redirects ---------------------------------------
+console.log("\npricing deep-link redirects:");
+for (const expected of PRICING_REDIRECTS) {
+  const res = await fetch(new URL(expected.path, BASE).toString(), {
+    redirect: "manual",
+    signal: AbortSignal.timeout(15_000),
+  });
+  const location = res.headers.get("location") ?? "";
+  const resolved = new URL(location || expected.path, BASE);
+  const actualTarget = `${resolved.pathname}${resolved.hash}`;
+  const redirectStatus = [301, 302, 303, 307, 308].includes(res.status);
+
+  if (redirectStatus && actualTarget === expected.location) {
+    console.log(`  ✓ ${expected.path} → ${expected.location}`);
   } else {
-    console.log(`  ✗ missing anchor: #${id}`);
-    failures.push({ file: "/pricing", missing: `anchor #${id}` });
+    console.log(
+      `  ✗ ${expected.path}: expected redirect to ${expected.location}; got HTTP ${res.status} → ${actualTarget}`,
+    );
+    failures.push({
+      file: expected.path,
+      missing: `redirect to ${expected.location}`,
+    });
   }
 }
 
@@ -83,4 +100,4 @@ if (failures.length > 0) {
   for (const f of failures) console.error(`  - ${f.file}: ${f.missing}`);
   process.exit(1);
 }
-console.log(`OK — sitemap, robots.txt, and pricing anchors all present (base: ${BASE})`);
+console.log(`OK — sitemap, robots.txt, and pricing deep links all valid (base: ${BASE})`);
