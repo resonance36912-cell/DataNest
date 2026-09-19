@@ -1,0 +1,33 @@
+{
+  "schema": "ronsas.premium-fixture.v1",
+  "id": "epublisher-malformed-02-duplicate-chapter-numbers",
+  "app": "epublisher",
+  "category": "malformed",
+  "review_status": "source-derived-reviewed",
+  "review_basis": "Mapped to existing app source/tests and checked against the premium-readiness required_checks manifest on 2026-09-19.",
+  "input": {
+    "raw": "Chapter 1: Start\nChapter 1: Again\nChapter 3: End"
+  },
+  "expected_checks": [
+    "source-fidelity",
+    "toc-navigation",
+    "narration-fidelity",
+    "export-reopen",
+    "epubcheck-when-epub"
+  ],
+  "provenance": [
+    "src/lib/__tests__/book-structure.test.ts",
+    "src/lib/__tests__/canonical-storyboard.test.ts",
+    "src/lib/__tests__/chapter-source-notes.test.ts",
+    "src/lib/__tests__/publication-readiness.test.ts",
+    "src/lib/__tests__/research-source-quality.test.ts",
+    "tests/e2e/export-matrix.spec.ts",
+    "tests/e2e/narration-gating.spec.ts"
+  ],
+  "critical_failure_classes": [
+    "cross-account-access",
+    "incorrect-billing",
+    "unusable-paid-artifact",
+    "fabricated-source-attribution"
+  ]
+}

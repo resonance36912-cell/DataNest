@@ -1,0 +1,34 @@
+{
+  "schema": "ronsas.premium-fixture.v1",
+  "id": "youtube-optimizer-multilingual-01-afrikaans",
+  "app": "youtube-optimizer",
+  "category": "multilingual",
+  "review_status": "source-derived-reviewed",
+  "review_basis": "Mapped to existing app source/tests and checked against the premium-readiness required_checks manifest on 2026-09-19.",
+  "input": {
+    "title": "Hoe om beter video's te bou",
+    "language": "af",
+    "goal": "title and content audit"
+  },
+  "expected_checks": [
+    "channel-attribution",
+    "traceable-statistics",
+    "reproducible-scoring",
+    "prioritized-actions",
+    "no-private-analytics-fabrication"
+  ],
+  "provenance": [
+    "src/lib/channel-audit.functions.ts",
+    "src/components/ChannelInput.tsx",
+    "src/components/VideoScoreAnalyzer.tsx",
+    "src/components/ThumbnailTextEditor.tsx",
+    "scripts/check-public-metric-labels.mjs",
+    "src/test/rons-ai.test.ts"
+  ],
+  "critical_failure_classes": [
+    "cross-account-access",
+    "incorrect-billing",
+    "unusable-paid-artifact",
+    "fabricated-source-attribution"
+  ]
+}
