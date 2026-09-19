@@ -32,6 +32,9 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
+const PROMOTION_PATH = join(ROOT, "src/lib/promotion.ts");
+const PROMOTION_SOURCE = existsSync(PROMOTION_PATH) ? readFileSync(PROMOTION_PATH, "utf8") : "";
+const FREE_PROMOTION_ACTIVE = /FREE_PROMOTION_ACTIVE\s*=\s*true\s+as\s+const/.test(PROMOTION_SOURCE);
 
 // ---------------------------------------------------------------------------
 // Canonical ZAR ladders per spoke (audit 2026-05-28). Mirrors
@@ -164,21 +167,24 @@ for (const file of files) {
     const lineNo = i + 1;
     const rel = relative(ROOT, file);
 
-    // 1. Stale + non-canonical ZAR prices
-    for (const m of line.matchAll(PRICE_RE)) {
-      const n = Number(m[1]);
-      if (HARD_STALE[n]) {
-        findings.push({
-          file: rel, line: lineNo, kind: "stale-price",
-          message: `R${n} — ${HARD_STALE[n]}`,
-          snippet: line.trim(),
-        });
-      } else if (!ALLOWED.has(n)) {
-        findings.push({
-          file: rel, line: lineNo, kind: "non-canonical-price",
-          message: `R${n} is not in the canonical ${APP} ladder (${[...ALLOWED].sort((a,b)=>a-b).map(v=>"R"+v).join(", ")})`,
-          snippet: line.trim(),
-        });
+    // 1. Paid-mode only: stale + non-canonical ZAR prices.
+    // During the free promotion there is deliberately no active customer price ladder.
+    if (!FREE_PROMOTION_ACTIVE) {
+      for (const m of line.matchAll(PRICE_RE)) {
+        const n = Number(m[1]);
+        if (HARD_STALE[n]) {
+          findings.push({
+            file: rel, line: lineNo, kind: "stale-price",
+            message: `R${n} — ${HARD_STALE[n]}`,
+            snippet: line.trim(),
+          });
+        } else if (!ALLOWED.has(n)) {
+          findings.push({
+            file: rel, line: lineNo, kind: "non-canonical-price",
+            message: `R${n} is not in the canonical ${APP} ladder (${[...ALLOWED].sort((a,b)=>a-b).map(v=>"R"+v).join(", ")})`,
+            snippet: line.trim(),
+          });
+        }
       }
     }
 
@@ -216,11 +222,15 @@ if (JSON_OUT) {
 
 const RED = "\x1b[31m", YEL = "\x1b[33m", GRN = "\x1b[32m", DIM = "\x1b[2m", RST = "\x1b[0m";
 
-console.log(`${DIM}ci-pricing-guard${RST}  app=${APP}  scope=${SCOPE}  files=${files.length}`);
-console.log(`${DIM}canonical ZAR:${RST} ${[...ALLOWED].sort((a,b)=>a-b).map(v=>"R"+v).join(", ")}\n`);
+console.log(`${DIM}ci-pricing-guard${RST}  app=${APP}  scope=${SCOPE}  files=${files.length}  mode=${FREE_PROMOTION_ACTIVE ? "FREE_PROMOTION" : "PAID"}`);
+if (!FREE_PROMOTION_ACTIVE) {
+  console.log(`${DIM}canonical ZAR:${RST} ${[...ALLOWED].sort((a,b)=>a-b).map(v=>"R"+v).join(", ")}\n`);
+} else {
+  console.log(`${DIM}canonical ZAR:${RST} paused while promotion costing is measured\n`);
+}
 
 if (findings.length === 0) {
-  console.log(`${GRN}✓ pricing guard passed — no stale, non-canonical, or forbidden references.${RST}`);
+  console.log(`${GRN}✓ commercial guard passed — no forbidden payment wiring${FREE_PROMOTION_ACTIVE ? " during the free promotion" : " or price drift"}.${RST}`);
   process.exit(0);
 }
 
