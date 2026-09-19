@@ -112,7 +112,7 @@ env:
 jobs:
   ssr-gate:
     name: Production build · SSR serve + meta/redirect assertions
-    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin, sovereign]
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin, sovereign, browser]
     timeout-minutes: 20
     permissions:
       contents: read
@@ -130,6 +130,10 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -410,7 +414,7 @@ jobs:
 
   lighthouse-gate:
     name: Production build · Lighthouse performance/SEO/best-practices
-    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin, sovereign]
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin, sovereign, browser]
     timeout-minutes: 25
     permissions:
       contents: read
@@ -432,6 +436,10 @@ jobs:
         with:
           bun-version: latest
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
@@ -444,7 +452,7 @@ jobs:
         run: bun run typecheck
 
       - name: Install Chrome for Lighthouse
-        run: bunx playwright install --with-deps chromium
+        run: bunx playwright install chromium
 
       # Fails the PR before the gate/comment step when .lighthouse/baseline.json
       # was moved without recorded __meta provenance and a refresh reason.
