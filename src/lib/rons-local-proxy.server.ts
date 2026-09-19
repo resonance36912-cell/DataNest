@@ -24,7 +24,14 @@ export async function proxyAuth(request:Request,action:string){
   if(token) headers["Authorization"]=`Bearer ${token}`;
   let body:string|undefined; if(action==="sign-in"||action==="sign-up"){ body=await request.text(); headers["Content-Type"]="application/json"; }
   let upstream:Response; try{ upstream=await fetch(`${gateway()}${path}`,{method:mutation?"POST":"GET",headers,body}); }
-  catch{ return Response.json({error:"RONS auth unavailable"},{status:503}); }
+  catch{
+    // Anonymous session/user discovery is optional during isolated SSR/Lighthouse runs.
+    // Fail closed whenever a session cookie exists or the request mutates auth state.
+    if(!token&&!mutation&&(action==="session"||action==="user")){
+      return Response.json(action==="session"?{session:null}:{user:null},{status:200,headers:{"Cache-Control":"no-store","X-RONS-Degraded":"gateway-unavailable"}});
+    }
+    return Response.json({error:"RONS auth unavailable"},{status:503});
+  }
   let payload:any={}; try{ payload=await upstream.json(); }catch{}
   const outHeaders=new Headers({"Cache-Control":"no-store"});
   if(action==="sign-out") outHeaders.set("Set-Cookie",cookie(request,"",0));
