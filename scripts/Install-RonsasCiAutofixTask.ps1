@@ -23,12 +23,13 @@ if ($LASTEXITCODE -ne 0 -or $origin.TrimEnd('/') -ne 'https://github.com/resonan
 }
 
 $powerShell = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
-$taskCommand = ('"{0}" -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "{1}" -RepoRoot "{2}" -Repository "resonance36912-cell/RONSAS" -AutoRemediate' -f $powerShell,$monitor,$RepoRoot)
+$arguments = ('-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "{0}" -RepoRoot "{1}" -Repository "resonance36912-cell/RONSAS" -AutoRemediate' -f $monitor,$RepoRoot)
 
-& schtasks.exe /Create /TN $TaskName /TR $taskCommand /SC MINUTE /MO $EveryMinutes /F | Out-Null
-if ($LASTEXITCODE -ne 0) { throw "Failed to create scheduled task '$TaskName'." }
+$action = New-ScheduledTaskAction -Execute $powerShell -Argument $arguments
+$trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1) -RepetitionInterval (New-TimeSpan -Minutes $EveryMinutes)
+$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Minutes 20)
 
-& schtasks.exe /Run /TN $TaskName | Out-Null
-if ($LASTEXITCODE -ne 0) { throw "Scheduled task '$TaskName' was created but could not be started." }
+Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Description 'RONSAS GitHub CI current-head monitor with guarded auto-remediation.' -Force | Out-Null
+Start-ScheduledTask -TaskName $TaskName
 
 Write-Output "Installed '$TaskName' every $EveryMinutes minute(s) with guarded auto-remediation."
