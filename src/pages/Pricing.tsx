@@ -7,13 +7,13 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import {
   HUB_URL,
-  hubUrl,
   APP_START_URL,
   HUB_DOCS_URL,
   HUB_SUPPORT_URL,
 } from "@/lib/entitlement";
+import { FREE_PROMOTION_ACTIVE, FREE_PROMOTION } from "@/lib/promotion";
 
-// Once-off packs sold via The Resonance Hub — no recurring app subscription.
+// Dormant packaging placeholders retained for future cost-based repricing. No purchase CTA is active.
 const PACKS = [
   {
     id: "free",
@@ -30,43 +30,111 @@ const PACKS = [
   {
     id: "credits",
     name: "Credit top-up",
-    price: "From R149",
-    unit: "once-off credits",
+    price: "Pricing paused",
+    unit: "included during promotion",
     icon: Rocket,
-    desc: "Buy credits and spend them when you need them.",
+    desc: "Credit-based usage is included while promotion costing is measured.",
     features: ["Audits, thumbnails & ideas", "Never expires within pack window", "Use across sessions"],
-    cta: "Buy credits",
-    href: hubUrl("/pricing#credits"),
-    external: true,
+    cta: "Open free",
+    href: APP_START_URL,
+    external: false,
   },
   {
     id: "project",
     name: "Project pack",
-    price: "From R599",
-    unit: "per project",
+    price: "Pricing paused",
+    unit: "included during promotion",
     icon: Star,
     desc: "One channel, full growth roadmap, done.",
     features: ["Deep channel audit", "100 AI thumbnails", "Growth roadmap export"],
-    cta: "Buy pack",
-    href: hubUrl("/pricing#packs"),
-    external: true,
+    cta: "Open free",
+    href: APP_START_URL,
+    external: false,
     popular: true,
   },
   {
     id: "studio",
     name: "Studio pack",
-    price: "From R2,999",
-    unit: "per studio",
+    price: "Pricing paused",
+    unit: "included during promotion",
     icon: Package,
     desc: "Agencies & multi-channel creators.",
     features: ["Multiple channel audits", "500 thumbnails", "Team collaboration"],
-    cta: "Buy pack",
-    href: hubUrl("/pricing#studio"),
-    external: true,
+    cta: "Open free",
+    href: APP_START_URL,
+    external: false,
   },
 ] as const;
 
 const Pricing = () => {
+  if (FREE_PROMOTION_ACTIVE) {
+    return (
+      <div className="min-h-screen bg-background">
+        <SEO
+          title="Free Access Promotion — YouTube Optimizer"
+          description={FREE_PROMOTION.description}
+          path="/pricing"
+          jsonLd={[
+            {
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "Resonance YouTube Optimizer",
+              applicationCategory: "BusinessApplication",
+              offers: {
+                "@type": "Offer",
+                priceCurrency: "ZAR",
+                price: "0",
+                availability: "https://schema.org/InStock",
+                description: "Free promotional access",
+              },
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "Product",
+              "@id": "https://youtubeoptimizer.life/pricing#promotion",
+              name: "Resonance YouTube Optimizer — Free Access Promotion",
+              description: FREE_PROMOTION.description,
+              brand: {
+                "@type": "Brand",
+                name: "The Resonance Hub",
+                "@id": "https://reson8.life/#organization",
+              },
+              offers: {
+                "@type": "Offer",
+                name: "Free promotional access",
+                priceCurrency: "ZAR",
+                price: "0",
+                url: "https://youtubeoptimizer.life/",
+                availability: "https://schema.org/InStock",
+                seller: { "@id": "https://reson8.life/#organization" },
+              },
+            },
+          ]}
+        />
+        <SiteHeader active="Free Access" />
+        <main className="container mx-auto px-4 sm:px-6 py-20">
+          <section className="mx-auto max-w-3xl rounded-3xl border border-primary/25 bg-card/60 p-8 text-center backdrop-blur-xl sm:p-12">
+            <Sparkles className="mx-auto h-8 w-8 text-primary" />
+            <p className="mt-4 text-xs font-mono font-semibold uppercase tracking-[0.22em] text-primary">{FREE_PROMOTION.shortLabel}</p>
+            <h1 className="mt-2 font-display text-4xl font-bold tracking-tight sm:text-6xl">{FREE_PROMOTION.headline}</h1>
+            <p className="mt-5 text-lg text-muted-foreground">{FREE_PROMOTION.description}</p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Sign in so audits, thumbnail generations, and AI usage can be measured for sustainable future pricing.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Button asChild variant="pill" size="pillLg">
+                <a href={APP_START_URL}>Open YouTube Optimizer free</a>
+              </Button>
+              <Button asChild variant="pillOutline" size="pillLg">
+                <a href={HUB_URL}>Back to Resonance Hub</a>
+              </Button>
+            </div>
+          </section>
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -124,7 +192,7 @@ const Pricing = () => {
         }}
       />
 
-      <SiteHeader active="Pricing" />
+      <SiteHeader active="Free Access" />
 
       <main className="relative overflow-x-clip">
         <div
@@ -289,8 +357,8 @@ const Pricing = () => {
           >
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Button asChild variant="pill" size="pillLg">
-                <a href={hubUrl("/pricing")} target="_blank" rel="noopener">
-                  View hub pricing <ExternalLink className="h-4 w-4" />
+                <a href={APP_START_URL}>
+                  Open free
                 </a>
               </Button>
               <Button asChild variant="pillOutline" size="pillLg">
@@ -300,7 +368,7 @@ const Pricing = () => {
               </Button>
             </div>
             <p className="text-sm text-muted-foreground">
-              Official pricing, checkout, updates, support, and ecosystem bundles are managed by{" "}
+              Free promotional access is active. Updates, support, and ecosystem navigation are managed by{" "}
               <a
                 href={HUB_URL}
                 target="_blank"

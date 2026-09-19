@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { FREE_PROMOTION_ACTIVE, FREE_PROMOTION_TIER } from "@/lib/promotion";
 
 export type Tier = "free" | "starter" | "pro" | "business" | null;
 export type Entitlement = {
@@ -35,6 +36,7 @@ async function readEntitlement(): Promise<Entitlement> {
     if (!res.ok) return { tier: null, status: "none" };
     const json = (await res.json()) as RonsSession;
     if (!json.authenticated) return { tier: null, status: "none" };
+    if (FREE_PROMOTION_ACTIVE) return { tier: FREE_PROMOTION_TIER, status: "active" };
     const status: Entitlement["status"] =
       json.status === "active" ? "active" :
       json.status === "past_due" ? "past_due" :
@@ -55,6 +57,7 @@ export function useEntitlement() {
 }
 
 export function tierMeets(have: Tier, need: Exclude<Tier, null | "free">) {
+  if (FREE_PROMOTION_ACTIVE) return true;
   const order = ["free", "starter", "pro", "business"] as const;
   if (!have) return false;
   return (order as readonly string[]).indexOf(have) >= (order as readonly string[]).indexOf(need);
@@ -63,7 +66,7 @@ export function tierMeets(have: Tier, need: Exclude<Tier, null | "free">) {
 export const APP_START_URL = isLocal && browserHost ? `http://${browserHost}:3401/` : "/";
 
 export function checkoutUrl(plan: string = "credits", returnTo?: string) {
-  if (plan === "free") return APP_START_URL;
+  if (FREE_PROMOTION_ACTIVE || plan === "free") return APP_START_URL;
   const back = returnTo ?? (typeof window !== "undefined" ? window.location.href : "/");
   return `${HUB_URL}/checkout?app=${APP_KEY}&pack=${plan}&return_to=${encodeURIComponent(back)}`;
 }
