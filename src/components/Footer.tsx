@@ -21,7 +21,7 @@ export default function Footer() {
               🇿🇦 Built in South Africa · POPIA-conscious.{" "}
               {FREE_PROMOTION_ACTIVE
                 ? `${FREE_PROMOTION.shortLabel}: full access is temporarily free while usage and provider costs are measured.`
-                : "Official pricing, updates, checkout, support, and ecosystem bundles are managed by The Resonance Hub."}{" "}
+                : "Pricing, updates, support, and ecosystem information are managed by The Resonance Hub."}{" "}
               <a href="https://reson8.life" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80">The Resonance Hub</a>.
             </p>
           </div>
@@ -31,9 +31,9 @@ export default function Footer() {
             <Link to="/ecosystem" className="hover:text-foreground transition-colors">Ecosystem</Link>
             <Link to="/dashboard" className="hover:text-foreground transition-colors">Dashboard</Link>
             <Link to={user ? "/account" : "/login"} className="hover:text-foreground transition-colors">{user ? "Account" : "Sign In"}</Link>
-            {!FREE_PROMOTION_ACTIVE && (
-              <a href="https://reson8.life/checkout" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Checkout</a>
-            )}
+            <a href="https://reson8.life/pricing" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
+              {FREE_PROMOTION_ACTIVE ? "Free Access" : "Pricing"}
+            </a>
             <a href="https://reson8.life/support" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Support</a>
             <a href="https://reson8.life/updates" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Updates</a>
             <a
