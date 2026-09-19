@@ -132,6 +132,13 @@ if (checks.every((check) => check.ok)) {
       ok: /RONSAS_ALLOW_LOAD_TEST/.test(prereq),
     },
     {
+      label: "PowerShell harness resolves portable k6 without requiring PATH mutation",
+      ok:
+        /Resolve-K6Executable/.test(prereq) &&
+        /RONSAS_K6_PATH/.test(prereq) &&
+        /Resonance\\OpenNova\\tools\\k6/.test(prereq),
+    },
+    {
       label: "k6 load script requires explicit load-test approval",
       ok: /RONSAS_ALLOW_LOAD_TEST/.test(k6) && /Load traffic is disabled/.test(k6),
     },

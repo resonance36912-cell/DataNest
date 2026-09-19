@@ -33,6 +33,26 @@ function Get-EnvReady([string]$Name) {
   return [Environment]::GetEnvironmentVariable($Name) -eq "1"
 }
 
+function Resolve-K6Executable {
+  $command = Get-Command k6 -ErrorAction SilentlyContinue
+  if ($command) { return $command.Source }
+
+  $explicit = [Environment]::GetEnvironmentVariable("RONSAS_K6_PATH")
+  if (-not [string]::IsNullOrWhiteSpace($explicit) -and (Test-Path -LiteralPath $explicit)) {
+    return (Resolve-Path -LiteralPath $explicit).Path
+  }
+
+  $portableRoot = Join-Path $env:USERPROFILE "Resonance\OpenNova\tools\k6"
+  if (Test-Path -LiteralPath $portableRoot) {
+    $candidate = Get-ChildItem -LiteralPath $portableRoot -Recurse -File -Filter "k6.exe" -ErrorAction SilentlyContinue |
+      Sort-Object FullName -Descending |
+      Select-Object -First 1
+    if ($candidate) { return $candidate.FullName }
+  }
+
+  return $null
+}
+
 function Test-ZeroSpendBudget {
   $path = Join-Path $repoRoot "qa\premium-readiness\staging-budget.json"
   if (-not (Test-Path -LiteralPath $path)) { return $false }
@@ -156,7 +176,8 @@ if (-not [string]::IsNullOrWhiteSpace($TargetBaseUrl)) {
   }
 }
 
-$k6Available = [bool](Get-Command k6 -ErrorAction SilentlyContinue)
+$k6Executable = Resolve-K6Executable
+$k6Available = -not [string]::IsNullOrWhiteSpace($k6Executable)
 $missingPrereqs = @($prereqs.Keys | Where-Object { -not $prereqs[$_] })
 $fixtureFailures = @($fixtures | Where-Object { -not $_.ready })
 $readyForSmoke = $targetSafe -and $missingPrereqs.Count -eq 0 -and $fixtureFailures.Count -eq 0
@@ -204,7 +225,7 @@ if ($Mode -eq "load") {
     throw "Set RONSAS_ALLOW_LOAD_TEST=1 after explicit approval before load mode."
   }
   $script = Join-Path $repoRoot "qa\performance\reson8-staging.k6.js"
-  & k6 run -e RONSAS_TEST_BASE_URL=$TargetBaseUrl -e RONSAS_ALLOW_LOAD_TEST=1 $script
+  & $k6Executable run -e RONSAS_TEST_BASE_URL=$TargetBaseUrl -e RONSAS_ALLOW_LOAD_TEST=1 $script
   if ($LASTEXITCODE -ne 0) { throw "k6 staging workload failed with exit code $LASTEXITCODE" }
   $trafficResult = [ordered]@{ profile = "load"; ok = $true }
 }
@@ -222,6 +243,7 @@ $report = [ordered]@{
   missing_prerequisites = $missingPrereqs
   fixture_status = $fixtures
   k6_available = $k6Available
+  k6_executable = $k6Executable
   ready_for_smoke = $readyForSmoke
   ready_for_load = $readyForLoad
   traffic_result = $trafficResult
@@ -237,7 +259,7 @@ $fixtures | Format-Table app, required, present, ready -AutoSize
 Write-Output ""
 Write-Output ("Missing prerequisites: " + ($(if ($missingPrereqs.Count) { $missingPrereqs -join ", " } else { "none" })))
 Write-Output ("Target safe: " + $targetSafe + " (" + $targetReason + ")")
-Write-Output ("k6 available: " + $k6Available)
+Write-Output ("k6 available: " + $k6Available + $(if ($k6Executable) { " (" + $k6Executable + ")" } else { "" }))
 Write-Output ("Ready for staging smoke: " + $readyForSmoke)
 Write-Output ("Ready for staging load: " + $readyForLoad)
 Write-Output ("Certification ready: False")
