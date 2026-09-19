@@ -2,7 +2,9 @@
 param(
     [string]$RepoRoot = 'C:\Users\Ashley\Documents\GitHub\rons-sovereign-codebase',
     [string]$Repository = 'resonance36912-cell/RONSAS',
-    [int]$RunLimit = 100
+    [int]$RunLimit = 100,
+    [switch]$AutoRemediate,
+    [string]$RemediatorPath = ''
 )
 
 Set-StrictMode -Version Latest
@@ -113,6 +115,18 @@ try {
         Write-MonitorLog ("CURRENT FAILURE count={0}; account={1}; main={2}" -f $currentFailures.Count, $account, $mainSha)
         foreach ($failure in $currentFailures) {
             Write-MonitorLog ("run={0} workflow='{1}' branch='{2}' sha={3} conclusion={4}" -f $failure.run_id, $failure.workflow, $failure.head_branch, $failure.head_sha, $failure.conclusion)
+        }
+        if ($AutoRemediate) {
+            if ([string]::IsNullOrWhiteSpace($RemediatorPath)) {
+                $RemediatorPath = Join-Path $RepoRoot 'scripts\Invoke-RonsasCiAutofix.ps1'
+            }
+            if (-not (Test-Path -LiteralPath $RemediatorPath -PathType Leaf)) {
+                throw "RONSAS CI remediator missing: $RemediatorPath"
+            }
+            Write-MonitorLog "AUTO-REMEDIATE invoking $RemediatorPath"
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $RemediatorPath -RepoRoot $RepoRoot -Repository $Repository -MonitorStatePath $StatePath
+            $remediationExit = $LASTEXITCODE
+            Write-MonitorLog "AUTO-REMEDIATE completed exit=$remediationExit"
         }
         Write-Output "RONSAS CI: $($currentFailures.Count) current failure(s). State: $StatePath"
         exit 2
