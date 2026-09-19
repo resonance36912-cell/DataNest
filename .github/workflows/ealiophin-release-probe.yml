@@ -1,0 +1,42 @@
+name: Ealiophin release-path probe
+
+on:
+  push:
+    paths:
+      - ".github/workflows/ealiophin-release-probe.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    name: Probe sovereign production runner
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
+    timeout-minutes: 5
+    steps:
+      - name: Probe runner and production mounts
+        shell: bash
+        run: |
+          set -u
+          echo "runner_os=$(uname -s)"
+          echo "runner_arch=$(uname -m)"
+          echo "pwd=$(pwd)"
+          command -v pwsh >/dev/null 2>&1 && echo "pwsh=present" || echo "pwsh=absent"
+          for p in             /mnt/c/Resonance/Sources/ronsas-hub-canonical             /mnt/c/Users/Ashley/Resonance/OpenNova             /mnt/c/Users/Ashley/AppData/Local/Resonance/RONS-ControlCenter
+          do
+            if [ -e "$p" ]; then
+              echo "path_ok=$p"
+            else
+              echo "path_missing=$p"
+            fi
+          done
+          if [ -f /mnt/c/Resonance/Sources/ronsas-hub-canonical/package.json ]; then
+            echo "hub_source=present"
+          else
+            echo "hub_source=missing"
+          fi
+          if [ -f /mnt/c/Users/Ashley/Resonance/OpenNova/runtime/production-edge/START-RONSAS-CANONICAL.ps1 ]; then
+            echo "canonical_start=present"
+          else
+            echo "canonical_start=missing"
+          fi
