@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { analyzeEpisode } from "@/lib/analyze-episode.functions";
+import { classifyPromotionCostingError, trackPromotionCosting } from "@/lib/costing-telemetry";
 import ResonanceScoreGauge from "./ResonanceScoreGauge";
 import DataTransparencyCard from "./DataTransparencyCard";
 import ModeBanner from "./ModeBanner";
@@ -70,6 +71,7 @@ const VideoScoreAnalyzer = () => {
       return;
     }
 
+    const startedAt = performance.now();
     setLoading(true);
     setError(null);
     setResult(null);
@@ -108,8 +110,26 @@ const VideoScoreAnalyzer = () => {
 
       const resonanceResult = calculateResonanceScore(resonanceData);
       setResult(resonanceResult);
+      void trackPromotionCosting({
+        operation: "video_score_analysis",
+        source: "VideoScoreAnalyzer",
+        outcome: "success",
+        durationMs: performance.now() - startedAt,
+        mode: isAuthenticated ? "creator" : "guest",
+        inputUnits: 1,
+        outputUnits: 1,
+      });
     } catch (err: any) {
       setError(err.message || "Failed to analyze video");
+      void trackPromotionCosting({
+        operation: "video_score_analysis",
+        source: "VideoScoreAnalyzer",
+        outcome: "failure",
+        durationMs: performance.now() - startedAt,
+        mode: isAuthenticated ? "creator" : "guest",
+        inputUnits: 1,
+        errorKind: classifyPromotionCostingError(err),
+      });
     } finally {
       setLoading(false);
     }

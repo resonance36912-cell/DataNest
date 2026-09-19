@@ -8,6 +8,7 @@ import { analyzeEpisode as analyzeEpisodeFn } from "@/lib/analyze-episode.functi
 import { generateThumbnail as generateThumbnailFn } from "@/lib/generate-thumbnail.functions";
 import ThumbnailTextEditor from "@/components/ThumbnailTextEditor";
 import CopyBlock from "@/components/CopyBlock";
+import { classifyPromotionCostingError, trackPromotionCosting } from "@/lib/costing-telemetry";
 
 interface EpisodeVideoData {
   id: string;
@@ -106,6 +107,7 @@ const EpisodeAnalysis = () => {
 
   const analyzeEpisode = async () => {
     if (!url.trim()) return;
+    const startedAt = performance.now();
     setLoading(true);
     setError(null);
     setVideoData(null);
@@ -116,8 +118,24 @@ const EpisodeAnalysis = () => {
       setVideoData(data.videoData);
       setAnalysis(data.analysis);
       setOverlayText(data.analysis?.thumbnailSuggestion || "");
+      void trackPromotionCosting({
+        operation: "episode_analysis",
+        source: "EpisodeAnalysis",
+        outcome: "success",
+        durationMs: performance.now() - startedAt,
+        inputUnits: 1,
+        outputUnits: 1,
+      });
     } catch (err: any) {
       setError(err.message || "Failed to analyze episode");
+      void trackPromotionCosting({
+        operation: "episode_analysis",
+        source: "EpisodeAnalysis",
+        outcome: "failure",
+        durationMs: performance.now() - startedAt,
+        inputUnits: 1,
+        errorKind: classifyPromotionCostingError(err),
+      });
     } finally {
       setLoading(false);
     }
@@ -125,12 +143,15 @@ const EpisodeAnalysis = () => {
 
   const generateThumbnail = useCallback(async () => {
     if (!videoData || !analysis) return;
+    const startedAt = performance.now();
+    let inputBytes: number | undefined;
     setThumbLoading(true);
     setThumbError(null);
     try {
       const imgRes = await fetch(videoData.thumbnailUrl);
       if (!imgRes.ok) throw new Error("Could not fetch current thumbnail.");
       const blob = await imgRes.blob();
+      inputBytes = blob.size;
       const originalThumbnail = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onloadend = () => resolve(String(reader.result));
@@ -154,13 +175,31 @@ const EpisodeAnalysis = () => {
       setThumbUrl(data.imageUrl);
       if (data?.suggestedText) setOverlayText(data.suggestedText);
       setThumbValidation(data.qualityValidation || null);
+      void trackPromotionCosting({
+        operation: "thumbnail_generation",
+        source: "EpisodeAnalysis",
+        outcome: "success",
+        durationMs: performance.now() - startedAt,
+        inputUnits: 1,
+        outputUnits: 1,
+        inputBytes,
+      });
     } catch (err: any) {
       setThumbError(err.message);
       setThumbValidation(null);
+      void trackPromotionCosting({
+        operation: "thumbnail_generation",
+        source: "EpisodeAnalysis",
+        outcome: "failure",
+        durationMs: performance.now() - startedAt,
+        inputUnits: 1,
+        inputBytes,
+        errorKind: classifyPromotionCostingError(err),
+      });
     } finally {
       setThumbLoading(false);
     }
-  }, [videoData, analysis, overlayText, hAlign, vPos]);
+  }, [videoData, analysis, regenPrompt, referenceImage]);
 
   const downloadImage = (dataUrl: string, filename: string) => {
     const link = document.createElement("a");
