@@ -1,0 +1,46 @@
+{
+  "schema": "ronsas.premium-readiness.provider-capabilities.v1",
+  "snapshot": "2026-09-19",
+  "apps": [
+    {
+      "id": "epublisher",
+      "stub_ready": true,
+      "mode": "mocked-provider-dry-run",
+      "evidence": [
+        "scripts/run-production-protocol-v1_1-dry-run.ts",
+        "src/lib/__tests__/fixtures/production-protocol-v1_1/mock-provider-faults-v1.json"
+      ],
+      "limitation": "Dry-run provider faults are available; live-provider dispatch remains disabled for staging qualification."
+    },
+    {
+      "id": "creative-studio",
+      "stub_ready": true,
+      "mode": "sovereign-local-function-shim",
+      "evidence": ["src/integrations/supabase/client.ts"],
+      "limitation": "Local shim covers analysis/brand/moodboard/edit paths; unsupported functions fail closed."
+    },
+    {
+      "id": "sync-vision",
+      "stub_ready": true,
+      "mode": "sovereign-local-deny-external",
+      "evidence": [
+        "src/integrations/supabase/client.ts",
+        "src/lib/sovereign-local.smoke.test.ts",
+        "src/lib/musetalk-local.contract.test.ts"
+      ],
+      "limitation": "Local provider paths and fail-closed external denial are available; unwired video generation returns an explicit local error."
+    },
+    {
+      "id": "youtube-optimizer",
+      "stub_ready": false,
+      "mode": "loopback-ai-with-external-public-data",
+      "evidence": [
+        "src/lib/rons-ai.server.ts",
+        "src/lib/channel-audit.server.ts",
+        "src/lib/generate-thumbnail.server.ts"
+      ],
+      "limitation": "AI is loopback-only and image generation is disabled, but channel resolution/metrics still call the YouTube public-data API. A deterministic YouTube-data stub is still required for zero-external-call high-volume tests."
+    }
+  ],
+  "overall_provider_stubs_ready": false
+}

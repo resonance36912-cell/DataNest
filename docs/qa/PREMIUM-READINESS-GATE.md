@@ -22,7 +22,7 @@ Use `-RequireReady` when you want missing prerequisites or fixture coverage to f
 
 ## Required staging prerequisites
 
-Set these environment variables to `1` only after the named prerequisite is genuinely available:
+The readiness harness accepts explicit environment flags only after the named prerequisite is genuinely available:
 
 - `RONSAS_DISPOSABLE_ACCOUNTS_READY`
 - `RONSAS_SANDBOX_PAYMENT_READY`
@@ -31,6 +31,13 @@ Set these environment variables to `1` only after the named prerequisite is genu
 - `RONSAS_APPROVED_TEST_BUDGET`
 
 No secret values should be stored in Git. These variables are readiness flags, not credentials.
+
+Two prerequisites can also be proven automatically on Ealiophin without setting an environment flag:
+
+- **Observability**: all four `resonance-sovereign-staging-v2` containers must be running, container logs must be readable, and the isolated auth/gateway health endpoints must return HTTP 200.
+- **Traffic budget**: `qa/premium-readiness/staging-budget.json` must validate as the active zero-external-spend budget. It authorizes no real provider usage, real payment or public-production load.
+
+Provider-stub readiness is governed by `qa/premium-readiness/provider-capabilities.json`. The global prerequisite remains false until every generative spoke has a deterministic zero-external-call provider/data path. Partial local modes do not count as global readiness.
 
 ## Output-quality fixtures
 
@@ -42,7 +49,7 @@ No secret values should be stored in Git. These variables are readiness flags, n
 - at least 95% representative-run pass rate;
 - zero critical failures.
 
-Fixture directories intentionally begin empty. Do not manufacture placeholder fixtures to satisfy the count. Add reviewed fixtures as real test material becomes available.
+Fixture files must be reviewed, representative inputs with documented expected checks and source/test provenance. Do not manufacture placeholder fixtures to satisfy the count. The fixture validator rejects unreviewed entries, duplicate IDs, placeholder content, missing provenance, weak category coverage and missing required-check coverage.
 
 ## Smoke test
 

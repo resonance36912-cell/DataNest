@@ -27,17 +27,26 @@ const read = (path: string) => readFileSync(path, "utf8");
 const manifestPath = "qa/premium-readiness/fixture-manifest.json";
 const prereqScriptPath = "scripts/Test-RonsasPremiumReadiness.ps1";
 const k6Path = "qa/performance/reson8-staging.k6.js";
+const budgetPath = "qa/premium-readiness/staging-budget.json";
+const providerCapabilitiesPath = "qa/premium-readiness/provider-capabilities.json";
 
 const checks: Check[] = [
   { label: "fixture manifest exists", ok: existsSync(manifestPath) },
   { label: "staging prerequisite harness exists", ok: existsSync(prereqScriptPath) },
   { label: "k6 staging workload exists", ok: existsSync(k6Path) },
+  { label: "zero-spend staging budget exists", ok: existsSync(budgetPath) },
+  { label: "provider capability manifest exists", ok: existsSync(providerCapabilitiesPath) },
 ];
 
 if (checks.every((check) => check.ok)) {
   const manifest = JSON.parse(read(manifestPath)) as FixtureManifest;
   const prereq = read(prereqScriptPath);
   const k6 = read(k6Path);
+  const budget = JSON.parse(read(budgetPath)) as Record<string, unknown>;
+  const providerCapabilities = JSON.parse(read(providerCapabilitiesPath)) as {
+    apps?: Array<{ id?: string; stub_ready?: boolean }>;
+    overall_provider_stubs_ready?: boolean;
+  };
 
   const requiredApps = ["epublisher", "creative-studio", "sync-vision", "youtube-optimizer"];
   const apps = Array.isArray(manifest.apps) ? manifest.apps : [];
@@ -135,6 +144,42 @@ if (checks.every((check) => check.ok)) {
       ok:
         /http_req_failed:\s*\["rate<0\.01"\]/.test(k6) &&
         /http_req_duration:\s*\["p\(95\)<750"\]/.test(k6),
+    },
+    {
+      label: "staging budget is zero external spend",
+      ok:
+        budget["schema"] === "ronsas.premium-readiness.staging-budget.v1" &&
+        Number(budget["approved_external_spend_cents_max"]) === 0 &&
+        Number(budget["approved_real_provider_calls_max"]) === 0,
+    },
+    {
+      label:
+        "staging budget forbids production and remains smoke-only while prerequisites are incomplete",
+      ok:
+        budget["production_hosts_forbidden"] === true &&
+        budget["smoke_only_until_prerequisites_complete"] === true,
+    },
+    {
+      label: "readiness harness can prove zero-spend budget automatically",
+      ok: /Test-ZeroSpendBudget/.test(prereq),
+    },
+    {
+      label: "readiness harness can prove isolated staging observability automatically",
+      ok:
+        /Test-StagingObservability/.test(prereq) &&
+        /resonance-sovereign-staging-v2-gateway-1/.test(prereq) &&
+        /127\.0\.0\.1:60600\/health/.test(prereq),
+    },
+    {
+      label: "provider capability manifest does not overstate readiness",
+      ok:
+        Array.isArray(providerCapabilities.apps) &&
+        providerCapabilities.apps.length === 4 &&
+        providerCapabilities.apps.some(
+          (app) => app.id === "youtube-optimizer" && app.stub_ready === false,
+        ) &&
+        providerCapabilities.overall_provider_stubs_ready === false &&
+        /Test-ProviderStubCapability/.test(prereq),
     },
   );
 }

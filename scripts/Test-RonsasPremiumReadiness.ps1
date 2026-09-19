@@ -33,6 +33,66 @@ function Get-EnvReady([string]$Name) {
   return [Environment]::GetEnvironmentVariable($Name) -eq "1"
 }
 
+function Test-ZeroSpendBudget {
+  $path = Join-Path $repoRoot "qa\premium-readiness\staging-budget.json"
+  if (-not (Test-Path -LiteralPath $path)) { return $false }
+  try {
+    $budget = Get-Content -LiteralPath $path -Raw | ConvertFrom-Json
+    return (
+      $budget.schema -eq "ronsas.premium-readiness.staging-budget.v1" -and
+      $budget.status -eq "active_zero_external_spend" -and
+      [int64]$budget.approved_external_spend_cents_max -eq 0 -and
+      [int64]$budget.approved_real_provider_calls_max -eq 0 -and
+      [bool]$budget.production_hosts_forbidden -and
+      [bool]$budget.smoke_only_until_prerequisites_complete
+    )
+  } catch {
+    return $false
+  }
+}
+
+function Test-ProviderStubCapability {
+  $path = Join-Path $repoRoot "qa\premium-readiness\provider-capabilities.json"
+  if (-not (Test-Path -LiteralPath $path)) { return $false }
+  try {
+    $capabilities = Get-Content -LiteralPath $path -Raw | ConvertFrom-Json
+    if ($capabilities.schema -ne "ronsas.premium-readiness.provider-capabilities.v1") { return $false }
+    $required = @("epublisher","creative-studio","sync-vision","youtube-optimizer")
+    foreach ($id in $required) {
+      $entry = @($capabilities.apps | Where-Object { $_.id -eq $id })
+      if ($entry.Count -ne 1 -or -not [bool]$entry[0].stub_ready) { return $false }
+    }
+    return [bool]$capabilities.overall_provider_stubs_ready
+  } catch {
+    return $false
+  }
+}
+
+function Test-StagingObservability {
+  if (-not (Get-Command podman -ErrorAction SilentlyContinue)) { return $false }
+  $containers = @(
+    "resonance-sovereign-staging-v2-postgres-1",
+    "resonance-sovereign-staging-v2-storage-1",
+    "resonance-sovereign-staging-v2-auth-1",
+    "resonance-sovereign-staging-v2-gateway-1"
+  )
+  try {
+    foreach ($container in $containers) {
+      $status = (& podman inspect -f "{{.State.Status}}" $container 2>$null | Out-String).Trim()
+      if ($LASTEXITCODE -ne 0 -or $status -ne "running") { return $false }
+      & cmd.exe /d /c "podman logs --tail 1 $container >nul 2>nul"
+      if ($LASTEXITCODE -ne 0) { return $false }
+    }
+    foreach ($url in @("http://127.0.0.1:60680/health","http://127.0.0.1:60600/health")) {
+      $response = Invoke-WebRequest -UseBasicParsing -Uri $url -TimeoutSec 5
+      if ([int]$response.StatusCode -ne 200) { return $false }
+    }
+    return $true
+  } catch {
+    return $false
+  }
+}
+
 function Resolve-FixtureCount([string]$RelativePath) {
   $path = Join-Path $repoRoot $RelativePath
   if (-not (Test-Path -LiteralPath $path)) { return 0 }
@@ -49,12 +109,18 @@ if (-not (Test-Path -LiteralPath $manifestPath)) {
 }
 $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
 
+$autoEvidence = [ordered]@{
+  provider_stubs = Test-ProviderStubCapability
+  observability = Test-StagingObservability
+  approved_traffic_budget = Test-ZeroSpendBudget
+}
+
 $prereqs = [ordered]@{
   disposable_accounts = Get-EnvReady "RONSAS_DISPOSABLE_ACCOUNTS_READY"
   sandbox_payments = Get-EnvReady "RONSAS_SANDBOX_PAYMENT_READY"
-  provider_stubs = Get-EnvReady "RONSAS_PROVIDER_STUBS_READY"
-  observability = Get-EnvReady "RONSAS_OBSERVABILITY_READY"
-  approved_traffic_budget = Get-EnvReady "RONSAS_APPROVED_TEST_BUDGET"
+  provider_stubs = (Get-EnvReady "RONSAS_PROVIDER_STUBS_READY") -or $autoEvidence.provider_stubs
+  observability = (Get-EnvReady "RONSAS_OBSERVABILITY_READY") -or $autoEvidence.observability
+  approved_traffic_budget = (Get-EnvReady "RONSAS_APPROVED_TEST_BUDGET") -or $autoEvidence.approved_traffic_budget
 }
 
 $fixtures = @()
@@ -152,6 +218,7 @@ $report = [ordered]@{
   target_reason = $targetReason
   production_hosts_blocked = $productionHosts
   prerequisites = $prereqs
+  automatic_evidence = $autoEvidence
   missing_prerequisites = $missingPrereqs
   fixture_status = $fixtures
   k6_available = $k6Available
