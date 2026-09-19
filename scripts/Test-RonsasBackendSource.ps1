@@ -14,7 +14,8 @@ if ([string]::IsNullOrWhiteSpace($ReportPath)) {
 
 $sourceRoot = Join-Path $env:USERPROFILE "Resonance\OpenNova\sources\rons-sovereign-backend-source"
 $expectedRemote = "https://github.com/resonance36912-cell/rons-sovereign-backend-source.git"
-$expectedTag = "ronsas-source-baseline-2026-09-19"
+$expectedBaselineTag = "ronsas-source-baseline-2026-09-19"
+$expectedValidatedTag = "ronsas-backend-v0.11-staging-validated"
 
 function Invoke-GitText {
   param([string[]]$Arguments)
@@ -45,6 +46,8 @@ $result = [ordered]@{
   origin_main = $null
   origin = $null
   baseline_tag = $null
+  validated_tag = $null
+  baseline_is_ancestor = $false
   clean = $false
   synchronized = $false
   authority_metadata = $false
@@ -67,7 +70,10 @@ try {
   $result.head = Invoke-GitText @("rev-parse","HEAD")
   $result.origin_main = Invoke-GitText @("rev-parse","origin/main")
   $result.origin = Invoke-GitText @("remote","get-url","origin")
-  $result.baseline_tag = Invoke-GitText @("rev-list","-n","1",$expectedTag)
+  $result.baseline_tag = Invoke-GitText @("rev-list","-n","1",$expectedBaselineTag)
+  $result.validated_tag = Invoke-GitText @("rev-list","-n","1",$expectedValidatedTag)
+  & git -C $sourceRoot merge-base --is-ancestor $result.baseline_tag $result.head
+  $result.baseline_is_ancestor = ($LASTEXITCODE -eq 0)
   $dirty = Invoke-GitText @("status","--porcelain")
   $result.clean = [string]::IsNullOrWhiteSpace($dirty)
   $result.synchronized = ($result.head -eq $result.origin_main)
@@ -76,7 +82,8 @@ try {
   if ($result.origin.TrimEnd("/") -ne $expectedRemote.TrimEnd("/")) { throw "origin remote mismatch" }
   if (-not $result.clean) { throw "backend source working tree is dirty" }
   if (-not $result.synchronized) { throw "backend source main is not synchronized with origin/main" }
-  if ($result.baseline_tag -ne $result.head) { throw "baseline tag does not identify current baseline head" }
+  if (-not $result.baseline_is_ancestor) { throw "baseline tag is not an ancestor of current backend source" }
+  if ($result.validated_tag -ne $result.head) { throw "validated backend tag does not identify current source head" }
 
   $authorityPath = Join-Path $sourceRoot "RONSAS-SOURCE-AUTHORITY.json"
   if (-not (Test-Path -LiteralPath $authorityPath)) { throw "RONSAS-SOURCE-AUTHORITY.json missing" }

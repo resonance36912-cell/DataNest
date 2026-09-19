@@ -30,18 +30,20 @@
       "role": "platform-source-authority",
       "visibility": "private",
       "default_branch": "main",
-      "verified_head": "c36a8083a3ad1d9b47867564df2e3bb1e2017205",
+      "verified_head": "791196ea8724c53b11a85665502e1f5ec0a7ed08",
       "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\sources\\rons-sovereign-backend-source",
       "baseline_tag": "ronsas-source-baseline-2026-09-19",
       "baseline_source": "ResonanceAppDev_ZeroCredit_v1.5.8",
-      "validation": "local-34-backend-tests-green-2026-09-19",
+      "validation": "local-42-backend-tests-and-staging-itn-boundary-green-2026-09-19",
       "github_actions": "blocked-before-runner-account-billing",
       "runtime_services": {
         "postgres": "http://127.0.0.1:55432",
         "gateway": "http://127.0.0.1:58600",
         "auth": "http://127.0.0.1:58680",
         "storage": "http://127.0.0.1:59000"
-      }
+      },
+      "validated_tag": "ronsas-backend-v0.11-staging-validated",
+      "gateway_image": "resonance-service-gateway:0.11"
     },
     {
       "id": "rcgf",

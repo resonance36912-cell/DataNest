@@ -6,8 +6,11 @@ The local RONSAS backend now has an independent private Git source authority:
 
 - Repository: `resonance36912-cell/rons-sovereign-backend-source`
 - Ealiophin source: `%USERPROFILE%\Resonance\OpenNova\sources\rons-sovereign-backend-source`
-- Baseline commit: `c36a808`
-- Baseline tag: `ronsas-source-baseline-2026-09-19`
+- Extraction baseline commit: `c36a808`
+- Extraction baseline tag: `ronsas-source-baseline-2026-09-19`
+- Current validated head: `791196e`
+- Current validated tag: `ronsas-backend-v0.11-staging-validated`
+- Staging gateway image: `resonance-service-gateway:0.11`
 - Extracted from: `ResonanceAppDev_ZeroCredit_v1.5.8`
 
 ## Owned source
@@ -26,7 +29,15 @@ It explicitly does **not** own mutable databases, auth state, object-storage dat
 
 ## Validation baseline
 
-The extracted source tree was recreated with Python 3.12 and pinned dependencies. All 34 direct backend tests pass locally on Ealiophin.
+The extracted source tree was recreated with Python 3.12 and pinned dependencies. The extraction baseline had 34 direct backend tests green. The current validated v0.11 head has 42/42 backend tests green.
+
+PayFast ITN settlement v0.11 was additionally validated against the isolated `resonance-sovereign-staging-v2` project:
+
+- migration 010 applied transactionally;
+- direct database integration proved activation, bundle supersession, replay idempotency, cancel/refund transitions and rollback cleanup;
+- HTTP procedure boundary proved missing-key 401, protected-table 403, keyed settlement 200, idempotent replay, one invoice/email/receipt and no raw-payload column;
+- synthetic staging rows were removed after the test;
+- the live backend and production billing data were not changed.
 
 The first GitHub Actions run did not allocate a runner. GitHub annotated the run with an account payment/spending-limit condition before any workflow step executed. This is an infrastructure block, not a backend test failure.
 
