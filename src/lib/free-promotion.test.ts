@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { checkoutUrl, tierMeets } from "@/lib/entitlement";
 import { FREE_PROMOTION_ACTIVE } from "@/lib/promotion";
@@ -15,5 +17,12 @@ describe("free-promotion commercial guard", () => {
       expect(url).not.toContain("checkout");
       expect(url).not.toContain("reson8.life");
     }
+  });
+
+  it("does not expose legacy paid acquisition copy while promotion mode is active", () => {
+    const indexSource = readFileSync(resolve(process.cwd(), "src/pages/Index.tsx"), "utf8");
+
+    expect(indexSource).not.toContain("buy once-off credits or project packs");
+    expect(indexSource).toContain("temporarily free");
   });
 });
