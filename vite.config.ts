@@ -36,14 +36,17 @@ export default defineConfig(({ mode }) => ({
     dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime"],
   },
   build: {
-    // Cleaner warning threshold now that vendor chunks are split out.
-    chunkSizeWarningLimit: 1200,
-    // NOTE: manualChunks removed intentionally. Splitting React-dependent
-    // vendors (recharts, radix, react-helmet, etc.) into separate chunks
-    // caused a production boot crash — those chunks executed before the
-    // `react-vendor` chunk, so `React` / `ReactDOM` were `undefined` at
-    // module init, producing `Cannot read properties of undefined
-    // (reading 'forwardRef' | 'createRoot')`. Let Rollup determine chunking
-    // automatically so React always evaluates before its consumers.
+    // Production reliability: Rolldown's automatic split graph can evaluate
+    // React-dependent chunks before React itself in this app. Keep one
+    // deterministic application chunk until the upstream splitter is safe.
+    rolldownOptions: {
+      output: {
+        codeSplitting: false,
+      },
+    },
+    chunkSizeWarningLimit: 2200,
+    // Keep this single-bundle policy until production browser coverage proves
+    // a future splitter can preserve React evaluation order. Previous manual
+    // and automatic split graphs both produced boot-time undefined React APIs.
   },
 }));

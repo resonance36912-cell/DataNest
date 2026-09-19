@@ -17,7 +17,7 @@ const CtaSection = () => (
         <span className="studio-gradient-text">Extraordinary</span>?
       </h2>
       <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
-        Start free — buy a project pack or credits through The Resonance Hub only when you're ready to publish. No app subscription.
+        Full Creative Studio access is free during the promotion while real provider usage and operating costs are measured.
       </p>
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
         <Link
@@ -33,7 +33,7 @@ const CtaSection = () => (
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 border border-border bg-card/60 text-foreground font-display font-semibold px-8 py-3.5 rounded-xl hover:bg-card transition-colors"
         >
-          View hub pricing ↗
+          Promotion details ↗
         </a>
       </div>
     </motion.div>

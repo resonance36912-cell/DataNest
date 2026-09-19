@@ -1,4 +1,4 @@
-﻿import { motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Check, X } from "lucide-react";
 
 /**
@@ -27,16 +27,16 @@ const STATS = [
   { value: "11", label: "SA official languages, plus Afrikaans-friendly copy" },
   { value: "<60s", label: "from URL to first creative draft" },
   { value: "2Ã—", label: "design variants every single generation" },
-  { value: "ZAR", label: "billing via PayFast â€” no FX surprises" },
+  { value: "FREE", label: "promotional access while real provider costs are measured" },
 ];
 
 const COMPARE = [
   { row: "Learns your brand from a URL", us: true, canva: false, gpt: false, dsg: true },
   { row: "Generates posters, social, ads & cinematic video", us: true, canva: true, gpt: false, dsg: true },
-  { row: "ZAR pricing & PayFast checkout", us: true, canva: false, gpt: false, dsg: true },
+  { row: "Built for South African workflows", us: true, canva: false, gpt: false, dsg: true },
   { row: "Afrikaans + SA-English copy out of the box", us: true, canva: false, gpt: true, dsg: true },
   { row: "Two unique variants per request", us: true, canva: false, gpt: false, dsg: false },
-  { row: "Cost of one mid-sized campaign", us: "R-", canva: "R$", gpt: "R$", dsg: "R$$$" },
+  { row: "Free promotional access during current costing study", us: true, canva: false, gpt: false, dsg: false },
 ];
 
 const TEAM = [
