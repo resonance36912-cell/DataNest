@@ -136,12 +136,26 @@ async function waitForServer(timeoutMs = 90_000) {
 
 function resolveChromePath() {
   if (process.env["CHROME_PATH"]) return process.env["CHROME_PATH"];
-  const root = process.env["PLAYWRIGHT_BROWSERS_PATH"];
-  if (!root || !existsSync(root)) return undefined;
-  const dir = readdirSync(root).find((d) => d.startsWith("chromium-"));
-  if (!dir) return undefined;
-  const candidate = path.join(root, dir, "chrome-linux", "chrome");
-  return existsSync(candidate) ? candidate : undefined;
+
+  // Playwright uses its per-user cache unless PLAYWRIGHT_BROWSERS_PATH is set.
+  // Recent Chrome-for-Testing builds use chrome-linux64/chrome while older
+  // Playwright Chromium builds used chrome-linux/chrome. Support both so the
+  // Lighthouse gate follows Playwright upgrades without a runner-specific path.
+  const roots = [
+    process.env["PLAYWRIGHT_BROWSERS_PATH"],
+    process.env["HOME"] ? path.join(process.env["HOME"], ".cache", "ms-playwright") : undefined,
+  ].filter(Boolean);
+
+  for (const root of roots) {
+    if (!existsSync(root)) continue;
+    for (const dir of readdirSync(root).filter((d) => d.startsWith("chromium-")).sort().reverse()) {
+      for (const relative of ["chrome-linux64/chrome", "chrome-linux/chrome"]) {
+        const candidate = path.join(root, dir, relative);
+        if (existsSync(candidate)) return candidate;
+      }
+    }
+  }
+  return undefined;
 }
 
 async function auditRoute(route, chromePath) {
