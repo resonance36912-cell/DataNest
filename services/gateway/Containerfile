@@ -7,6 +7,7 @@ COPY services/gateway/bootstrap.py /app/bootstrap.py
 COPY services/gateway/subscription_mirror.py /app/subscription_mirror.py
 COPY services/gateway/billing_read.py /app/billing_read.py
 COPY services/gateway/checkout_audit.py /app/checkout_audit.py
+COPY services/gateway/payfast_settlement.py /app/payfast_settlement.py
 COPY services/gateway/governance.py /app/governance.py
 COPY services/gateway/app.py /app/app.py
 USER 65532:65532

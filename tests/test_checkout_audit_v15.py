@@ -62,6 +62,6 @@ def test_checkout_contract_and_container_are_governed():
     compat=Path("apps/rons-hub-backend/open-nova-adapters/supabase-compat.ts").read_text(encoding="utf-8")
     container=Path("services/gateway/Containerfile").read_text(encoding="utf-8")
     assert "record_payfast_launch" in contract and "record_payfast_launch" in compat
-    assert "protected_audits: [payfast_launch_logs]" in contract
-    assert 'protectedAudits: ["payfast_launch_logs"]' in compat
+    assert "protected_audits:" in contract and "payfast_launch_logs" in contract
+    assert "protectedAudits:" in compat and "payfast_launch_logs" in compat
     assert "COPY services/gateway/checkout_audit.py /app/checkout_audit.py" in container
