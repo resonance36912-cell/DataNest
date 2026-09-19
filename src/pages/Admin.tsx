@@ -32,6 +32,11 @@ const Admin = () => {
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [featureData, setFeatureData] = useState<any[]>([]);
   const [recentViews, setRecentViews] = useState<any[]>([]);
+  const [costingStats, setCostingStats] = useState({
+    samples: 0,
+    failures: 0,
+    avgDurationMs: 0,
+  });
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -97,7 +102,7 @@ const Admin = () => {
     // Feature usage breakdown
     const { data: features } = await supabase
       .from("feature_usage")
-      .select("feature");
+      .select("feature, metadata");
     if (features) {
       const counts: Record<string, number> = {};
       features.forEach((f: any) => {
@@ -108,6 +113,21 @@ const Admin = () => {
           .map(([name, value]) => ({ name, value }))
           .sort((a, b) => b.value - a.value)
       );
+
+      const costingEvents = features
+        .filter((f: any) => f.feature === "promotion_costing")
+        .map((f: any) => (f.metadata && typeof f.metadata === "object" ? f.metadata : {}));
+      const durations = costingEvents
+        .map((m: any) => Number(m.duration_ms))
+        .filter((value: number) => Number.isFinite(value) && value >= 0);
+      const failures = costingEvents.filter((m: any) => m.outcome === "failure").length;
+      setCostingStats({
+        samples: costingEvents.length,
+        failures,
+        avgDurationMs: durations.length
+          ? Math.round(durations.reduce((sum: number, value: number) => sum + value, 0) / durations.length)
+          : 0,
+      });
     }
     } catch (err) {
       console.error("Failed to fetch analytics:", err);
@@ -138,6 +158,14 @@ const Admin = () => {
     { label: "Audits Run", value: stats.totalAudits, icon: BarChart3, color: "text-resonance-violet" },
     { label: "Users", value: stats.totalUsers, icon: Users, color: "text-resonance-magenta" },
     { label: "Feature Uses", value: stats.totalFeatureUses, icon: Zap, color: "text-resonance-gold" },
+    { label: "Costing Samples", value: costingStats.samples, icon: TrendingUp, color: "text-resonance-cyan" },
+    {
+      label: "Avg Costing Time",
+      value: costingStats.samples ? `${(costingStats.avgDurationMs / 1000).toFixed(1)}s` : "—",
+      icon: Clock,
+      color: "text-resonance-violet",
+    },
+    { label: "Costing Failures", value: costingStats.failures, icon: BarChart3, color: "text-resonance-magenta" },
   ];
 
   return (
