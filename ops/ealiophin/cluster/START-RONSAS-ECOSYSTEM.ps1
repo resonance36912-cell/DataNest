@@ -261,7 +261,10 @@ if (Test-Path -LiteralPath $brokerConfig -PathType Leaf) {
     try {
         $broker = Get-Content -LiteralPath $brokerConfig -Raw | ConvertFrom-Json
         $broker.providers.'rons-local'.model = $localLlmModel
-        $broker | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $brokerConfig -Encoding UTF8
+        $broker.providers.'rons-local'.base_url = 'http://127.0.0.1:7866'
+        # Windows PowerShell Set-Content UTF8 emits a BOM; the Python broker reads strict UTF-8 JSON.
+        $brokerJson = $broker | ConvertTo-Json -Depth 20
+        [IO.File]::WriteAllText($brokerConfig, $brokerJson, (New-Object Text.UTF8Encoding($false)))
     } catch { Write-Warning "Could not update local AI broker model label: $($_.Exception.Message)" }
 }
 $services += Start-PythonService 'local-llm' 7866 'http://127.0.0.1:7866/health' (Join-Path $Runtime 'rons-local-llm-service.py') $SystemPython 'rons-local-llm-service.py' @{ RONS_LLM_MODEL=$localLlmModel }

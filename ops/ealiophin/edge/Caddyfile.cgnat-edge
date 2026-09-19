@@ -33,6 +33,34 @@
 			header_up X-Forwarded-Proto https
 		}
 	}
+	# Same-origin sovereign service routes must precede the SPA/static fallback.
+	# Backends remain loopback-only; the edge translates the public browser origin
+	# to the governed localhost ePublisher origin expected by each service.
+	handle_path /open-nova-research/* {
+		reverse_proxy 127.0.0.1:8787 {
+			# Research service independently enforces a loopback Host header.
+			header_up Host 127.0.0.1:8787
+			header_up Origin http://localhost:3101
+		}
+	}
+	handle_path /open-nova-stt/* {
+		reverse_proxy 127.0.0.1:7869 127.0.0.1:7864 {
+			lb_policy first
+			lb_try_duration 2s
+			lb_try_interval 250ms
+			header_up Origin http://localhost:3101
+		}
+	}
+	handle_path /open-nova-image/* {
+		reverse_proxy 127.0.0.1:7870 {
+			header_up Origin http://localhost:3101
+		}
+	}
+	handle_path /open-nova-ai/* {
+		reverse_proxy 127.0.0.1:7868 {
+			header_up Origin http://localhost:3101
+		}
+	}
 	handle {
 		# Pin ePublisher to the governed localhost IPv6 listener; IPv4 may be
 		# occupied by a stale process on Ealiophin during hot recovery.
