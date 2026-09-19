@@ -3,6 +3,7 @@ import { Ticket, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { CouponRedeemField } from "@/components/brand/CouponRedeemField";
 import { grantCouponUnlock } from "@/lib/featureGates";
+import { FREE_PROMOTION_ACTIVE } from "@/lib/promotion";
 
 /**
  * Inline "Have a coupon?" toggle shown next to a locked Generate Video button.
@@ -13,6 +14,8 @@ import { grantCouponUnlock } from "@/lib/featureGates";
  */
 export default function CouponUnlockField() {
   const [open, setOpen] = useState(false);
+
+  if (FREE_PROMOTION_ACTIVE) return null;
 
   return (
     <div className="rounded-md border border-dashed border-primary/30 bg-primary/5 px-2 py-1.5">

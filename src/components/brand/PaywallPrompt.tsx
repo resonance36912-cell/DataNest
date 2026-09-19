@@ -3,6 +3,7 @@ import { hubCheckoutUrl, HUB_URL, type Tier } from "@/lib/entitlement";
 import { HUB_TIERS, tierDisplayName, type HubTier } from "@/lib/hubTiers";
 import { BrandButton } from "./BrandButton";
 import { CouponRedeemField } from "./CouponRedeemField";
+import { FREE_PROMOTION_ACTIVE, FREE_PROMOTION } from "@/lib/promotion";
 
 /**
  * <PaywallPrompt /> — the single, canonical "this feature is locked" card.
@@ -26,6 +27,19 @@ export function PaywallPrompt({
   /** Render a tighter card (used inside narrow side panels). */
   compact?: boolean;
 }) {
+  if (FREE_PROMOTION_ACTIVE) {
+    return (
+      <div className="rounded-2xl border border-primary/25 bg-primary/5 p-6 text-center">
+        <Sparkles className="mx-auto h-6 w-6 text-primary" />
+        <p className="mt-3 text-xs font-mono uppercase tracking-[0.22em] text-primary">{FREE_PROMOTION.shortLabel}</p>
+        <h3 className="mt-2 text-lg font-bold">{featureLabel} is included</h3>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Full feature access is available during the promotion. Sign in so usage can be measured for future costing.
+        </p>
+      </div>
+    );
+  }
+
   // Normalize to a Hub-sold tier. Legacy "starter" gates fall back to Creator
   // (Starter isn't sold on the Hub).
   const hubTierKey: HubTier =

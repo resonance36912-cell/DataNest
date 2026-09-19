@@ -2,6 +2,7 @@ import * as React from "react";
 import { useEntitlement, type Tier, tierMeets } from "@/lib/entitlement";
 import { useEntitlementReturnRefresh } from "@/hooks/useEntitlementReturnRefresh";
 import { PaywallPrompt } from "./PaywallPrompt";
+import { FREE_PROMOTION_ACTIVE } from "@/lib/promotion";
 
 
 /**
@@ -35,6 +36,8 @@ export function PaywallGate({
 }) {
   const { data, isLoading, error } = useEntitlement();
   const { refreshing } = useEntitlementReturnRefresh();
+
+  if (FREE_PROMOTION_ACTIVE) return <>{children}</>;
 
   // Hold the gate while we're verifying a fresh post-checkout entitlement,
   // so the paywall doesn't flash before the Hub webhook lands.

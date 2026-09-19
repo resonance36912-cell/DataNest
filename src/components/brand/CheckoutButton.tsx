@@ -1,6 +1,7 @@
 import * as React from "react";
 import { BrandButton } from "./BrandButton";
 import { hubCheckoutUrl } from "@/lib/entitlement";
+import { FREE_PROMOTION_ACTIVE } from "@/lib/promotion";
 
 /**
  * <CheckoutButton />
@@ -32,7 +33,7 @@ export function CheckoutButton({
   const href = hubCheckoutUrl(sku, returnTo);
   return (
     <BrandButton variant={variant} size={size} className={className} asChild>
-      <a href={href}>{children}</a>
+      <a href={href}>{FREE_PROMOTION_ACTIVE ? "Use free during promotion" : children}</a>
     </BrandButton>
   );
 }

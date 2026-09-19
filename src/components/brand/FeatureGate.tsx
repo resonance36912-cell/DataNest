@@ -2,6 +2,7 @@ import * as React from "react";
 import { PaywallGate } from "./PaywallGate";
 import { FEATURE_GATES, useFeatureGate, type GatedFeature } from "@/lib/featureGates";
 import { recordFeatureAttempt } from "@/lib/featureAttempts";
+import { FREE_PROMOTION_ACTIVE } from "@/lib/promotion";
 
 /**
  * Thin convenience wrapper around <PaywallGate /> that reads the minimum tier,
@@ -32,8 +33,10 @@ export function FeatureGate({
   const { allowed, loading: gateLoading, error } = useFeatureGate(feature);
 
   React.useEffect(() => {
-    if (!gateLoading && !error && !allowed) recordFeatureAttempt(feature);
+    if (!FREE_PROMOTION_ACTIVE && !gateLoading && !error && !allowed) recordFeatureAttempt(feature);
   }, [feature, gateLoading, error, allowed]);
+
+  if (FREE_PROMOTION_ACTIVE) return <>{children}</>;
 
   return (
     <PaywallGate

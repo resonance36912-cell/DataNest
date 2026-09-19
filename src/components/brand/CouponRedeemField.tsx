@@ -3,6 +3,7 @@ import { Loader2, Tag, Check, X, Ticket } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { FREE_PROMOTION_ACTIVE } from "@/lib/promotion";
 import {
   useRedeemCoupon,
   useValidateCoupon,
@@ -28,6 +29,8 @@ export function CouponRedeemField({
   className?: string;
   onRedeemed?: (result: CouponResult) => void;
 }) {
+  if (FREE_PROMOTION_ACTIVE) return null;
+
   const [code, setCode] = React.useState("");
   const [preview, setPreview] = React.useState<CouponResult | null>(null);
   const validate = useValidateCoupon();

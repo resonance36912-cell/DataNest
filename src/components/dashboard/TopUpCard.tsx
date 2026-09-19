@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { clearEntitlementCache } from "@/lib/entitlement";
+import { FREE_PROMOTION_ACTIVE, FREE_PROMOTION } from "@/lib/promotion";
 
 type CreditPack = {
   id: string;
@@ -82,7 +83,7 @@ export default function TopUpCard() {
   const native = useMemo(() => isAndroidNative(), []);
 
   useEffect(() => {
-    if (!user) return;
+    if (FREE_PROMOTION_ACTIVE || !user) return;
     let cancelled = false;
     (async () => {
       const [packsRes, balRes] = await Promise.all([
@@ -101,7 +102,7 @@ export default function TopUpCard() {
 
   // Refresh balance when a new topup lands
   useEffect(() => {
-    if (!user) return;
+    if (FREE_PROMOTION_ACTIVE || !user) return;
     const ch = supabase
       .channel(`dash-topup:${user.id}`)
       .on(
@@ -138,6 +139,23 @@ export default function TopUpCard() {
       supabase.removeChannel(ch);
     };
   }, [user]);
+
+  if (FREE_PROMOTION_ACTIVE) {
+    return (
+      <section className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 via-card to-card p-6">
+        <div className="flex items-start gap-3">
+          <Sparkles className="mt-0.5 h-5 w-5 text-primary" />
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">{FREE_PROMOTION.shortLabel}</div>
+            <h2 className="mt-1 text-lg font-semibold">Credit purchases are paused</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {FREE_PROMOTION.description} Storyboard, rendering, vocal sync, and export access are included during the promotion.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   async function handleBuy(pack: CreditPack) {
     if (!user) return;

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ResonanceLogo } from "@/components/brand/ResonanceLogo";
 import { useAuth } from "@/contexts/AuthContext";
+import { FREE_PROMOTION_ACTIVE, FREE_PROMOTION } from "@/lib/promotion";
 
 export default function Footer() {
   const { user } = useAuth();
@@ -17,9 +18,11 @@ export default function Footer() {
               </span>
             </div>
             <p className="max-w-sm text-center text-[11px] text-muted-foreground md:text-left">
-              🇿🇦 Built in South Africa · ZAR once-off packs · POPIA-conscious.
-              No third-party tracking. Official pricing, updates, checkout, support, and ecosystem bundles
-              are managed by <a href="https://reson8.life" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80">The Resonance Hub</a>.
+              🇿🇦 Built in South Africa · POPIA-conscious.{" "}
+              {FREE_PROMOTION_ACTIVE
+                ? `${FREE_PROMOTION.shortLabel}: full access is temporarily free while usage and provider costs are measured.`
+                : "Official pricing, updates, checkout, support, and ecosystem bundles are managed by The Resonance Hub."}{" "}
+              <a href="https://reson8.life" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80">The Resonance Hub</a>.
             </p>
           </div>
 
@@ -28,7 +31,9 @@ export default function Footer() {
             <Link to="/ecosystem" className="hover:text-foreground transition-colors">Ecosystem</Link>
             <Link to="/dashboard" className="hover:text-foreground transition-colors">Dashboard</Link>
             <Link to={user ? "/account" : "/login"} className="hover:text-foreground transition-colors">{user ? "Account" : "Sign In"}</Link>
-            <a href="https://reson8.life/checkout" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Checkout</a>
+            {!FREE_PROMOTION_ACTIVE && (
+              <a href="https://reson8.life/checkout" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Checkout</a>
+            )}
             <a href="https://reson8.life/support" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Support</a>
             <a href="https://reson8.life/updates" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Updates</a>
             <a
