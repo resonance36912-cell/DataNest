@@ -108,7 +108,7 @@ const Index = () => {
     <div className="min-h-screen bg-background grid-bg">
       <SEO
         title="YouTube Optimizer — Tools in tune with you · The Resonance"
-        description="AI-powered YouTube channel audits, titles, thumbnails and growth analytics. Part of The Resonance Hub — buy once-off credits or project packs on reson8.life. No recurring app subscription required."
+        description="AI-powered YouTube channel audits, titles, thumbnails and growth analytics. Full access is temporarily free while Resonance measures real usage costs and establishes sustainable pricing."
         path="/"
         jsonLd={[
           {
