@@ -26,6 +26,7 @@ type FixtureManifest = {
 const read = (path: string) => readFileSync(path, "utf8");
 const manifestPath = "qa/premium-readiness/fixture-manifest.json";
 const prereqScriptPath = "scripts/Test-RonsasPremiumReadiness.ps1";
+const credentialPrereqScriptPath = "scripts/Test-RonsasPremiumCredentialPrereqs.ps1";
 const k6Path = "qa/performance/reson8-staging.k6.js";
 const budgetPath = "qa/premium-readiness/staging-budget.json";
 const providerCapabilitiesPath = "qa/premium-readiness/provider-capabilities.json";
@@ -33,6 +34,7 @@ const providerCapabilitiesPath = "qa/premium-readiness/provider-capabilities.jso
 const checks: Check[] = [
   { label: "fixture manifest exists", ok: existsSync(manifestPath) },
   { label: "staging prerequisite harness exists", ok: existsSync(prereqScriptPath) },
+  { label: "credential prerequisite preflight exists", ok: existsSync(credentialPrereqScriptPath) },
   { label: "k6 staging workload exists", ok: existsSync(k6Path) },
   { label: "zero-spend staging budget exists", ok: existsSync(budgetPath) },
   { label: "provider capability manifest exists", ok: existsSync(providerCapabilitiesPath) },
@@ -41,6 +43,7 @@ const checks: Check[] = [
 if (checks.every((check) => check.ok)) {
   const manifest = JSON.parse(read(manifestPath)) as FixtureManifest;
   const prereq = read(prereqScriptPath);
+  const credentialPrereq = read(credentialPrereqScriptPath);
   const k6 = read(k6Path);
   const budget = JSON.parse(read(budgetPath)) as Record<string, unknown>;
   const providerCapabilities = JSON.parse(read(providerCapabilitiesPath)) as {
@@ -180,6 +183,29 @@ if (checks.every((check) => check.ok)) {
         ) &&
         providerCapabilities.overall_provider_stubs_ready === false &&
         /Test-ProviderStubCapability/.test(prereq),
+    },
+    {
+      label: "credential preflight is restricted to loopback staging auth",
+      ok:
+        /127\.0\.0\.1/.test(credentialPrereq) &&
+        /localhost/.test(credentialPrereq) &&
+        /Credential probes are restricted to loopback staging auth endpoints/.test(
+          credentialPrereq,
+        ),
+    },
+    {
+      label:
+        "credential preflight never creates accounts or claims PayFast proof from configuration alone",
+      ok:
+        !/\/v1\/auth\/sign-up/.test(credentialPrereq) &&
+        /\/v1\/auth\/sign-in/.test(credentialPrereq) &&
+        /payfast_sandbox_proven = \$false/.test(credentialPrereq),
+    },
+    {
+      label: "credential preflight reports hashed identity only and documents secret omission",
+      ok:
+        /identity_hash/.test(credentialPrereq) &&
+        /No passwords, keys, passphrases or session tokens are written/.test(credentialPrereq),
     },
   );
 }

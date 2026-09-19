@@ -39,6 +39,22 @@ Two prerequisites can also be proven automatically on Ealiophin without setting 
 
 Provider-stub readiness is governed by `qa/premium-readiness/provider-capabilities.json`. The global prerequisite remains false until every generative spoke has a deterministic zero-external-call provider/data path. Partial local modes do not count as global readiness.
 
+### Credential-dependent prerequisite preflight
+
+Use the assessment-only credential preflight to see whether disposable-account and PayFast sandbox environment fields are present without printing or storing their values:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Test-RonsasPremiumCredentialPrereqs.ps1
+```
+
+Disposable staging accounts are never created by this script. After an operator provisions the five disposable roles, set the corresponding `RONSAS_TEST_<ROLE>_EMAIL` and `RONSAS_TEST_<ROLE>_PASSWORD` variables only in the process environment and run:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Test-RonsasPremiumCredentialPrereqs.ps1 -Mode accounts
+```
+
+The account probe is loopback-only and calls staging `/v1/auth/sign-in`; it writes only a short SHA-256 identity prefix and boolean probe result. It never writes passwords or session tokens. PayFast sandbox fields are presence-checked only and never treated as proof: `sandbox_payments` remains false until an isolated end-to-end sandbox transaction and entitlement result are evidenced.
+
 ## Output-quality fixtures
 
 `qa/premium-readiness/fixture-manifest.json` defines the required minimums:
