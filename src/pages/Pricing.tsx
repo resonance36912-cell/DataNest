@@ -334,8 +334,8 @@ const Pricing = () => {
           >
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Button asChild variant="pill" size="pillLg">
-                <a href={hubUrl("/pricing")} target="_blank" rel="noopener">
-                  View hub pricing <ExternalLink className="h-4 w-4" />
+                <a href={APP_START_URL}>
+                  Open free
                 </a>
               </Button>
               <Button asChild variant="pillOutline" size="pillLg">
@@ -345,7 +345,7 @@ const Pricing = () => {
               </Button>
             </div>
             <p className="text-sm text-muted-foreground">
-              Official pricing, checkout, updates, support, and ecosystem bundles are managed by{" "}
+              Free promotional access is active. Updates, support, and ecosystem navigation are managed by{" "}
               <a
                 href={HUB_URL}
                 target="_blank"
