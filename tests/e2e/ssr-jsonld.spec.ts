@@ -29,7 +29,7 @@ const PAGE_SCHEMAS: Record<string, string[]> = {
     "BreadcrumbList",
     "SoftwareApplication",
   ],
-  "/pricing": ["Organization", "WebPage", "BreadcrumbList", "Product"],
+  "/pricing": ["Organization", "WebPage", "BreadcrumbList", "SoftwareApplication"],
   "/privacy": ["Organization", "WebPage", "BreadcrumbList"],
   "/terms": ["Organization", "WebPage", "BreadcrumbList"],
 };
@@ -173,30 +173,23 @@ test.describe("JSON-LD structured data (initial SSR HTML)", () => {
     }
   });
 
-  test("Product offers on /pricing are complete", async () => {
+  test("free-promotion /pricing emits no purchasable Product or Offer schema", async () => {
     const ctx = await pwRequest.newContext({ baseURL: BASE_URL });
     const html = await (await ctx.get("/pricing")).text();
     await ctx.dispose();
 
-    const product = parseJsonLd(html, "/pricing").find(
-      (n) => n["@type"] === "Product",
-    );
-    expect(product, "/pricing has no Product node").toBeTruthy();
-    expect(String(product!["name"]).trim()).not.toBe("");
-    expect(String(product!["description"]).trim()).not.toBe("");
+    const nodes = parseJsonLd(html, "/pricing");
+    const types = typesOf(nodes);
+    expect(types, "/pricing must not advertise a paid Product during free promotion").not.toContain("Product");
+    expect(
+      types.some((type) => /Offer|AggregateOffer/.test(String(type))),
+      "/pricing must not expose paid Offer schema during free promotion",
+    ).toBe(false);
 
-    const offers = product!["offers"];
-    if (offers) {
-      const list = Array.isArray(offers) ? (offers as Node[]) : [offers as Node];
-      for (const offer of list) {
-        expect(String(offer["@type"])).toMatch(/Offer|AggregateOffer/);
-        expect(offer["priceCurrency"], "offer needs priceCurrency").toBeTruthy();
-        expect(
-          offer["price"] ?? offer["lowPrice"],
-          "offer needs a price",
-        ).toBeDefined();
-      }
-    }
+    const app = nodes.find((n) => n["@type"] === "SoftwareApplication");
+    expect(app, "/pricing should describe the application").toBeTruthy();
+    expect(String(app!["name"]).trim()).not.toBe("");
+    expect(String(app!["description"]).trim()).not.toBe("");
   });
 
   test("legacy hub redirects emit no JSON-LD", async () => {

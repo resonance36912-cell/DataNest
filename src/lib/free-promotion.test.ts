@@ -19,10 +19,17 @@ describe("free-promotion commercial guard", () => {
     }
   });
 
-  it("does not expose legacy paid acquisition copy while promotion mode is active", () => {
-    const indexSource = readFileSync(resolve(process.cwd(), "src/pages/Index.tsx"), "utf8");
+  it("ships no paid pricing branch or pricing lock CTA", () => {
+    const pricing = readFileSync(resolve(process.cwd(), "src/pages/Pricing.tsx"), "utf8");
+    const locked = readFileSync(resolve(process.cwd(), "src/components/LockedSection.tsx"), "utf8");
+    const llms = readFileSync(resolve(process.cwd(), "public/llms.txt"), "utf8");
 
-    expect(indexSource).not.toContain("buy once-off credits or project packs");
-    expect(indexSource).toContain("temporarily free");
+    expect(pricing).not.toMatch(/R\s?\d/);
+    expect(pricing).not.toContain("Project pack");
+    expect(locked).not.toContain("HUB_PRICING_URL");
+    expect(locked).not.toContain("View hub pricing");
+    expect(llms).not.toMatch(/R\s?\d/);
+    expect(llms).not.toContain("Hub checkout");
+    expect(llms).toContain("no charge");
   });
 });
