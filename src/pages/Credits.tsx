@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { clearEntitlementCache, HUB_URL } from "@/lib/entitlement";
 import CreditsSyncStatus from "@/components/credits/CreditsSyncStatus";
+import { FREE_PROMOTION_ACTIVE, FREE_PROMOTION } from "@/lib/promotion";
 
 
 type CreditPack = {
@@ -99,6 +100,13 @@ export default function Credits() {
 
   const syncAccountData = useCallback(async () => {
     if (!user) return;
+    if (FREE_PROMOTION_ACTIVE) {
+      setPacks([]);
+      setBalance(null);
+      setTopups([]);
+      setLastSyncedAt(new Date());
+      return;
+    }
     const [packsRes, balRes, topupsRes] = await Promise.all([
       supabase.from("credit_packs").select("*").eq("active", true).order("sort_order"),
       supabase.from("user_credits").select("balance").eq("user_id", user.id).maybeSingle(),
@@ -138,7 +146,7 @@ export default function Credits() {
 
   // Realtime: refresh balance + history when a topup lands
   useEffect(() => {
-    if (!user) return;
+    if (FREE_PROMOTION_ACTIVE || !user) return;
     const ch = supabase
       .channel(`credits:${user.id}`)
       .on(
@@ -172,6 +180,33 @@ export default function Credits() {
     };
   }, [user, navigate, syncAccountData]);
 
+
+  if (FREE_PROMOTION_ACTIVE) {
+    return (
+      <>
+        <SeoHead
+          title="Free Access Promotion — Sync Vision"
+          description={FREE_PROMOTION.description}
+          path="/credits"
+        />
+        <Navbar />
+        <main className="container max-w-3xl pt-24 pb-16">
+          <section className="rounded-3xl border border-primary/25 bg-card/60 p-8 text-center backdrop-blur-xl sm:p-12">
+            <Sparkles className="mx-auto h-8 w-8 text-primary" />
+            <p className="mt-4 text-xs font-semibold uppercase tracking-[0.22em] text-primary">{FREE_PROMOTION.shortLabel}</p>
+            <h1 className="mt-2 text-3xl font-display font-bold">Credit purchases are paused</h1>
+            <p className="mt-4 text-muted-foreground">{FREE_PROMOTION.description}</p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Scene generation, vocal sync, rendering, and exports are included during promotional access.
+            </p>
+            <Button asChild className="mt-8 rounded-full">
+              <Link to="/dashboard">Return to Sync Vision</Link>
+            </Button>
+          </section>
+        </main>
+      </>
+    );
+  }
 
   async function handleBuy(pack: CreditPack) {
     if (!user) return;

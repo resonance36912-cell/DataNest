@@ -20,6 +20,7 @@
  */
 
 import { toast } from "sonner";
+import { FREE_PROMOTION_ACTIVE } from "@/lib/promotion";
 
 const STORAGE_KEY = "merge.billingReminder.v1";
 const REMINDER_DELAY_MS = 60_000; // 60s — enough time for a fal.ai top-up to propagate
@@ -65,18 +66,23 @@ const safeClear = () => {
 };
 
 const showReminderToast = (onRetry?: () => void) => {
-  toast.warning("Did you top up fal.ai? Try the merge again.", {
+  if (FREE_PROMOTION_ACTIVE) {
+    toast.warning("Rendering capacity is temporarily unavailable.", {
+      id: "billing-retry-reminder",
+      description:
+        "Your promotional access remains free. The video provider is temporarily unavailable; retry shortly or contact support if the issue persists.",
+      duration: 20_000,
+      action: onRetry ? { label: "Retry now", onClick: onRetry } : undefined,
+    });
+    return;
+  }
+
+  toast.warning("Provider billing requires attention. Try the merge again after funding is restored.", {
     id: "billing-retry-reminder",
     description:
-      "If you've added funds, balances usually propagate within ~30 seconds. Click Retry to resume.",
+      "Provider balances usually propagate within ~30 seconds. Click Retry to resume.",
     duration: 20_000,
-    action: onRetry
-      ? { label: "Retry now", onClick: onRetry }
-      : {
-          label: "Open billing",
-          onClick: () =>
-            window.open("https://fal.ai/dashboard/billing", "_blank", "noopener,noreferrer"),
-        },
+    action: onRetry ? { label: "Retry now", onClick: onRetry } : undefined,
   });
 };
 

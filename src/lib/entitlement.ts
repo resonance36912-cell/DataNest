@@ -11,6 +11,7 @@ import {
   isOwnerBetaCode,
   isOwnerBetaEligible,
 } from "@/lib/betaAccess";
+import { FREE_PROMOTION_ACTIVE, FREE_PROMOTION_TIER } from "@/lib/promotion";
 
 export type Tier = "free" | "starter" | "creator" | "pro" | "business" | "all_access" | null;
 
@@ -152,6 +153,19 @@ async function fetchCookieEntitlement(): Promise<Entitlement> {
     if (!res.ok) return FALLBACK;
     const raw = await res.json() as Record<string, unknown>;
     if (!raw.authenticated) return FALLBACK;
+    if (FREE_PROMOTION_ACTIVE) {
+      return {
+        app: APP_KEY,
+        userId: String(raw.userId ?? raw.user_id ?? "promotion-user"),
+        tier: FREE_PROMOTION_TIER,
+        status: "active",
+        currentPeriodEnd: null,
+        hasAccess: true,
+        source: "bundle",
+        _source: "fresh",
+        _fetchedAt: Date.now(),
+      };
+    }
     return {
       app: APP_KEY, userId: String(raw.userId ?? raw.user_id ?? ""),
       tier: (raw.tier as Tier) ?? "free", status: (raw.status as Entitlement["status"]) ?? "inactive",
@@ -169,6 +183,19 @@ async function fetchEntitlement(): Promise<Entitlement> {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return FALLBACK;
   const uid = session.user.id;
+  if (FREE_PROMOTION_ACTIVE) {
+    return {
+      app: APP_KEY,
+      userId: uid,
+      tier: FREE_PROMOTION_TIER,
+      status: "active",
+      currentPeriodEnd: null,
+      hasAccess: true,
+      source: "bundle",
+      _source: "fresh",
+      _fetchedAt: Date.now(),
+    };
+  }
   const cached = readCache(uid);
   if (cached) return cached;
 
@@ -221,6 +248,7 @@ export function useRefreshEntitlement() {
 
 const ORDER: Tier[] = ["free", "starter", "creator", "pro", "business", "all_access"];
 export function tierMeets(have: Tier, need: Exclude<Tier, null | "free">): boolean {
+  if (FREE_PROMOTION_ACTIVE) return true;
   if (!have) return false;
   return ORDER.indexOf(have) >= ORDER.indexOf(need);
 }
@@ -247,6 +275,7 @@ export function appendCheckoutReturnMarker(url: string, value: "success" | "canc
  * or a bare plan string (`creator`, `all_access`).
  */
 export function hubCheckoutUrl(skuOrPlan: string, returnTo?: string, couponCode?: string) {
+  if (FREE_PROMOTION_ACTIVE) return "/";
   const base = returnTo ?? (typeof window !== "undefined" ? window.location.href : HUB_URL);
   const back = appendCheckoutReturnMarker(base, "success");
   const parts = skuOrPlan.split(":");

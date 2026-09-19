@@ -15,6 +15,7 @@
  * Companion hub route: `GET https://reson8.life/api/public/entitlement?app=<key>`
  * Companion doc:       docs/spoke-payment-gate-brief.md
  */
+import { FREE_PROMOTION_ACTIVE, FREE_PROMOTION_TIER } from "./promotion";
 
 // The spoke's supabase middleware ships an authenticated client + userId +
 // the raw access token on `context`.
@@ -104,6 +105,22 @@ export async function requireTier(
       JSON.stringify({ error: "unauthorized", message: "Sign in required" }),
       { status: 401, headers: { "Content-Type": "application/json" } },
     );
+  }
+
+  if (FREE_PROMOTION_ACTIVE) {
+    return {
+      ok: true,
+      app,
+      userId: context.userId,
+      tier: FREE_PROMOTION_TIER,
+      status: "active",
+      source: "all_access",
+      expiresAt: null,
+      features: { promotion: true },
+      checkedAt: new Date().toISOString(),
+      hasAccess: true,
+      currentPeriodEnd: null,
+    };
   }
 
   const cacheKey = `${context.userId}:${app}`;

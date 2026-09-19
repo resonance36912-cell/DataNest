@@ -22,6 +22,7 @@ import {
 } from "@/lib/entitlement";
 import { FEATURE_GATES, type GatedFeature } from "@/lib/featureGates";
 import { tierDisplayName } from "@/lib/hubTiers";
+import { FREE_PROMOTION_ACTIVE } from "@/lib/promotion";
 
 const STORYBOARD_FEATURES: GatedFeature[] = ["storyboard_video", "hd_render"];
 
@@ -101,7 +102,7 @@ export default function EntitlementLocksPanel() {
             <Lock className="h-4 w-4 text-amber-400 shrink-0" />
           )}
           <h4 className="text-xs font-semibold text-foreground truncate">
-            Generation locks
+            {FREE_PROMOTION_ACTIVE ? "Generation access" : "Generation locks"}
           </h4>
           {!isLoading && (
             <Badge

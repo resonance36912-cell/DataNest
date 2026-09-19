@@ -1,4 +1,5 @@
 import { ResonanceLogo } from "./ResonanceLogo";
+import { FREE_PROMOTION_ACTIVE, FREE_PROMOTION } from "@/lib/promotion";
 
 /**
  * <ResonanceFooter />
@@ -45,15 +46,20 @@ export function ResonanceFooter({
         </nav>
         <div className="text-xs space-y-2">
           <a href={`mailto:${contact}`} className="block hover:text-white">{contact}</a>
-          <a href="https://reson8.life/pricing" className="block hover:text-white">Pricing</a>
-          <a href="https://reson8.life/updates" className="block hover:text-white">Updates</a>
-          <a href="https://reson8.life/account/credits" className="block hover:text-white">
-            My credits &amp; packs
+          <a href="https://reson8.life/pricing" className="block hover:text-white">
+            {FREE_PROMOTION_ACTIVE ? "Free promotion" : "Pricing"}
           </a>
+          <a href="https://reson8.life/updates" className="block hover:text-white">Updates</a>
+          {!FREE_PROMOTION_ACTIVE && (
+            <a href="https://reson8.life/account/credits" className="block hover:text-white">
+              My credits &amp; packs
+            </a>
+          )}
+          {FREE_PROMOTION_ACTIVE && <span className="block text-primary">{FREE_PROMOTION.shortLabel}</span>}
         </div>
       </div>
       <div className="border-t border-white/5 px-6 py-4 text-[10px] uppercase tracking-[0.25em] text-white/40 text-center">
-        © {new Date().getFullYear()} The Resonance · ZAR · PayFast · POPIA
+        © {new Date().getFullYear()} The Resonance · {FREE_PROMOTION_ACTIVE ? "Free promotional access" : "ZAR · PayFast"} · POPIA
       </div>
     </footer>
   );
