@@ -58,7 +58,7 @@ export function ResonanceFooter({
         </nav>
         <div className="text-xs space-y-2">
           <a href={HUB_PRICING_URL} target="_blank" rel="noopener noreferrer" className="block hover:text-foreground">
-            Hub pricing ↗
+            Free promotion ↗
           </a>
           <a href={HUB_UPDATES_URL} target="_blank" rel="noopener noreferrer" className="block hover:text-foreground">
             Hub updates ↗
@@ -74,13 +74,13 @@ export function ResonanceFooter({
 
       <div className="border-t border-white/5 px-6 py-6 text-center max-w-4xl mx-auto">
         <p className="text-xs leading-relaxed text-muted-foreground">
-          Official pricing, updates, checkout, support, and ecosystem bundles are managed by{" "}
+          Free-access promotion details, updates, support, and future pricing information are managed by{" "}
           <a href={HUB_URL} target="_blank" rel="noopener noreferrer" className="text-foreground/90 underline-offset-4 hover:underline">
             The Resonance Hub
           </a>.
         </p>
         <p className="mt-2 text-[10px] uppercase tracking-[0.25em] text-muted-foreground/70">
-          © {new Date().getFullYear()} The Resonance · ZAR · POPIA
+          © {new Date().getFullYear()} The Resonance · Free promotion · POPIA
         </p>
       </div>
     </footer>

@@ -76,9 +76,9 @@ const Home = () => {
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-foreground transition-colors inline-flex items-center gap-1"
-              title="Official pricing lives on The Resonance Hub"
+              title="Free promotion details live on The Resonance Hub"
             >
-              Pricing <span className="opacity-60">↗</span>
+              Free access <span className="opacity-60">↗</span>
             </a>
             <a
               href={HUB_UPDATES_URL}
@@ -143,7 +143,7 @@ const Home = () => {
                 { label: "About", to: "/about" },
                 { label: "Features", href: "/#features" },
                 { label: "Logo Designer", to: "/logo-designer" },
-                { label: "Hub pricing", href: HUB_PRICING_URL, external: true },
+                { label: "Free promotion", href: HUB_PRICING_URL, external: true },
                 { label: "Hub updates", href: HUB_UPDATES_URL, external: true },
                 { label: "Contact", to: "/contact" },
                 { label: "Part of The Resonance Hub", href: HUB_URL, external: true },
@@ -193,7 +193,7 @@ const Home = () => {
             className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-card/60 px-4 py-1.5 text-xs text-muted-foreground mb-8"
           >
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-            Tools in tune with you · 🇿🇦 Built in South Africa · ZAR · PayFast secure checkout
+            Tools in tune with you · 🇿🇦 Built in South Africa · Free promotional access
           </motion.div>
 
           <motion.div
@@ -237,7 +237,7 @@ const Home = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            Upload a product image, complete a guided brief, or add a reference link to turn product details into polished posters, ads, social posts and cinematic video concepts. Built in South Africa. ZAR pricing. POPIA-safe.
+            Upload a product image, complete a guided brief, or add a reference link to turn product details into polished posters, ads, social posts and cinematic video concepts. Built in South Africa. Free promotional access. POPIA-safe.
           </motion.p>
 
           <motion.div
@@ -294,7 +294,7 @@ const Home = () => {
             <span className="hidden sm:inline opacity-30">·</span>
             <span>POPIA-safe</span>
             <span className="hidden sm:inline opacity-30">·</span>
-            <span>ZAR via PayFast</span>
+            <span>No payment required during promotion</span>
             <span className="hidden sm:inline opacity-30">·</span>
             <span>Part of <a href={HUB_URL} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:underline hover:text-foreground">The Resonance ↗</a></span>
           </motion.div>
