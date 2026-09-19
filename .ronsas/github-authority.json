@@ -1,6 +1,6 @@
 {
   "schema": "ronsas-github-authority/v1",
-  "snapshot_date": "2026-09-18",
+  "snapshot_date": "2026-09-19",
   "canonical_owner": "resonance36912-cell",
   "development_identity": "ResonanceAppDev",
   "control_repository": "resonance36912-cell/RONSAS",
@@ -23,6 +23,25 @@
       "verified_head": "0a48e34103b0c21fb9917ca79545b049a68883d1",
       "production_branch": "ronsas/ealiophin-production",
       "production_head": "5470b50869a93aa51af5e74168879bccc8123779"
+    },
+    {
+      "id": "sovereign-backend-source",
+      "repository": "resonance36912-cell/rons-sovereign-backend-source",
+      "role": "platform-source-authority",
+      "visibility": "private",
+      "default_branch": "main",
+      "verified_head": "c36a8083a3ad1d9b47867564df2e3bb1e2017205",
+      "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\sources\\rons-sovereign-backend-source",
+      "baseline_tag": "ronsas-source-baseline-2026-09-19",
+      "baseline_source": "ResonanceAppDev_ZeroCredit_v1.5.8",
+      "validation": "local-34-backend-tests-green-2026-09-19",
+      "github_actions": "blocked-before-runner-account-billing",
+      "runtime_services": {
+        "postgres": "http://127.0.0.1:55432",
+        "gateway": "http://127.0.0.1:58600",
+        "auth": "http://127.0.0.1:58680",
+        "storage": "http://127.0.0.1:59000"
+      }
     },
     {
       "id": "rcgf",
