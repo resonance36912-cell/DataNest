@@ -31,7 +31,7 @@ const qualityPrinciples = [
     icon: CheckCircle2,
     step: "Verify",
     title: "Fix the signal before it multiplies",
-    desc: "Lock lyrics, timing, mood, and scene coverage before a paid image or video job starts.",
+    desc: "Lock lyrics, timing, mood, and scene coverage before an image or video generation job starts.",
     proof: "Fewer avoidable regenerations",
   },
   {
@@ -45,7 +45,7 @@ const qualityPrinciples = [
     icon: Zap,
     step: "Route",
     title: "Use specialists for specialist work",
-    desc: "Analysis, transcription, visual generation, lip sync, storage, and checkout use purpose-fit services.",
+    desc: "Analysis, transcription, visual generation, lip sync, storage, and delivery use purpose-fit services.",
     proof: "Quality where it matters most",
   },
   {
@@ -53,14 +53,14 @@ const qualityPrinciples = [
     step: "Deliver",
     title: "Master once, export cleanly",
     desc: "Normalize scenes to a 1080p/30 master, preserve sync, and upscale only when the destination needs it.",
-    proof: "No paid pixels without purpose",
+    proof: "No unnecessary premium processing",
   },
 ];
 
 const TRUST_ITEMS = [
-  "No card to start",
-  "Cost review before generation",
-  "No automatic paid retries",
+  "Free promotional access",
+  "Provider usage measured",
+  "No payment required",
   "1080p native master",
   "POPIA-conscious",
 ];
@@ -125,7 +125,7 @@ export default function Index() {
           >
             Direct the whole video
             {" "}<span className="gradient-text font-serif italic font-normal">before</span>{" "}
-            you pay to render it.
+            the final render.
           </h1>
 
           {/* Tri-color claim */}
@@ -174,7 +174,7 @@ export default function Index() {
               className="gap-2 rounded-full border-white/15 px-8 hover:bg-white/5"
             >
               <a href="#quality-economics">
-                See how costs stay controlled <ArrowRight className="h-4 w-4" />
+                See how quality stays controlled <ArrowRight className="h-4 w-4" />
               </a>
             </Button>
           </div>
@@ -212,10 +212,10 @@ export default function Index() {
               </h2>
             </div>
             <div className="rounded-2xl border border-primary/20 bg-card/60 p-5 text-sm leading-relaxed text-muted-foreground backdrop-blur-xl">
-              Sync Vision separates decisions from expensive execution. You can correct the
-              transcript, timing, character, and shot plan first. Provider estimates are visible
-              before generation, every paid batch requires approval, and failed video jobs wait
-              for you instead of retrying themselves.
+              Sync Vision separates creative decisions from provider execution. You can correct the
+              transcript, timing, character, and shot plan first. Provider estimates remain visible
+              for the promotion costing study, every provider batch requires approval, and failed
+              video jobs wait for you instead of retrying themselves.
             </div>
           </div>
 
@@ -239,7 +239,7 @@ export default function Index() {
             <span className="inline-flex items-center gap-2"><Sparkles className="h-3.5 w-3.5 text-primary" /> Sovereign local analysis and creative direction</span>
             <span className="inline-flex items-center gap-2"><Zap className="h-3.5 w-3.5 text-primary" /> Local visual generation adapters; external providers denied by default</span>
             <span className="inline-flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-primary" /> Local transcription adapter required for track analysis</span>
-            <span className="inline-flex items-center gap-2"><DollarSign className="h-3.5 w-3.5 text-primary" /> Secure one-off checkout, no auto-renewal</span>
+            <span className="inline-flex items-center gap-2"><DollarSign className="h-3.5 w-3.5 text-primary" /> Free promotional access · no payment required</span>
           </div>
         </div>
       </section>
@@ -254,8 +254,8 @@ export default function Index() {
         <InteractiveProductPreview />
       </LazySection>
 
-      {/* Pricing — dedicated tier comparison */}
-      <LazySection minHeight={900} label="Loading pricing">
+      {/* Promotion access — dedicated free-access comparison */}
+      <LazySection minHeight={900} label="Loading promotion access">
         <PricingSection />
       </LazySection>
 
@@ -265,7 +265,7 @@ export default function Index() {
         <div className="container py-20 text-center">
           <h2 className="text-3xl font-bold sm:text-4xl">Ready to direct with intent?</h2>
           <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
-            Start with the treatment. Approve the vision. Spend on the scenes worth finishing.
+            Start with the treatment. Approve the vision. Finish the scenes worth mastering.
           </p>
           <Link to={user ? "/project/new" : "/login"} onClick={user ? undefined : primeStartFree}>
             <Button

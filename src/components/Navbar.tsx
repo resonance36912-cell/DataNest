@@ -29,10 +29,10 @@ const navLinks = [
   { to: "/admin", label: "Admin", adminOnly: true },
 ];
 
-// External Hub links — pricing, updates, and support are managed
+// External Hub links — promotion details, updates, and support are managed
 // centrally by The Resonance Hub, not by this spoke app.
 const hubLinks = [
-  { href: "https://reson8.life/checkout", label: "Checkout" },
+  { href: "https://reson8.life/pricing", label: "Free Access" },
   { href: "https://reson8.life/support", label: "Support" },
   { href: "https://reson8.life/updates", label: "Updates" },
 ];
