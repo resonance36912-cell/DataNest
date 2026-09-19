@@ -28,7 +28,7 @@ export default function HdRenderSection({
             <div>
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-primary" />
-                Upgrade to <Badge variant="outline" className="border-primary text-primary font-bold text-xs px-2 py-0.5">HD</Badge> for Export
+                Render <Badge variant="outline" className="border-primary text-primary font-bold text-xs px-2 py-0.5">HD</Badge> for Export
               </h3>
               <p className="text-sm text-muted-foreground mt-1">
                 {previewScenes.length} scene{previewScenes.length > 1 ? "s" : ""} at preview quality.
