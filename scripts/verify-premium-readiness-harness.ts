@@ -47,7 +47,7 @@ if (checks.every((check) => check.ok)) {
   const k6 = read(k6Path);
   const budget = JSON.parse(read(budgetPath)) as Record<string, unknown>;
   const providerCapabilities = JSON.parse(read(providerCapabilitiesPath)) as {
-    apps?: Array<{ id?: string; stub_ready?: boolean }>;
+    apps?: Array<{ id?: string; stub_ready?: boolean; source_commit?: string }>;
     overall_provider_stubs_ready?: boolean;
   };
 
@@ -174,14 +174,17 @@ if (checks.every((check) => check.ok)) {
         /127\.0\.0\.1:60600\/health/.test(prereq),
     },
     {
-      label: "provider capability manifest does not overstate readiness",
+      label: "provider capability manifest proves all four zero-external staging paths",
       ok:
         Array.isArray(providerCapabilities.apps) &&
         providerCapabilities.apps.length === 4 &&
+        providerCapabilities.apps.every((app) => app.stub_ready === true) &&
         providerCapabilities.apps.some(
-          (app) => app.id === "youtube-optimizer" && app.stub_ready === false,
+          (app) =>
+            app.id === "youtube-optimizer" &&
+            app.source_commit === "b78a628be1c85ed5047c7775afbaf5e65524ed8d",
         ) &&
-        providerCapabilities.overall_provider_stubs_ready === false &&
+        providerCapabilities.overall_provider_stubs_ready === true &&
         /Test-ProviderStubCapability/.test(prereq),
     },
     {
