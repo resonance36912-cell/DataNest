@@ -74,19 +74,42 @@ const Pricing = () => {
           title="Free Access Promotion — YouTube Optimizer"
           description={FREE_PROMOTION.description}
           path="/pricing"
-          jsonLd={{
-            "@context": "https://schema.org",
-            "@type": "SoftwareApplication",
-            name: "Resonance YouTube Optimizer",
-            applicationCategory: "BusinessApplication",
-            offers: {
-              "@type": "Offer",
-              priceCurrency: "ZAR",
-              price: "0",
-              availability: "https://schema.org/InStock",
-              description: "Free promotional access",
+          jsonLd={[
+            {
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "Resonance YouTube Optimizer",
+              applicationCategory: "BusinessApplication",
+              offers: {
+                "@type": "Offer",
+                priceCurrency: "ZAR",
+                price: "0",
+                availability: "https://schema.org/InStock",
+                description: "Free promotional access",
+              },
             },
-          }}
+            {
+              "@context": "https://schema.org",
+              "@type": "Product",
+              "@id": "https://youtubeoptimizer.life/pricing#promotion",
+              name: "Resonance YouTube Optimizer — Free Access Promotion",
+              description: FREE_PROMOTION.description,
+              brand: {
+                "@type": "Brand",
+                name: "The Resonance Hub",
+                "@id": "https://reson8.life/#organization",
+              },
+              offers: {
+                "@type": "Offer",
+                name: "Free promotional access",
+                priceCurrency: "ZAR",
+                price: "0",
+                url: "https://youtubeoptimizer.life/",
+                availability: "https://schema.org/InStock",
+                seller: { "@id": "https://reson8.life/#organization" },
+              },
+            },
+          ]}
         />
         <SiteHeader active="Free Access" />
         <main className="container mx-auto px-4 sm:px-6 py-20">
