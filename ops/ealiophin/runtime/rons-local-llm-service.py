@@ -5,12 +5,14 @@ HOST = "127.0.0.1"
 PORT = int(os.getenv("RONS_LLM_PORT", "7866"))
 OLLAMA = os.getenv("RONS_OLLAMA_URL", "http://127.0.0.1:11434")
 MODEL = os.getenv("RONS_LLM_MODEL", "qwen3:8b")
+NUM_CTX = max(4096, min(32768, int(os.getenv("RONS_LLM_NUM_CTX", "16384"))))
+NUM_PREDICT = max(256, min(8192, int(os.getenv("RONS_LLM_NUM_PREDICT", "4096"))))
 ALLOWED_ORIGINS = {"http://127.0.0.1:3101", "http://localhost:3101"}
 
 def ollama_generate(prompt, system=""):
     payload = json.dumps({"model": MODEL, "prompt": prompt, "system": system,
                           "stream": False, "think": False, "keep_alive": 0,
-                          "options": {"temperature": 0.35, "num_ctx": 32768}}).encode()
+                          "options": {"temperature": 0.35, "num_ctx": NUM_CTX, "num_predict": NUM_PREDICT}}).encode()
     req = urllib.request.Request(f"{OLLAMA}/api/generate", data=payload,
                                  headers={"Content-Type": "application/json"})
     with urllib.request.urlopen(req, timeout=180) as r:
@@ -48,7 +50,7 @@ class Handler(BaseHTTPRequestHandler):
                     tags = json.loads(r.read().decode("utf-8"))
                 names = [m.get("name") for m in tags.get("models", [])]
                 self.send_json(200, {"ok": True, "model": MODEL, "model_ready": MODEL in names,
-                                     "ollama": True, "models": names})
+                                     "ollama": True, "models": names, "num_ctx": NUM_CTX, "num_predict": NUM_PREDICT})
             except Exception as e:
                 self.send_json(503, {"ok": False, "model": MODEL, "model_ready": False,
                                      "ollama": False, "error": str(e)})

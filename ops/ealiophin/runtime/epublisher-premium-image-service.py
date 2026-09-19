@@ -14,6 +14,7 @@ FAST_DIR = Path(os.getenv("RONS_EPUBLISHER_FAST_MODEL_DIR", str(ROOT / "sd-turbo
 PREMIUM_BASE = Path(os.getenv("RONS_EPUBLISHER_PREMIUM_BASE", str(ROOT / "sdxl-base" / "sd_xl_base_1.0.safetensors")))
 PREMIUM_LORA = Path(os.getenv("RONS_EPUBLISHER_PREMIUM_LORA", str(ROOT / "sdxl-lightning" / "sdxl_lightning_4step_lora.safetensors")))
 MAX_ACTIVE_GENERATIONS = max(1, int(os.getenv("RONS_IMAGE_MAX_ACTIVE", "1")))
+IDLE_UNLOAD_SECONDS = max(0, int(os.getenv("RONS_IMAGE_IDLE_UNLOAD_SECONDS", "90")))
 
 _lock = threading.Lock()
 _generation_gate = threading.BoundedSemaphore(MAX_ACTIVE_GENERATIONS)
@@ -21,6 +22,7 @@ _fast_pipe = None
 _premium_pipe = None
 _fast_error = None
 _premium_error = None
+_idle_timer = None
 
 ALLOWED_ORIGINS = {
     "http://127.0.0.1:3101", "http://localhost:3101",
@@ -39,6 +41,40 @@ def premium_complete():
         and PREMIUM_LORA.is_file()
         and PREMIUM_LORA.stat().st_size > 250_000_000
     )
+
+def _cancel_idle_unload():
+    global _idle_timer
+    with _lock:
+        timer = _idle_timer
+        _idle_timer = None
+        if timer is not None:
+            timer.cancel()
+
+def _unload_pipelines():
+    global _fast_pipe, _premium_pipe, _idle_timer
+    with _lock:
+        _fast_pipe = None
+        _premium_pipe = None
+        _idle_timer = None
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        try:
+            torch.cuda.ipc_collect()
+        except Exception:
+            pass
+
+def _schedule_idle_unload():
+    global _idle_timer
+    if IDLE_UNLOAD_SECONDS <= 0:
+        return
+    with _lock:
+        if _idle_timer is not None:
+            _idle_timer.cancel()
+        timer = threading.Timer(IDLE_UNLOAD_SECONDS, _unload_pipelines)
+        timer.daemon = True
+        _idle_timer = timer
+        timer.start()
 
 def dims(orientation, quality, aspect_ratio=""):
     if quality == "fast":
@@ -137,6 +173,7 @@ def procedural_image(prompt, width, height, seed):
     return Image.alpha_composite(img.convert("RGBA"), overlay).convert("RGB")
 
 def generate_image(body):
+    _cancel_idle_unload()
     prompt = str(body.get("prompt") or "").strip()
     if not prompt:
         raise ValueError("prompt required")
@@ -260,6 +297,7 @@ class Handler(BaseHTTPRequestHandler):
                     "error": _premium_error,
                 },
                 "maxActive": MAX_ACTIVE_GENERATIONS,
+                "idleUnloadSeconds": IDLE_UNLOAD_SECONDS,
             }
             return self.send_json(200, payload)
         return self.send_json(404, {"error": "not found"})
@@ -281,6 +319,7 @@ class Handler(BaseHTTPRequestHandler):
 
             try:
                 image, meta = generate_image(body)
+                _schedule_idle_unload()
                 buf = io.BytesIO()
                 image.save(buf, format="PNG", optimize=True)
                 encoded = base64.b64encode(buf.getvalue()).decode("ascii")

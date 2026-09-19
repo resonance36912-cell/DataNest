@@ -267,11 +267,11 @@ if (Test-Path -LiteralPath $brokerConfig -PathType Leaf) {
         [IO.File]::WriteAllText($brokerConfig, $brokerJson, (New-Object Text.UTF8Encoding($false)))
     } catch { Write-Warning "Could not update local AI broker model label: $($_.Exception.Message)" }
 }
-$services += Start-PythonService 'local-llm' 7866 'http://127.0.0.1:7866/health' (Join-Path $Runtime 'rons-local-llm-service.py') $SystemPython 'rons-local-llm-service.py' @{ RONS_LLM_MODEL=$localLlmModel }
+$services += Start-PythonService 'local-llm' 7866 'http://127.0.0.1:7866/health' (Join-Path $Runtime 'rons-local-llm-service.py') $SystemPython 'rons-local-llm-service.py' @{ RONS_LLM_MODEL=$localLlmModel; RONS_LLM_NUM_CTX='16384'; RONS_LLM_NUM_PREDICT='4096' }
 $services += Start-PythonService 'local-stt' 7864 'http://127.0.0.1:7864/health' (Join-Path $Runtime 'syncvision-local-stt.py') $SttPython 'syncvision-local-stt.py' @{ HF_HUB_DISABLE_XET='1'; RONS_STT_MODELS_ROOT=(Join-Path $Runtime 'models') }
 $services += Start-PythonService 'epublisher-stt' 7869 'http://127.0.0.1:7869/health' (Join-Path $Runtime 'syncvision-local-stt.py') $SttPython 'syncvision-local-stt.py' @{ HF_HUB_DISABLE_XET='1'; RONS_STT_MODELS_ROOT=(Join-Path $Runtime 'models'); RONS_STT_PORT='7869' }
 $services += Start-PythonService 'local-image' 7865 'http://127.0.0.1:7865/health' (Join-Path $Runtime 'epublisher-image-service.py') $MediaPython 'epublisher-image-service.py'
-$services += Start-PythonService 'premium-image' 7870 'http://127.0.0.1:7870/health' (Join-Path $Runtime 'epublisher-premium-image-service.py') $MediaPython 'epublisher-premium-image-service.py' @{ RONS_EPUBLISHER_IMAGE_PORT='7870'; RONS_IMAGE_MAX_ACTIVE='1'; RONS_EPUBLISHER_MODELS_ROOT=(Join-Path $Runtime 'models') }
+$services += Start-PythonService 'premium-image' 7870 'http://127.0.0.1:7870/health' (Join-Path $Runtime 'epublisher-premium-image-service.py') $MediaPython 'epublisher-premium-image-service.py' @{ RONS_EPUBLISHER_IMAGE_PORT='7870'; RONS_IMAGE_MAX_ACTIVE='1'; RONS_IMAGE_IDLE_UNLOAD_SECONDS='90'; RONS_EPUBLISHER_MODELS_ROOT=(Join-Path $Runtime 'models') }
 $services += Start-PythonService 'creative-source' 7867 'http://127.0.0.1:7867/health' (Join-Path $Runtime 'creative-source-service.py') $MediaPython 'creative-source-service.py'
 $services += Start-PythonService 'ai-broker' 7868 'http://127.0.0.1:7868/health' (Join-Path $Runtime 'ai-broker-service.py') $SystemPython 'ai-broker-service.py'
 
