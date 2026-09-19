@@ -64,7 +64,9 @@ def anonymous_entitlement(app_id: str) -> dict:
     now = __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat()
     return {"ok": True, "authenticated": False, "app": app_id, "user_id": "", "userId": "",
             "has_access": False, "hasAccess": False, "tier": "free", "status": "inactive",
-            "source": "none", "features": {}, "current_period_end": None, "currentPeriodEnd": None,
+            "source": "none", "features": {}, "credits_remaining": 0, "creditsRemaining": 0,
+            "pack_tier": None, "packTier": None,
+            "current_period_end": None, "currentPeriodEnd": None,
             "expiresAt": None, "checkedAt": now}
 
 
@@ -188,6 +190,33 @@ class Broker(BaseHTTPRequestHandler):
         sub_status, rows = gateway_json("/v1/db/query", method="POST", body=query)
         if sub_status != 200 or not isinstance(rows, list):
             return self._send_json(503, {"error": "entitlement lookup unavailable"})
+        wallet_query = {"table": "credit_wallets", "action": "select", "columns": "balance",
+                        "filters": [{"column": "user_id", "op": "eq", "value": uid},
+                                    {"column": "app", "op": "eq", "value": app_id}],
+                        "options": {"limit": 1}}
+        wallet_status, wallet_rows = gateway_json("/v1/db/query", method="POST", body=wallet_query)
+        credits_remaining = 0
+        if wallet_status == 200 and isinstance(wallet_rows, list) and wallet_rows:
+            try:
+                credits_remaining = max(0, int((wallet_rows[0] or {}).get("balance", 0) or 0))
+            except (TypeError, ValueError):
+                credits_remaining = 0
+
+        invoice_query = {"table": "invoices", "action": "select", "columns": "tier,status,issued_at",
+                         "filters": [{"column": "user_id", "op": "eq", "value": uid},
+                                     {"column": "app", "op": "eq", "value": app_id}],
+                         "options": {"limit": 100}}
+        invoice_status, invoice_rows = gateway_json("/v1/db/query", method="POST", body=invoice_query)
+        pack_rank = {"starter_pack": 1, "creator_pack": 2, "studio_pack": 3}
+        pack_tier = None
+        if invoice_status == 200 and isinstance(invoice_rows, list):
+            paid_pack_tiers = [
+                str(r.get("tier")) for r in invoice_rows
+                if isinstance(r, dict) and r.get("status") == "paid" and str(r.get("tier")) in pack_rank
+            ]
+            if paid_pack_tiers:
+                pack_tier = max(paid_pack_tiers, key=lambda value: pack_rank.get(value, 0))
+
         active = [r for r in rows if isinstance(r, dict) and r.get("status") == "active"]
         winner = next((r for r in active if r.get("app") == "all_access"), None)
         if winner is None:
@@ -201,6 +230,8 @@ class Broker(BaseHTTPRequestHandler):
             "has_access": winner is not None, "hasAccess": winner is not None,
             "tier": tier, "status": (winner or {}).get("status", "inactive"),
             "source": source, "features": {},
+            "credits_remaining": credits_remaining, "creditsRemaining": credits_remaining,
+            "pack_tier": pack_tier, "packTier": pack_tier,
             "current_period_end": period_end, "currentPeriodEnd": period_end,
             "expiresAt": period_end, "checkedAt": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
         })
