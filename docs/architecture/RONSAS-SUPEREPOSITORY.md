@@ -108,28 +108,29 @@ C:\Users\Ashley\Dropbox\RONS-Audit\RONS-AI-AUDIT-REPOSITORY\ <- Dropbox local mi
 | Local LLM | `C:\Users\Ashley\Resonance\OpenNova\runtime` | `http://127.0.0.1:7866/health` | status and sanitized evidence only |
 | Creative source | `C:\Users\Ashley\Resonance\OpenNova\runtime` | `http://127.0.0.1:7867/health` | status and sanitized evidence only |
 | RONS AI broker | `C:\Users\Ashley\Resonance\OpenNova\runtime\ai-broker` | `http://127.0.0.1:7868/health` | status and sanitized evidence only |
+| ePublisher speech-to-text | `C:\Users\Ashley\Resonance\OpenNova\runtime` | `http://127.0.0.1:7869/health` | isolated ePublisher STT instance; same governed local STT runtime |
 | AppDev Foundry | `C:\Users\Ashley\Resonance\OpenNova\ResonanceAppDev_ZeroCredit_v1.5.8` | `http://127.0.0.1:8787/v1/apps` | `04-SOURCE-BUNDLES/AppDev-Foundry-SOURCE-v1.0.0.zip` |
 | Sovereign gateway | Foundry-managed local service | `http://127.0.0.1:8787/v1/backend/health` | validation/receipts; direct port 58600 remains loopback-controlled |
 | Ollama | `C:\Users\Ashley\AppData\Local\Programs\Ollama` | `http://127.0.0.1:11434/` | model metadata only; no model blobs |
 
-All declared service listener ports except the intentionally indirect gateway port were observed listening on 2026-09-14. The last packaged control status, generated 2026-09-12, reported 14 up, 0 down, and 0 required down.
+The original declared service listener ports except the intentionally indirect gateway port were observed listening on 2026-09-14. The dedicated ePublisher STT listener on port 7869 was verified live and healthy on 2026-09-19. The last packaged control status generated 2026-09-12 predates that service entry and reported 14 up, 0 down, and 0 required down.
 
 ## GitHub map
 
 | Repository | Local source path | Configured remote | State |
 | --- | --- | --- | --- |
 | RCGF | `C:\Users\Ashley\Documents\GitHub\RCGF` | `https://github.com/resonance36912-cell/RCGF.git` | governance upstream; `main` verified |
-| Resonance Hub | `C:\Resonance\Sources\ronsas-hub-canonical` | `https://github.com/resonance36912-cell/resonance-hub.git` | production source branch `ronsas/ealiophin-production` verified at `5470b50` |
+| Resonance Hub | `C:\Resonance\Sources\ronsas-hub-canonical` | `https://github.com/resonance36912-cell/resonance-hub.git` | production source branch `ronsas/ealiophin-production` verified at `fc24b9a`; public release tag `ronsas-public-2026-09-18.3` |
 | RONS sovereign codebase | `C:\Users\Ashley\Documents\GitHub\rons-sovereign-codebase` | `https://github.com/resonance36912-cell/RONSAS.git` | private sovereign control authority |
 | Sovereign backend | `C:\Users\Ashley\Resonance\OpenNova\sources\rons-sovereign-backend-source` | `https://github.com/resonance36912-cell/rons-sovereign-backend-source.git` | private platform source authority on `main` at `791196e`; baseline `c36a808` / `ronsas-source-baseline-2026-09-19`; validated tag `ronsas-backend-v0.11-staging-validated`; 42 backend tests + isolated ITN staging boundary green |
-| ePublisher | `C:\Users\Ashley\Resonance\OpenNova\apps\epublisher-sovereign-local-v0.1` | `https://github.com/resonance36912-cell/rons-epublisher-sovereign-source.git` | source authority on `main` at `34f7bbd`; optimized tag `ronsas-source-optimized-2026-09-18`; GitHub Actions green |
-| Creative Studio | `C:\Users\Ashley\Resonance\OpenNova\apps\creative-studio-sovereign-local-v0.1` | `https://github.com/resonance36912-cell/rons-creative-studio-sovereign-source.git` | private source authority on `main` at `663b4f7`; optimized tag `ronsas-source-optimized-2026-09-18`; local pricing/tests/build green |
-| Sync Vision | `C:\Users\Ashley\Resonance\OpenNova\apps\sync-vision-sovereign-local-v0.1` | `https://github.com/resonance36912-cell/rons-sync-vision-sovereign-source.git` | private source authority on `main` at `fbb29b3`; optimized tag `ronsas-source-optimized-2026-09-18`; local typecheck/meta/tests/build green |
-| YouTube Optimizer | `C:\Users\Ashley\Resonance\OpenNova\apps\youtube-optimizer-sovereign-local-v0.1` | `https://github.com/resonance36912-cell/rons-youtube-optimizer-sovereign-source.git` | private source authority on `main` at `2290568`; optimized tag `ronsas-source-optimized-2026-09-18`; local config/typecheck/tests/build green |
+| ePublisher | `C:\Users\Ashley\Resonance\OpenNova\apps\epublisher-sovereign-local-v0.1` | `https://github.com/resonance36912-cell/rons-epublisher-sovereign-source.git` | source authority on `main` at `4a87eed`; npm audit 0; governed tests/types/build and premium storyboard/image routing baseline |
+| Creative Studio | `C:\Users\Ashley\Resonance\OpenNova\apps\creative-studio-sovereign-local-v0.1` | `https://github.com/resonance36912-cell/rons-creative-studio-sovereign-source.git` | private source authority on `main` at `bcea190`; sovereign Ealiophin CI enabled; npm CI authority retained |
+| Sync Vision | `C:\Users\Ashley\Resonance\OpenNova\apps\sync-vision-sovereign-local-v0.1` | `https://github.com/resonance36912-cell/rons-sync-vision-sovereign-source.git` | private source authority on `main` at `491e923`; npm audit 0; sovereign Ealiophin CI green |
+| YouTube Optimizer | `C:\Users\Ashley\Resonance\OpenNova\apps\youtube-optimizer-sovereign-local-v0.1` | `https://github.com/resonance36912-cell/rons-youtube-optimizer-sovereign-source.git` | private source authority on `main` at `48f258d`; sovereign runner migration PR validates CI/SSR/Lighthouse gates |
 
 GitHub CLI authentication is active as `resonance36912-cell`. RONSAS and the three newly-created spoke repositories remain private. Native branch protection for private repositories is unavailable on the current GitHub plan, so RONSAS continues to enforce review-branch promotion by policy and tracked local pre-push guards.
 
-As of 2026-09-18, GitHub-hosted Actions for the three new private spoke repositories are blocked before runner allocation by an account billing/spending-limit condition reported by GitHub. Those red runs are infrastructure-blocked, not code failures: Creative Studio, Sync Vision, and YouTube Optimizer passed their declared validation gates locally before publication. ePublisher is public and its GitHub Actions CI is green. See [SPOKE-SOURCE-AUTHORITY.md](./SPOKE-SOURCE-AUTHORITY.md) for the validation and promotion model.
+As of 2026-09-19, private-spoke validation has been moved onto the sovereign Ealiophin self-hosted runner. Sync Vision is green on current main; Creative Studio and YouTube Optimizer use the same governed runner path, with browser-capable jobs explicitly labelled where required. ePublisher remains public with GitHub Actions CI and zero npm advisories. See [SPOKE-SOURCE-AUTHORITY.md](./SPOKE-SOURCE-AUTHORITY.md) for the validation and promotion model.
 
 ## Dropbox map
 

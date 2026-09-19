@@ -284,6 +284,14 @@
                          "required":  true
                      },
                      {
+                         "id":  "epublisher-stt",
+                         "name":  "ePublisher Speech-to-Text",
+                         "port":  7869,
+                         "listen_port":  7869,
+                         "uri":  "http://127.0.0.1:7869/health",
+                         "required":  true
+                     },
+                     {
                          "id":  "foundry",
                          "name":  "Foundry",
                          "port":  8787,
