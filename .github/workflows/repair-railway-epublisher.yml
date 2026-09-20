@@ -73,10 +73,18 @@ jobs:
             }
           } | ConvertTo-Json -Depth 10 -Compress
 
-          $ErrorActionPreference='Continue'
-          $patchOut=$patch | & $Node $RailwayJs environment edit --project $Project --environment $Environment --stage --json 2>&1
-          $patchExit=$LASTEXITCODE
-          $ErrorActionPreference='Stop'
-          if($patchExit -ne 0){throw ('Railway source JSON staging failed: ' + (($patchOut | Out-String).Trim()))}
-          Write-Host (($patchOut | Out-String).Trim())
+          $patchPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-source-patch.json'
+          $stdoutPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-source-patch.stdout'
+          $stderrPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-source-patch.stderr'
+          [IO.File]::WriteAllText($patchPath,$patch,(New-Object Text.UTF8Encoding($false)))
+          Remove-Item -Force -LiteralPath $stdoutPath,$stderrPath -ErrorAction SilentlyContinue
+
+          $args=@($RailwayJs,'environment','edit','--project',$Project,'--environment',$Environment,'--stage','--json')
+          $proc=Start-Process -FilePath $Node -ArgumentList $args -RedirectStandardInput $patchPath -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -NoNewWindow -Wait -PassThru
+          $patchOut=if(Test-Path -LiteralPath $stdoutPath){Get-Content -Raw -LiteralPath $stdoutPath}else{''}
+          $patchErr=if(Test-Path -LiteralPath $stderrPath){Get-Content -Raw -LiteralPath $stderrPath}else{''}
+          if(-not [string]::IsNullOrWhiteSpace($patchErr)){Write-Host $patchErr.Trim()}
+          if($proc.ExitCode -ne 0){throw ('Railway source JSON staging failed: ' + (($patchOut + [Environment]::NewLine + $patchErr).Trim()))}
+          Write-Host $patchOut.Trim()
+          Remove-Item -Force -LiteralPath $patchPath,$stdoutPath,$stderrPath -ErrorAction SilentlyContinue
           Write-Host ('RONSAS RAILWAY EPUB TARGET STAGED: ' + $Target)
