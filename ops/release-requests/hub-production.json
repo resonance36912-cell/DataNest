@@ -14,6 +14,6 @@
     "routeSmoke": "passed"
   },
   "purpose": "Publish the validated free-promotion Hub bundle so /pricing and /changelog match governed production source.",
-  "retryAttempt": 2,
-  "retryReason": "Windows runner online; retry after explicit GitHub Actions PowerShell execution-policy fix."
+  "retryAttempt": 3,
+  "retryReason": "Windows runner shell probe passed with in-memory scriptblock under process ExecutionPolicy Bypass."
 }

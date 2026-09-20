@@ -24,7 +24,7 @@ jobs:
 
       - name: Read and validate governed release request
         id: request
-        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
           $r = Get-Content -Raw -LiteralPath 'ops/release-requests/hub-production.json' | ConvertFrom-Json
@@ -36,7 +36,7 @@ jobs:
           "commit=$($r.commit)" >> $env:GITHUB_OUTPUT
 
       - name: Prepare exact Hub source in isolated worktree
-        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
           $Hub='C:\Resonance\Sources\ronsas-hub-canonical'
@@ -65,7 +65,7 @@ jobs:
           "RONSAS_HUB_SOURCE=$Hub" >> $env:GITHUB_ENV
 
       - name: Build and verify isolated candidate
-        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
           Push-Location $env:RONSAS_HUB_WORKTREE
@@ -86,7 +86,7 @@ jobs:
           }
 
       - name: Stage candidate beside live bundle
-        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
           $From=Join-Path $env:RONSAS_HUB_WORKTREE '.output-candidate-local'
@@ -100,7 +100,7 @@ jobs:
           $global:LASTEXITCODE=0
 
       - name: Validate and atomically promote with rollback
-        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
           $Promoter=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\cluster\PROMOTE-RONSAS-HUB.ps1'
@@ -110,7 +110,7 @@ jobs:
           if ($LASTEXITCODE) { throw 'Hub promotion failed.' }
 
       - name: Restore public edge and verify policy-critical routes
-        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
           $Control="$env:USERPROFILE\AppData\Local\Resonance\RONS-ControlCenter"
@@ -135,7 +135,7 @@ jobs:
 
       - name: Record governed release receipt
         if: always()
-        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ReceiptRoot="$env:USERPROFILE\Resonance\OpenNova\runtime\release-receipts"
           New-Item -ItemType Directory -Force -Path $ReceiptRoot | Out-Null
@@ -150,7 +150,7 @@ jobs:
 
       - name: Remove isolated worktree
         if: always()
-        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           if($env:RONSAS_HUB_WORKTREE -and (Test-Path -LiteralPath $env:RONSAS_HUB_WORKTREE)){
             & git -C $env:RONSAS_HUB_SOURCE worktree remove --force $env:RONSAS_HUB_WORKTREE
