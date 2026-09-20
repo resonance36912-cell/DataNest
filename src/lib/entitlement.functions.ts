@@ -3,6 +3,7 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { FREE_PROMOTION_ACTIVE } from "@/lib/commercial-policy";
 
 const AppSchema = z.enum([
   "epublisher",
@@ -15,7 +16,13 @@ const AppSchema = z.enum([
 export type AppKey = z.infer<typeof AppSchema>;
 export type Tier = "free" | "starter" | "creator" | "pro" | "business" | "all_access";
 export type EntitlementStatus = "active" | "pending" | "past_due" | "cancelled" | "inactive";
-export type EntitlementSource = "direct" | "all_access" | "admin_override" | "trial" | "none";
+export type EntitlementSource =
+  | "direct"
+  | "all_access"
+  | "admin_override"
+  | "trial"
+  | "promotion"
+  | "none";
 
 export type EntitlementFeatures = Record<string, boolean>;
 
@@ -69,6 +76,14 @@ export function deriveFeatures(app: AppKey, tier: Tier): EntitlementFeatures {
   }
 }
 
+export function promotionTier(app: AppKey): Tier {
+  return app === "all_access" ? "all_access" : "business";
+}
+
+export function promotionFeatures(app: AppKey): EntitlementFeatures {
+  return deriveFeatures(app, promotionTier(app));
+}
+
 /**
  * Fire-and-forget audit write. Never throws into the request path —
  * a failed log must NOT cause the entitlement check itself to fail.
@@ -113,6 +128,32 @@ export const getEntitlement = createServerFn({ method: "POST" })
     }
     const sourceIp = req?.headers.get("x-forwarded-for") ?? null;
     const userAgent = req?.headers.get("user-agent") ?? null;
+
+    if (FREE_PROMOTION_ACTIVE) {
+      const tier = promotionTier(data.app);
+      void logEntitlementCheck({
+        userId,
+        app: data.app,
+        tier,
+        status: "active",
+        source: "promotion",
+        sourceIp,
+        userAgent,
+      });
+      return {
+        ok: true,
+        app: data.app,
+        userId,
+        tier,
+        status: "active",
+        source: "promotion",
+        expiresAt: null,
+        features: promotionFeatures(data.app),
+        checkedAt,
+        hasAccess: true,
+        currentPeriodEnd: null,
+      };
+    }
 
     const { data: rows, error } = await supabase
       .from("subscriptions")
