@@ -1,0 +1,27 @@
+name: One-shot Windows PowerShell shell probe
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/windows-shell-probe-20260920.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 5
+    steps:
+      - name: Verify in-memory PowerShell scriptblock shell
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          Write-Host "custom_shell=ok"
+          Write-Host ("process_policy=" + (Get-ExecutionPolicy -Scope Process))
+          $probe = Join-Path $env:RUNNER_TEMP 'ronsas-shell-probe.txt'
+          'ok' | Set-Content -LiteralPath $probe -Encoding ASCII
+          if ((Get-Content -Raw -LiteralPath $probe).Trim() -ne 'ok') { throw 'Probe file mismatch.' }
+          Remove-Item -LiteralPath $probe -Force
+          Write-Host "multiline_script=ok"
