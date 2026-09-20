@@ -20,7 +20,14 @@
 
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
-import { deriveFeatures, type AppKey, type Tier } from "@/lib/entitlement.functions";
+import {
+  deriveFeatures,
+  promotionFeatures,
+  promotionTier,
+  type AppKey,
+  type Tier,
+} from "@/lib/entitlement.functions";
+import { FREE_PROMOTION_ACTIVE } from "@/lib/commercial-policy";
 
 // ── Tier ranking (mirror of canonical) ──────────────────────────────────────
 const TIER_RANK: Record<Tier, number> = {
@@ -43,7 +50,7 @@ type CachedEntitlement = {
   userId: string;
   tier: Tier;
   status: "active" | "pending" | "past_due" | "cancelled" | "inactive";
-  source: "direct" | "all_access" | "none";
+  source: "direct" | "all_access" | "promotion" | "none";
   expiresAt: string | null;
   features: Record<string, boolean>;
   checkedAt: string;
@@ -113,27 +120,24 @@ export async function requireTierFromRequest(args: {
   // 1. Extract bearer token.
   const authHeader = request.headers.get("authorization") ?? "";
   if (!authHeader.toLowerCase().startsWith("bearer ")) {
-    throw new Response(
-      JSON.stringify({ error: "unauthorized", message: "Sign in required" }),
-      { status: 401, headers },
-    );
+    throw new Response(JSON.stringify({ error: "unauthorized", message: "Sign in required" }), {
+      status: 401,
+      headers,
+    });
   }
   const accessToken = authHeader.slice(7).trim();
   if (!accessToken) {
-    throw new Response(
-      JSON.stringify({ error: "unauthorized", message: "Sign in required" }),
-      { status: 401, headers },
-    );
+    throw new Response(JSON.stringify({ error: "unauthorized", message: "Sign in required" }), {
+      status: 401,
+      headers,
+    });
   }
 
   // 2. Validate the JWT and pull the user id (cheap, no DB round-trip).
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-    throw new Response(
-      JSON.stringify({ error: "server_misconfigured" }),
-      { status: 500, headers },
-    );
+    throw new Response(JSON.stringify({ error: "server_misconfigured" }), { status: 500, headers });
   }
 
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
@@ -149,6 +153,32 @@ export async function requireTierFromRequest(args: {
     );
   }
   const userId = claimsData.claims.sub as string;
+
+  if (FREE_PROMOTION_ACTIVE) {
+    const checkedAt = new Date().toISOString();
+    const tier = promotionTier(app);
+    const ent: CachedEntitlement = {
+      ok: true,
+      app,
+      userId,
+      tier,
+      status: "active",
+      source: "promotion",
+      expiresAt: null,
+      features: promotionFeatures(app),
+      checkedAt,
+      hasAccess: true,
+      currentPeriodEnd: null,
+    };
+    return {
+      userId,
+      accessToken,
+      tier: ent.tier,
+      status: ent.status,
+      source: ent.source,
+      entitlement: ent,
+    };
+  }
 
   // 3. Cache lookup.
   let ent: CachedEntitlement | undefined;
@@ -169,10 +199,10 @@ export async function requireTierFromRequest(args: {
 
     if (queryErr) {
       // Fail closed.
-      throw new Response(
-        JSON.stringify(upgradeBody(app, required, "free", "inactive", returnTo)),
-        { status: 402, headers },
-      );
+      throw new Response(JSON.stringify(upgradeBody(app, required, "free", "inactive", returnTo)), {
+        status: 402,
+        headers,
+      });
     }
 
     const active = (rows ?? []).filter((r) => r.status === "active");
@@ -218,14 +248,13 @@ export async function requireTierFromRequest(args: {
 
   // 5. Evaluate.
   const allowed =
-    ent.status === "active" &&
-    (ent.source === "all_access" || hasAtLeast(ent.tier, required));
+    ent.status === "active" && (ent.source === "all_access" || ent.source === "promotion" || hasAtLeast(ent.tier, required));
 
   if (!allowed) {
-    throw new Response(
-      JSON.stringify(upgradeBody(app, required, ent.tier, ent.status, returnTo)),
-      { status: 402, headers },
-    );
+    throw new Response(JSON.stringify(upgradeBody(app, required, ent.tier, ent.status, returnTo)), {
+      status: 402,
+      headers,
+    });
   }
 
   return {
