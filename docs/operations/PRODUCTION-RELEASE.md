@@ -29,7 +29,7 @@ Database rollback is forward-only. Never delete an applied migration or run an u
    - `bun test`
    - `bun run typecheck`
    - `bun run build:local`
-4. Stage the resulting `.output-local` beside the live bundle and compare a deterministic SHA-256 tree hash with the validated build.
+4. Stage the resulting `.output-local` beside the live bundle and compare a deterministic SHA-256 tree hash with the validated build. Candidate health validation uses loopback-only port `4195`; it must not be included in the public Caddy upstream chain.
 5. Read the RONSAS cluster ownership record and replace only the supervisor-owned Hub listener. Never stop an unrecognized process.
 6. Preserve the previous `.output-local` directory under `runtime\production-edge\backups` before promoting the validated bundle.
 7. Run `runtime\production-edge\START-RONSAS-CANONICAL.ps1` to restore the supervised ecosystem, validate/reload Caddy, and ensure the named Cloudflare tunnel is running.

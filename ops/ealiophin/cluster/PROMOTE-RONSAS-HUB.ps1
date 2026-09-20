@@ -4,7 +4,7 @@ param(
     [string]$HubSource = 'C:\Resonance\Sources\ronsas-hub-canonical',
     [string]$CandidateDirName = '.output-candidate-local',
     [string]$LiveDirName = '.output-local',
-    [int]$CandidatePort = 4175,
+    [int]$CandidatePort = 4195,
     [int]$LivePort = 4174,
     [switch]$ValidateOnly
 )

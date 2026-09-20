@@ -16,9 +16,11 @@
     "currentHead": "791c5b7e74dab20c1e48fb0d7bb34a8f6d426d57",
     "runtimeDelta": "test-only; application/runtime code unchanged",
     "testIsolationPr": 48,
-    "commercialModeRun": 35483989207
+    "commercialModeRun": 35483989207,
+    "candidatePort": 4195,
+    "publicFallbackPortPreserved": 4175
   },
   "purpose": "Publish the validated free-promotion Hub bundle so /pricing and /changelog match governed production source.",
-  "retryAttempt": 6,
-  "retryReason": "Exact current Hub head passed build/tests/typecheck/build:local; promoter now safely clears only a verified stale RONSAS candidate listener on port 4175."
+  "retryAttempt": 7,
+  "retryReason": "Public Caddy actively uses 4175 as a live Hub fallback. Move isolated candidate validation to unassigned loopback-only port 4195 and retry the same validated current Hub head."
 }
