@@ -61,11 +61,16 @@ jobs:
           Write-Host ('Railway CLI: ' + (& $Railway --version))
 
           function Invoke-RailwayApi([string]$Query,[hashtable]$Variables){
-            $vars=$Variables | ConvertTo-Json -Depth 10 -Compress
-            $raw=& $Railway api $Query --variables $vars --compact 2>&1
-            if($LASTEXITCODE -ne 0){throw ('Railway CLI API call failed: ' + (($raw | Out-String).Trim()))}
-            $text=($raw | Out-String).Trim()
-            return $text | ConvertFrom-Json
+            $varsPath=Join-Path $env:RUNNER_TEMP ('railway-vars-' + [guid]::NewGuid().ToString('N') + '.json')
+            try {
+              $Variables | ConvertTo-Json -Depth 10 -Compress | Set-Content -LiteralPath $varsPath -Encoding UTF8
+              $raw=& $Railway api $Query --variables ('@' + $varsPath) --compact 2>&1
+              if($LASTEXITCODE -ne 0){throw ('Railway CLI API call failed: ' + (($raw | Out-String).Trim()))}
+              $text=($raw | Out-String).Trim()
+              return $text | ConvertFrom-Json
+            } finally {
+              Remove-Item -Force -LiteralPath $varsPath -ErrorAction SilentlyContinue
+            }
           }
 
           $staged=Invoke-RailwayApi 'query($environmentId:String!){environmentStagedChanges(environmentId:$environmentId)}' @{environmentId=$Environment}
