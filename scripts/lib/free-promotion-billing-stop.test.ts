@@ -27,7 +27,7 @@ test("recurring cancellation stays on governed Ealiophin production host", () =>
   expect(workflow).toContain("--execute");
   expect(worker).toContain('/subscriptions/" + encodeURIComponent(token) + "/cancel"');
   expect(worker).toContain('method: "PUT"');
-  expect(worker).toContain("tokenFingerprint");
+  expect(worker).toContain("fingerprint");
   expect(worker).not.toContain("console.log(token)");
 });
 
