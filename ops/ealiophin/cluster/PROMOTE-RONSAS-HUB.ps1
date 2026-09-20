@@ -61,9 +61,9 @@ function Get-ListenerPid([int]$Port) {
     return $null
 }
 
-function Start-Hub([string]$Entry,[int]$Port) {
+function Start-Hub([string]$Entry,[int]$Port,[switch]$DetachFromActionsCleanup) {
     $prior = @{}
-    foreach ($key in @('HOST','PORT','NODE_ENV','RESONANCE_BACKEND_PROVIDER','RESONANCE_SOVEREIGN_GATEWAY_URL','RONS_SOVEREIGN_PROXY_ENABLED','RONS_ENTITLEMENT_SHADOW','RONS_IDENTITY_SHADOW','RONS_ROLE_SHADOW','RONS_AUTH_EXCHANGE_KEY_FILE','RONS_GATEWAY_PROCEDURE_KEY_FILE')) {
+    foreach ($key in @('HOST','PORT','NODE_ENV','RESONANCE_BACKEND_PROVIDER','RESONANCE_SOVEREIGN_GATEWAY_URL','RONS_SOVEREIGN_PROXY_ENABLED','RONS_ENTITLEMENT_SHADOW','RONS_IDENTITY_SHADOW','RONS_ROLE_SHADOW','RONS_AUTH_EXCHANGE_KEY_FILE','RONS_GATEWAY_PROCEDURE_KEY_FILE','RUNNER_TRACKING_ID')) {
         $prior[$key] = [Environment]::GetEnvironmentVariable($key,'Process')
     }
     try {
@@ -78,6 +78,10 @@ function Start-Hub([string]$Entry,[int]$Port) {
         $env:RONS_ROLE_SHADOW = '1'
         $env:RONS_AUTH_EXCHANGE_KEY_FILE = Join-Path $SecretRoot 'auth-exchange-key'
         $env:RONS_GATEWAY_PROCEDURE_KEY_FILE = Join-Path $SecretRoot 'gateway-procedure-key'
+        if ($DetachFromActionsCleanup) {
+            [Environment]::SetEnvironmentVariable('RUNNER_TRACKING_ID',$null,'Process')
+            Write-Host '[RONSAS] Starting production Hub outside GitHub Actions orphan-process cleanup.'
+        }
         $out = Join-Path $ReceiptRoot ("hub-$Port.out.log")
         $err = Join-Path $ReceiptRoot ("hub-$Port.err.log")
         return Start-Process -FilePath $Node -ArgumentList @(("--env-file=" + $EnvFile),$Entry) -WorkingDirectory $HubSource -RedirectStandardOutput $out -RedirectStandardError $err -WindowStyle Hidden -PassThru
@@ -164,7 +168,7 @@ try {
     }
     Move-Item -LiteralPath $Candidate -Destination $Live
 
-    $newProcess = Start-Hub $LiveEntry $LivePort
+    $newProcess = Start-Hub $LiveEntry $LivePort -DetachFromActionsCleanup
     if (-not (Wait-Http ("http://127.0.0.1:$LivePort/") 45)) { throw 'Promoted Hub failed production health validation.' }
     $newPid = Get-ListenerPid $LivePort
     if (-not $newPid) { throw 'Promoted Hub is reachable but listener PID was not found.' }
@@ -186,7 +190,7 @@ try {
         if ($rollback -and (Test-Path -LiteralPath $rollback)) {
             if (Test-Path -LiteralPath $Live) { Move-Item -LiteralPath $Live -Destination (Join-Path $HubSource ('.output-failed-' + $stamp)) }
             Move-Item -LiteralPath $rollback -Destination $Live
-            $restored = Start-Hub $LiveEntry $LivePort
+            $restored = Start-Hub $LiveEntry $LivePort -DetachFromActionsCleanup
             if (Wait-Http ("http://127.0.0.1:$LivePort/") 45) {
                 $restoredPid = Get-ListenerPid $LivePort
                 if ($restoredPid) { Update-State $restoredPid }

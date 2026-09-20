@@ -21,6 +21,6 @@
     "publicFallbackPortPreserved": 4175
   },
   "purpose": "Publish the validated free-promotion Hub bundle so /pricing and /changelog match governed production source.",
-  "retryAttempt": 7,
-  "retryReason": "Public Caddy actively uses 4175 as a live Hub fallback. Move isolated candidate validation to unassigned loopback-only port 4195 and retry the same validated current Hub head."
+  "retryAttempt": 8,
+  "retryReason": "GitHub Actions cleanup terminated the promoted production Node process after the release job. Detach only the live Hub process from RUNNER_TRACKING_ID cleanup and retry the same validated free-promotion Hub head; keep candidate processes tracked and preserve all route checks."
 }
