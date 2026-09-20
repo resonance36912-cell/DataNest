@@ -53,7 +53,7 @@ jobs:
           }
           Write-Host "RONSAS Linux runner online: $name"
 
-      - name: Cancel obsolete closed-PR workflow backlog
+      - name: Cancel obsolete and superseded PR workflow backlog
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
@@ -62,12 +62,28 @@ jobs:
 
           $openPullsRaw = & gh.exe api "repos/$repo/pulls?state=open&per_page=100"
           if ($LASTEXITCODE -ne 0) { throw 'Unable to query open pull requests.' }
-          $openHeadBranches = @(
-            ($openPullsRaw | ConvertFrom-Json) |
-              ForEach-Object { [string]$_.head.ref } |
-              Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
-              Sort-Object -Unique
-          )
+          $openPulls = @($openPullsRaw | ConvertFrom-Json)
+          $openByHead = @{}
+          foreach ($pr in $openPulls) {
+            $branch = [string]$pr.head.ref
+            $sha = [string]$pr.head.sha
+            if ([string]::IsNullOrWhiteSpace($branch) -or [string]::IsNullOrWhiteSpace($sha)) { continue }
+            $openByHead[$branch] = [pscustomobject]@{
+              number = [int]$pr.number
+              sha = $sha
+            }
+          }
+
+          function Cancel-Run([object]$run, [string]$status, [string]$reason) {
+            $head = [string]$run.head_branch
+            Write-Host "Cancelling $status PR run $($run.id): $($run.name) [$head] — $reason"
+            & gh.exe api -X POST "repos/$repo/actions/runs/$($run.id)/cancel" *> $null
+            if ($LASTEXITCODE -eq 0) {
+              $script:cancelled++
+              return
+            }
+            Write-Warning "Run $($run.id) could not be cancelled (it may have completed concurrently)."
+          }
 
           foreach ($status in @('queued','in_progress')) {
             $runsRaw = & gh.exe api "repos/$repo/actions/runs?status=$status&per_page=100"
@@ -78,57 +94,70 @@ jobs:
               if ([string]$run.event -ne 'pull_request') { continue }
 
               $head = [string]$run.head_branch
-
-              # GitHub sometimes omits pull_requests[] from workflow-run payloads.
-              # In that case, use the run's head branch only when it is absent
-              # from the complete set of currently open PR head branches.
+              $runSha = [string]$run.head_sha
               $prs = @($run.pull_requests)
+
+              # GitHub sometimes omits pull_requests[] from older workflow-run
+              # payloads. Resolve those runs against the exact currently-open
+              # head branch. An open PR run is current only when its SHA still
+              # equals that PR's current head SHA.
               if ($prs.Count -eq 0) {
                 if ([string]::IsNullOrWhiteSpace($head)) {
                   Write-Host "Keeping $status run $($run.id): no PR relation or head branch available."
                   continue
                 }
-                if ($openHeadBranches -contains $head) {
-                  Write-Host "Keeping $status run $($run.id): branch [$head] still has an open PR."
+
+                if ($openByHead.ContainsKey($head)) {
+                  $current = $openByHead[$head]
+                  if (-not [string]::IsNullOrWhiteSpace($runSha) -and $runSha -ne [string]$current.sha) {
+                    Cancel-Run $run $status "superseded by current PR #$($current.number) head $($current.sha)"
+                  } else {
+                    Write-Host "Keeping $status run $($run.id): current head for open PR #$($current.number)."
+                  }
                   continue
                 }
 
-                Write-Host "Cancelling obsolete $status PR run $($run.id): $($run.name) [$head] has no open PR."
-                & gh.exe api -X POST "repos/$repo/actions/runs/$($run.id)/cancel" *> $null
-                if ($LASTEXITCODE -eq 0) {
-                  $cancelled++
-                } else {
-                  Write-Warning "Run $($run.id) could not be cancelled (it may have completed concurrently)."
-                }
+                Cancel-Run $run $status "head branch has no open PR"
                 continue
               }
 
-              $allClosed = $true
+              $verified = $true
+              $hasOpen = $false
+              $matchesCurrentOpenHead = $false
+              $openDescriptions = @()
+
               foreach ($prRef in $prs) {
                 $prNumber = [int]$prRef.number
-                $state = (& gh.exe api "repos/$repo/pulls/$prNumber" --jq .state).Trim()
-                if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($state)) {
-                  Write-Warning "Keeping run $($run.id): unable to verify PR #$prNumber state."
-                  $allClosed = $false
+                $prRaw = & gh.exe api "repos/$repo/pulls/$prNumber"
+                if ($LASTEXITCODE -ne 0) {
+                  Write-Warning "Keeping run $($run.id): unable to verify PR #$prNumber."
+                  $verified = $false
                   break
                 }
-                if ($state -ne 'closed') {
-                  Write-Host "Keeping run $($run.id): PR #$prNumber is $state."
-                  $allClosed = $false
-                  break
+                $pr = $prRaw | ConvertFrom-Json
+                $state = [string]$pr.state
+                if ($state -eq 'open') {
+                  $hasOpen = $true
+                  $currentSha = [string]$pr.head.sha
+                  $openDescriptions += "#$prNumber@$currentSha"
+                  if (-not [string]::IsNullOrWhiteSpace($runSha) -and $runSha -eq $currentSha) {
+                    $matchesCurrentOpenHead = $true
+                  }
                 }
               }
 
-              if (-not $allClosed) { continue }
-
-              Write-Host "Cancelling obsolete $status closed-PR run $($run.id): $($run.name) [$head]"
-              & gh.exe api -X POST "repos/$repo/actions/runs/$($run.id)/cancel" *> $null
-              if ($LASTEXITCODE -eq 0) {
-                $cancelled++
-              } else {
-                Write-Warning "Run $($run.id) could not be cancelled (it may have completed concurrently)."
+              if (-not $verified) { continue }
+              if ($matchesCurrentOpenHead) {
+                Write-Host "Keeping $status run $($run.id): matches current open PR head."
+                continue
               }
+              if ($hasOpen) {
+                Cancel-Run $run $status "superseded open-PR run; current heads: $($openDescriptions -join ', ')"
+                continue
+              }
+
+              Cancel-Run $run $status "all associated PRs are closed"
             }
           }
 
-          Write-Host "Obsolete closed-PR workflow runs cancelled: $cancelled"
+          Write-Host "Obsolete/superseded PR workflow runs cancelled: $cancelled"
