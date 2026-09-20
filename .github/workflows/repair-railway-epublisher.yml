@@ -17,7 +17,7 @@ concurrency:
 jobs:
   repair:
     runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -28,6 +28,8 @@ jobs:
           $r=Get-Content -Raw -LiteralPath 'ops/release-requests/railway-epublisher-fallback.json' | ConvertFrom-Json
           if([string]$r.schema -ne 'ronsas-railway-epublisher-repair/v1'){throw 'Unexpected repair schema.'}
           if([string]$r.confirmation -ne 'REPAIR RAILWAY EPUB FALLBACK'){throw 'Explicit repair confirmation missing.'}
+          if([string]$r.projectId -ne '70cc7bde-c5ba-4224-9c74-ddb873b27379'){throw 'Unexpected Railway project.'}
+          if([string]$r.environmentId -ne '78627988-2f5f-42a8-a507-ee5e221bf10a'){throw 'Unexpected Railway environment.'}
           if([string]$r.serviceId -ne '37312153-7877-4830-85ae-5b48e6275319'){throw 'Unexpected Railway service.'}
           if([string]$r.repo -ne 'resonance36912-cell/rons-epublisher-sovereign-source'){throw 'Unexpected source repository.'}
           if([string]$r.branch -ne 'main'){throw 'Unexpected source branch.'}
@@ -35,16 +37,15 @@ jobs:
           if([string]$r.targetCommit -ne '5827b0b89abc8e5f13aa29593075edddbf80a9ae'){throw 'Unexpected target commit.'}
           if([bool]$r.constraints.changeDomains -or [bool]$r.constraints.changeBilling -or [bool]$r.constraints.changeVariables -or [bool]$r.constraints.createService -or [bool]$r.constraints.cloudflareWorkerMigration){throw 'Repair request violates protected constraints.'}
 
-      - name: Repair staged source and deploy exact commit
+      - name: Stage governed source reconnect
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
+          $Project='70cc7bde-c5ba-4224-9c74-ddb873b27379'
           $Environment='78627988-2f5f-42a8-a507-ee5e221bf10a'
           $Service='37312153-7877-4830-85ae-5b48e6275319'
           $Repo='resonance36912-cell/rons-epublisher-sovereign-source'
           $Branch='main'
-          $Stale='3db4856da7ddda7fd8dd18c2e7fe7b66c0334a51'
-          $Target='5827b0b89abc8e5f13aa29593075edddbf80a9ae'
 
           $Railway=(Get-Command railway.cmd -ErrorAction SilentlyContinue).Source
           if(-not $Railway){
@@ -55,65 +56,11 @@ jobs:
             $Railway=(Get-Command railway.cmd -ErrorAction SilentlyContinue).Source
             if(-not $Railway){throw 'Railway CLI bootstrap completed but railway.cmd is unavailable.'}
           }
+
           Write-Host ('Railway CLI: ' + (& $Railway --version))
-
-          function Invoke-RailwayApi([string]$Query){
-            $raw=& $Railway api $Query --compact --allow-errors 2>&1
-            $exit=$LASTEXITCODE
-            $text=(($raw | ForEach-Object { $_.ToString() }) -join [Environment]::NewLine).Trim()
-            if($exit -ne 0){throw ('Railway CLI API call failed: ' + $text)}
-            try {
-              $obj=$text | ConvertFrom-Json
-            } catch {
-              throw ('Railway CLI returned non-JSON output: ' + $text)
-            }
-            if($obj.errors){
-              $messages=@($obj.errors | ForEach-Object {[string]$_.message}) -join '; '
-              throw ('Railway GraphQL: ' + $messages)
-            }
-            return $obj
-          }
-
-          $stagedQuery='query {{ environmentStagedChanges(environmentId: "{0}") }}' -f $Environment
-          $staged=Invoke-RailwayApi $stagedQuery
-          $stagedJson=$staged.data.environmentStagedChanges | ConvertTo-Json -Depth 20 -Compress
-          if([string]::IsNullOrWhiteSpace($stagedJson) -or $stagedJson -eq 'null'){throw 'Expected staged Railway changes are absent.'}
-          if($stagedJson.IndexOf($Service,[StringComparison]::OrdinalIgnoreCase) -lt 0){throw 'Staged changes are not scoped to the expected ePublisher service.'}
-          if($stagedJson.IndexOf($Stale,[StringComparison]::OrdinalIgnoreCase) -lt 0){throw 'Expected stale commit pin is no longer present; refusing mutation.'}
-          if($stagedJson.IndexOf($Repo,[StringComparison]::OrdinalIgnoreCase) -lt 0){throw 'Expected repository is not present in staged changes.'}
-
-          $connectQuery='mutation {{ serviceConnect(id: "{0}", input: {{ repo: "{1}", branch: "{2}" }}) {{ id }} }}' -f $Service,$Repo,$Branch
-          Invoke-RailwayApi $connectQuery | Out-Null
-
-          $post=Invoke-RailwayApi $stagedQuery
-          $postJson=$post.data.environmentStagedChanges | ConvertTo-Json -Depth 20 -Compress
-          $hasPost=(-not [string]::IsNullOrWhiteSpace($postJson)) -and ($postJson -notin @('null','[]','{}'))
-          if($hasPost){
-            if($postJson.IndexOf($Stale,[StringComparison]::OrdinalIgnoreCase) -ge 0){throw 'Source reconnect did not clear the stale commit pin; refusing to commit staged changes.'}
-            if($postJson.IndexOf($Repo,[StringComparison]::OrdinalIgnoreCase) -lt 0){throw 'Post-reconnect staged state does not contain the governed repository.'}
-            $commitQuery='mutation {{ environmentPatchCommitStaged(environmentId: "{0}") }}' -f $Environment
-            Invoke-RailwayApi $commitQuery | Out-Null
-          }
-
-          $deployQuery='mutation {{ serviceInstanceDeployV2(serviceId: "{0}", environmentId: "{1}", commitSha: "{2}") }}' -f $Service,$Environment,$Target
-          $deployed=Invoke-RailwayApi $deployQuery
-          $deploymentId=[string]$deployed.data.serviceInstanceDeployV2
-          if([string]::IsNullOrWhiteSpace($deploymentId)){throw 'Railway returned no deployment ID.'}
-          Write-Host ('Railway deployment ID: ' + $deploymentId)
-
-          for($i=0;$i -lt 40;$i++){
-            $statusQuery='query {{ deployment(id: "{0}") {{ id status meta }} }}' -f $deploymentId
-            $statusResp=Invoke-RailwayApi $statusQuery
-            $status=[string]$statusResp.data.deployment.status
-            $commit=[string]$statusResp.data.deployment.meta.commitHash
-            Write-Host ('Railway deployment status: ' + $status)
-            if(-not [string]::IsNullOrWhiteSpace($commit) -and $commit -ne $Target){throw ('Railway deployment commit mismatch: ' + $commit)}
-            if($status -eq 'SUCCESS'){
-              if($commit -ne $Target){throw 'Successful deployment did not report the governed target commit.'}
-              Write-Host ('RONSAS RAILWAY EPUB FALLBACK: HEALTHY at ' + $Target) -ForegroundColor Green
-              exit 0
-            }
-            if($status -in @('FAILED','CRASHED','REMOVED','SKIPPED')){throw ('Railway deployment ended with status ' + $status)}
-            Start-Sleep -Seconds 15
-          }
-          throw 'Railway deployment did not reach a terminal state within the governed polling window.'
+          $raw=& $Railway service source connect --repo $Repo --branch $Branch --service $Service --environment $Environment --project $Project --json 2>&1
+          $exit=$LASTEXITCODE
+          $text=(($raw | ForEach-Object { $_.ToString() }) -join [Environment]::NewLine).Trim()
+          if($exit -ne 0){throw ('Railway source reconnect failed: ' + $text)}
+          Write-Host $text
+          Write-Host 'RONSAS RAILWAY EPUB SOURCE RECONNECT: STAGED'
