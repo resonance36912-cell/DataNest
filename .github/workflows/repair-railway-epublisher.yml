@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "ops/release-requests/railway-epublisher-fallback.json"
+      - ".github/workflows/repair-railway-epublisher.yml"
 
 permissions:
   contents: read
@@ -15,7 +16,7 @@ concurrency:
 
 jobs:
   repair:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
     timeout-minutes: 20
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
@@ -24,105 +25,81 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Validate governed request
-        id: request
-        shell: bash
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
-          set -euo pipefail
-          file="ops/release-requests/railway-epublisher-fallback.json"
-          test -f "$file"
-          test "$(jq -r .schema "$file")" = "ronsas-railway-epublisher-repair/v1"
-          test "$(jq -r .confirmation "$file")" = "REPAIR RAILWAY EPUB FALLBACK"
-          test "$(jq -r .projectId "$file")" = "70cc7bde-c5ba-4224-9c74-ddb873b27379"
-          test "$(jq -r .environmentId "$file")" = "78627988-2f5f-42a8-a507-ee5e221bf10a"
-          test "$(jq -r .serviceId "$file")" = "37312153-7877-4830-85ae-5b48e6275319"
-          test "$(jq -r .repo "$file")" = "resonance36912-cell/rons-epublisher-sovereign-source"
-          test "$(jq -r .branch "$file")" = "main"
-          test "$(jq -r .staleCommit "$file")" = "3db4856da7ddda7fd8dd18c2e7fe7b66c0334a51"
-          test "$(jq -r .targetCommit "$file")" = "5827b0b89abc8e5f13aa29593075edddbf80a9ae"
-          test "$(jq -r .constraints.changeDomains "$file")" = "false"
-          test "$(jq -r .constraints.changeBilling "$file")" = "false"
-          test "$(jq -r .constraints.changeVariables "$file")" = "false"
-          test "$(jq -r .constraints.createService "$file")" = "false"
-          test "$(jq -r .constraints.cloudflareWorkerMigration "$file")" = "false"
+          $ErrorActionPreference='Stop'
+          $file='ops/release-requests/railway-epublisher-fallback.json'
+          if(-not (Test-Path -LiteralPath $file -PathType Leaf)){throw 'Governed Railway repair request is missing.'}
+          $r=Get-Content -Raw -LiteralPath $file | ConvertFrom-Json
+          if([string]$r.schema -ne 'ronsas-railway-epublisher-repair/v1'){throw 'Unexpected repair schema.'}
+          if([string]$r.confirmation -ne 'REPAIR RAILWAY EPUB FALLBACK'){throw 'Explicit repair confirmation missing.'}
+          if([string]$r.projectId -ne '70cc7bde-c5ba-4224-9c74-ddb873b27379'){throw 'Unexpected Railway project.'}
+          if([string]$r.environmentId -ne '78627988-2f5f-42a8-a507-ee5e221bf10a'){throw 'Unexpected Railway environment.'}
+          if([string]$r.serviceId -ne '37312153-7877-4830-85ae-5b48e6275319'){throw 'Unexpected Railway service.'}
+          if([string]$r.repo -ne 'resonance36912-cell/rons-epublisher-sovereign-source'){throw 'Unexpected source repository.'}
+          if([string]$r.branch -ne 'main'){throw 'Unexpected source branch.'}
+          if([string]$r.staleCommit -ne '3db4856da7ddda7fd8dd18c2e7fe7b66c0334a51'){throw 'Unexpected stale commit.'}
+          if([string]$r.targetCommit -ne '5827b0b89abc8e5f13aa29593075edddbf80a9ae'){throw 'Unexpected target commit.'}
+          if([bool]$r.constraints.changeDomains -or [bool]$r.constraints.changeBilling -or [bool]$r.constraints.changeVariables -or [bool]$r.constraints.createService -or [bool]$r.constraints.cloudflareWorkerMigration){throw 'Repair request violates protected constraints.'}
 
       - name: Repair staged source and deploy exact commit
-        shell: bash
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
-          set -euo pipefail
+          $ErrorActionPreference='Stop'
+          $Api='https://backboard.railway.com/graphql/v2'
+          $Environment='78627988-2f5f-42a8-a507-ee5e221bf10a'
+          $Service='37312153-7877-4830-85ae-5b48e6275319'
+          $Repo='resonance36912-cell/rons-epublisher-sovereign-source'
+          $Branch='main'
+          $Stale='3db4856da7ddda7fd8dd18c2e7fe7b66c0334a51'
+          $Target='5827b0b89abc8e5f13aa29593075edddbf80a9ae'
 
-          API="https://backboard.railway.com/graphql/v2"
-          PROJECT="70cc7bde-c5ba-4224-9c74-ddb873b27379"
-          ENVIRONMENT="78627988-2f5f-42a8-a507-ee5e221bf10a"
-          SERVICE="37312153-7877-4830-85ae-5b48e6275319"
-          REPO="resonance36912-cell/rons-epublisher-sovereign-source"
-          BRANCH="main"
-          STALE="3db4856da7ddda7fd8dd18c2e7fe7b66c0334a51"
-          TARGET="5827b0b89abc8e5f13aa29593075edddbf80a9ae"
+          if(-not [string]::IsNullOrWhiteSpace($env:RAILWAY_TOKEN)){
+            $Headers=@{Authorization=('Bearer ' + $env:RAILWAY_TOKEN)}
+          } elseif(-not [string]::IsNullOrWhiteSpace($env:RAILWAY_PROJECT_TOKEN)){
+            $Headers=@{'Project-Access-Token'=$env:RAILWAY_PROJECT_TOKEN}
+          } else {
+            throw 'No Railway credential is configured in repository secrets.'
+          }
+          $Headers['Content-Type']='application/json'
 
-          if [ -n "${RAILWAY_TOKEN:-}" ]; then
-            AUTH_HEADER="Authorization: Bearer $RAILWAY_TOKEN"
-          elif [ -n "${RAILWAY_PROJECT_TOKEN:-}" ]; then
-            AUTH_HEADER="Project-Access-Token: $RAILWAY_PROJECT_TOKEN"
-          else
-            echo "::error::No Railway credential is configured in repository secrets."
-            exit 20
-          fi
-
-          gql() {
-            local query="$1"
-            local variables="$2"
-            local out
-            out="$(curl --fail-with-body --silent --show-error               --request POST "$API"               --header "$AUTH_HEADER"               --header "Content-Type: application/json"               --data "$(jq -cn --arg q "$query" --argjson v "$variables" '{query:$q,variables:$v}')")"
-            if jq -e '.errors and (.errors|length>0)' >/dev/null <<<"$out"; then
-              jq -r '.errors[] | "::error::Railway GraphQL: " + .message' <<<"$out"
-              exit 21
-            fi
-            printf '%s' "$out"
+          function Invoke-RailwayGraphQL([string]$Query,[hashtable]$Variables){
+            $body=@{query=$Query;variables=$Variables} | ConvertTo-Json -Depth 10 -Compress
+            $resp=Invoke-RestMethod -Method Post -Uri $Api -Headers $Headers -Body $body -TimeoutSec 30
+            if($resp.errors){
+              $messages=@($resp.errors | ForEach-Object {[string]$_.message}) -join '; '
+              throw ('Railway GraphQL: ' + $messages)
+            }
+            return $resp
           }
 
-          staged="$(gql             'query($environmentId:String!){environmentStagedChanges(environmentId:$environmentId)}'             "$(jq -cn --arg environmentId "$ENVIRONMENT" '{environmentId:$environmentId}')")"
+          $staged=Invoke-RailwayGraphQL 'query($environmentId:String!){environmentStagedChanges(environmentId:$environmentId)}' @{environmentId=$Environment}
+          $stagedJson=$staged.data.environmentStagedChanges | ConvertTo-Json -Depth 20 -Compress
+          if([string]::IsNullOrWhiteSpace($stagedJson) -or $stagedJson -eq 'null'){throw 'Expected staged Railway changes are absent.'}
+          if($stagedJson.IndexOf($Service,[StringComparison]::OrdinalIgnoreCase) -lt 0){throw 'Staged changes are not scoped to the expected ePublisher service.'}
+          if($stagedJson.IndexOf($Stale,[StringComparison]::OrdinalIgnoreCase) -lt 0){throw 'Expected stale commit pin is no longer present; refusing mutation.'}
+          if($stagedJson.IndexOf($Repo,[StringComparison]::OrdinalIgnoreCase) -lt 0){throw 'Expected repository is not present in staged changes.'}
 
-          staged_json="$(jq -c '.data.environmentStagedChanges' <<<"$staged")"
-          test "$staged_json" != "null" || { echo "::error::Expected staged Railway changes are absent."; exit 22; }
-          grep -Fq "$SERVICE" <<<"$staged_json" || { echo "::error::Staged changes are not scoped to the expected ePublisher service."; exit 23; }
-          grep -Fq "$STALE" <<<"$staged_json" || { echo "::error::Expected stale commit pin is no longer present; refusing mutation."; exit 24; }
-          grep -Fq "$REPO" <<<"$staged_json" || { echo "::error::Expected repository is not present in staged changes."; exit 25; }
+          Invoke-RailwayGraphQL 'mutation($environmentId:String!){environmentPatchCommitStaged(environmentId:$environmentId)}' @{environmentId=$Environment} | Out-Null
+          Invoke-RailwayGraphQL 'mutation($id:String!,$input:ServiceConnectInput!){serviceConnect(id:$id,input:$input){id}}' @{id=$Service;input=@{repo=$Repo;branch=$Branch}} | Out-Null
 
-          # Commit the already-reviewed staging patch without using the Railway
-          # deploy-staged-changes operation. The next steps immediately reconnect
-          # the same service source and deploy the exact governed target SHA.
-          gql             'mutation($environmentId:String!){environmentPatchCommitStaged(environmentId:$environmentId)}'             "$(jq -cn --arg environmentId "$ENVIRONMENT" '{environmentId:$environmentId}')" >/dev/null
+          $deployed=Invoke-RailwayGraphQL 'mutation($serviceId:String!,$environmentId:String!,$commitSha:String!){serviceInstanceDeployV2(serviceId:$serviceId,environmentId:$environmentId,commitSha:$commitSha)}' @{serviceId=$Service;environmentId=$Environment;commitSha=$Target}
+          $deploymentId=[string]$deployed.data.serviceInstanceDeployV2
+          if([string]::IsNullOrWhiteSpace($deploymentId)){throw 'Railway returned no deployment ID.'}
+          Write-Host ('Railway deployment ID: ' + $deploymentId)
 
-          gql             'mutation($id:String!,$input:ServiceConnectInput!){serviceConnect(id:$id,input:$input){id}}'             "$(jq -cn --arg id "$SERVICE" --arg repo "$REPO" --arg branch "$BRANCH" '{id:$id,input:{repo:$repo,branch:$branch}}')" >/dev/null
-
-          deployed="$(gql             'mutation($serviceId:String!,$environmentId:String!,$commitSha:String!){serviceInstanceDeployV2(serviceId:$serviceId,environmentId:$environmentId,commitSha:$commitSha)}'             "$(jq -cn --arg serviceId "$SERVICE" --arg environmentId "$ENVIRONMENT" --arg commitSha "$TARGET" '{serviceId:$serviceId,environmentId:$environmentId,commitSha:$commitSha}')")"
-
-          deployment_id="$(jq -r '.data.serviceInstanceDeployV2 // empty' <<<"$deployed")"
-          test -n "$deployment_id" || { echo "::error::Railway returned no deployment ID."; exit 26; }
-          echo "Deployment ID: $deployment_id"
-
-          for i in $(seq 1 40); do
-            status_json="$(gql               'query($id:String!){deployment(id:$id){id status meta}}'               "$(jq -cn --arg id "$deployment_id" '{id:$id}')")"
-            status="$(jq -r '.data.deployment.status' <<<"$status_json")"
-            commit="$(jq -r '.data.deployment.meta.commitHash // empty' <<<"$status_json")"
-            echo "Railway deployment status: $status"
-            if [ -n "$commit" ] && [ "$commit" != "$TARGET" ]; then
-              echo "::error::Railway deployment commit mismatch: $commit"
-              exit 27
-            fi
-            case "$status" in
-              SUCCESS)
-                test "$commit" = "$TARGET" || { echo "::error::Successful deployment did not report the governed target commit."; exit 28; }
-                echo "RONSAS RAILWAY EPUB FALLBACK: HEALTHY at $TARGET"
-                exit 0
-                ;;
-              FAILED|CRASHED|REMOVED|SKIPPED)
-                echo "::error::Railway deployment ended with status $status"
-                exit 29
-                ;;
-            esac
-            sleep 15
-          done
-
-          echo "::error::Railway deployment did not reach a terminal state within the governed polling window."
-          exit 30
+          for($i=0;$i -lt 40;$i++){
+            $statusResp=Invoke-RailwayGraphQL 'query($id:String!){deployment(id:$id){id status meta}}' @{id=$deploymentId}
+            $status=[string]$statusResp.data.deployment.status
+            $commit=[string]$statusResp.data.deployment.meta.commitHash
+            Write-Host ('Railway deployment status: ' + $status)
+            if(-not [string]::IsNullOrWhiteSpace($commit) -and $commit -ne $Target){throw ('Railway deployment commit mismatch: ' + $commit)}
+            if($status -eq 'SUCCESS'){
+              if($commit -ne $Target){throw 'Successful deployment did not report the governed target commit.'}
+              Write-Host ('RONSAS RAILWAY EPUB FALLBACK: HEALTHY at ' + $Target) -ForegroundColor Green
+              exit 0
+            }
+            if($status -in @('FAILED','CRASHED','REMOVED','SKIPPED')){throw ('Railway deployment ended with status ' + $status)}
+            Start-Sleep -Seconds 15
+          }
+          throw 'Railway deployment did not reach a terminal state within the governed polling window.'
