@@ -21,6 +21,6 @@
     "publicFallbackPortPreserved": 4175
   },
   "purpose": "Publish the validated free-promotion Hub bundle so /pricing and /changelog match governed production source.",
-  "retryAttempt": 8,
-  "retryReason": "GitHub Actions cleanup terminated the promoted production Node process after the release job. Detach only the live Hub process from RUNNER_TRACKING_ID cleanup and retry the same validated free-promotion Hub head; keep candidate processes tracked and preserve all route checks."
+  "retryAttempt": 9,
+  "retryReason": "Retry the same validated free-promotion Hub head after separating Hub release gates from independent spoke availability checks. The prior promotion itself passed and the Hub policy-critical routes were HTTP 200; an unrelated YouTube spoke HTTP 502 should remain visible as a warning without invalidating Hub promotion."
 }
