@@ -27,70 +27,82 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cancel obsolete Linux CI backlog
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
-        run: |
-          $ErrorActionPreference='Stop'
-          $repo='resonance36912-cell/RONSAS'
-          $targetNames=@('Security scan','Verify prebuild','Verify checkout links','Verify ePublisher checkout')
-          $cancelNames=@('Temporary format free promotion')
-          $currentRun=[long]$env:GITHUB_RUN_ID
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const targetNames = new Set([
+              "Security scan",
+              "Verify prebuild",
+              "Verify checkout links",
+              "Verify ePublisher checkout",
+            ]);
+            const cancelNames = new Set(["Temporary format free promotion"]);
+            const activeStates = new Set(["queued", "pending", "waiting", "in_progress", "requested"]);
+            const currentRun = Number(context.runId);
 
-          $openPullsRaw=& gh.exe api "repos/$repo/pulls?state=open&per_page=100"
-          if ($LASTEXITCODE -ne 0) { throw 'Unable to query open pull requests.' }
-          $openPulls=($openPullsRaw -join "`n") | ConvertFrom-Json
-          $openByHead=@{}
-          foreach ($pr in $openPulls) {
-            $openByHead[[string]$pr.head.ref]=[pscustomobject]@{
-              number=[int]$pr.number
-              sha=[string]$pr.head.sha
-            }
-          }
+            const openPulls = await github.paginate(github.rest.pulls.list, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              per_page: 100,
+            });
+            const openByHead = new Map(
+              openPulls.map((pr) => [
+                pr.head.ref,
+                { number: pr.number, sha: pr.head.sha },
+              ]),
+            );
 
-          $runsRaw=& gh.exe api "repos/$repo/actions/runs?per_page=100"
-          if ($LASTEXITCODE -ne 0) { throw 'Unable to query workflow runs.' }
-          $runsPayload=($runsRaw -join "`n") | ConvertFrom-Json
-          $runs=@($runsPayload.workflow_runs)
-          $active=@('queued','pending','waiting','in_progress','requested')
-          $cancelled=0
+            const { data: runsPage } = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+            });
+            const runs = runsPage.workflow_runs;
 
-          foreach ($run in $runs) {
-            if ($active -notcontains [string]$run.status) { continue }
-            if ([long]$run.id -eq $currentRun) { continue }
+            let cancelled = 0;
+            for (const run of runs) {
+              if (!activeStates.has(run.status) || run.id === currentRun) continue;
 
-            $name=[string]$run.name
-            $event=[string]$run.event
-            $branch=[string]$run.head_branch
-            $sha=[string]$run.head_sha
-            $reason=$null
-
-            if ($targetNames -contains $name) {
-              if ($event -eq 'pull_request') {
-                if (-not $openByHead.ContainsKey($branch)) {
-                  $reason="closed or unmatched PR branch $branch"
-                } else {
-                  $current=$openByHead[$branch]
-                  if ($sha -ne [string]$current.sha) {
-                    $reason="superseded PR #$($current.number) head"
+              let reason = null;
+              if (targetNames.has(run.name)) {
+                if (run.event === "pull_request") {
+                  const current = openByHead.get(run.head_branch || "");
+                  if (!current) {
+                    reason = `closed or unmatched PR branch ${run.head_branch || "(none)"}`;
+                  } else if (run.head_sha !== current.sha) {
+                    reason = `superseded PR #${current.number} head`;
                   }
+                } else if (run.event === "push" && run.head_branch === "main") {
+                  reason = "main push CI superseded by exact-head PR validation";
                 }
-              } elseif ($event -eq 'push' -and $branch -eq 'main') {
-                $reason='main push CI superseded by exact-head PR validation'
+              } else if (cancelNames.has(run.name)) {
+                reason = "obsolete temporary formatter";
+              } else if (
+                run.name === "Governed Linux runner recovery" ||
+                run.name === "Guarded zombie Linux runner recycle"
+              ) {
+                reason = "superseded recovery run";
               }
-            } elseif ($cancelNames -contains $name) {
-              $reason='obsolete temporary formatter'
-            } elseif ($name -eq 'Governed Linux runner recovery' -or $name -eq 'Guarded zombie Linux runner recycle') {
-              $reason='superseded recovery run'
+
+              if (!reason) continue;
+              core.info(`Cancelling run ${run.id}: ${run.name} - ${reason}`);
+              try {
+                await github.rest.actions.cancelWorkflowRun({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: run.id,
+                });
+                cancelled += 1;
+              } catch (error) {
+                core.warning(
+                  `Could not cancel run ${run.id}: ${error.status || "error"} ${error.message}`,
+                );
+              }
             }
 
-            if (-not $reason) { continue }
-            Write-Host "Cancelling run $($run.id): $name - $reason"
-            & gh.exe api -X POST "repos/$repo/actions/runs/$($run.id)/cancel" *> $null
-            if ($LASTEXITCODE -eq 0) { $cancelled++ } else { Write-Warning "Could not cancel run $($run.id)." }
-          }
-
-          Write-Host "Cancelled stale/superseded workflow runs: $cancelled"
+            core.info(`Cancelled stale/superseded workflow runs: ${cancelled}`);
 
       - name: Restore governed Linux Actions runner
         continue-on-error: true
