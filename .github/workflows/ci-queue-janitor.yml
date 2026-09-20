@@ -16,66 +16,83 @@ jobs:
   prune:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    env:
-      GH_TOKEN: ${{ github.token }}
-      REPO: ${{ github.repository }}
     steps:
-      - name: Cancel stale Linux CI and superseded recovery runs
-        shell: bash
-        run: |
-          set -euo pipefail
+      - name: Cancel stale CI and superseded recovery runs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const active = new Set(["queued", "pending", "waiting", "in_progress", "requested"]);
+            const linuxCi = new Set([
+              "Security scan",
+              "Verify prebuild",
+              "Verify checkout links",
+              "Verify ePublisher checkout",
+            ]);
+            const recovery = new Set([
+              "Governed Linux runner recovery",
+              "Guarded zombie Linux runner recycle",
+              "Temporary format free promotion",
+            ]);
 
-          current_main="$(gh api "repos/$REPO/commits/main" --jq .sha)"
-          open_prs="$(mktemp)"
-          gh api "repos/$REPO/pulls?state=open&per_page=100"             --jq '.[] | [.head.ref, .head.sha, (.number|tostring)] | @tsv' > "$open_prs"
+            const pulls = await github.paginate(github.rest.pulls.list, {
+              owner,
+              repo,
+              state: "open",
+              per_page: 100,
+            });
+            const currentPrByBranch = new Map(
+              pulls.map((pr) => [pr.head.ref, { number: pr.number, sha: pr.head.sha }]),
+            );
 
-          cancel_run() {
-            local id="$1" reason="$2"
-            echo "cancel run=$id reason=$reason"
-            gh api -X POST "repos/$REPO/actions/runs/$id/cancel" >/dev/null 2>&1 || true
-          }
+            const runs = await github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
+              owner,
+              repo,
+              per_page: 100,
+            });
 
-          runs="$(mktemp)"
-          gh api "repos/$REPO/actions/runs?per_page=100"             --jq '.workflow_runs[]
-              | select(.status == "queued" or .status == "pending" or .status == "waiting" or .status == "in_progress")
-              | [.id, .name, .event, (.head_branch // ""), (.head_sha // ""), .status]
-              | @tsv' > "$runs"
+            let cancelled = 0;
+            for (const run of runs) {
+              if (!active.has(run.status)) continue;
+              if (run.id === context.runId) continue;
 
-          while IFS=$'\t' read -r id name event branch sha status; do
-            case "$name" in
-              "Security scan"|"Verify prebuild"|"Verify checkout links"|"Verify ePublisher checkout")
-                if [ "$event" = "pull_request" ]; then
-                  current="$(awk -F '\t' -v b="$branch" '$1 == b {print $2 "\t" $3; exit}' "$open_prs")"
-                  if [ -n "$current" ]; then
-                    current_sha="${current%%$'\t'*}"
-                    pr_number="${current#*$'\t'}"
-                    if [ "$sha" = "$current_sha" ]; then
-                      echo "keep run=$id current open PR #$pr_number head=$sha"
-                    else
-                      cancel_run "$id" "superseded PR #$pr_number head"
-                    fi
-                  else
-                    cancel_run "$id" "closed/no-open-PR branch $branch"
-                  fi
-                elif [ "$event" = "push" ] && [ "$branch" = "main" ]; then
-                  if [ "$sha" = "$GITHUB_SHA" ]; then
-                    cancel_run "$id" "janitor-only main commit"
-                  elif [ "$sha" != "$current_main" ]; then
-                    cancel_run "$id" "stale main push"
-                  else
-                    echo "keep run=$id current main head=$sha"
-                  fi
-                fi
-                ;;
-              "Governed Linux runner recovery"|"Guarded zombie Linux runner recycle")
-                cancel_run "$id" "superseded runner recovery"
-                ;;
-            esac
-          done < "$runs"
+              let reason = null;
+              if (linuxCi.has(run.name)) {
+                if (run.event === "pull_request") {
+                  const current = currentPrByBranch.get(run.head_branch ?? "");
+                  if (!current) {
+                    reason = "closed or unmatched PR branch";
+                  } else if (run.head_sha !== current.sha) {
+                    reason = `superseded PR #${current.number} head`;
+                  }
+                } else if (run.event === "push" && run.head_branch === "main") {
+                  reason = "main push CI is superseded by PR exact-head validation";
+                }
+              } else if (recovery.has(run.name)) {
+                reason = "superseded recovery/formatter run";
+              }
 
-      - name: Dispatch latest governed Linux runner recovery
-        shell: bash
-        run: |
-          set -euo pipefail
-          gh workflow run windows-recover-linux-runner.yml --repo "$REPO" --ref main
-          echo "Dispatched latest governed Linux runner recovery."
+              if (!reason) continue;
+              core.info(`Cancelling run ${run.id} (${run.name}): ${reason}`);
+              try {
+                await github.rest.actions.cancelWorkflowRun({ owner, repo, run_id: run.id });
+                cancelled += 1;
+              } catch (error) {
+                core.warning(`Could not cancel run ${run.id}: ${error.message}`);
+              }
+            }
+
+            core.info(`Cancelled ${cancelled} stale/superseded run(s).`);
+
+      - name: Dispatch fresh governed Linux runner recovery
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            await github.rest.actions.createWorkflowDispatch({
+              owner,
+              repo,
+              workflow_id: "windows-recover-linux-runner.yml",
+              ref: "main",
+            });
+            core.info("Dispatched governed Linux runner recovery.");
