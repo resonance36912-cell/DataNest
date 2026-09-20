@@ -18,9 +18,6 @@ jobs:
   repair:
     runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
     timeout-minutes: 20
-    env:
-      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-      RAILWAY_PROJECT_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -28,13 +25,9 @@ jobs:
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
-          $file='ops/release-requests/railway-epublisher-fallback.json'
-          if(-not (Test-Path -LiteralPath $file -PathType Leaf)){throw 'Governed Railway repair request is missing.'}
-          $r=Get-Content -Raw -LiteralPath $file | ConvertFrom-Json
+          $r=Get-Content -Raw -LiteralPath 'ops/release-requests/railway-epublisher-fallback.json' | ConvertFrom-Json
           if([string]$r.schema -ne 'ronsas-railway-epublisher-repair/v1'){throw 'Unexpected repair schema.'}
           if([string]$r.confirmation -ne 'REPAIR RAILWAY EPUB FALLBACK'){throw 'Explicit repair confirmation missing.'}
-          if([string]$r.projectId -ne '70cc7bde-c5ba-4224-9c74-ddb873b27379'){throw 'Unexpected Railway project.'}
-          if([string]$r.environmentId -ne '78627988-2f5f-42a8-a507-ee5e221bf10a'){throw 'Unexpected Railway environment.'}
           if([string]$r.serviceId -ne '37312153-7877-4830-85ae-5b48e6275319'){throw 'Unexpected Railway service.'}
           if([string]$r.repo -ne 'resonance36912-cell/rons-epublisher-sovereign-source'){throw 'Unexpected source repository.'}
           if([string]$r.branch -ne 'main'){throw 'Unexpected source branch.'}
@@ -46,7 +39,6 @@ jobs:
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
-          $Api='https://backboard.railway.com/graphql/v2'
           $Environment='78627988-2f5f-42a8-a507-ee5e221bf10a'
           $Service='37312153-7877-4830-85ae-5b48e6275319'
           $Repo='resonance36912-cell/rons-epublisher-sovereign-source'
@@ -54,42 +46,34 @@ jobs:
           $Stale='3db4856da7ddda7fd8dd18c2e7fe7b66c0334a51'
           $Target='5827b0b89abc8e5f13aa29593075edddbf80a9ae'
 
-          if(-not [string]::IsNullOrWhiteSpace($env:RAILWAY_TOKEN)){
-            $Headers=@{Authorization=('Bearer ' + $env:RAILWAY_TOKEN)}
-          } elseif(-not [string]::IsNullOrWhiteSpace($env:RAILWAY_PROJECT_TOKEN)){
-            $Headers=@{'Project-Access-Token'=$env:RAILWAY_PROJECT_TOKEN}
-          } else {
-            throw 'No Railway credential is configured in repository secrets.'
-          }
-          $Headers['Content-Type']='application/json'
+          $Railway=(Get-Command railway.exe -ErrorAction SilentlyContinue).Source
+          if(-not $Railway){$Railway=(Get-Command railway -ErrorAction SilentlyContinue).Source}
+          if(-not $Railway){throw 'Railway CLI is not installed on the governed Ealiophin runner.'}
 
-          function Invoke-RailwayGraphQL([string]$Query,[hashtable]$Variables){
-            $body=@{query=$Query;variables=$Variables} | ConvertTo-Json -Depth 10 -Compress
-            $resp=Invoke-RestMethod -Method Post -Uri $Api -Headers $Headers -Body $body -TimeoutSec 30
-            if($resp.errors){
-              $messages=@($resp.errors | ForEach-Object {[string]$_.message}) -join '; '
-              throw ('Railway GraphQL: ' + $messages)
-            }
-            return $resp
+          function Invoke-RailwayApi([string]$Query,[hashtable]$Variables){
+            $vars=$Variables | ConvertTo-Json -Depth 10 -Compress
+            $raw=& $Railway api $Query --variables $vars --compact 2>&1
+            if($LASTEXITCODE -ne 0){throw ('Railway CLI API call failed: ' + (($raw | Out-String).Trim()))}
+            $text=($raw | Out-String).Trim()
+            return $text | ConvertFrom-Json
           }
 
-          $staged=Invoke-RailwayGraphQL 'query($environmentId:String!){environmentStagedChanges(environmentId:$environmentId)}' @{environmentId=$Environment}
+          $staged=Invoke-RailwayApi 'query($environmentId:String!){environmentStagedChanges(environmentId:$environmentId)}' @{environmentId=$Environment}
           $stagedJson=$staged.data.environmentStagedChanges | ConvertTo-Json -Depth 20 -Compress
           if([string]::IsNullOrWhiteSpace($stagedJson) -or $stagedJson -eq 'null'){throw 'Expected staged Railway changes are absent.'}
           if($stagedJson.IndexOf($Service,[StringComparison]::OrdinalIgnoreCase) -lt 0){throw 'Staged changes are not scoped to the expected ePublisher service.'}
           if($stagedJson.IndexOf($Stale,[StringComparison]::OrdinalIgnoreCase) -lt 0){throw 'Expected stale commit pin is no longer present; refusing mutation.'}
           if($stagedJson.IndexOf($Repo,[StringComparison]::OrdinalIgnoreCase) -lt 0){throw 'Expected repository is not present in staged changes.'}
 
-          Invoke-RailwayGraphQL 'mutation($environmentId:String!){environmentPatchCommitStaged(environmentId:$environmentId)}' @{environmentId=$Environment} | Out-Null
-          Invoke-RailwayGraphQL 'mutation($id:String!,$input:ServiceConnectInput!){serviceConnect(id:$id,input:$input){id}}' @{id=$Service;input=@{repo=$Repo;branch=$Branch}} | Out-Null
-
-          $deployed=Invoke-RailwayGraphQL 'mutation($serviceId:String!,$environmentId:String!,$commitSha:String!){serviceInstanceDeployV2(serviceId:$serviceId,environmentId:$environmentId,commitSha:$commitSha)}' @{serviceId=$Service;environmentId=$Environment;commitSha=$Target}
+          Invoke-RailwayApi 'mutation($environmentId:String!){environmentPatchCommitStaged(environmentId:$environmentId)}' @{environmentId=$Environment} | Out-Null
+          Invoke-RailwayApi 'mutation($id:String!,$input:ServiceConnectInput!){serviceConnect(id:$id,input:$input){id}}' @{id=$Service;input=@{repo=$Repo;branch=$Branch}} | Out-Null
+          $deployed=Invoke-RailwayApi 'mutation($serviceId:String!,$environmentId:String!,$commitSha:String!){serviceInstanceDeployV2(serviceId:$serviceId,environmentId:$environmentId,commitSha:$commitSha)}' @{serviceId=$Service;environmentId=$Environment;commitSha=$Target}
           $deploymentId=[string]$deployed.data.serviceInstanceDeployV2
           if([string]::IsNullOrWhiteSpace($deploymentId)){throw 'Railway returned no deployment ID.'}
           Write-Host ('Railway deployment ID: ' + $deploymentId)
 
           for($i=0;$i -lt 40;$i++){
-            $statusResp=Invoke-RailwayGraphQL 'query($id:String!){deployment(id:$id){id status meta}}' @{id=$deploymentId}
+            $statusResp=Invoke-RailwayApi 'query($id:String!){deployment(id:$id){id status meta}}' @{id=$deploymentId}
             $status=[string]$statusResp.data.deployment.status
             $commit=[string]$statusResp.data.deployment.meta.commitHash
             Write-Host ('Railway deployment status: ' + $status)
