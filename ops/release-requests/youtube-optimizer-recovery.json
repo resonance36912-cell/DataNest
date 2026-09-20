@@ -19,6 +19,6 @@
     "rebuildSource": false,
     "touchOtherSpokes": false
   },
-  "retryAttempt": 3,
-  "retryReason": "Retrigger from the settled current control-repo head after CI queue-maintenance commits completed. The reusable governed edge script is now on main; local YouTube 3401 is healthy and the remaining fault is public-edge only."
+  "retryAttempt": 4,
+  "retryReason": "Retrigger from current main after queue-janitor maintenance settled. Run the reusable governed edge script against the verified healthy YouTube loopback runtime and existing Caddy/cloudflared configuration."
 }
