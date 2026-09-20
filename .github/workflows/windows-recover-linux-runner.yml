@@ -1,6 +1,9 @@
 name: Governed Linux runner recovery
 
 on:
+  # workflow_dispatch is the normal manual recovery path. When the connector
+  # cannot dispatch workflows directly, a reviewed no-op change to this file
+  # also triggers the same governed Windows-side recovery via the push path.
   workflow_dispatch:
   push:
     branches: [main]
