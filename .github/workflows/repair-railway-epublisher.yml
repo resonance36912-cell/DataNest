@@ -59,18 +59,21 @@ jobs:
 
           Write-Host ('Railway CLI: ' + (& $Railway --version))
 
-          $ErrorActionPreference='Continue'
-          $branchStage=& $Railway environment edit --project $Project --environment $Environment --service-config $Service source.branch $Branch --stage --message 'RONSAS governed ePublisher fallback source repair' --json 2>&1
-          $branchExit=$LASTEXITCODE
-          $ErrorActionPreference='Stop'
-          if($branchExit -ne 0){throw ('Railway branch staging failed: ' + (($branchStage | Out-String).Trim()))}
-          Write-Host (($branchStage | Out-String).Trim())
+          $patch=@{
+            services=@{
+              $Service=@{
+                source=@{
+                  branch=$Branch
+                  commitSha=$Target
+                }
+              }
+            }
+          } | ConvertTo-Json -Depth 10 -Compress
 
           $ErrorActionPreference='Continue'
-          $commitStage=& $Railway environment edit --project $Project --environment $Environment --service-config $Service source.commitSha $Target --stage --message 'RONSAS governed ePublisher fallback target commit' --json 2>&1
-          $commitExit=$LASTEXITCODE
+          $patchOut=$patch | & $Railway environment edit --project $Project --environment $Environment --stage --json 2>&1
+          $patchExit=$LASTEXITCODE
           $ErrorActionPreference='Stop'
-          if($commitExit -ne 0){throw ('Railway commit staging failed: ' + (($commitStage | Out-String).Trim()))}
-          Write-Host (($commitStage | Out-String).Trim())
-
+          if($patchExit -ne 0){throw ('Railway source JSON staging failed: ' + (($patchOut | Out-String).Trim()))}
+          Write-Host (($patchOut | Out-String).Trim())
           Write-Host ('RONSAS RAILWAY EPUB TARGET STAGED: ' + $Target)
