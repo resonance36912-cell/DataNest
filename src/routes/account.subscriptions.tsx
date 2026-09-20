@@ -87,7 +87,6 @@ function log(event: string, detail: Record<string, unknown> = {}) {
   // route can show the last-known auth gate results for support triage.
   recordAuthGateEvent(event, level, detail);
   if (level === "info" && !debugEnabled()) return;
-  // eslint-disable-next-line no-console
   console[level](`[account/subscriptions] ${event}`, {
     ts: new Date().toISOString(),
     env: typeof window === "undefined" ? "ssr" : "browser",
