@@ -1,0 +1,17 @@
+{
+  "schema": "ronsas-hub-release-request/v1",
+  "sourceRepo": "resonance36912-cell/resonance-hub",
+  "sourceBranch": "ronsas/ealiophin-production",
+  "commit": "174cf6f64edbf9eafb7301008c1be7dcfbdbdf3f",
+  "confirmation": "PROMOTE RONSAS HUB",
+  "validation": {
+    "workflowRun": 35483409056,
+    "artifactId": 10596204376,
+    "artifactName": "ronsas-hub-candidate-174cf6f",
+    "artifactArchiveDigest": "sha256:fe13f1dde0e5ad1fb0d41d1c10f5d24303fb1c0bc0989a74086017867994d2b6",
+    "candidateBundleSha256": "6b607b9f42de1859137d5e58af61fb3b4dd859667dc79f931e2bce80f0ba3bfc",
+    "candidateFiles": 340,
+    "routeSmoke": "passed"
+  },
+  "purpose": "Publish the validated free-promotion Hub bundle so /pricing and /changelog match governed production source."
+}
