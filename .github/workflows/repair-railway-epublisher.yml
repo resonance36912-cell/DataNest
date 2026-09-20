@@ -59,7 +59,7 @@ jobs:
 
           Write-Host ('Railway CLI: ' + (& $Railway --version))
 
-          $link=& $Railway link --project $Project --environment $Environment --service $Service --json 2>&1
+          $link=& $Railway link --workspace 'd60eede3-77a8-4dc9-9e7f-19b8f9e938e6' --project $Project --environment $Environment --service $Service --json 2>&1
           if($LASTEXITCODE -ne 0){throw ('Railway link failed: ' + (($link | Out-String).Trim()))}
           Write-Host (($link | Out-String).Trim())
 
