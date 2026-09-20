@@ -4,8 +4,6 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - ".github/workflows/ci-queue-janitor.yml"
 
 permissions:
   actions: write
@@ -34,7 +32,7 @@ jobs:
 
           $openPullsRaw = & gh.exe api "repos/$repo/pulls?state=open&per_page=100"
           if ($LASTEXITCODE -ne 0) { throw 'Unable to query open pull requests.' }
-          $openPulls = @(($openPullsRaw -join "`n") | ConvertFrom-Json)
+          $openPulls = ($openPullsRaw -join "`n") | ConvertFrom-Json
 
           $currentPrByBranch = @{}
           foreach ($pr in $openPulls) {
