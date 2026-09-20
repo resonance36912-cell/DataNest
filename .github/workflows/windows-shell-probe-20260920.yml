@@ -12,8 +12,11 @@ permissions:
 jobs:
   probe:
     runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
-    timeout-minutes: 5
+    timeout-minutes: 12
     steps:
+      - name: Check out RONSAS control authority
+        uses: actions/checkout@v4
+
       - name: Verify in-memory PowerShell scriptblock shell
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
@@ -25,3 +28,9 @@ jobs:
           if ((Get-Content -Raw -LiteralPath $probe).Trim() -ne 'ok') { throw 'Probe file mismatch.' }
           Remove-Item -LiteralPath $probe -Force
           Write-Host "multiline_script=ok"
+
+      - name: Execute governed YouTube public-edge recovery
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\ops\ealiophin\edge\RECOVER-YOUTUBE-PUBLIC-EDGE.ps1" -RequestPath ".\ops\release-requests\youtube-optimizer-recovery.json"
+          if($LASTEXITCODE){throw "YouTube public-edge recovery failed with exit code $LASTEXITCODE"}
