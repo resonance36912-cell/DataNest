@@ -48,7 +48,17 @@ jobs:
 
           $Railway=(Get-Command railway.exe -ErrorAction SilentlyContinue).Source
           if(-not $Railway){$Railway=(Get-Command railway -ErrorAction SilentlyContinue).Source}
-          if(-not $Railway){throw 'Railway CLI is not installed on the governed Ealiophin runner.'}
+          if(-not $Railway){
+            $Npm=(Get-Command npm.cmd -ErrorAction SilentlyContinue).Source
+            if(-not $Npm){$Npm=(Get-Command npm -ErrorAction SilentlyContinue).Source}
+            if(-not $Npm){throw 'Railway CLI is missing and npm is unavailable for governed bootstrap.'}
+            & $Npm install -g @railway/cli
+            if($LASTEXITCODE -ne 0){throw 'Governed Railway CLI bootstrap failed.'}
+            $Railway=(Get-Command railway.exe -ErrorAction SilentlyContinue).Source
+            if(-not $Railway){$Railway=(Get-Command railway -ErrorAction SilentlyContinue).Source}
+            if(-not $Railway){throw 'Railway CLI bootstrap completed but executable is unavailable.'}
+          }
+          Write-Host ('Railway CLI: ' + (& $Railway --version))
 
           function Invoke-RailwayApi([string]$Query,[hashtable]$Variables){
             $vars=$Variables | ConvertTo-Json -Depth 10 -Compress
