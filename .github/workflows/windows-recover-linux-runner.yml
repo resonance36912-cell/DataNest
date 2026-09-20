@@ -173,6 +173,7 @@ jobs:
           $name='Ealiophin-RONSAS-Linux-2'
           $script = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
           $targetNames = @('Security scan','Verify prebuild','Verify checkout links','Verify ePublisher checkout')
+          $idleBacklogCycles = 0
 
           for ($i = 0; $i -lt 60; $i++) {
             $runsRaw = & gh.exe api "repos/$repo/actions/runs?per_page=100"
@@ -193,13 +194,22 @@ jobs:
             $runner = @($payload.runners | Where-Object { $_.name -eq $name }) | Select-Object -First 1
 
             if (-not $runner -or [string]$runner.status -ne 'online') {
+              $idleBacklogCycles = 0
               Write-Host "Linux runner offline while $($active.Count) CI run(s) remain; restoring."
               & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $script
               if ($LASTEXITCODE -ne 0) { throw "Linux runner watchdog recovery failed with exit code $LASTEXITCODE" }
             } elseif ([bool]$runner.busy) {
+              $idleBacklogCycles = 0
               Write-Host "Linux runner busy; active backlog=$($active.Count)."
             } else {
-              Write-Host "Linux runner online and idle; active backlog=$($active.Count)."
+              $idleBacklogCycles++
+              Write-Host "Linux runner online and idle; active backlog=$($active.Count); idle backlog cycles=$idleBacklogCycles."
+              if ($idleBacklogCycles -ge 3) {
+                Write-Host 'Runner stayed online/idle while dispatchable CI remained queued; performing guarded recycle.'
+                & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $script -ForceRecycle
+                if ($LASTEXITCODE -ne 0) { throw "Linux runner guarded recycle failed with exit code $LASTEXITCODE" }
+                $idleBacklogCycles = 0
+              }
             }
 
             Start-Sleep -Seconds 10
