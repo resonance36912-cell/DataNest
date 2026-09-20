@@ -22,7 +22,7 @@ concurrency:
 jobs:
   recover:
     runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - name: Check out RONSAS control authority
         uses: actions/checkout@v4
@@ -54,6 +54,7 @@ jobs:
           Write-Host "RONSAS Linux runner online: $name"
 
       - name: Cancel obsolete and superseded PR workflow backlog
+        continue-on-error: true
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
@@ -161,3 +162,45 @@ jobs:
           }
 
           Write-Host "Obsolete/superseded PR workflow runs cancelled: $cancelled"
+
+
+      - name: Keep Linux runner available while CI backlog drains
+        if: always()
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $repo='resonance36912-cell/RONSAS'
+          $name='Ealiophin-RONSAS-Linux-2'
+          $script = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
+          $targetNames = @('Security scan','Verify prebuild','Verify checkout links','Verify ePublisher checkout')
+
+          for ($i = 0; $i -lt 60; $i++) {
+            $runsRaw = & gh.exe api "repos/$repo/actions/runs?per_page=100"
+            if ($LASTEXITCODE -ne 0) { throw 'Unable to query workflow backlog.' }
+            $runs = @(($runsRaw | ConvertFrom-Json).workflow_runs)
+            $active = @($runs | Where-Object {
+              ($targetNames -contains [string]$_.name) -and
+              (@('queued','pending','waiting','in_progress') -contains [string]$_.status)
+            })
+
+            if ($active.Count -eq 0) {
+              Write-Host 'No active Linux CI backlog remains.'
+              break
+            }
+
+            $payload = & gh.exe api "repos/$repo/actions/runners" | ConvertFrom-Json
+            if ($LASTEXITCODE -ne 0) { throw 'Unable to query GitHub runner registration.' }
+            $runner = @($payload.runners | Where-Object { $_.name -eq $name }) | Select-Object -First 1
+
+            if (-not $runner -or [string]$runner.status -ne 'online') {
+              Write-Host "Linux runner offline while $($active.Count) CI run(s) remain; restoring."
+              & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $script
+              if ($LASTEXITCODE -ne 0) { throw "Linux runner watchdog recovery failed with exit code $LASTEXITCODE" }
+            } elseif ([bool]$runner.busy) {
+              Write-Host "Linux runner busy; active backlog=$($active.Count)."
+            } else {
+              Write-Host "Linux runner online and idle; active backlog=$($active.Count)."
+            }
+
+            Start-Sleep -Seconds 10
+          }
