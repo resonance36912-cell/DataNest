@@ -1,5 +1,5 @@
 name: Governed Linux runner recovery
-# Recovery supersession trigger: 2026-09-20T11:20Z
+# Recovery supersession trigger: 2026-09-20T11:20Z (governed retry)
 
 on:
   workflow_dispatch:
