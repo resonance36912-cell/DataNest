@@ -2,7 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
-import { deriveFeatures, logEntitlementCheck, type Tier } from "@/lib/entitlement.functions";
+import {
+  deriveFeatures,
+  logEntitlementCheck,
+  promotionFeatures,
+  promotionTier,
+  type Tier,
+} from "@/lib/entitlement.functions";
+import { FREE_PROMOTION_ACTIVE } from "@/lib/commercial-policy";
 
 /**
  * Public entitlement endpoint for spoke apps.
@@ -52,7 +59,8 @@ export const Route = createFileRoute("/api/public/entitlement")({
       OPTIONS: async () => new Response(null, { status: 204, headers: CORS }),
 
       GET: async ({ request }) => {
-        const sourceIp = request.headers.get("x-forwarded-for") ?? request.headers.get("cf-connecting-ip");
+        const sourceIp =
+          request.headers.get("x-forwarded-for") ?? request.headers.get("cf-connecting-ip");
         const userAgent = request.headers.get("user-agent");
         const url = new URL(request.url);
         const appParam = url.searchParams.get("app");
@@ -64,12 +72,30 @@ export const Route = createFileRoute("/api/public/entitlement")({
 
         const authHeader = request.headers.get("authorization") ?? "";
         if (!authHeader.toLowerCase().startsWith("bearer ")) {
-          void logEntitlementCheck({ userId: null, app, tier: null, status: "unauthorized", source: null, error: "missing_bearer", sourceIp, userAgent });
+          void logEntitlementCheck({
+            userId: null,
+            app,
+            tier: null,
+            status: "unauthorized",
+            source: null,
+            error: "missing_bearer",
+            sourceIp,
+            userAgent,
+          });
           return json({ error: "Missing Bearer token" }, 401);
         }
         const token = authHeader.slice(7).trim();
         if (!token) {
-          void logEntitlementCheck({ userId: null, app, tier: null, status: "unauthorized", source: null, error: "empty_bearer", sourceIp, userAgent });
+          void logEntitlementCheck({
+            userId: null,
+            app,
+            tier: null,
+            status: "unauthorized",
+            source: null,
+            error: "empty_bearer",
+            sourceIp,
+            userAgent,
+          });
           return json({ error: "Missing Bearer token" }, 401);
         }
 
@@ -86,10 +112,47 @@ export const Route = createFileRoute("/api/public/entitlement")({
 
         const { data: claimsData, error: claimsErr } = await supabase.auth.getClaims(token);
         if (claimsErr || !claimsData?.claims?.sub) {
-          void logEntitlementCheck({ userId: null, app, tier: null, status: "unauthorized", source: null, error: "invalid_token", sourceIp, userAgent });
+          void logEntitlementCheck({
+            userId: null,
+            app,
+            tier: null,
+            status: "unauthorized",
+            source: null,
+            error: "invalid_token",
+            sourceIp,
+            userAgent,
+          });
           return json({ error: "Invalid or expired token" }, 401);
         }
         const userId = claimsData.claims.sub as string;
+
+        if (FREE_PROMOTION_ACTIVE) {
+          const checkedAt = new Date().toISOString();
+          const tier = promotionTier(app);
+          void logEntitlementCheck({
+            userId,
+            app,
+            tier,
+            status: "active",
+            source: "promotion",
+            sourceIp,
+            userAgent,
+          });
+          return json({
+            ok: true,
+            app,
+            userId,
+            tier,
+            status: "active",
+            source: "promotion",
+            expiresAt: null,
+            features: promotionFeatures(app),
+            checkedAt,
+            hasAccess: true,
+            currentPeriodEnd: null,
+            promotion: true,
+          });
+        }
 
         const { data: rows, error } = await supabase
           .from("subscriptions")
@@ -99,7 +162,16 @@ export const Route = createFileRoute("/api/public/entitlement")({
 
         if (error) {
           console.error("entitlement query failed:", error);
-          void logEntitlementCheck({ userId, app, tier: "free", status: "inactive", source: "none", error: error.message, sourceIp, userAgent });
+          void logEntitlementCheck({
+            userId,
+            app,
+            tier: "free",
+            status: "inactive",
+            source: "none",
+            error: error.message,
+            sourceIp,
+            userAgent,
+          });
           return json({ error: "Lookup failed" }, 500);
         }
 
@@ -110,7 +182,15 @@ export const Route = createFileRoute("/api/public/entitlement")({
         const checkedAt = new Date().toISOString();
 
         if (!winner) {
-          void logEntitlementCheck({ userId, app, tier: "free", status: "inactive", source: "none", sourceIp, userAgent });
+          void logEntitlementCheck({
+            userId,
+            app,
+            tier: "free",
+            status: "inactive",
+            source: "none",
+            sourceIp,
+            userAgent,
+          });
           return json({
             ok: true,
             app,
@@ -128,7 +208,15 @@ export const Route = createFileRoute("/api/public/entitlement")({
 
         const tier = winner.tier as Tier;
         const source = winner.app === "all_access" ? "all_access" : "direct";
-        void logEntitlementCheck({ userId, app, tier, status: winner.status, source, sourceIp, userAgent });
+        void logEntitlementCheck({
+          userId,
+          app,
+          tier,
+          status: winner.status,
+          source,
+          sourceIp,
+          userAgent,
+        });
 
         return json({
           ok: true,
