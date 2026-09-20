@@ -21,6 +21,6 @@
     "publicFallbackPortPreserved": 4175
   },
   "purpose": "Publish the validated free-promotion Hub bundle so /pricing and /changelog match governed production source.",
-  "retryAttempt": 9,
-  "retryReason": "Retry the same validated free-promotion Hub head after separating Hub release gates from independent spoke availability checks. The prior promotion itself passed and the Hub policy-critical routes were HTTP 200; an unrelated YouTube spoke HTTP 502 should remain visible as a warning without invalidating Hub promotion."
+  "retryAttempt": 10,
+  "retryReason": "Re-trigger governed Hub production promotion after PR #110 merged and exact-head CI passed. Canonical Hub production head remains 791c5b7e74dab20c1e48fb0d7bb34a8f6d426d57; public /pricing is still serving the prior paid-pack surface, so republish the already validated free-promotion bundle."
 }
