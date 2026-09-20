@@ -6,7 +6,8 @@ param(
     [string]$RunnerName = 'Ealiophin-RONSAS-Linux-2',
     [string]$Network = 'ronsas-ci',
     [string]$Proxy = 'ronsas-podman-api',
-    [string]$Volume = 'ronsas-actions-work'
+    [string]$Volume = 'ronsas-actions-work',
+    [switch]$ForceRecycle
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -63,7 +64,7 @@ if (Test-ContainerExists $Container) {
     }
 }
 
-if ($containerReady -and $registered -and $registered.status -eq 'online') {
+if ($containerReady -and $registered -and $registered.status -eq 'online' -and -not $ForceRecycle) {
     Ensure-RunnerLabels $registered
     Write-Host 'RONSAS Actions runner already healthy on governed CI network.' -ForegroundColor Green
     exit 0
@@ -73,10 +74,11 @@ if ($registered -and [bool]$registered.busy) {
     throw 'RONSAS Actions runner is busy; refusing to replace an active runner.'
 }
 
-if ($registered -and $registered.status -ne 'online') {
-    Write-Host "Removing stale offline GitHub runner registration: $RunnerName (id=$($registered.id))" -ForegroundColor Yellow
+if ($registered -and ($registered.status -ne 'online' -or $ForceRecycle)) {
+    $reason = if ($ForceRecycle) { 'guarded recycle' } else { 'stale offline registration' }
+    Write-Host "Removing GitHub runner registration for $reason: $RunnerName (id=$($registered.id))" -ForegroundColor Yellow
     & $gh api -X DELETE "repos/$Repository/actions/runners/$($registered.id)"
-    if ($LASTEXITCODE -ne 0) { throw 'Failed to remove stale GitHub runner registration.' }
+    if ($LASTEXITCODE -ne 0) { throw 'Failed to remove GitHub runner registration.' }
     $registered = $null
 }
 
