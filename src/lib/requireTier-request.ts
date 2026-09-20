@@ -248,7 +248,8 @@ export async function requireTierFromRequest(args: {
 
   // 5. Evaluate.
   const allowed =
-    ent.status === "active" && (ent.source === "all_access" || ent.source === "promotion" || hasAtLeast(ent.tier, required));
+    ent.status === "active" &&
+    (ent.source === "all_access" || ent.source === "promotion" || hasAtLeast(ent.tier, required));
 
   if (!allowed) {
     throw new Response(JSON.stringify(upgradeBody(app, required, ent.tier, ent.status, returnTo)), {

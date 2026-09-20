@@ -658,12 +658,12 @@ function Index() {
               The Resonance <span className="text-gradient-brand">Hub</span>
             </h1>
             <p className="text-base md:text-lg text-white/75 leading-[1.65] text-pretty max-w-[58ch] mb-6">
-              The source of truth for every Resonance app, update, promotion, governance control, and
-              ecosystem capability.
+              The source of truth for every Resonance app, update, promotion, governance control,
+              and ecosystem capability.
             </p>
             <p className="text-sm text-white/65 leading-relaxed max-w-[58ch] mb-4">
-              Discover new tools, follow product updates, and use the Resonance ecosystem free during
-              the current costing-validation promotion.
+              Discover new tools, follow product updates, and use the Resonance ecosystem free
+              during the current costing-validation promotion.
             </p>
             <p className="text-[13px] text-white/60 leading-relaxed max-w-[58ch] mb-10">
               All Resonance apps are currently free to use during promotion while usage and delivery
@@ -926,8 +926,9 @@ function Index() {
               </h2>
             </div>
             <p className="text-white/60 max-w-md text-sm leading-relaxed">
-              Each app is independently deployed. During the current promotion, authenticated users can
-              use the available Resonance product capabilities without payment while costing is measured.
+              Each app is independently deployed. During the current promotion, authenticated users
+              can use the available Resonance product capabilities without payment while costing is
+              measured.
             </p>
           </div>
 
@@ -1037,8 +1038,8 @@ function Index() {
               Free promotion. No checkout.
             </h2>
             <p className="text-white/70 max-w-2xl mx-auto text-sm leading-relaxed mb-8">
-              All Resonance apps are free during the current promotion while usage, provider, storage,
-              render, and support costs are measured. New checkout is disabled.
+              All Resonance apps are free during the current promotion while usage, provider,
+              storage, render, and support costs are measured. New checkout is disabled.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
@@ -1133,8 +1134,8 @@ function Index() {
             ))}
           </div>
           <p className="text-center text-xs text-white/60 mt-6">
-            New payments are disabled during the current promotion. Historical commercial catalogs are
-            retained internally for costing analysis and future pricing design.
+            New payments are disabled during the current promotion. Historical commercial catalogs
+            are retained internally for costing analysis and future pricing design.
           </p>
         </section>
 

@@ -314,11 +314,7 @@ export function resolvePack(id: string): PackDef | null {
   return PACK_CATALOG[id] ?? null;
 }
 
-export function resolveSku(
-  app: string,
-  plan: string,
-  cycle: Cycle = "monthly",
-): SkuDef | null {
+export function resolveSku(app: string, plan: string, cycle: Cycle = "monthly"): SkuDef | null {
   const key = `${app}:${plan}:${cycle}`;
   return SKU_CATALOG[key] ?? null;
 }
@@ -402,9 +398,7 @@ async function buildLaunch(
     item_description: def.label,
     custom_str1: userId,
     custom_str2: def.sku,
-    ...(meta.retryOfSubscriptionId
-      ? { custom_str3: `retry:${meta.retryOfSubscriptionId}` }
-      : {}),
+    ...(meta.retryOfSubscriptionId ? { custom_str3: `retry:${meta.retryOfSubscriptionId}` } : {}),
     ...(email ? { email_address: email } : {}),
   };
   fields.signature = buildSignature(fields, passphrase);

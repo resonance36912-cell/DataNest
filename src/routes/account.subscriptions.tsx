@@ -17,7 +17,11 @@ import { FREE_PROMOTION_ACTIVE, FREE_PROMOTION_MESSAGE } from "@/lib/commercial-
 export const Route = createFileRoute("/account/subscriptions")({
   head: () => ({
     meta: [
-      { title: FREE_PROMOTION_ACTIVE ? "My Access — The Resonance" : "My Subscriptions — The Resonance" },
+      {
+        title: FREE_PROMOTION_ACTIVE
+          ? "My Access — The Resonance"
+          : "My Subscriptions — The Resonance",
+      },
       {
         name: "description",
         content: FREE_PROMOTION_ACTIVE
@@ -69,7 +73,9 @@ function useDebugEnabled(): [boolean, (next: boolean) => void] {
   useEffect(() => {
     const fn = () => setEnabled(debugEnabled());
     debugSubscribers.add(fn);
-    return () => { debugSubscribers.delete(fn); };
+    return () => {
+      debugSubscribers.delete(fn);
+    };
   }, []);
   return [enabled, setDebugEnabled];
 }
@@ -103,11 +109,11 @@ function DebugToggle() {
       aria-pressed={enabled}
       title="Toggle verbose auth-gate logging in this tab"
     >
-      Debug auth: <span className={enabled ? "text-emerald-400" : ""}>{enabled ? "on" : "off"}</span>
+      Debug auth:{" "}
+      <span className={enabled ? "text-emerald-400" : ""}>{enabled ? "on" : "off"}</span>
     </button>
   );
 }
-
 
 /**
  * Client-side auth gate. Waits for Supabase to hydrate the session from
@@ -284,7 +290,8 @@ function SubscriptionsGate() {
       if (!diagnostics.analyticsEmitted) {
         diagnostics.analyticsEmitted = true;
         const elapsedMs = Math.round(
-          (typeof performance !== "undefined" ? performance.now() : Date.now()) - diagnostics.mountedAt,
+          (typeof performance !== "undefined" ? performance.now() : Date.now()) -
+            diagnostics.mountedAt,
         );
         emitAuthGateAnalytics({
           decision: "redirect",
@@ -303,7 +310,8 @@ function SubscriptionsGate() {
       if (!diagnostics.analyticsEmitted) {
         diagnostics.analyticsEmitted = true;
         const elapsedMs = Math.round(
-          (typeof performance !== "undefined" ? performance.now() : Date.now()) - diagnostics.mountedAt,
+          (typeof performance !== "undefined" ? performance.now() : Date.now()) -
+            diagnostics.mountedAt,
         );
         emitAuthGateAnalytics({
           decision: "render",
@@ -322,7 +330,6 @@ function SubscriptionsGate() {
     }
   }, [status, navigate, diagnostics]);
 
-
   if (status === "checking") {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
@@ -334,14 +341,13 @@ function SubscriptionsGate() {
   return <SubscriptionsPage />;
 }
 
-
 const ALL_APPS: AppKey[] = ["epublisher", "creative_studio", "sync_vision", "youtube_optimizer"];
 
 function statusBadge(status: SubscriptionRow["status"]) {
   const map: Record<SubscriptionRow["status"], string> = {
-    active:    "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
-    pending:   "bg-amber-500/15 text-amber-300 border-amber-500/40",
-    past_due:  "bg-red-500/15 text-red-300 border-red-500/40",
+    active: "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
+    pending: "bg-amber-500/15 text-amber-300 border-amber-500/40",
+    past_due: "bg-red-500/15 text-red-300 border-red-500/40",
     cancelled: "bg-zinc-500/15 text-zinc-300 border-zinc-500/40",
   };
   return map[status];
@@ -349,7 +355,11 @@ function statusBadge(status: SubscriptionRow["status"]) {
 
 function formatDate(iso: string | null) {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-ZA", { day: "numeric", month: "short", year: "numeric" });
+  return new Date(iso).toLocaleDateString("en-ZA", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 function formatPrice(cents: number) {
@@ -424,7 +434,8 @@ function SubscriptionsPage() {
       case "creator_pass":
         return {
           name: "Creator Pass",
-          description: "Ecosystem pass — includes ePublisher, Creative Studio, and YouTube Optimizer.",
+          description:
+            "Ecosystem pass — includes ePublisher, Creative Studio, and YouTube Optimizer.",
           coveredApps: new Set<AppKey>(["epublisher", "creative_studio", "youtube_optimizer"]),
           coveredTierLabel: "Pro (via Creator Pass)",
         };
@@ -432,14 +443,24 @@ function SubscriptionsPage() {
         return {
           name: "Studio Pass",
           description: "Ecosystem pass — Pro-level access across every Resonance app.",
-          coveredApps: new Set<AppKey>(["epublisher", "creative_studio", "sync_vision", "youtube_optimizer"]),
+          coveredApps: new Set<AppKey>([
+            "epublisher",
+            "creative_studio",
+            "sync_vision",
+            "youtube_optimizer",
+          ]),
           coveredTierLabel: "Pro (via Studio Pass)",
         };
       case "all_access":
         return {
           name: "All-Access (legacy)",
           description: "Legacy ecosystem pass — Pro-level access across every Resonance app.",
-          coveredApps: new Set<AppKey>(["epublisher", "creative_studio", "sync_vision", "youtube_optimizer"]),
+          coveredApps: new Set<AppKey>([
+            "epublisher",
+            "creative_studio",
+            "sync_vision",
+            "youtube_optimizer",
+          ]),
           coveredTierLabel: "Pro (via All-Access)",
         };
       default:
@@ -452,7 +473,6 @@ function SubscriptionsPage() {
         };
     }
   })();
-
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -476,8 +496,8 @@ function SubscriptionsPage() {
           {FREE_PROMOTION_ACTIVE && (
             <div className="mt-5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-100">
               <strong className="block mb-1">Free promotion active</strong>
-              {FREE_PROMOTION_MESSAGE} Historical subscription records remain visible below for audit
-              and account continuity.
+              {FREE_PROMOTION_MESSAGE} Historical subscription records remain visible below for
+              audit and account continuity.
             </div>
           )}
         </header>
@@ -516,7 +536,6 @@ function SubscriptionsPage() {
                         ? `${bundleInfo.description} Renews ${formatDate(bundle?.current_period_end ?? null)}.`
                         : bundleInfo.description}
                   </p>
-
                 </div>
                 <div className="text-right">
                   {FREE_PROMOTION_ACTIVE ? (
@@ -524,7 +543,9 @@ function SubscriptionsPage() {
                       Promotion · R0
                     </span>
                   ) : bundleActive ? (
-                    <span className={`inline-block rounded-full border px-3 py-1 text-xs ${statusBadge("active")}`}>
+                    <span
+                      className={`inline-block rounded-full border px-3 py-1 text-xs ${statusBadge("active")}`}
+                    >
                       Active · {formatPrice(bundle!.amount_cents)}/mo
                     </span>
                   ) : (
@@ -556,16 +577,15 @@ function SubscriptionsPage() {
                     ? "Promotion"
                     : coveredByBundle
                       ? bundleInfo.coveredTierLabel
-                      : sub?.tier ?? "Free";
+                      : (sub?.tier ?? "Free");
                   const effectiveStatus: SubscriptionRow["status"] = FREE_PROMOTION_ACTIVE
                     ? "active"
                     : coveredByBundle
                       ? "active"
-                      : sub?.status ?? "pending";
+                      : (sub?.status ?? "pending");
                   const renewal = coveredByBundle
                     ? bundle?.current_period_end
-                    : sub?.current_period_end ?? null;
-
+                    : (sub?.current_period_end ?? null);
 
                   return (
                     <div
@@ -575,7 +595,9 @@ function SubscriptionsPage() {
                       <div className="flex items-center gap-4 min-w-0">
                         <div
                           className="h-10 w-10 rounded-lg flex-shrink-0"
-                          style={{ background: `linear-gradient(135deg, ${meta.accent}, ${meta.accent}88)` }}
+                          style={{
+                            background: `linear-gradient(135deg, ${meta.accent}, ${meta.accent}88)`,
+                          }}
                         />
                         <div className="min-w-0">
                           <p className="font-medium truncate">{meta.label}</p>
@@ -587,14 +609,17 @@ function SubscriptionsPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3 flex-shrink-0">
-                        <span className={`inline-block rounded-full border px-3 py-1 text-xs capitalize ${statusBadge(effectiveStatus)}`}>
+                        <span
+                          className={`inline-block rounded-full border px-3 py-1 text-xs capitalize ${statusBadge(effectiveStatus)}`}
+                        >
                           {effectiveStatus.replace("_", " ")}
                         </span>
                         {FREE_PROMOTION_ACTIVE ? (
                           <span className="text-xs text-emerald-400">Free access</span>
                         ) : sub && !coveredByBundle ? (
                           <span className="text-xs text-muted-foreground font-mono">
-                            {formatPrice(sub.amount_cents)}/{sub.billing_cycle === "monthly" ? "mo" : "yr"}
+                            {formatPrice(sub.amount_cents)}/
+                            {sub.billing_cycle === "monthly" ? "mo" : "yr"}
                           </span>
                         ) : (
                           !coveredByBundle && (
@@ -633,23 +658,38 @@ function SubscriptionsPage() {
                     </thead>
                     <tbody>
                       {subs.map((s) => {
-                        const retryable = s.status === "pending" || s.status === "past_due" || s.status === "cancelled";
+                        const retryable =
+                          s.status === "pending" ||
+                          s.status === "past_due" ||
+                          s.status === "cancelled";
                         return (
-                        <tr key={`${s.app}-${s.updated_at}`} className="border-t border-border">
-                          <td className="px-4 py-3">{APP_META[s.app as AppKey]?.label ?? s.app}</td>
-                          <td className="px-4 py-3 capitalize">{s.tier}</td>
-                          <td className="px-4 py-3">
-                            <span className={`inline-block rounded border px-2 py-0.5 text-xs capitalize ${statusBadge(s.status)}`}>
-                              {s.status.replace("_", " ")}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 capitalize">{s.billing_cycle}</td>
-                          <td className="px-4 py-3 text-xs">{formatDate(s.current_period_end)}</td>
-                          <td className="px-4 py-3 text-right font-mono text-xs">{formatPrice(s.amount_cents)}</td>
-                          <td className="px-4 py-3 text-right">
-                            {retryable ? <RetryPaymentButton subscriptionId={s.id} /> : <span className="text-xs text-muted-foreground">—</span>}
-                          </td>
-                        </tr>
+                          <tr key={`${s.app}-${s.updated_at}`} className="border-t border-border">
+                            <td className="px-4 py-3">
+                              {APP_META[s.app as AppKey]?.label ?? s.app}
+                            </td>
+                            <td className="px-4 py-3 capitalize">{s.tier}</td>
+                            <td className="px-4 py-3">
+                              <span
+                                className={`inline-block rounded border px-2 py-0.5 text-xs capitalize ${statusBadge(s.status)}`}
+                              >
+                                {s.status.replace("_", " ")}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 capitalize">{s.billing_cycle}</td>
+                            <td className="px-4 py-3 text-xs">
+                              {formatDate(s.current_period_end)}
+                            </td>
+                            <td className="px-4 py-3 text-right font-mono text-xs">
+                              {formatPrice(s.amount_cents)}
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              {retryable ? (
+                                <RetryPaymentButton subscriptionId={s.id} />
+                              ) : (
+                                <span className="text-xs text-muted-foreground">—</span>
+                              )}
+                            </td>
+                          </tr>
                         );
                       })}
                     </tbody>
@@ -672,7 +712,6 @@ function SubscriptionsPage() {
           </>
         )}
 
-
         <footer className="mt-16 flex justify-end">
           <DebugToggle />
         </footer>
@@ -680,4 +719,3 @@ function SubscriptionsPage() {
     </div>
   );
 }
-
