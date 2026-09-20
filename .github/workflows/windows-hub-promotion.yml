@@ -116,28 +116,53 @@ jobs:
           & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $Promoter -Root "$env:USERPROFILE\Resonance\OpenNova" -HubSource $env:RONSAS_HUB_SOURCE
           if ($LASTEXITCODE) { throw 'Hub promotion failed.' }
 
-      - name: Restore public edge and verify policy-critical routes
+      - name: Restore public edge and verify Hub policy-critical routes
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
           $Control="$env:USERPROFILE\AppData\Local\Resonance\RONS-ControlCenter"
           & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Control 'RONS-Ensure-Public-Edge.ps1')
+          if ($LASTEXITCODE) { throw 'Public edge restore failed.' }
           Start-Sleep -Seconds 4
-          $checks=@(
+
+          $hubChecks=@(
             @{Url='https://reson8.life/'; Contains='temporarily free'},
             @{Url='https://reson8.life/pricing'; Contains='free during the promotion'},
             @{Url='https://reson8.life/changelog'; Contains='Changelog'},
-            @{Url='https://reson8.life/api/public/app-status/health'; Contains='"ok": true'},
-            @{Url='https://epublisher.reson8.life/'; Contains=''},
-            @{Url='https://creative.reson8.life/'; Contains=''},
-            @{Url='https://sync.reson8.life/'; Contains=''},
-            @{Url='https://youtube.reson8.life/'; Contains=''}
+            @{Url='https://reson8.life/api/public/app-status/health'; Contains='"ok": true'}
           )
-          foreach($c in $checks){
+          foreach($c in $hubChecks){
             $resp=Invoke-WebRequest -UseBasicParsing -Uri $c.Url -TimeoutSec 15
             if($resp.StatusCode -ne 200){throw "$($c.Url) returned $($resp.StatusCode)"}
             if($c.Contains -and [string]$resp.Content -notlike ('*'+$c.Contains+'*')){throw "$($c.Url) missing expected marker: $($c.Contains)"}
-            Write-Host "PASS $($c.Url) HTTP $($resp.StatusCode)"
+            Write-Host "PASS HUB $($c.Url) HTTP $($resp.StatusCode)"
+          }
+
+      - name: Observe spoke availability without invalidating Hub promotion
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $spokes=@(
+            'https://epublisher.reson8.life/',
+            'https://creative.reson8.life/',
+            'https://sync.reson8.life/',
+            'https://youtube.reson8.life/'
+          )
+          $failures=@()
+          foreach($url in $spokes){
+            try {
+              $resp=Invoke-WebRequest -UseBasicParsing -Uri $url -TimeoutSec 15
+              if($resp.StatusCode -ne 200){throw "HTTP $($resp.StatusCode)"}
+              Write-Host "PASS SPOKE $url HTTP $($resp.StatusCode)"
+            } catch {
+              $msg="$url unavailable: $($_.Exception.Message)"
+              Write-Warning $msg
+              $failures += $msg
+            }
+          }
+          if($failures.Count -gt 0){
+            Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value "### Spoke availability warnings"
+            foreach($f in $failures){ Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value "- $f" }
           }
 
       - name: Record governed release receipt
