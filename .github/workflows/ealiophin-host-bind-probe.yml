@@ -1,0 +1,23 @@
+name: One-shot Ealiophin host-bind probe
+
+on:
+  push:
+    paths:
+      - ".github/workflows/ealiophin-host-bind-probe.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
+    timeout-minutes: 5
+    steps:
+      - name: Probe read-only Windows host bind through governed Podman
+        shell: bash
+        run: |
+          set -u
+          podman --remote version
+          echo "host_bind_probe_begin"
+          podman --remote run --rm --entrypoint sh             -v /mnt/c:/hostc:ro             localhost/ronsas-actions-runner:2.337.0-r2             -lc 'for p in /hostc/Resonance/Sources/ronsas-hub-canonical /hostc/Users/Ashley/Resonance/OpenNova /hostc/Users/Ashley/AppData/Local/Resonance/RONS-ControlCenter; do if [ -e "$p" ]; then echo "host_path_ok=$p"; else echo "host_path_missing=$p"; fi; done'
+          echo "host_bind_probe_end"
