@@ -1,0 +1,58 @@
+name: Guarded zombie Linux runner recycle
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/windows-zombie-linux-runner-recycle.yml"
+      - "ops/ealiophin/ci/START-RONSAS-ACTIONS-RUNNER.ps1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ronsas-zombie-linux-runner-recycle
+  cancel-in-progress: true
+
+jobs:
+  recycle:
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 5
+    steps:
+      - name: Check out RONSAS control authority
+        uses: actions/checkout@v4
+
+      - name: Recycle only an idle Linux runner with queued CI
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $repo='resonance36912-cell/RONSAS'
+          $name='Ealiophin-RONSAS-Linux-2'
+          $targetNames = @('Security scan','Verify prebuild','Verify checkout links','Verify ePublisher checkout')
+
+          $runsRaw = & gh.exe api "repos/$repo/actions/runs?per_page=100"
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to query workflow backlog.' }
+          $runs = @(($runsRaw | ConvertFrom-Json).workflow_runs)
+          $queued = @($runs | Where-Object {
+            ($targetNames -contains [string]$_.name) -and
+            (@('queued','pending','waiting') -contains [string]$_.status)
+          })
+
+          if ($queued.Count -eq 0) {
+            Write-Host 'No queued Linux CI backlog; recycle not required.'
+            exit 0
+          }
+
+          $payload = & gh.exe api "repos/$repo/actions/runners" | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to query GitHub runner registration.' }
+          $runner = @($payload.runners | Where-Object { $_.name -eq $name }) | Select-Object -First 1
+
+          if ($runner -and [bool]$runner.busy) {
+            Write-Host "Linux runner is busy; preserving active work. queued=$($queued.Count)"
+            exit 0
+          }
+
+          $script = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
+          Write-Host "Guarded recycle requested; queued Linux CI=$($queued.Count)."
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $script -ForceRecycle
+          if ($LASTEXITCODE -ne 0) { throw "Guarded Linux runner recycle failed with exit code $LASTEXITCODE" }
