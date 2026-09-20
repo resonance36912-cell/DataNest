@@ -59,12 +59,20 @@ jobs:
               ]),
             );
 
-            const { data: runsPage } = await github.rest.actions.listWorkflowRunsForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              per_page: 100,
-            });
-            const runs = runsPage.workflow_runs;
+            const runsById = new Map();
+            for (const status of activeStates) {
+              const statusRuns = await github.paginate(
+                github.rest.actions.listWorkflowRunsForRepo,
+                {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  status,
+                  per_page: 100,
+                },
+              );
+              for (const run of statusRuns) runsById.set(run.id, run);
+            }
+            const runs = [...runsById.values()];
 
             let cancelled = 0;
             for (const run of runs) {
