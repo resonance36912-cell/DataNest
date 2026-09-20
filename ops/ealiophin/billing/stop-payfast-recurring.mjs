@@ -8,13 +8,19 @@ const execute = process.argv.includes("--execute");
 if (!requestPath) throw new Error("--request is required");
 const request = JSON.parse(readFileSync(requestPath, "utf8"));
 
-if (request.schema !== "ronsas-free-promotion-billing-stop/v1") throw new Error("Bad request schema");
-if (request.confirmation !== "STOP RONSAS RECURRING BILLING") throw new Error("Missing confirmation");
+if (request.schema !== "ronsas-free-promotion-billing-stop/v1")
+  throw new Error("Bad request schema");
+if (request.confirmation !== "STOP RONSAS RECURRING BILLING")
+  throw new Error("Missing confirmation");
 if (request.policy?.freePromotion !== true) throw new Error("Free promotion must be active");
-if (request.policy?.newCheckoutLaunches !== false) throw new Error("Checkout launches must be disabled");
-if (request.policy?.existingRecurringCharges !== false) throw new Error("Recurring charges must be disabled");
-if (request.policy?.cancelProviderTokens !== true) throw new Error("Provider cancellation is required");
-if (request.policy?.refundPriorPayments !== false) throw new Error("Refunds are outside this operation");
+if (request.policy?.newCheckoutLaunches !== false)
+  throw new Error("Checkout launches must be disabled");
+if (request.policy?.existingRecurringCharges !== false)
+  throw new Error("Recurring charges must be disabled");
+if (request.policy?.cancelProviderTokens !== true)
+  throw new Error("Provider cancellation is required");
+if (request.policy?.refundPriorPayments !== false)
+  throw new Error("Refunds are outside this operation");
 
 const need = (name) => {
   const value = process.env[name]?.trim();
@@ -75,7 +81,9 @@ async function fetchJson(url, options, label) {
   const response = await fetch(url, options);
   const text = await response.text();
   let payload = null;
-  try { payload = text ? JSON.parse(text) : null; } catch {}
+  try {
+    payload = text ? JSON.parse(text) : null;
+  } catch {}
   if (!response.ok || payload?.status === "failed") {
     throw new Error(label + " failed with HTTP " + response.status);
   }
