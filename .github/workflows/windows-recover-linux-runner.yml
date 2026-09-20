@@ -1,5 +1,5 @@
 name: Governed Linux runner recovery
-# Recovery trigger audit: 2026-09-20 free-promotion CI queue recovery — trigger 2
+# Recovery trigger audit: 2026-09-20 free-promotion CI queue recovery — trigger 3
 
 on:
   # workflow_dispatch is the normal manual recovery path. When the connector
