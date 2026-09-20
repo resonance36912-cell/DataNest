@@ -12,105 +12,99 @@ permissions:
   contents: read
   pull-requests: read
 
+concurrency:
+  group: ronsas-ci-queue-janitor
+  cancel-in-progress: true
+
 jobs:
   prune:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
     timeout-minutes: 5
     env:
       GH_TOKEN: ${{ github.token }}
       GH_REPOSITORY: ${{ github.repository }}
       GH_RUN_ID: ${{ github.run_id }}
     steps:
-      - name: Prune queue and dispatch recovery
-        shell: bash
+      - name: Prune stale CI queue and dispatch recovery
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
-          python3 - <<'PY'
-          import json
-          import os
-          import urllib.error
-          import urllib.request
+          $ErrorActionPreference = 'Stop'
+          $repo = $env:GH_REPOSITORY
+          $currentRunId = [long]$env:GH_RUN_ID
 
-          token = os.environ["GH_TOKEN"]
-          repository = os.environ["GH_REPOSITORY"]
-          current_run_id = int(os.environ["GH_RUN_ID"])
-          base = f"https://api.github.com/repos/{repository}"
-          headers = {
-              "Authorization": f"Bearer {token}",
-              "Accept": "application/vnd.github+json",
-              "X-GitHub-Api-Version": "2022-11-28",
-              "User-Agent": "ronsas-ci-queue-janitor",
+          $openPullsRaw = & gh.exe api "repos/$repo/pulls?state=open&per_page=100"
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to query open pull requests.' }
+          $openPulls = @($openPullsRaw | ConvertFrom-Json)
+
+          $currentPrByBranch = @{}
+          foreach ($pr in $openPulls) {
+            $branch = [string]$pr.head.ref
+            $sha = [string]$pr.head.sha
+            if ([string]::IsNullOrWhiteSpace($branch) -or [string]::IsNullOrWhiteSpace($sha)) { continue }
+            $currentPrByBranch[$branch] = [pscustomobject]@{
+              number = [int]$pr.number
+              sha = $sha
+            }
           }
 
-          def request(path, method="GET", payload=None):
-              data = None if payload is None else json.dumps(payload).encode("utf-8")
-              req = urllib.request.Request(base + path, data=data, headers=headers, method=method)
-              try:
-                  with urllib.request.urlopen(req, timeout=30) as response:
-                      body = response.read().decode("utf-8")
-                      return json.loads(body) if body else None
-              except urllib.error.HTTPError as error:
-                  body = error.read().decode("utf-8", errors="replace")
-                  raise RuntimeError(f"{method} {path} failed: {error.code} {body}") from error
+          $runsRaw = & gh.exe api "repos/$repo/actions/runs?per_page=100"
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to query workflow runs.' }
+          $runs = @(($runsRaw | ConvertFrom-Json).workflow_runs)
 
-          pulls = request("/pulls?state=open&per_page=100")
-          current_pr_by_branch = {
-              pr["head"]["ref"]: {"number": pr["number"], "sha": pr["head"]["sha"]}
-              for pr in pulls
-          }
-          runs = request("/actions/runs?per_page=100")["workflow_runs"]
-
-          active = {"queued", "pending", "waiting", "in_progress", "requested"}
-          linux_ci = {
-              "Security scan",
-              "Verify prebuild",
-              "Verify checkout links",
-              "Verify ePublisher checkout",
-          }
-          recovery = {
-              "Governed Linux runner recovery",
-              "Guarded zombie Linux runner recycle",
-              "Temporary format free promotion",
-          }
-
-          cancelled = 0
-          for run in runs:
-              if run.get("status") not in active or run["id"] == current_run_id:
-                  continue
-
-              reason = None
-              name = run.get("name", "")
-              event = run.get("event", "")
-              branch = run.get("head_branch") or ""
-              sha = run.get("head_sha") or ""
-
-              if name in linux_ci:
-                  if event == "pull_request":
-                      current = current_pr_by_branch.get(branch)
-                      if current is None:
-                          reason = "closed or unmatched PR branch"
-                      elif sha != current["sha"]:
-                          reason = f"superseded PR #{current['number']} head"
-                  elif event == "push" and branch == "main":
-                      reason = "main push CI superseded by exact-head PR validation"
-              elif name in recovery:
-                  reason = "superseded recovery or formatter run"
-
-              if reason is None:
-                  continue
-
-              print(f"cancel run={run['id']} name={name!r} reason={reason}")
-              try:
-                  request(f"/actions/runs/{run['id']}/cancel", method="POST")
-                  cancelled += 1
-              except Exception as error:
-                  print(f"warning: {error}")
-
-          print(f"cancelled={cancelled}")
-
-          request(
-              "/actions/workflows/windows-recover-linux-runner.yml/dispatches",
-              method="POST",
-              payload={"ref": "main"},
+          $active = @('queued','pending','waiting','in_progress','requested')
+          $linuxCi = @(
+            'Security scan',
+            'Verify prebuild',
+            'Verify checkout links',
+            'Verify ePublisher checkout'
           )
-          print("dispatched governed Linux runner recovery")
-          PY
+          $recovery = @(
+            'Governed Linux runner recovery',
+            'Guarded zombie Linux runner recycle',
+            'Temporary format free promotion'
+          )
+
+          $cancelled = 0
+          foreach ($run in $runs) {
+            if ($active -notcontains [string]$run.status) { continue }
+            if ([long]$run.id -eq $currentRunId) { continue }
+
+            $reason = $null
+            $name = [string]$run.name
+            $event = [string]$run.event
+            $headBranch = [string]$run.head_branch
+            $headSha = [string]$run.head_sha
+
+            if ($linuxCi -contains $name) {
+              if ($event -eq 'pull_request') {
+                if (-not $currentPrByBranch.ContainsKey($headBranch)) {
+                  $reason = 'closed or unmatched PR branch'
+                } else {
+                  $current = $currentPrByBranch[$headBranch]
+                  if ($headSha -ne [string]$current.sha) {
+                    $reason = "superseded PR #$($current.number) head"
+                  }
+                }
+              } elseif ($event -eq 'push' -and $headBranch -eq 'main') {
+                $reason = 'main push CI superseded by exact-head PR validation'
+              }
+            } elseif ($recovery -contains $name) {
+              $reason = 'superseded recovery or formatter run'
+            }
+
+            if ([string]::IsNullOrWhiteSpace($reason)) { continue }
+
+            Write-Host "Cancelling run=$($run.id) name=$name reason=$reason"
+            & gh.exe api -X POST "repos/$repo/actions/runs/$($run.id)/cancel" *> $null
+            if ($LASTEXITCODE -eq 0) {
+              $cancelled++
+            } else {
+              Write-Warning "Run $($run.id) could not be cancelled; it may have completed concurrently."
+            }
+          }
+
+          Write-Host "cancelled=$cancelled"
+
+          & gh.exe api -X POST "repos/$repo/actions/workflows/windows-recover-linux-runner.yml/dispatches" -f ref=main *> $null
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to dispatch governed Linux runner recovery.' }
+          Write-Host 'dispatched governed Linux runner recovery'
