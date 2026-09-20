@@ -4,8 +4,6 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - ".github/workflows/ci-queue-janitor.yml"
 
 permissions:
   actions: write
@@ -34,7 +32,15 @@ jobs:
 
           $openPullsRaw = & gh.exe api "repos/$repo/pulls?state=open&per_page=100"
           if ($LASTEXITCODE -ne 0) { throw 'Unable to query open pull requests.' }
-          $openPulls = @(($openPullsRaw -join "`n") | ConvertFrom-Json)
+          $openPullsParsed = ($openPullsRaw -join "`n") | ConvertFrom-Json
+          $openPulls = @()
+          if ($null -ne $openPullsParsed) {
+            if ($openPullsParsed -is [System.Array]) {
+              foreach ($item in $openPullsParsed) { $openPulls += $item }
+            } else {
+              $openPulls += $openPullsParsed
+            }
+          }
 
           $currentPrByBranch = @{}
           foreach ($pr in $openPulls) {
@@ -50,7 +56,14 @@ jobs:
           $runsRaw = & gh.exe api "repos/$repo/actions/runs?per_page=100"
           if ($LASTEXITCODE -ne 0) { throw 'Unable to query workflow runs.' }
           $runsPayload = ($runsRaw -join "`n") | ConvertFrom-Json
-          $runs = @($runsPayload.workflow_runs)
+          $runs = @()
+          if ($null -ne $runsPayload -and $null -ne $runsPayload.workflow_runs) {
+            if ($runsPayload.workflow_runs -is [System.Array]) {
+              foreach ($item in $runsPayload.workflow_runs) { $runs += $item }
+            } else {
+              $runs += $runsPayload.workflow_runs
+            }
+          }
 
           $active = @('queued','pending','waiting','in_progress','requested')
           $linuxCi = @(
@@ -96,8 +109,12 @@ jobs:
             if ([string]::IsNullOrWhiteSpace($reason)) { continue }
 
             Write-Host "Cancelling run=$($run.id) name=$name reason=$reason"
+            $savedErrorActionPreference = $ErrorActionPreference
+            $ErrorActionPreference = 'Continue'
             & gh.exe api -X POST "repos/$repo/actions/runs/$($run.id)/cancel" *> $null
-            if ($LASTEXITCODE -eq 0) {
+            $cancelExitCode = $LASTEXITCODE
+            $ErrorActionPreference = $savedErrorActionPreference
+            if ($cancelExitCode -eq 0) {
               $cancelled++
             } else {
               Write-Warning "Run $($run.id) could not be cancelled; it may have completed concurrently."
