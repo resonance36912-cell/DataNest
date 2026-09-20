@@ -132,10 +132,25 @@ jobs:
             @{Url='https://reson8.life/api/public/app-status/health'; Contains='"ok": true'}
           )
           foreach($c in $hubChecks){
-            $resp=Invoke-WebRequest -UseBasicParsing -Uri $c.Url -TimeoutSec 15
-            if($resp.StatusCode -ne 200){throw "$($c.Url) returned $($resp.StatusCode)"}
-            if($c.Contains -and [string]$resp.Content -notlike ('*'+$c.Contains+'*')){throw "$($c.Url) missing expected marker: $($c.Contains)"}
-            Write-Host "PASS HUB $($c.Url) HTTP $($resp.StatusCode)"
+            $passed=$false
+            $lastError=$null
+            for($attempt=1;$attempt -le 8;$attempt++){
+              try {
+                $separator=if($c.Url.Contains('?')){'&'}else{'?'}
+                $verifyUri=$c.Url+$separator+'ronsas_verify='+[DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+                $resp=Invoke-WebRequest -UseBasicParsing -Uri $verifyUri -Headers @{'Cache-Control'='no-cache';'Pragma'='no-cache'} -TimeoutSec 15
+                if($resp.StatusCode -ne 200){throw "$($c.Url) returned $($resp.StatusCode)"}
+                if($c.Contains -and [string]$resp.Content -notlike ('*'+$c.Contains+'*')){throw "$($c.Url) missing expected marker: $($c.Contains)"}
+                Write-Host "PASS HUB $($c.Url) HTTP $($resp.StatusCode) attempt=$attempt"
+                $passed=$true
+                break
+              } catch {
+                $lastError=$_.Exception.Message
+                Write-Warning "Hub edge check attempt $attempt failed for $($c.Url): $lastError"
+                if($attempt -lt 8){Start-Sleep -Seconds 5}
+              }
+            }
+            if(-not $passed){throw "Public Hub verification failed after 8 attempts for $($c.Url): $lastError"}
           }
 
       - name: Observe spoke availability without invalidating Hub promotion
