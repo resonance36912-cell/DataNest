@@ -115,7 +115,7 @@ function BillingPortal() {
           </div>
         )}
 
-        {isLoading && <p className="text-muted-foreground">Loading…</p>
+        {isLoading && <p className="text-muted-foreground">Loading…</p>}
         {error && (
           <div className="rounded border border-destructive/40 bg-destructive/10 p-4 text-sm">
             <p>Could not load billing: {(error as Error).message}</p>
