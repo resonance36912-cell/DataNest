@@ -1,17 +1,25 @@
 {
-  "schema": "ronsas-railway-epublisher-repair/v3",
+  "schema": "ronsas-railway-epublisher-repair/v4",
   "projectId": "70cc7bde-c5ba-4224-9c74-ddb873b27379",
   "environmentId": "78627988-2f5f-42a8-a507-ee5e221bf10a",
   "serviceId": "37312153-7877-4830-85ae-5b48e6275319",
-  "repo": "resonance36912-cell/rons-epublisher-sovereign-source",
-  "branch": "main",
-  "targetCommit": "5827b0b89abc8e5f13aa29593075edddbf80a9ae",
+  "governedSource": {
+    "repo": "resonance36912-cell/rons-epublisher-sovereign-source",
+    "revision": "5827b0b89abc8e5f13aa29593075edddbf80a9ae"
+  },
+  "prebuiltImage": "ghcr.io/resonance36912-cell/rons-epublisher-sovereign-source@sha256:24bd12c56ba0f33b7d615f9860396e094df5c394d0b614d3320b13477ef22da1",
+  "verification": {
+    "workflowRunId": 35501093514,
+    "anonymousPull": true,
+    "runtimeSmoke": true
+  },
   "confirmation": "REPAIR RAILWAY EPUB FALLBACK",
   "recovery": {
-    "disableMetalBuildEnvironment": true,
+    "switchToPrebuiltImage": true,
+    "clearGitSourceBinding": true,
+    "clearStartCommandOverride": true,
     "stageOnly": true,
-    "reason": "Explicit legacy build-environment fallback after Railway defaulted a null buildEnvironment back to V3 and continued assigning the failing Metal builder path.",
-    "targetBuildEnvironment": "V2"
+    "reason": "Bypass Railway Metal builder infrastructure failure using an immutable public image built from the exact governed source revision and verified by anonymous pull plus HTTP runtime smoke test."
   },
   "constraints": {
     "changeDomains": false,
@@ -19,8 +27,8 @@
     "changeVariables": false,
     "createService": false,
     "cloudflareWorkerMigration": false,
-    "changeBuilderType": false,
-    "changeDockerfilePath": false,
-    "changeStartCommand": false
+    "changeHealthcheck": false,
+    "changeReplicas": false,
+    "changeRuntime": false
   }
 }

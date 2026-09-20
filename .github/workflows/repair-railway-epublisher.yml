@@ -26,29 +26,27 @@ jobs:
         run: |
           $ErrorActionPreference='Stop'
           $r=Get-Content -Raw -LiteralPath 'ops/release-requests/railway-epublisher-fallback.json' | ConvertFrom-Json
-          if([string]$r.schema -ne 'ronsas-railway-epublisher-repair/v3'){throw 'Unexpected repair schema.'}
+          if([string]$r.schema -ne 'ronsas-railway-epublisher-repair/v4'){throw 'Unexpected repair schema.'}
           if([string]$r.confirmation -ne 'REPAIR RAILWAY EPUB FALLBACK'){throw 'Explicit repair confirmation missing.'}
           if([string]$r.projectId -ne '70cc7bde-c5ba-4224-9c74-ddb873b27379'){throw 'Unexpected Railway project.'}
           if([string]$r.environmentId -ne '78627988-2f5f-42a8-a507-ee5e221bf10a'){throw 'Unexpected Railway environment.'}
           if([string]$r.serviceId -ne '37312153-7877-4830-85ae-5b48e6275319'){throw 'Unexpected Railway service.'}
-          if([string]$r.repo -ne 'resonance36912-cell/rons-epublisher-sovereign-source'){throw 'Unexpected source repository.'}
-          if([string]$r.branch -ne 'main'){throw 'Unexpected source branch.'}
-          if([string]$r.targetCommit -ne '5827b0b89abc8e5f13aa29593075edddbf80a9ae'){throw 'Unexpected target commit.'}
-          if(-not [bool]$r.recovery.disableMetalBuildEnvironment){throw 'Legacy build fallback is not authorized.'}
-          if([string]$r.recovery.targetBuildEnvironment -ne 'V2'){throw 'Unexpected target build environment.'}
-          if(-not [bool]$r.recovery.stageOnly){throw 'This workflow must remain stage-only.'}
-          if([bool]$r.constraints.changeDomains -or [bool]$r.constraints.changeBilling -or [bool]$r.constraints.changeVariables -or [bool]$r.constraints.createService -or [bool]$r.constraints.cloudflareWorkerMigration -or [bool]$r.constraints.changeBuilderType -or [bool]$r.constraints.changeDockerfilePath -or [bool]$r.constraints.changeStartCommand){throw 'Repair request violates protected constraints.'}
+          if([string]$r.governedSource.repo -ne 'resonance36912-cell/rons-epublisher-sovereign-source'){throw 'Unexpected governed source repo.'}
+          if([string]$r.governedSource.revision -ne '5827b0b89abc8e5f13aa29593075edddbf80a9ae'){throw 'Unexpected governed source revision.'}
+          if([string]$r.prebuiltImage -ne 'ghcr.io/resonance36912-cell/rons-epublisher-sovereign-source@sha256:24bd12c56ba0f33b7d615f9860396e094df5c394d0b614d3320b13477ef22da1'){throw 'Unexpected prebuilt image.'}
+          if([long]$r.verification.workflowRunId -ne 35501093514){throw 'Unexpected verification workflow.'}
+          if(-not [bool]$r.verification.anonymousPull -or -not [bool]$r.verification.runtimeSmoke){throw 'Image verification is incomplete.'}
+          if(-not [bool]$r.recovery.switchToPrebuiltImage -or -not [bool]$r.recovery.clearGitSourceBinding -or -not [bool]$r.recovery.clearStartCommandOverride -or -not [bool]$r.recovery.stageOnly){throw 'Prebuilt-image recovery authorization is incomplete.'}
+          if([bool]$r.constraints.changeDomains -or [bool]$r.constraints.changeBilling -or [bool]$r.constraints.changeVariables -or [bool]$r.constraints.createService -or [bool]$r.constraints.cloudflareWorkerMigration -or [bool]$r.constraints.changeHealthcheck -or [bool]$r.constraints.changeReplicas -or [bool]$r.constraints.changeRuntime){throw 'Repair request violates protected constraints.'}
 
-      - name: Stage governed legacy build fallback
+      - name: Stage immutable prebuilt image source
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
           $Project='70cc7bde-c5ba-4224-9c74-ddb873b27379'
           $Environment='78627988-2f5f-42a8-a507-ee5e221bf10a'
           $Service='37312153-7877-4830-85ae-5b48e6275319'
-          $Branch='main'
-          $Target='5827b0b89abc8e5f13aa29593075edddbf80a9ae'
-          $BuildEnvironment='V2'
+          $Image='ghcr.io/resonance36912-cell/rons-epublisher-sovereign-source@sha256:24bd12c56ba0f33b7d615f9860396e094df5c394d0b614d3320b13477ef22da1'
 
           $Railway=(Get-Command railway.cmd -ErrorAction SilentlyContinue).Source
           if(-not $Railway){throw 'railway.cmd is unavailable on the governed Ealiophin runner.'}
@@ -61,19 +59,21 @@ jobs:
             services=@{
               $Service=@{
                 source=@{
-                  branch=$Branch
-                  commitSha=$Target
+                  image=$Image
+                  repo=$null
+                  branch=$null
+                  commitSha=$null
                 }
-                build=@{
-                  buildEnvironment=$BuildEnvironment
+                deploy=@{
+                  startCommand=$null
                 }
               }
             }
           } | ConvertTo-Json -Depth 10 -Compress
 
-          $patchPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-legacy-build.json'
-          $stdoutPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-legacy-build.stdout'
-          $stderrPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-legacy-build.stderr'
+          $patchPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-prebuilt-image.json'
+          $stdoutPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-prebuilt-image.stdout'
+          $stderrPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-prebuilt-image.stderr'
           [IO.File]::WriteAllText($patchPath,$patch,(New-Object Text.UTF8Encoding($false)))
           Remove-Item -Force -LiteralPath $stdoutPath,$stderrPath -ErrorAction SilentlyContinue
 
@@ -82,10 +82,10 @@ jobs:
           $patchOut=if(Test-Path -LiteralPath $stdoutPath){Get-Content -Raw -LiteralPath $stdoutPath}else{''}
           $patchErr=if(Test-Path -LiteralPath $stderrPath){Get-Content -Raw -LiteralPath $stderrPath}else{''}
           if(-not [string]::IsNullOrWhiteSpace($patchErr)){Write-Host $patchErr.Trim()}
-          if($proc.ExitCode -ne 0){throw ('Railway legacy build staging failed: ' + (($patchOut + [Environment]::NewLine + $patchErr).Trim()))}
+          if($proc.ExitCode -ne 0){throw ('Railway prebuilt-image staging failed: ' + (($patchOut + [Environment]::NewLine + $patchErr).Trim()))}
 
           $result=$patchOut | ConvertFrom-Json
-          if(-not [bool]$result.staged){throw ('Railway did not stage the legacy build fallback: ' + $patchOut.Trim())}
+          if(-not [bool]$result.staged){throw ('Railway did not stage the prebuilt-image recovery: ' + $patchOut.Trim())}
           Write-Host $patchOut.Trim()
           Remove-Item -Force -LiteralPath $patchPath,$stdoutPath,$stderrPath -ErrorAction SilentlyContinue
-          Write-Host ('RONSAS RAILWAY EPUB LEGACY BUILD: STAGED ONLY at ' + $Target)
+          Write-Host ('RONSAS RAILWAY EPUB PREBUILT IMAGE: STAGED ONLY ' + $Image)
