@@ -40,3 +40,10 @@ jobs:
           else
             echo "canonical_start=missing"
           fi
+          if command -v podman >/dev/null 2>&1; then
+            echo "podman=present"
+            podman --remote version --format '{{.Client.Version}} {{.Server.Version}}' || true
+            podman --remote ps --format 'container={{.Names}} image={{.Image}} status={{.Status}}' || true
+          else
+            echo "podman=absent"
+          fi
