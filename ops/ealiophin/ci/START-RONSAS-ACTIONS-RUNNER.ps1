@@ -76,7 +76,7 @@ if ($registered -and [bool]$registered.busy) {
 
 if ($registered -and ($registered.status -ne 'online' -or $ForceRecycle)) {
     $reason = if ($ForceRecycle) { 'guarded recycle' } else { 'stale offline registration' }
-    Write-Host "Removing GitHub runner registration for $reason: $RunnerName (id=$($registered.id))" -ForegroundColor Yellow
+    Write-Host "Removing GitHub runner registration for ${reason}: $RunnerName (id=$($registered.id))" -ForegroundColor Yellow
     & $gh api -X DELETE "repos/$Repository/actions/runners/$($registered.id)"
     if ($LASTEXITCODE -ne 0) { throw 'Failed to remove GitHub runner registration.' }
     $registered = $null
