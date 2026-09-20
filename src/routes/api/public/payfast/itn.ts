@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { createHash } from "crypto";
+import { FREE_PROMOTION_ACTIVE } from "@/lib/commercial-policy";
 
 /**
  * PayFast Instant Transaction Notification (ITN) endpoint.
@@ -17,8 +18,8 @@ const SKU_CATALOG: Record<
   // Active ecosystem passes (Hub only).
   "all_access:creator_pass:monthly": { app: "all_access", tier: "creator_pass", amountCents: 49900,  cycle: "monthly" },
   "all_access:studio_pass:monthly":  { app: "all_access", tier: "studio_pass",  amountCents: 149900, cycle: "monthly" },
-  // Legacy per-app monthly SKUs — retired from UI but kept live so existing
-  // PayFast subscriptions keep renewing.
+  // Legacy per-app monthly SKUs remain only for historical ITN reconciliation.
+  // Provider renewals are cancelled during the governed free promotion.
   "epublisher:starter:monthly":  { app: "epublisher", tier: "starter",  amountCents: 9900,   cycle: "monthly" },
   "epublisher:creator:monthly":  { app: "epublisher", tier: "creator",  amountCents: 19900,  cycle: "monthly" },
   "epublisher:pro:monthly":      { app: "epublisher", tier: "pro",      amountCents: 44900,  cycle: "monthly" },
@@ -242,11 +243,24 @@ export const Route = createFileRoute("/api/public/payfast/itn")({
         //   FAILED    → renewal failed; treat as past_due until retried
         //   anything else → pending
         const isRefund = paymentStatus === "REFUND" || paymentStatus === "REFUNDED";
+        const providerNextStatus =
+          paymentStatus === "COMPLETE"
+            ? "active"
+            : paymentStatus === "CANCELLED"
+              ? "cancelled"
+              : isRefund
+                ? "cancelled"
+                : paymentStatus === "FAILED"
+                  ? "past_due"
+                  : "pending";
+
+        // Preserve late COMPLETE ITNs as financial history below, but never
+        // let a provider renewal restore paid entitlement while the governed
+        // free promotion is active.
         const nextStatus =
-          paymentStatus === "COMPLETE" ? "active" :
-          paymentStatus === "CANCELLED" ? "cancelled" :
-          isRefund ? "cancelled" :
-          paymentStatus === "FAILED" ? "past_due" : "pending";
+          FREE_PROMOTION_ACTIVE && providerNextStatus === "active"
+            ? "cancelled"
+            : providerNextStatus;
 
         const periodEnd = new Date();
         // Monthly-only billing. See note on SKU_CATALOG above.
