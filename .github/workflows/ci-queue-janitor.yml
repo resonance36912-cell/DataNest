@@ -59,58 +59,68 @@ jobs:
               ]),
             );
 
-            const runsById = new Map();
-            for (const status of activeStates) {
-              const statusRuns = await github.paginate(
-                github.rest.actions.listWorkflowRunsForRepo,
-                {
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  status,
-                  per_page: 100,
-                },
-              );
-              for (const run of statusRuns) runsById.set(run.id, run);
-            }
-            const runs = [...runsById.values()];
-
             let cancelled = 0;
-            for (const run of runs) {
-              if (!activeStates.has(run.status) || run.id === currentRun) continue;
-
-              let reason = null;
-              if (targetNames.has(run.name)) {
-                if (run.event === "pull_request") {
-                  const current = openByHead.get(run.head_branch || "");
-                  if (!current) {
-                    reason = "closed or unmatched PR branch";
-                  } else if (run.head_sha !== current.sha) {
-                    reason = `superseded PR #${current.number} head`;
-                  }
-                } else if (run.event === "push" && run.head_branch === "main") {
-                  reason = "main push CI superseded by exact-head PR validation";
-                }
-              } else if (recoveryNames.has(run.name)) {
-                reason = "superseded recovery or formatter run";
+            for (let pass = 1; pass <= 4; pass += 1) {
+              const runsById = new Map();
+              for (const status of activeStates) {
+                const statusRuns = await github.paginate(
+                  github.rest.actions.listWorkflowRunsForRepo,
+                  {
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    status,
+                    per_page: 100,
+                  },
+                );
+                for (const run of statusRuns) runsById.set(run.id, run);
               }
 
-              if (!reason) continue;
-              core.info(`Cancelling run=${run.id} name=${run.name} reason=${reason}`);
-              try {
-                await github.rest.actions.cancelWorkflowRun({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  run_id: run.id,
-                });
-                cancelled += 1;
-              } catch (error) {
-                core.warning(
-                  `Run ${run.id} could not be cancelled; it may have completed concurrently: ${error.status || "error"} ${error.message}`,
+              let passCancelled = 0;
+              for (const run of runsById.values()) {
+                if (!activeStates.has(run.status) || run.id === currentRun) continue;
+
+                let reason = null;
+                if (targetNames.has(run.name)) {
+                  if (run.event === "pull_request") {
+                    const current = openByHead.get(run.head_branch || "");
+                    if (!current) {
+                      reason = "closed or unmatched PR branch";
+                    } else if (run.head_sha !== current.sha) {
+                      reason = `superseded PR #${current.number} head`;
+                    }
+                  } else if (run.event === "push" && run.head_branch === "main") {
+                    reason = "main push CI superseded by exact-head PR validation";
+                  }
+                } else if (recoveryNames.has(run.name)) {
+                  reason = "superseded recovery or formatter run";
+                }
+
+                if (!reason) continue;
+                core.info(
+                  `pass=${pass} cancelling run=${run.id} name=${run.name} reason=${reason}`,
                 );
+                try {
+                  await github.rest.actions.cancelWorkflowRun({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    run_id: run.id,
+                  });
+                  cancelled += 1;
+                  passCancelled += 1;
+                } catch (error) {
+                  core.warning(
+                    `Run ${run.id} could not be cancelled; it may have completed concurrently: ${error.status || "error"} ${error.message}`,
+                  );
+                }
+              }
+
+              core.info(`pass=${pass} cancelled=${passCancelled}`);
+              if (pass < 4) {
+                await new Promise((resolve) => setTimeout(resolve, 3000));
               }
             }
 
-            core.info(`cancelled=${cancelled}`);
+            core.info(`cancelled_total=${cancelled}`);
 
             await github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
