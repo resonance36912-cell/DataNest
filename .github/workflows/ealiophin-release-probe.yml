@@ -42,6 +42,15 @@ jobs:
           fi
           if command -v podman >/dev/null 2>&1; then
             echo "podman=present"
+            podman --remote version || true
+            echo "podman_ps_begin"
+            podman --remote ps --format '{{.Names}}|{{.Image}}|{{.Status}}' || true
+            echo "podman_ps_end"
+          else
+            echo "podman=absent"
+          fi
+          if command -v podman >/dev/null 2>&1; then
+            echo "podman=present"
             podman --remote version --format '{{.Client.Version}} {{.Server.Version}}' || true
             podman --remote ps --format 'container={{.Names}} image={{.Image}} status={{.Status}}' || true
           else
