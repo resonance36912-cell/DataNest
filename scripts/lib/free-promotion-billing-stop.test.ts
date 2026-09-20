@@ -1,3 +1,4 @@
+// Governs the no-new-billing and no-recurring-billing promotion invariants.
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 
