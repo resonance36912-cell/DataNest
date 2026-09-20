@@ -12,12 +12,22 @@ import {
 import { retryPayfastLaunch } from "@/lib/checkout.functions";
 import { recordAuthGateEvent } from "@/lib/auth-gate-debug";
 import { emitAuthGateAnalytics } from "@/lib/auth-gate-analytics";
+import { FREE_PROMOTION_ACTIVE, FREE_PROMOTION_MESSAGE } from "@/lib/commercial-policy";
 
 export const Route = createFileRoute("/account/subscriptions")({
   head: () => ({
     meta: [
-      { title: "My Subscriptions — The Resonance" },
-      { name: "description", content: "Manage your Resonance subscriptions and entitlements." },
+      {
+        title: FREE_PROMOTION_ACTIVE
+          ? "My Access — The Resonance"
+          : "My Subscriptions — The Resonance",
+      },
+      {
+        name: "description",
+        content: FREE_PROMOTION_ACTIVE
+          ? "View promotional access and historical subscription records."
+          : "Manage your Resonance subscriptions and entitlements.",
+      },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
@@ -63,7 +73,9 @@ function useDebugEnabled(): [boolean, (next: boolean) => void] {
   useEffect(() => {
     const fn = () => setEnabled(debugEnabled());
     debugSubscribers.add(fn);
-    return () => { debugSubscribers.delete(fn); };
+    return () => {
+      debugSubscribers.delete(fn);
+    };
   }, []);
   return [enabled, setDebugEnabled];
 }
@@ -75,7 +87,6 @@ function log(event: string, detail: Record<string, unknown> = {}) {
   // route can show the last-known auth gate results for support triage.
   recordAuthGateEvent(event, level, detail);
   if (level === "info" && !debugEnabled()) return;
-  // eslint-disable-next-line no-console
   console[level](`[account/subscriptions] ${event}`, {
     ts: new Date().toISOString(),
     env: typeof window === "undefined" ? "ssr" : "browser",
@@ -97,11 +108,11 @@ function DebugToggle() {
       aria-pressed={enabled}
       title="Toggle verbose auth-gate logging in this tab"
     >
-      Debug auth: <span className={enabled ? "text-emerald-400" : ""}>{enabled ? "on" : "off"}</span>
+      Debug auth:{" "}
+      <span className={enabled ? "text-emerald-400" : ""}>{enabled ? "on" : "off"}</span>
     </button>
   );
 }
-
 
 /**
  * Client-side auth gate. Waits for Supabase to hydrate the session from
@@ -278,7 +289,8 @@ function SubscriptionsGate() {
       if (!diagnostics.analyticsEmitted) {
         diagnostics.analyticsEmitted = true;
         const elapsedMs = Math.round(
-          (typeof performance !== "undefined" ? performance.now() : Date.now()) - diagnostics.mountedAt,
+          (typeof performance !== "undefined" ? performance.now() : Date.now()) -
+            diagnostics.mountedAt,
         );
         emitAuthGateAnalytics({
           decision: "redirect",
@@ -297,7 +309,8 @@ function SubscriptionsGate() {
       if (!diagnostics.analyticsEmitted) {
         diagnostics.analyticsEmitted = true;
         const elapsedMs = Math.round(
-          (typeof performance !== "undefined" ? performance.now() : Date.now()) - diagnostics.mountedAt,
+          (typeof performance !== "undefined" ? performance.now() : Date.now()) -
+            diagnostics.mountedAt,
         );
         emitAuthGateAnalytics({
           decision: "render",
@@ -316,7 +329,6 @@ function SubscriptionsGate() {
     }
   }, [status, navigate, diagnostics]);
 
-
   if (status === "checking") {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
@@ -328,14 +340,13 @@ function SubscriptionsGate() {
   return <SubscriptionsPage />;
 }
 
-
 const ALL_APPS: AppKey[] = ["epublisher", "creative_studio", "sync_vision", "youtube_optimizer"];
 
 function statusBadge(status: SubscriptionRow["status"]) {
   const map: Record<SubscriptionRow["status"], string> = {
-    active:    "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
-    pending:   "bg-amber-500/15 text-amber-300 border-amber-500/40",
-    past_due:  "bg-red-500/15 text-red-300 border-red-500/40",
+    active: "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
+    pending: "bg-amber-500/15 text-amber-300 border-amber-500/40",
+    past_due: "bg-red-500/15 text-red-300 border-red-500/40",
     cancelled: "bg-zinc-500/15 text-zinc-300 border-zinc-500/40",
   };
   return map[status];
@@ -343,7 +354,11 @@ function statusBadge(status: SubscriptionRow["status"]) {
 
 function formatDate(iso: string | null) {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-ZA", { day: "numeric", month: "short", year: "numeric" });
+  return new Date(iso).toLocaleDateString("en-ZA", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 function formatPrice(cents: number) {
@@ -379,6 +394,8 @@ function RetryPaymentButton({ subscriptionId }: { subscriptionId: string }) {
       setLoading(false);
     }
   }
+
+  if (FREE_PROMOTION_ACTIVE) return null;
 
   return (
     <div className="flex flex-col items-end gap-1">
@@ -416,7 +433,8 @@ function SubscriptionsPage() {
       case "creator_pass":
         return {
           name: "Creator Pass",
-          description: "Ecosystem pass — includes ePublisher, Creative Studio, and YouTube Optimizer.",
+          description:
+            "Ecosystem pass — includes ePublisher, Creative Studio, and YouTube Optimizer.",
           coveredApps: new Set<AppKey>(["epublisher", "creative_studio", "youtube_optimizer"]),
           coveredTierLabel: "Pro (via Creator Pass)",
         };
@@ -424,14 +442,24 @@ function SubscriptionsPage() {
         return {
           name: "Studio Pass",
           description: "Ecosystem pass — Pro-level access across every Resonance app.",
-          coveredApps: new Set<AppKey>(["epublisher", "creative_studio", "sync_vision", "youtube_optimizer"]),
+          coveredApps: new Set<AppKey>([
+            "epublisher",
+            "creative_studio",
+            "sync_vision",
+            "youtube_optimizer",
+          ]),
           coveredTierLabel: "Pro (via Studio Pass)",
         };
       case "all_access":
         return {
           name: "All-Access (legacy)",
           description: "Legacy ecosystem pass — Pro-level access across every Resonance app.",
-          coveredApps: new Set<AppKey>(["epublisher", "creative_studio", "sync_vision", "youtube_optimizer"]),
+          coveredApps: new Set<AppKey>([
+            "epublisher",
+            "creative_studio",
+            "sync_vision",
+            "youtube_optimizer",
+          ]),
           coveredTierLabel: "Pro (via All-Access)",
         };
       default:
@@ -444,7 +472,6 @@ function SubscriptionsPage() {
         };
     }
   })();
-
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -459,9 +486,18 @@ function SubscriptionsPage() {
             </Link>
           </div>
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">My Account</p>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight">Subscriptions</h1>
+          <h1 className="mt-2 text-4xl font-semibold tracking-tight">
+            {FREE_PROMOTION_ACTIVE ? "Access" : "Subscriptions"}
+          </h1>
           {data?.email && (
             <p className="mt-2 text-sm text-muted-foreground">Signed in as {data.email}</p>
+          )}
+          {FREE_PROMOTION_ACTIVE && (
+            <div className="mt-5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-100">
+              <strong className="block mb-1">Free promotion active</strong>
+              {FREE_PROMOTION_MESSAGE} Historical subscription records remain visible below for
+              audit and account continuity.
+            </div>
           )}
         </header>
 
@@ -485,19 +521,30 @@ function SubscriptionsPage() {
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
                   <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                    {bundleActive ? "Active ecosystem pass" : "Optional ecosystem pass"}
+                    {FREE_PROMOTION_ACTIVE
+                      ? "Promotion access"
+                      : bundleActive
+                        ? "Active ecosystem pass"
+                        : "Optional ecosystem pass"}
                   </p>
                   <h2 className="mt-1 text-2xl font-semibold">{bundleInfo.name}</h2>
                   <p className="mt-1 text-sm text-muted-foreground max-w-md">
-                    {bundleActive
-                      ? `${bundleInfo.description} Renews ${formatDate(bundle?.current_period_end ?? null)}.`
-                      : bundleInfo.description}
+                    {FREE_PROMOTION_ACTIVE
+                      ? "All ecosystem products are available at R0 during the promotion. Any subscription data shown here is retained as historical account state."
+                      : bundleActive
+                        ? `${bundleInfo.description} Renews ${formatDate(bundle?.current_period_end ?? null)}.`
+                        : bundleInfo.description}
                   </p>
-
                 </div>
                 <div className="text-right">
-                  {bundleActive ? (
-                    <span className={`inline-block rounded-full border px-3 py-1 text-xs ${statusBadge("active")}`}>
+                  {FREE_PROMOTION_ACTIVE ? (
+                    <span className="inline-block rounded-full border border-emerald-500/40 bg-emerald-500/15 px-3 py-1 text-xs text-emerald-300">
+                      Promotion · R0
+                    </span>
+                  ) : bundleActive ? (
+                    <span
+                      className={`inline-block rounded-full border px-3 py-1 text-xs ${statusBadge("active")}`}
+                    >
                       Active · {formatPrice(bundle!.amount_cents)}/mo
                     </span>
                   ) : (
@@ -525,13 +572,19 @@ function SubscriptionsPage() {
                   // tier's pass get relabeled. Creator Pass excludes Sync
                   // Vision; that app must still show its own per-app sub.
                   const coveredByBundle = bundleActive && bundleInfo.coveredApps.has(app);
-                  const effectiveTier = coveredByBundle ? bundleInfo.coveredTierLabel : sub?.tier ?? "Free";
-                  const effectiveStatus: SubscriptionRow["status"] =
-                    coveredByBundle ? "active" : sub?.status ?? "pending";
+                  const effectiveTier = FREE_PROMOTION_ACTIVE
+                    ? "Promotion"
+                    : coveredByBundle
+                      ? bundleInfo.coveredTierLabel
+                      : (sub?.tier ?? "Free");
+                  const effectiveStatus: SubscriptionRow["status"] = FREE_PROMOTION_ACTIVE
+                    ? "active"
+                    : coveredByBundle
+                      ? "active"
+                      : (sub?.status ?? "pending");
                   const renewal = coveredByBundle
                     ? bundle?.current_period_end
-                    : sub?.current_period_end ?? null;
-
+                    : (sub?.current_period_end ?? null);
 
                   return (
                     <div
@@ -541,22 +594,31 @@ function SubscriptionsPage() {
                       <div className="flex items-center gap-4 min-w-0">
                         <div
                           className="h-10 w-10 rounded-lg flex-shrink-0"
-                          style={{ background: `linear-gradient(135deg, ${meta.accent}, ${meta.accent}88)` }}
+                          style={{
+                            background: `linear-gradient(135deg, ${meta.accent}, ${meta.accent}88)`,
+                          }}
                         />
                         <div className="min-w-0">
                           <p className="font-medium truncate">{meta.label}</p>
                           <p className="text-xs text-muted-foreground capitalize">
-                            {effectiveTier} · renews {formatDate(renewal ?? null)}
+                            {FREE_PROMOTION_ACTIVE
+                              ? "Promotion · R0 promotional access"
+                              : `${effectiveTier} · renews ${formatDate(renewal ?? null)}`}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3 flex-shrink-0">
-                        <span className={`inline-block rounded-full border px-3 py-1 text-xs capitalize ${statusBadge(effectiveStatus)}`}>
+                        <span
+                          className={`inline-block rounded-full border px-3 py-1 text-xs capitalize ${statusBadge(effectiveStatus)}`}
+                        >
                           {effectiveStatus.replace("_", " ")}
                         </span>
-                        {sub && !coveredByBundle ? (
+                        {FREE_PROMOTION_ACTIVE ? (
+                          <span className="text-xs text-emerald-400">Free access</span>
+                        ) : sub && !coveredByBundle ? (
                           <span className="text-xs text-muted-foreground font-mono">
-                            {formatPrice(sub.amount_cents)}/{sub.billing_cycle === "monthly" ? "mo" : "yr"}
+                            {formatPrice(sub.amount_cents)}/
+                            {sub.billing_cycle === "monthly" ? "mo" : "yr"}
                           </span>
                         ) : (
                           !coveredByBundle && (
@@ -586,30 +648,47 @@ function SubscriptionsPage() {
                         <th className="px-4 py-3">Tier</th>
                         <th className="px-4 py-3">Status</th>
                         <th className="px-4 py-3">Cycle</th>
-                        <th className="px-4 py-3">Renews</th>
+                        <th className="px-4 py-3">
+                          {FREE_PROMOTION_ACTIVE ? "Recorded period end" : "Renews"}
+                        </th>
                         <th className="px-4 py-3 text-right">Amount</th>
                         <th className="px-4 py-3 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {subs.map((s) => {
-                        const retryable = s.status === "pending" || s.status === "past_due" || s.status === "cancelled";
+                        const retryable =
+                          s.status === "pending" ||
+                          s.status === "past_due" ||
+                          s.status === "cancelled";
                         return (
-                        <tr key={`${s.app}-${s.updated_at}`} className="border-t border-border">
-                          <td className="px-4 py-3">{APP_META[s.app as AppKey]?.label ?? s.app}</td>
-                          <td className="px-4 py-3 capitalize">{s.tier}</td>
-                          <td className="px-4 py-3">
-                            <span className={`inline-block rounded border px-2 py-0.5 text-xs capitalize ${statusBadge(s.status)}`}>
-                              {s.status.replace("_", " ")}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 capitalize">{s.billing_cycle}</td>
-                          <td className="px-4 py-3 text-xs">{formatDate(s.current_period_end)}</td>
-                          <td className="px-4 py-3 text-right font-mono text-xs">{formatPrice(s.amount_cents)}</td>
-                          <td className="px-4 py-3 text-right">
-                            {retryable ? <RetryPaymentButton subscriptionId={s.id} /> : <span className="text-xs text-muted-foreground">—</span>}
-                          </td>
-                        </tr>
+                          <tr key={`${s.app}-${s.updated_at}`} className="border-t border-border">
+                            <td className="px-4 py-3">
+                              {APP_META[s.app as AppKey]?.label ?? s.app}
+                            </td>
+                            <td className="px-4 py-3 capitalize">{s.tier}</td>
+                            <td className="px-4 py-3">
+                              <span
+                                className={`inline-block rounded border px-2 py-0.5 text-xs capitalize ${statusBadge(s.status)}`}
+                              >
+                                {s.status.replace("_", " ")}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 capitalize">{s.billing_cycle}</td>
+                            <td className="px-4 py-3 text-xs">
+                              {formatDate(s.current_period_end)}
+                            </td>
+                            <td className="px-4 py-3 text-right font-mono text-xs">
+                              {formatPrice(s.amount_cents)}
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              {retryable ? (
+                                <RetryPaymentButton subscriptionId={s.id} />
+                              ) : (
+                                <span className="text-xs text-muted-foreground">—</span>
+                              )}
+                            </td>
+                          </tr>
                         );
                       })}
                     </tbody>
@@ -625,13 +704,12 @@ function SubscriptionsPage() {
                   to="/pricing"
                   className="mt-4 inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition"
                 >
-                  View pricing
+                  {FREE_PROMOTION_ACTIVE ? "Open free access" : "View pricing"}
                 </Link>
               </div>
             )}
           </>
         )}
-
 
         <footer className="mt-16 flex justify-end">
           <DebugToggle />
@@ -640,4 +718,3 @@ function SubscriptionsPage() {
     </div>
   );
 }
-
