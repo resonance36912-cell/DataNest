@@ -680,7 +680,7 @@ function Index() {
                 to="/pricing"
                 className="px-6 py-3.5 rounded-full border border-white/15 hover:border-white/40 font-bold text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(295_90%_60%)]"
               >
-                View pricing
+                Free access
               </Link>
             </div>
           </div>
