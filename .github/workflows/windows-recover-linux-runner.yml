@@ -51,3 +51,37 @@ jobs:
             if ($labels -notcontains $required) { throw "Runner missing required label: $required" }
           }
           Write-Host "RONSAS Linux runner online: $name"
+
+      - name: Cancel obsolete closed-PR workflow backlog
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $repo='resonance36912-cell/RONSAS'
+
+          $openRaw = & gh.exe api "repos/$repo/pulls?state=open&per_page=100"
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to query open pull requests.' }
+          $openHeads = @{}
+          foreach ($pr in @($openRaw | ConvertFrom-Json)) {
+            $openHeads[[string]$pr.head.ref] = $true
+          }
+
+          $cancelled = 0
+          foreach ($status in @('queued','in_progress')) {
+            $runsRaw = & gh.exe api "repos/$repo/actions/runs?status=$status&per_page=100"
+            if ($LASTEXITCODE -ne 0) { throw "Unable to query $status workflow runs." }
+            $runs = @(($runsRaw | ConvertFrom-Json).workflow_runs)
+            foreach ($run in $runs) {
+              if ([string]$run.event -ne 'pull_request') { continue }
+              $head = [string]$run.head_branch
+              if ($openHeads.ContainsKey($head)) { continue }
+
+              Write-Host "Cancelling obsolete $status PR run $($run.id): $($run.name) [$head]"
+              & gh.exe api -X POST "repos/$repo/actions/runs/$($run.id)/cancel" *> $null
+              if ($LASTEXITCODE -eq 0) {
+                $cancelled++
+              } else {
+                Write-Warning "Run $($run.id) could not be cancelled (it may have completed concurrently)."
+              }
+            }
+          }
+          Write-Host "Obsolete closed-PR workflow runs cancelled: $cancelled"
