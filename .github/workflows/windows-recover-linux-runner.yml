@@ -1,0 +1,50 @@
+name: Governed Linux runner recovery
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/windows-recover-linux-runner.yml"
+      - "ops/ealiophin/ci/START-RONSAS-ACTIONS-RUNNER.ps1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ronsas-linux-runner-recovery
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 10
+    steps:
+      - name: Check out RONSAS control authority
+        uses: actions/checkout@v4
+
+      - name: Restore governed Linux Actions runner
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $script = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
+          if (-not (Test-Path -LiteralPath $script -PathType Leaf)) { throw "Runner recovery script missing: $script" }
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $script
+          if ($LASTEXITCODE -ne 0) { throw "Linux runner recovery failed with exit code $LASTEXITCODE" }
+
+      - name: Verify Linux runner is online
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $repo='resonance36912-cell/RONSAS'
+          $name='Ealiophin-RONSAS-Linux-2'
+          $payload = & gh.exe api "repos/$repo/actions/runners" | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to query GitHub runner registration.' }
+          $runner = @($payload.runners | Where-Object { $_.name -eq $name }) | Select-Object -First 1
+          if (-not $runner) { throw "Runner registration not found: $name" }
+          if ([string]$runner.status -ne 'online') { throw "Runner is not online: status=$($runner.status)" }
+          $labels = @($runner.labels | ForEach-Object { [string]$_.name })
+          foreach ($required in @('self-hosted','Linux','X64','ronsas','ealiophin')) {
+            if ($labels -notcontains $required) { throw "Runner missing required label: $required" }
+          }
+          Write-Host "RONSAS Linux runner online: $name"
