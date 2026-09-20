@@ -65,6 +65,13 @@ const ALLOW_INNER_HTML = new Set<string>([
   "src/components/ui/chart.tsx", // shadcn-generated CSS variables block
 ]);
 
+const ALLOW_INNER_HTML_EXPRESSIONS = new Map<string, RegExp>([
+  [
+    "src/routes/__root.tsx",
+    /dangerouslySetInnerHTML=\{\{\s*__html:\s*POSTHOG_BOOTSTRAP_SCRIPT\s*\}\}/,
+  ], // audited static PostHog bootstrap; no user-controlled interpolation
+]);
+
 for (const file of walk("src")) {
   const sourcePath = file.replaceAll("\\", "/");
   if (!/\.(ts|tsx|js|jsx)$/.test(sourcePath)) continue;
@@ -122,7 +129,12 @@ for (const file of walk("src")) {
     }
 
     // 4. dangerouslySetInnerHTML outside allowlist
-    if (/dangerouslySetInnerHTML/.test(line) && !ALLOW_INNER_HTML.has(sourcePath)) {
+    const allowedInnerHtmlExpression = ALLOW_INNER_HTML_EXPRESSIONS.get(sourcePath);
+    if (
+      /dangerouslySetInnerHTML/.test(line) &&
+      !ALLOW_INNER_HTML.has(sourcePath) &&
+      !allowedInnerHtmlExpression?.test(line)
+    ) {
       findings.push({
         file: sourcePath,
         line: ln,
