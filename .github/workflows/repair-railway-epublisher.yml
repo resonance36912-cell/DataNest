@@ -58,6 +58,9 @@ jobs:
           }
 
           Write-Host ('Railway CLI: ' + (& $Railway --version))
+          $Node=(Get-Command node.exe -ErrorAction Stop).Source
+          $RailwayJs=Join-Path (Split-Path -Parent $Railway) 'node_modules\@railway\cli\bin\railway.js'
+          if(-not (Test-Path -LiteralPath $RailwayJs -PathType Leaf)){throw ('Railway CLI Node entrypoint not found: ' + $RailwayJs)}
 
           $patch=@{
             services=@{
@@ -71,7 +74,7 @@ jobs:
           } | ConvertTo-Json -Depth 10 -Compress
 
           $ErrorActionPreference='Continue'
-          $patchOut=$patch | & $Railway environment edit --project $Project --environment $Environment --stage --json 2>&1
+          $patchOut=$patch | & $Node $RailwayJs environment edit --project $Project --environment $Environment --stage --json 2>&1
           $patchExit=$LASTEXITCODE
           $ErrorActionPreference='Stop'
           if($patchExit -ne 0){throw ('Railway source JSON staging failed: ' + (($patchOut | Out-String).Trim()))}
