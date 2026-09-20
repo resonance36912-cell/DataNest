@@ -1,0 +1,89 @@
+name: One-shot Windows runner bootstrap staging
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/bootstrap-windows-runner-20260920.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  stage:
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
+    timeout-minutes: 5
+    steps:
+      - name: Check out RONSAS control authority
+        uses: actions/checkout@v4
+
+      - name: Stage exact Windows runner installer and temporary TRIGGERcmd command
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/ronsas-stage-windows-runner.sh <<'SH'
+          set -eu
+
+          source_file="$(find /work -type f -path '*/ops/ealiophin/ci/INSTALL-RONSAS-WINDOWS-RUNNER.ps1' | head -n 1)"
+          if [ -z "$source_file" ] || [ ! -f "$source_file" ]; then
+            echo "installer_source=missing"
+            exit 2
+          fi
+
+          target_file=/hostcontrol/INSTALL-RONSAS-WINDOWS-RUNNER.ps1
+          cp "$source_file" "$target_file"
+          chmod 0644 "$target_file" || true
+          echo "installer_staged=$target_file"
+          sha256sum "$source_file" "$target_file"
+
+          cfg=/trigger/commands.json
+          if [ ! -f "$cfg" ]; then
+            echo "triggercmd_config=missing"
+            exit 3
+          fi
+
+          if grep -Fq '"trigger": "RONS Install Windows Runner"' "$cfg"; then
+            echo "triggercmd_command=already_present"
+            exit 0
+          fi
+
+          stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+          backup="/trigger/commands.json.pre-rons-windows-runner-$stamp.backup"
+          cp "$cfg" "$backup"
+
+          tmp=/trigger/commands.json.rons.tmp
+          line_count="$(wc -l < "$cfg" | tr -d ' ')"
+          if [ "$line_count" -lt 2 ]; then
+            echo "triggercmd_config=invalid"
+            exit 4
+          fi
+
+          head -n "$((line_count - 1))" "$cfg" > "$tmp"
+          cat >> "$tmp" <<'JSON'
+          ,
+          {
+            "trigger": "RONS Install Windows Runner",
+            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\INSTALL-RONSAS-WINDOWS-RUNNER.ps1\"",
+            "offCommand": "",
+            "ground": "background",
+            "voice": "rons install windows runner",
+            "voiceReply": "",
+            "allowParams": "false",
+            "quoteParams": "false",
+            "mcpToolDescription": "Install or restore the private RONSAS Windows production GitHub runner using the governed installer",
+            "icon": ""
+          }
+          ]
+          JSON
+          mv "$tmp" "$cfg"
+
+          echo "triggercmd_backup=$backup"
+          echo "triggercmd_command=added"
+          grep -F '"trigger": "RONS Install Windows Runner"' "$cfg"
+          SH
+
+          podman --remote run --rm -i --entrypoint sh \
+            -v ronsas-actions-work:/work:ro \
+            -v /mnt/c/Users/Ashley/AppData/Local/Resonance/RONS-ControlCenter:/hostcontrol:rw \
+            -v /mnt/c/Users/Ashley/.TRIGGERcmdData:/trigger:rw \
+            localhost/ronsas-actions-runner:2.337.0-r2 -s < /tmp/ronsas-stage-windows-runner.sh
