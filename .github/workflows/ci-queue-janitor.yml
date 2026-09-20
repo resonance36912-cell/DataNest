@@ -16,9 +16,9 @@ concurrency:
 
 jobs:
   prune:
-    # Queue control must not depend on the self-hosted runners it may need to recover.
-    # This job manages only GitHub Actions metadata; RONSAS runtime/build authority remains local.
-    runs-on: ubuntu-latest
+    # Queue control runs on the independent Windows production control runner.
+    # It does not consume the Linux validation runner it is pruning/recovering.
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
     timeout-minutes: 5
     steps:
       - name: Prune stale CI queue and dispatch governed recovery
