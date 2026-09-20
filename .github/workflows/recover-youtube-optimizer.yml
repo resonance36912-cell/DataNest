@@ -152,19 +152,121 @@ jobs:
           if(-not (Test-Url $LocalUrl 10)){throw 'Final loopback YouTube verification failed.'}
 
           if(-not (Test-Url $PublicUrl 10)){
-            $Edge=Join-Path $env:LOCALAPPDATA 'Resonance\RONS-ControlCenter\RONS-Ensure-Public-Edge.ps1'
-            if(Test-Path -LiteralPath $Edge -PathType Leaf){
-              & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $Edge
+            $ControlRoot=Join-Path $env:LOCALAPPDATA 'Resonance\RONS-ControlCenter'
+            $ControlConfig=Join-Path $ControlRoot 'rons-control.json'
+            $EdgeScript=Join-Path $ControlRoot 'RONS-Ensure-Public-Edge.ps1'
+            if(-not (Test-Path -LiteralPath $ControlConfig -PathType Leaf)){throw "RONS control config missing: $ControlConfig"}
+            $control=Get-Content -Raw -LiteralPath $ControlConfig | ConvertFrom-Json
+            $edge=$control.publicEdge
+            if(-not $edge){throw 'RONS public-edge configuration is missing.'}
+
+            $CaddyExe=[string]$edge.caddyExe
+            $CaddyConfig=[string]$edge.caddyConfig
+            $CloudflaredExe=[string]$edge.cloudflaredExe
+            $CloudflaredConfig=[string]$edge.cloudflaredConfig
+            $TunnelName=[string]$edge.tunnelName
+            foreach($required in @($CaddyExe,$CaddyConfig,$CloudflaredExe,$CloudflaredConfig,$EdgeScript)){
+              if(-not (Test-Path -LiteralPath $required)){throw "Required public-edge asset missing: $required"}
             }
+
+            $GovernedCaddy=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\edge\Caddyfile.cgnat-edge'
+            if(-not (Test-Path -LiteralPath $GovernedCaddy -PathType Leaf)){throw 'Governed Caddyfile is missing from the control repository.'}
+            & $CaddyExe validate --config $GovernedCaddy
+            if($LASTEXITCODE -ne 0){throw 'Governed Caddyfile validation failed.'}
+
+            $installedHash=(Get-FileHash -Algorithm SHA256 -LiteralPath $CaddyConfig).Hash
+            $governedHash=(Get-FileHash -Algorithm SHA256 -LiteralPath $GovernedCaddy).Hash
+            Write-Host "Caddy config installed=$installedHash governed=$governedHash"
+            if($installedHash -ne $governedHash){
+              $backup=Join-Path $LogRoot ('Caddyfile.before-youtube-recovery-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
+              Copy-Item -LiteralPath $CaddyConfig -Destination $backup -Force
+              Copy-Item -LiteralPath $GovernedCaddy -Destination $CaddyConfig -Force
+              Write-Host "Promoted governed Caddyfile after backup: $backup"
+            }
+
+            $caddyEdgeUrl='http://127.0.0.1:8804/'
+            if($installedHash -ne $governedHash -or -not (Test-Url $caddyEdgeUrl 8)){
+              & $CaddyExe reload --config $CaddyConfig
+              if($LASTEXITCODE -ne 0){throw 'Managed Caddy reload failed.'}
+              Start-Sleep -Seconds 2
+            }
+            if(-not (Test-Url $caddyEdgeUrl 10)){throw 'YouTube app is healthy on 3401 but managed Caddy route 8804 is unhealthy.'}
+            Write-Host 'PASS local Caddy YouTube edge http://127.0.0.1:8804/'
+
+            $cfLines=@(Get-Content -LiteralPath $CloudflaredConfig)
+            $hostIndex=-1
+            for($i=0;$i -lt $cfLines.Count;$i++){
+              if($cfLines[$i] -match '^\s*-?\s*hostname:\s*youtube\.reson8\.life\s*
+          "pid=$listenerPid" >> $env:GITHUB_OUTPUT
+          Write-Host 'RONSAS YOUTUBE OPTIMIZER: LOCAL + PUBLIC HEALTHY'
+
+      - name: Record recovery evidence
+        if: always()
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ReceiptRoot=Join-Path $env:USERPROFILE 'Resonance\OpenNova\runtime\release-receipts'
+          New-Item -ItemType Directory -Force -Path $ReceiptRoot | Out-Null
+          [pscustomobject]@{
+            schema='ronsas-youtube-recovery-receipt/v1'
+            runId='${{ github.run_id }}'
+            module='youtube-optimizer'
+            pid='${{ steps.recover.outputs.pid }}'
+            conclusion='${{ job.status }}'
+            recordedAt=(Get-Date).ToUniversalTime().ToString('o')
+          } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $ReceiptRoot ("github-youtube-recovery-${{ github.run_id }}.json")) -Encoding UTF8
+){$hostIndex=$i;break}
+            }
+            if($hostIndex -lt 0){throw 'Existing cloudflared config has no youtube.reson8.life ingress; refusing domain mutation.'}
+            $end=[Math]::Min($cfLines.Count-1,$hostIndex+5)
+            $ingressBlock=($cfLines[$hostIndex..$end] -join "`n")
+            if($ingressBlock -notmatch 'service:\s*http://127\.0\.0\.1:8804\s*
+          "pid=$listenerPid" >> $env:GITHUB_OUTPUT
+          Write-Host 'RONSAS YOUTUBE OPTIMIZER: LOCAL + PUBLIC HEALTHY'
+
+      - name: Record recovery evidence
+        if: always()
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ReceiptRoot=Join-Path $env:USERPROFILE 'Resonance\OpenNova\runtime\release-receipts'
+          New-Item -ItemType Directory -Force -Path $ReceiptRoot | Out-Null
+          [pscustomobject]@{
+            schema='ronsas-youtube-recovery-receipt/v1'
+            runId='${{ github.run_id }}'
+            module='youtube-optimizer'
+            pid='${{ steps.recover.outputs.pid }}'
+            conclusion='${{ job.status }}'
+            recordedAt=(Get-Date).ToUniversalTime().ToString('o')
+          } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $ReceiptRoot ("github-youtube-recovery-${{ github.run_id }}.json")) -Encoding UTF8
+){
+              throw 'Existing youtube.reson8.life ingress does not target governed local edge port 8804; refusing domain mutation.'
+            }
+            Write-Host 'PASS cloudflared config maps existing youtube.reson8.life -> http://127.0.0.1:8804'
+
+            $tunnel=Get-CimInstance Win32_Process -Filter "Name='cloudflared.exe'" -ErrorAction SilentlyContinue |
+              Where-Object {
+                [string]$_.CommandLine -like ('*' + $TunnelName + '*') -and
+                [string]$_.CommandLine -like ('*' + $CloudflaredConfig + '*')
+              } | Select-Object -First 1
+
+            if($tunnel){
+              Write-Host "Recycling verified existing cloudflared tunnel PID $($tunnel.ProcessId) so it reloads the unchanged ingress config."
+              Stop-Process -Id ([int]$tunnel.ProcessId) -Force -ErrorAction Stop
+              Start-Sleep -Seconds 2
+            } else {
+              Write-Host 'Verified managed tunnel process was not running; invoking governed edge recovery.'
+            }
+
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $EdgeScript
+            if($LASTEXITCODE -ne 0){Write-Warning "Public-edge ensure returned code $LASTEXITCODE; final route verification remains authoritative."}
           }
 
-          $deadline=(Get-Date).AddSeconds(60)
+          $deadline=(Get-Date).AddSeconds(75)
           $publicOk=$false
           do {
             if(Test-Url $PublicUrl 12){$publicOk=$true;break}
             Start-Sleep -Seconds 3
           } while((Get-Date) -lt $deadline)
-          if(-not $publicOk){throw 'YouTube Optimizer loopback is healthy but the governed public URL still fails.'}
+          if(-not $publicOk){throw 'YouTube Optimizer loopback and local Caddy edge are healthy but the existing named tunnel still fails publicly.'}
 
           "pid=$listenerPid" >> $env:GITHUB_OUTPUT
           Write-Host 'RONSAS YOUTUBE OPTIMIZER: LOCAL + PUBLIC HEALTHY'
