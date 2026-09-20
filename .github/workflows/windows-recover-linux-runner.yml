@@ -57,25 +57,44 @@ jobs:
         run: |
           $ErrorActionPreference='Stop'
           $repo='resonance36912-cell/RONSAS'
-
-          $openRaw = & gh.exe api "repos/$repo/pulls?state=open&per_page=100"
-          if ($LASTEXITCODE -ne 0) { throw 'Unable to query open pull requests.' }
-          $openHeads = @{}
-          foreach ($pr in @($openRaw | ConvertFrom-Json)) {
-            $openHeads[[string]$pr.head.ref] = $true
-          }
-
           $cancelled = 0
+
           foreach ($status in @('queued','in_progress')) {
             $runsRaw = & gh.exe api "repos/$repo/actions/runs?status=$status&per_page=100"
             if ($LASTEXITCODE -ne 0) { throw "Unable to query $status workflow runs." }
             $runs = @(($runsRaw | ConvertFrom-Json).workflow_runs)
+
             foreach ($run in $runs) {
               if ([string]$run.event -ne 'pull_request') { continue }
-              $head = [string]$run.head_branch
-              if ($openHeads.ContainsKey($head)) { continue }
 
-              Write-Host "Cancelling obsolete $status PR run $($run.id): $($run.name) [$head]"
+              # Fail safe: a PR-triggered run must carry an associated PR number.
+              # If GitHub omits that relation, leave the run untouched.
+              $prs = @($run.pull_requests)
+              if ($prs.Count -eq 0) {
+                Write-Host "Keeping $status run $($run.id): no PR relation available."
+                continue
+              }
+
+              $allClosed = $true
+              foreach ($prRef in $prs) {
+                $prNumber = [int]$prRef.number
+                $state = (& gh.exe api "repos/$repo/pulls/$prNumber" --jq .state).Trim()
+                if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($state)) {
+                  Write-Warning "Keeping run $($run.id): unable to verify PR #$prNumber state."
+                  $allClosed = $false
+                  break
+                }
+                if ($state -ne 'closed') {
+                  Write-Host "Keeping run $($run.id): PR #$prNumber is $state."
+                  $allClosed = $false
+                  break
+                }
+              }
+
+              if (-not $allClosed) { continue }
+
+              $head = [string]$run.head_branch
+              Write-Host "Cancelling obsolete $status closed-PR run $($run.id): $($run.name) [$head]"
               & gh.exe api -X POST "repos/$repo/actions/runs/$($run.id)/cancel" *> $null
               if ($LASTEXITCODE -eq 0) {
                 $cancelled++
@@ -84,4 +103,5 @@ jobs:
               }
             }
           }
+
           Write-Host "Obsolete closed-PR workflow runs cancelled: $cancelled"
