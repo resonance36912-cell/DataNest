@@ -26,7 +26,7 @@ jobs:
         run: |
           $ErrorActionPreference='Stop'
           $r=Get-Content -Raw -LiteralPath 'ops/release-requests/railway-epublisher-fallback.json' | ConvertFrom-Json
-          if([string]$r.schema -ne 'ronsas-railway-epublisher-repair/v1'){throw 'Unexpected repair schema.'}
+          if([string]$r.schema -ne 'ronsas-railway-epublisher-repair/v2'){throw 'Unexpected repair schema.'}
           if([string]$r.confirmation -ne 'REPAIR RAILWAY EPUB FALLBACK'){throw 'Explicit repair confirmation missing.'}
           if([string]$r.projectId -ne '70cc7bde-c5ba-4224-9c74-ddb873b27379'){throw 'Unexpected Railway project.'}
           if([string]$r.environmentId -ne '78627988-2f5f-42a8-a507-ee5e221bf10a'){throw 'Unexpected Railway environment.'}
@@ -34,54 +34,56 @@ jobs:
           if([string]$r.repo -ne 'resonance36912-cell/rons-epublisher-sovereign-source'){throw 'Unexpected source repository.'}
           if([string]$r.branch -ne 'main'){throw 'Unexpected source branch.'}
           if([string]$r.targetCommit -ne '5827b0b89abc8e5f13aa29593075edddbf80a9ae'){throw 'Unexpected target commit.'}
-          if([bool]$r.constraints.changeDomains -or [bool]$r.constraints.changeBilling -or [bool]$r.constraints.changeVariables -or [bool]$r.constraints.createService -or [bool]$r.constraints.cloudflareWorkerMigration){throw 'Repair request violates protected constraints.'}
+          if(-not [bool]$r.recovery.disableMetalBuildEnvironment){throw 'Metal build fallback is not authorized.'}
+          if(-not [bool]$r.recovery.stageOnly){throw 'This workflow must remain stage-only.'}
+          if([bool]$r.constraints.changeDomains -or [bool]$r.constraints.changeBilling -or [bool]$r.constraints.changeVariables -or [bool]$r.constraints.createService -or [bool]$r.constraints.cloudflareWorkerMigration -or [bool]$r.constraints.changeBuilderType -or [bool]$r.constraints.changeDockerfilePath -or [bool]$r.constraints.changeStartCommand){throw 'Repair request violates protected constraints.'}
 
-      - name: Deploy exact governed ePublisher commit
+      - name: Stage governed non-Metal build fallback
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
+          $Project='70cc7bde-c5ba-4224-9c74-ddb873b27379'
           $Environment='78627988-2f5f-42a8-a507-ee5e221bf10a'
           $Service='37312153-7877-4830-85ae-5b48e6275319'
+          $Branch='main'
           $Target='5827b0b89abc8e5f13aa29593075edddbf80a9ae'
 
           $Railway=(Get-Command railway.cmd -ErrorAction SilentlyContinue).Source
           if(-not $Railway){throw 'railway.cmd is unavailable on the governed Ealiophin runner.'}
           Write-Host ('Railway CLI: ' + (& $Railway --version))
+          $Node=(Get-Command node.exe -ErrorAction Stop).Source
+          $RailwayJs=Join-Path (Split-Path -Parent $Railway) 'node_modules\@railway\cli\bin\railway.js'
+          if(-not (Test-Path -LiteralPath $RailwayJs -PathType Leaf)){throw ('Railway CLI Node entrypoint not found: ' + $RailwayJs)}
 
-          function Invoke-RailwayApi([string]$Query,[hashtable]$Variables,[string]$Tag){
-            $queryPath=Join-Path $env:RUNNER_TEMP ('railway-' + $Tag + '.graphql')
-            $varsPath=Join-Path $env:RUNNER_TEMP ('railway-' + $Tag + '.json')
-            $stdoutPath=Join-Path $env:RUNNER_TEMP ('railway-' + $Tag + '.stdout')
-            $stderrPath=Join-Path $env:RUNNER_TEMP ('railway-' + $Tag + '.stderr')
-            [IO.File]::WriteAllText($queryPath,$Query,(New-Object Text.UTF8Encoding($false)))
-            [IO.File]::WriteAllText($varsPath,($Variables | ConvertTo-Json -Depth 10 -Compress),(New-Object Text.UTF8Encoding($false)))
-            Remove-Item -Force -LiteralPath $stdoutPath,$stderrPath -ErrorAction SilentlyContinue
-            $args=@('api','--file',$queryPath,'--variables',('@' + $varsPath),'--compact')
-            $proc=Start-Process -FilePath $Railway -ArgumentList $args -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -NoNewWindow -Wait -PassThru
-            $out=if(Test-Path -LiteralPath $stdoutPath){Get-Content -Raw -LiteralPath $stdoutPath}else{''}
-            $err=if(Test-Path -LiteralPath $stderrPath){Get-Content -Raw -LiteralPath $stderrPath}else{''}
-            Remove-Item -Force -LiteralPath $queryPath,$varsPath,$stdoutPath,$stderrPath -ErrorAction SilentlyContinue
-            if($proc.ExitCode -ne 0){throw ('Railway API failed: ' + (($out + [Environment]::NewLine + $err).Trim()))}
-            return ($out | ConvertFrom-Json)
-          }
-
-          $deploy=Invoke-RailwayApi 'mutation($serviceId:String!,$environmentId:String!,$commitSha:String!){serviceInstanceDeployV2(serviceId:$serviceId,environmentId:$environmentId,commitSha:$commitSha)}' @{serviceId=$Service;environmentId=$Environment;commitSha=$Target} 'deploy'
-          $deploymentId=[string]$deploy.data.serviceInstanceDeployV2
-          if([string]::IsNullOrWhiteSpace($deploymentId)){throw 'Railway returned no deployment ID.'}
-          Write-Host ('Railway deployment ID: ' + $deploymentId)
-
-          for($i=0;$i -lt 40;$i++){
-            $state=Invoke-RailwayApi 'query($id:String!){deployment(id:$id){id status meta}}' @{id=$deploymentId} ('state-' + $i)
-            $status=[string]$state.data.deployment.status
-            $commit=[string]$state.data.deployment.meta.commitHash
-            Write-Host ('Railway deployment status: ' + $status)
-            if(-not [string]::IsNullOrWhiteSpace($commit) -and $commit -ne $Target){throw ('Railway deployment commit mismatch: ' + $commit)}
-            if($status -eq 'SUCCESS'){
-              if($commit -ne $Target){throw 'Successful deployment did not report the governed target commit.'}
-              Write-Host ('RONSAS RAILWAY EPUB FALLBACK: HEALTHY at ' + $Target)
-              exit 0
+          $patch=@{
+            services=@{
+              $Service=@{
+                source=@{
+                  branch=$Branch
+                  commitSha=$Target
+                }
+                build=@{
+                  buildEnvironment=$null
+                }
+              }
             }
-            if($status -in @('FAILED','CRASHED','REMOVED','SKIPPED')){throw ('Railway deployment ended with status ' + $status + ' for ' + $deploymentId)}
-            Start-Sleep -Seconds 15
-          }
-          throw ('Railway deployment did not reach a terminal state: ' + $deploymentId)
+          } | ConvertTo-Json -Depth 10 -Compress
+
+          $patchPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-metal-fallback.json'
+          $stdoutPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-metal-fallback.stdout'
+          $stderrPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-metal-fallback.stderr'
+          [IO.File]::WriteAllText($patchPath,$patch,(New-Object Text.UTF8Encoding($false)))
+          Remove-Item -Force -LiteralPath $stdoutPath,$stderrPath -ErrorAction SilentlyContinue
+
+          $args=@($RailwayJs,'environment','edit','--project',$Project,'--environment',$Environment,'--stage','--json')
+          $proc=Start-Process -FilePath $Node -ArgumentList $args -RedirectStandardInput $patchPath -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -NoNewWindow -Wait -PassThru
+          $patchOut=if(Test-Path -LiteralPath $stdoutPath){Get-Content -Raw -LiteralPath $stdoutPath}else{''}
+          $patchErr=if(Test-Path -LiteralPath $stderrPath){Get-Content -Raw -LiteralPath $stderrPath}else{''}
+          if(-not [string]::IsNullOrWhiteSpace($patchErr)){Write-Host $patchErr.Trim()}
+          if($proc.ExitCode -ne 0){throw ('Railway Metal fallback staging failed: ' + (($patchOut + [Environment]::NewLine + $patchErr).Trim()))}
+
+          $result=$patchOut | ConvertFrom-Json
+          if(-not [bool]$result.staged){throw ('Railway did not stage the Metal fallback: ' + $patchOut.Trim())}
+          Write-Host $patchOut.Trim()
+          Remove-Item -Force -LiteralPath $patchPath,$stdoutPath,$stderrPath -ErrorAction SilentlyContinue
+          Write-Host ('RONSAS RAILWAY EPUB METAL FALLBACK: STAGED ONLY at ' + $Target)
