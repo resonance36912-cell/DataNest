@@ -19,6 +19,7 @@
     "rebuildSource": false,
     "touchOtherSpokes": false
   },
-  "retryAttempt": 4,
-  "retryReason": "Retrigger from current main after queue-janitor maintenance settled. Run the reusable governed edge script against the verified healthy YouTube loopback runtime and existing Caddy/cloudflared configuration."
+  "retryAttempt": 5,
+  "retryReason": "The verified root cause is a stale service target inside the already-existing youtube.reson8.life cloudflared ingress. Authorize changing only that target to governed local Caddy port 8804, preserving the existing hostname, tunnel identity, DNS/domain attachment, billing policy, and dormant Worker state.",
+  "repairExistingIngressTarget": true
 }

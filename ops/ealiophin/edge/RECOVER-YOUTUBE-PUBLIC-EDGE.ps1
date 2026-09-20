@@ -107,17 +107,74 @@ try {
   $cfLines=@(Get-Content -LiteralPath $CloudflaredConfig)
   $hostIndex=-1
   for($i=0;$i -lt $cfLines.Count;$i++){
-    if($cfLines[$i] -match '^\s*-?\s*hostname:\s*youtube\.reson8\.life\s*$'){$hostIndex=$i;break}
-  }
-  if($hostIndex -lt 0){throw 'Existing cloudflared config has no youtube.reson8.life ingress; refusing domain mutation.'}
-  $end=[Math]::Min($cfLines.Count-1,$hostIndex+5)
-  $ingressBlock=($cfLines[$hostIndex..$end] -join [Environment]::NewLine)
-  if($ingressBlock -notmatch 'service:\s*http://127\.0\.0\.1:8804\s*$'){
-    throw 'Existing youtube.reson8.life ingress does not target governed local edge port 8804; refusing domain mutation.'
-  }
-  Write-Host 'PASS existing cloudflared ingress: youtube.reson8.life -> http://127.0.0.1:8804'
+    if($cfLines[$i] -match '^\s*-?\s*hostname:\s*youtube\.reson8\.life\s*
+  if(-not (Wait-Url $PublicUrl 75)){throw 'YouTube loopback and Caddy local edge are healthy, but youtube.reson8.life still fails through the existing named tunnel.'}
 
-  if(-not (Test-Url $PublicUrl 10)){
+  Write-Host "PASS public YouTube edge: $PublicUrl"
+  Write-Host 'RONSAS YOUTUBE PUBLIC EDGE: HEALTHY'
+  Write-Receipt 'success' 'Loopback 3401, Caddy 8804, existing cloudflared ingress, and public URL verified.'
+  exit 0
+} catch {
+  $message=$_.Exception.Message
+  Write-Receipt 'failure' $message
+  Write-Error $message
+  exit 2
+}
+){$hostIndex=$i;break}
+  }
+  if($hostIndex -lt 0){throw 'Existing cloudflared config has no youtube.reson8.life ingress; refusing domain attachment.'}
+
+  $serviceIndex=-1
+  $serviceValue=''
+  $end=[Math]::Min($cfLines.Count-1,$hostIndex+5)
+  for($i=$hostIndex+1;$i -le $end;$i++){
+    $m=[regex]::Match([string]$cfLines[$i],'^\s*service:\s*(\S+)\s*
+  if(-not (Wait-Url $PublicUrl 75)){throw 'YouTube loopback and Caddy local edge are healthy, but youtube.reson8.life still fails through the existing named tunnel.'}
+
+  Write-Host "PASS public YouTube edge: $PublicUrl"
+  Write-Host 'RONSAS YOUTUBE PUBLIC EDGE: HEALTHY'
+  Write-Receipt 'success' 'Loopback 3401, Caddy 8804, existing cloudflared ingress, and public URL verified.'
+  exit 0
+} catch {
+  $message=$_.Exception.Message
+  Write-Receipt 'failure' $message
+  Write-Error $message
+  exit 2
+}
+)
+    if($m.Success){
+      $serviceIndex=$i
+      $serviceValue=[string]$m.Groups[1].Value
+      break
+    }
+  }
+  if($serviceIndex -lt 0){throw 'Existing youtube.reson8.life ingress has no service target; refusing domain mutation.'}
+  Write-Host "Existing YouTube ingress target: $serviceValue"
+
+  $governedService='http://127.0.0.1:8804'
+  $ingressChanged=$false
+  if($serviceValue -ne $governedService){
+    if(-not [bool]$request.repairExistingIngressTarget){
+      throw "Existing YouTube ingress target is $serviceValue, but governed target repair is not authorized."
+    }
+    $backup=Join-Path $LogRoot ('cloudflared.before-youtube-edge-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '.yml')
+    Copy-Item -LiteralPath $CloudflaredConfig -Destination $backup -Force
+    $indent=([regex]::Match([string]$cfLines[$serviceIndex],'^\s*')).Value
+    $cfLines[$serviceIndex]=$indent + 'service: ' + $governedService
+    [IO.File]::WriteAllLines($CloudflaredConfig,$cfLines,(New-Object Text.UTF8Encoding($false)))
+    Write-Host "Corrected existing YouTube ingress target only: $serviceValue -> $governedService"
+    Write-Host "Cloudflared config backup: $backup"
+
+    & $CloudflaredExe --config $CloudflaredConfig tunnel ingress validate
+    if($LASTEXITCODE -ne 0){
+      Copy-Item -LiteralPath $backup -Destination $CloudflaredConfig -Force
+      throw 'Corrected cloudflared ingress failed validation; original config restored.'
+    }
+    $ingressChanged=$true
+  }
+  Write-Host 'PASS existing hostname preserved: youtube.reson8.life -> http://127.0.0.1:8804'
+
+  if($ingressChanged -or -not (Test-Url $PublicUrl 10)){
     $tunnel=Get-CimInstance Win32_Process -Filter "Name='cloudflared.exe'" -ErrorAction SilentlyContinue |
       Where-Object {
         [string]$_.CommandLine -like ('*' + $TunnelName + '*') -and
@@ -125,7 +182,7 @@ try {
       } | Select-Object -First 1
 
     if($tunnel){
-      Write-Host "Recycling verified existing named tunnel PID $($tunnel.ProcessId); ingress config is unchanged."
+      Write-Host "Recycling verified existing named tunnel PID $($tunnel.ProcessId) to load the validated ingress target."
       Stop-Process -Id ([int]$tunnel.ProcessId) -Force -ErrorAction Stop
       Start-Sleep -Seconds 2
     } else {
