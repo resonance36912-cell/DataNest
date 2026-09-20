@@ -1,5 +1,5 @@
 {
-  "schema": "ronsas-railway-epublisher-repair/v4",
+  "schema": "ronsas-railway-epublisher-repair/v5",
   "projectId": "70cc7bde-c5ba-4224-9c74-ddb873b27379",
   "environmentId": "78627988-2f5f-42a8-a507-ee5e221bf10a",
   "serviceId": "37312153-7877-4830-85ae-5b48e6275319",
@@ -15,11 +15,11 @@
   },
   "confirmation": "REPAIR RAILWAY EPUB FALLBACK",
   "recovery": {
-    "switchToPrebuiltImage": true,
-    "clearGitSourceBinding": true,
-    "clearStartCommandOverride": true,
+    "replaceSourceBinding": true,
+    "disconnectExistingSource": true,
+    "connectImmutableImage": true,
     "stageOnly": true,
-    "reason": "Bypass Railway Metal builder infrastructure failure using an immutable public image built from the exact governed source revision and verified by anonymous pull plus HTTP runtime smoke test."
+    "reason": "Replace Railway mixed Git+image source state using the supported explicit source disconnect/connect operations. Do not deploy until the resulting source state is independently verified."
   },
   "constraints": {
     "changeDomains": false,
@@ -29,6 +29,7 @@
     "cloudflareWorkerMigration": false,
     "changeHealthcheck": false,
     "changeReplicas": false,
-    "changeRuntime": false
+    "changeRuntime": false,
+    "changeStartCommand": false
   }
 }
