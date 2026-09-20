@@ -1,0 +1,45 @@
+name: One-shot Ealiophin governed host-mount probe
+
+on:
+  push:
+    paths:
+      - ".github/workflows/ealiophin-host-mount-probe-20260920.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
+    timeout-minutes: 5
+    steps:
+      - name: Inspect governed Podman mounts and host-path candidates
+        shell: bash
+        run: |
+          set -u
+          echo "podman_remote_version_begin"
+          podman --remote version
+          echo "podman_remote_version_end"
+
+          echo "proxy_mounts_begin"
+          podman --remote inspect ronsas-podman-api --format '{{json .Mounts}}' || true
+          echo "proxy_mounts_end"
+
+          echo "runner_mounts_begin"
+          podman --remote inspect ronsas-actions-ealiophin --format '{{json .Mounts}}' || true
+          echo "runner_mounts_end"
+
+          echo "volumes_begin"
+          podman --remote volume ls --format '{{.Name}}' || true
+          echo "volumes_end"
+
+          image=localhost/ronsas-actions-runner:2.337.0-r2
+          for src in             /mnt/c/Resonance/Sources/ronsas-hub-canonical             /c/Resonance/Sources/ronsas-hub-canonical             C:/Resonance/Sources/ronsas-hub-canonical
+          do
+            echo "candidate=$src"
+            if podman --remote run --rm --entrypoint sh -v "$src:/hosthub:ro" "$image" -lc 'test -f /hosthub/package.json && echo hosthub_package_json=present || echo hosthub_package_json=missing'; then
+              echo "candidate_result=ran"
+            else
+              echo "candidate_result=mount_failed"
+            fi
+          done
