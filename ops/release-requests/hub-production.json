@@ -14,6 +14,6 @@
     "routeSmoke": "passed"
   },
   "purpose": "Publish the validated free-promotion Hub bundle so /pricing and /changelog match governed production source.",
-  "retryAttempt": 3,
-  "retryReason": "Windows runner shell probe passed with in-memory scriptblock under process ExecutionPolicy Bypass."
+  "retryAttempt": 4,
+  "retryReason": "Release reached Hub tests; production .env.local is now linked only after tests/typecheck so unit tests remain environment-isolated."
 }

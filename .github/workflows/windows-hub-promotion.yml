@@ -60,9 +60,9 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Unable to create isolated Hub worktree.' }
           $envFile=Join-Path $Hub '.env.local'
           if (-not (Test-Path -LiteralPath $envFile -PathType Leaf)) { throw 'Production Hub .env.local missing.' }
-          New-Item -ItemType HardLink -Path (Join-Path $Worktree '.env.local') -Target $envFile | Out-Null
           "RONSAS_HUB_WORKTREE=$Worktree" >> $env:GITHUB_ENV
           "RONSAS_HUB_SOURCE=$Hub" >> $env:GITHUB_ENV
+          "RONSAS_HUB_ENV=$envFile" >> $env:GITHUB_ENV
 
       - name: Build and verify isolated candidate
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
@@ -78,6 +78,13 @@ jobs:
             if ($LASTEXITCODE) { throw 'tests failed' }
             & bun run typecheck
             if ($LASTEXITCODE) { throw 'typecheck failed' }
+
+            # Keep production runtime environment out of unit tests. Bun auto-loads
+            # .env.local, so link it only after tests/typecheck have passed.
+            $linkedEnv=Join-Path $env:RONSAS_HUB_WORKTREE '.env.local'
+            if (Test-Path -LiteralPath $linkedEnv) { Remove-Item -Force -LiteralPath $linkedEnv }
+            New-Item -ItemType HardLink -Path $linkedEnv -Target $env:RONSAS_HUB_ENV | Out-Null
+
             $env:RONS_LOCAL_OUTPUT_DIR='.output-candidate-local'
             & bun run build:local
             if ($LASTEXITCODE) { throw 'local candidate build failed' }
