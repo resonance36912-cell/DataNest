@@ -3,6 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { FREE_PROMOTION_ACTIVE, FREE_PROMOTION_MESSAGE } from "@/lib/commercial-policy";
 import {
   getMyBilling,
   labelForApp,
@@ -13,11 +14,16 @@ import {
 export const Route = createFileRoute("/account/billing")({
   head: () => ({
     meta: [
-      { title: "Billing — The Resonance" },
+      {
+        title: FREE_PROMOTION_ACTIVE
+          ? "Access & Billing History — The Resonance"
+          : "Billing — The Resonance",
+      },
       {
         name: "description",
-        content:
-          "View subscriptions, credit balances, and payment history across every Resonance app.",
+        content: FREE_PROMOTION_ACTIVE
+          ? "View free promotional access alongside historical billing records."
+          : "View subscriptions, credit balances, and payment history across every Resonance app.",
       },
       { name: "robots", content: "noindex, nofollow" },
     ],
@@ -77,9 +83,13 @@ function BillingPortal() {
       <div className="max-w-5xl mx-auto px-4 py-10 space-y-8">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Billing</h1>
+            <h1 className="text-3xl font-bold">
+              {FREE_PROMOTION_ACTIVE ? "Access & Billing History" : "Billing"}
+            </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Subscriptions, credits, and payment history for {data?.email ?? "your account"}.
+              {FREE_PROMOTION_ACTIVE
+                ? `Free promotional access and historical account records for ${data?.email ?? "your account"}.`
+                : `Subscriptions, credits, and payment history for ${data?.email ?? "your account"}.`}
             </p>
           </div>
           <div className="flex gap-2 text-sm">
@@ -92,12 +102,20 @@ function BillingPortal() {
             </Link>
             <span className="text-muted-foreground">·</span>
             <Link to="/pricing" className="text-primary underline">
-              Plans
+              {FREE_PROMOTION_ACTIVE ? "Free access" : "Plans"}
             </Link>
           </div>
         </header>
 
-        {isLoading && <p className="text-muted-foreground">Loading…</p>}
+        {FREE_PROMOTION_ACTIVE && (
+          <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-100">
+            <strong className="block mb-1">Free promotion active</strong>
+            {FREE_PROMOTION_MESSAGE} Records below are retained for historical reconciliation and do
+            not constitute a current paid offer.
+          </div>
+        )}
+
+        {isLoading && <p className="text-muted-foreground">Loading…</p>
         {error && (
           <div className="rounded border border-destructive/40 bg-destructive/10 p-4 text-sm">
             <p>Could not load billing: {(error as Error).message}</p>
@@ -125,14 +143,20 @@ function SubscriptionsCard({ data }: { data: MyBilling }) {
   return (
     <section className="rounded-lg border bg-card p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Subscriptions</h2>
-        <span className="text-xs text-muted-foreground">{active.length} active</span>
+        <h2 className="text-xl font-semibold">
+          {FREE_PROMOTION_ACTIVE ? "Subscription records" : "Subscriptions"}
+        </h2>
+        <span className="text-xs text-muted-foreground">
+          {FREE_PROMOTION_ACTIVE ? "Historical account state" : `${active.length} active`}
+        </span>
       </div>
       {data.subscriptions.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          No subscriptions yet.{" "}
+          {FREE_PROMOTION_ACTIVE
+            ? "No historical subscription records. Free access is active. "
+            : "No subscriptions yet. "}
           <Link to="/pricing" className="underline">
-            Browse plans
+            {FREE_PROMOTION_ACTIVE ? "Open free access" : "Browse plans"}
           </Link>
           .
         </p>
@@ -153,7 +177,8 @@ function SubscriptionsCard({ data }: { data: MyBilling }) {
                 <StatusBadge status={s.status} />
                 {s.current_period_end && (
                   <div className="text-muted-foreground mt-1">
-                    Renews {new Date(s.current_period_end).toLocaleDateString()}
+                    {FREE_PROMOTION_ACTIVE ? "Recorded period end" : "Renews"}{" "}
+                    {new Date(s.current_period_end).toLocaleDateString()}
                   </div>
                 )}
               </div>
@@ -171,7 +196,9 @@ function WalletsCard({ data }: { data: MyBilling }) {
       <h2 className="text-xl font-semibold mb-4">Credit wallets</h2>
       {data.wallets.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          No credit wallets yet. Credits appear here after you purchase a credit pack.
+          {FREE_PROMOTION_ACTIVE
+            ? "No usage wallets recorded yet. Promotional allowances can appear here as products report usage."
+            : "No credit wallets yet. Credits appear here after you purchase a credit pack."}
         </p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
