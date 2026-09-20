@@ -16,6 +16,7 @@
 import { readFileSync } from "node:fs";
 import { PACK_CATALOG } from "../src/lib/checkout.functions";
 import { APP_META } from "../src/lib/pricing-meta";
+import { FREE_PROMOTION_ACTIVE } from "../src/lib/commercial-policy";
 import {
   verifyPackCatalogAgainstAppMeta,
   verifyPricingSourceUsesCatalogLoop,
@@ -28,20 +29,28 @@ failures.push(...verifyPackCatalogAgainstAppMeta(PACK_CATALOG, APP_META));
 
 // R4 / R5
 const src = readFileSync("src/routes/pricing.tsx", "utf8");
-const srcResults = verifyPricingSourceUsesCatalogLoop(src);
-for (const r of srcResults) {
-  if (r.startsWith("__LITERAL_PACK_IDS__:")) {
-    const ids = r.slice("__LITERAL_PACK_IDS__:".length).split(",").filter(Boolean);
-    for (const id of ids) {
-      if (!PACK_CATALOG[id]) {
-        failures.push(
-          `src/routes/pricing.tsx: literal /checkout?pack=${id} does not ` +
-            `resolve in PACK_CATALOG.`,
-        );
+if (FREE_PROMOTION_ACTIVE) {
+  if (/\/checkout\?pack=/.test(src)) {
+    failures.push(
+      "src/routes/pricing.tsx: pack checkout links must be absent while FREE_PROMOTION_ACTIVE is true.",
+    );
+  }
+} else {
+  const srcResults = verifyPricingSourceUsesCatalogLoop(src);
+  for (const r of srcResults) {
+    if (r.startsWith("__LITERAL_PACK_IDS__:")) {
+      const ids = r.slice("__LITERAL_PACK_IDS__:".length).split(",").filter(Boolean);
+      for (const id of ids) {
+        if (!PACK_CATALOG[id]) {
+          failures.push(
+            `src/routes/pricing.tsx: literal /checkout?pack=${id} does not ` +
+              `resolve in PACK_CATALOG.`,
+          );
+        }
       }
+    } else {
+      failures.push(r);
     }
-  } else {
-    failures.push(r);
   }
 }
 
@@ -54,5 +63,5 @@ if (failures.length) {
 const appCount = new Set(Object.values(PACK_CATALOG).map((p) => p.app)).size;
 console.log(
   `✓ verify-pricing-packs: ${Object.keys(PACK_CATALOG).length} pack(s) across ` +
-    `${appCount} app section(s); pricing.tsx renders every catalog id and no others.`,
+    `${appCount} app section(s); commercial surface matches the active pricing policy.`,
 );
