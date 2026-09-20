@@ -54,11 +54,12 @@ jobs:
               ]),
             );
 
-            const runs = await github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
+            const { data: runsPage } = await github.rest.actions.listWorkflowRunsForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               per_page: 100,
             });
+            const runs = runsPage.workflow_runs;
 
             let cancelled = 0;
             for (const run of runs) {
