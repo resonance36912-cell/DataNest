@@ -1,0 +1,81 @@
+name: CI queue janitor
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/ci-queue-janitor.yml"
+
+permissions:
+  actions: write
+  contents: read
+  pull-requests: read
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Cancel stale Linux CI and superseded recovery runs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          current_main="$(gh api "repos/$REPO/commits/main" --jq .sha)"
+          open_prs="$(mktemp)"
+          gh api "repos/$REPO/pulls?state=open&per_page=100"             --jq '.[] | [.head.ref, .head.sha, (.number|tostring)] | @tsv' > "$open_prs"
+
+          cancel_run() {
+            local id="$1" reason="$2"
+            echo "cancel run=$id reason=$reason"
+            gh api -X POST "repos/$REPO/actions/runs/$id/cancel" >/dev/null 2>&1 || true
+          }
+
+          runs="$(mktemp)"
+          gh api "repos/$REPO/actions/runs?per_page=100"             --jq '.workflow_runs[]
+              | select(.status == "queued" or .status == "pending" or .status == "waiting" or .status == "in_progress")
+              | [.id, .name, .event, (.head_branch // ""), (.head_sha // ""), .status]
+              | @tsv' > "$runs"
+
+          while IFS=$'\t' read -r id name event branch sha status; do
+            case "$name" in
+              "Security scan"|"Verify prebuild"|"Verify checkout links"|"Verify ePublisher checkout")
+                if [ "$event" = "pull_request" ]; then
+                  current="$(awk -F '\t' -v b="$branch" '$1 == b {print $2 "\t" $3; exit}' "$open_prs")"
+                  if [ -n "$current" ]; then
+                    current_sha="${current%%$'\t'*}"
+                    pr_number="${current#*$'\t'}"
+                    if [ "$sha" = "$current_sha" ]; then
+                      echo "keep run=$id current open PR #$pr_number head=$sha"
+                    else
+                      cancel_run "$id" "superseded PR #$pr_number head"
+                    fi
+                  else
+                    cancel_run "$id" "closed/no-open-PR branch $branch"
+                  fi
+                elif [ "$event" = "push" ] && [ "$branch" = "main" ]; then
+                  if [ "$sha" = "$GITHUB_SHA" ]; then
+                    cancel_run "$id" "janitor-only main commit"
+                  elif [ "$sha" != "$current_main" ]; then
+                    cancel_run "$id" "stale main push"
+                  else
+                    echo "keep run=$id current main head=$sha"
+                  fi
+                fi
+                ;;
+              "Governed Linux runner recovery"|"Guarded zombie Linux runner recycle")
+                cancel_run "$id" "superseded runner recovery"
+                ;;
+            esac
+          done < "$runs"
+
+      - name: Dispatch latest governed Linux runner recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run windows-recover-linux-runner.yml --repo "$REPO" --ref main
+          echo "Dispatched latest governed Linux runner recovery."
