@@ -46,49 +46,64 @@ jobs:
           $Stale='3db4856da7ddda7fd8dd18c2e7fe7b66c0334a51'
           $Target='5827b0b89abc8e5f13aa29593075edddbf80a9ae'
 
-          $Railway=(Get-Command railway.exe -ErrorAction SilentlyContinue).Source
-          if(-not $Railway){$Railway=(Get-Command railway -ErrorAction SilentlyContinue).Source}
+          $Railway=(Get-Command railway.cmd -ErrorAction SilentlyContinue).Source
           if(-not $Railway){
             $Npm=(Get-Command npm.cmd -ErrorAction SilentlyContinue).Source
-            if(-not $Npm){$Npm=(Get-Command npm -ErrorAction SilentlyContinue).Source}
             if(-not $Npm){throw 'Railway CLI is missing and npm is unavailable for governed bootstrap.'}
             & $Npm install -g @railway/cli
             if($LASTEXITCODE -ne 0){throw 'Governed Railway CLI bootstrap failed.'}
-            $Railway=(Get-Command railway.exe -ErrorAction SilentlyContinue).Source
-            if(-not $Railway){$Railway=(Get-Command railway -ErrorAction SilentlyContinue).Source}
-            if(-not $Railway){throw 'Railway CLI bootstrap completed but executable is unavailable.'}
+            $Railway=(Get-Command railway.cmd -ErrorAction SilentlyContinue).Source
+            if(-not $Railway){throw 'Railway CLI bootstrap completed but railway.cmd is unavailable.'}
           }
           Write-Host ('Railway CLI: ' + (& $Railway --version))
 
-          function Invoke-RailwayApi([string]$Query,[hashtable]$Variables){
-            $varsPath=Join-Path $env:RUNNER_TEMP ('railway-vars-' + [guid]::NewGuid().ToString('N') + '.json')
+          function Invoke-RailwayApi([string]$Query){
+            $raw=& $Railway api $Query --compact --allow-errors 2>&1
+            $exit=$LASTEXITCODE
+            $text=(($raw | ForEach-Object { $_.ToString() }) -join [Environment]::NewLine).Trim()
+            if($exit -ne 0){throw ('Railway CLI API call failed: ' + $text)}
             try {
-              [IO.File]::WriteAllText($varsPath,($Variables | ConvertTo-Json -Depth 10 -Compress),(New-Object Text.UTF8Encoding($false)))
-              $raw=& $Railway api $Query --variables ('@' + $varsPath) --compact 2>&1
-              if($LASTEXITCODE -ne 0){throw ('Railway CLI API call failed: ' + (($raw | Out-String).Trim()))}
-              $text=($raw | Out-String).Trim()
-              return $text | ConvertFrom-Json
-            } finally {
-              Remove-Item -Force -LiteralPath $varsPath -ErrorAction SilentlyContinue
+              $obj=$text | ConvertFrom-Json
+            } catch {
+              throw ('Railway CLI returned non-JSON output: ' + $text)
             }
+            if($obj.errors){
+              $messages=@($obj.errors | ForEach-Object {[string]$_.message}) -join '; '
+              throw ('Railway GraphQL: ' + $messages)
+            }
+            return $obj
           }
 
-          $staged=Invoke-RailwayApi 'query($environmentId:String!){environmentStagedChanges(environmentId:$environmentId)}' @{environmentId=$Environment}
+          $stagedQuery='query {{ environmentStagedChanges(environmentId: "{0}") }}' -f $Environment
+          $staged=Invoke-RailwayApi $stagedQuery
           $stagedJson=$staged.data.environmentStagedChanges | ConvertTo-Json -Depth 20 -Compress
           if([string]::IsNullOrWhiteSpace($stagedJson) -or $stagedJson -eq 'null'){throw 'Expected staged Railway changes are absent.'}
           if($stagedJson.IndexOf($Service,[StringComparison]::OrdinalIgnoreCase) -lt 0){throw 'Staged changes are not scoped to the expected ePublisher service.'}
           if($stagedJson.IndexOf($Stale,[StringComparison]::OrdinalIgnoreCase) -lt 0){throw 'Expected stale commit pin is no longer present; refusing mutation.'}
           if($stagedJson.IndexOf($Repo,[StringComparison]::OrdinalIgnoreCase) -lt 0){throw 'Expected repository is not present in staged changes.'}
 
-          Invoke-RailwayApi 'mutation($environmentId:String!){environmentPatchCommitStaged(environmentId:$environmentId)}' @{environmentId=$Environment} | Out-Null
-          Invoke-RailwayApi 'mutation($id:String!,$input:ServiceConnectInput!){serviceConnect(id:$id,input:$input){id}}' @{id=$Service;input=@{repo=$Repo;branch=$Branch}} | Out-Null
-          $deployed=Invoke-RailwayApi 'mutation($serviceId:String!,$environmentId:String!,$commitSha:String!){serviceInstanceDeployV2(serviceId:$serviceId,environmentId:$environmentId,commitSha:$commitSha)}' @{serviceId=$Service;environmentId=$Environment;commitSha=$Target}
+          $connectQuery='mutation {{ serviceConnect(id: "{0}", input: {{ repo: "{1}", branch: "{2}" }}) {{ id }} }}' -f $Service,$Repo,$Branch
+          Invoke-RailwayApi $connectQuery | Out-Null
+
+          $post=Invoke-RailwayApi $stagedQuery
+          $postJson=$post.data.environmentStagedChanges | ConvertTo-Json -Depth 20 -Compress
+          $hasPost=(-not [string]::IsNullOrWhiteSpace($postJson)) -and ($postJson -notin @('null','[]','{}'))
+          if($hasPost){
+            if($postJson.IndexOf($Stale,[StringComparison]::OrdinalIgnoreCase) -ge 0){throw 'Source reconnect did not clear the stale commit pin; refusing to commit staged changes.'}
+            if($postJson.IndexOf($Repo,[StringComparison]::OrdinalIgnoreCase) -lt 0){throw 'Post-reconnect staged state does not contain the governed repository.'}
+            $commitQuery='mutation {{ environmentPatchCommitStaged(environmentId: "{0}") }}' -f $Environment
+            Invoke-RailwayApi $commitQuery | Out-Null
+          }
+
+          $deployQuery='mutation {{ serviceInstanceDeployV2(serviceId: "{0}", environmentId: "{1}", commitSha: "{2}") }}' -f $Service,$Environment,$Target
+          $deployed=Invoke-RailwayApi $deployQuery
           $deploymentId=[string]$deployed.data.serviceInstanceDeployV2
           if([string]::IsNullOrWhiteSpace($deploymentId)){throw 'Railway returned no deployment ID.'}
           Write-Host ('Railway deployment ID: ' + $deploymentId)
 
           for($i=0;$i -lt 40;$i++){
-            $statusResp=Invoke-RailwayApi 'query($id:String!){deployment(id:$id){id status meta}}' @{id=$deploymentId}
+            $statusQuery='query {{ deployment(id: "{0}") {{ id status meta }} }}' -f $deploymentId
+            $statusResp=Invoke-RailwayApi $statusQuery
             $status=[string]$statusResp.data.deployment.status
             $commit=[string]$statusResp.data.deployment.meta.commitHash
             Write-Host ('Railway deployment status: ' + $status)
