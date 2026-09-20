@@ -1,0 +1,185 @@
+name: Recover YouTube Optimizer spoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ops/release-requests/youtube-optimizer-recovery.json"
+      - ".github/workflows/recover-youtube-optimizer.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ronsas-youtube-optimizer-recovery
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate governed recovery request
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $r=Get-Content -Raw -LiteralPath 'ops/release-requests/youtube-optimizer-recovery.json' | ConvertFrom-Json
+          if([string]$r.schema -ne 'ronsas-youtube-recovery/v1'){throw 'Unexpected recovery schema.'}
+          if([string]$r.module -ne 'youtube-optimizer'){throw 'Unexpected module.'}
+          if([int]$r.listenPort -ne 3401){throw 'Unexpected listen port.'}
+          if([string]$r.runtimeRelative -ne 'runtime\youtube-optimizer-stage'){throw 'Unexpected runtime path.'}
+          if([string]$r.entryRelative -ne '.output\server\index.mjs'){throw 'Unexpected runtime entry.'}
+          if([string]$r.confirmation -ne 'RECOVER RONSAS YOUTUBE OPTIMIZER'){throw 'Explicit recovery confirmation missing.'}
+          if([bool]$r.constraints.changeBilling -or [bool]$r.constraints.changeDomains -or [bool]$r.constraints.createService -or [bool]$r.constraints.cloudflareWorkerMigration -or [bool]$r.constraints.rebuildSource -or [bool]$r.constraints.touchOtherSpokes){throw 'Recovery request violates protected constraints.'}
+
+      - name: Recover only verified YouTube Optimizer runtime
+        id: recover
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Root=Join-Path $env:USERPROFILE 'Resonance\OpenNova'
+          $RuntimeDir=Join-Path $Root 'runtime\youtube-optimizer-stage'
+          $Entry=Join-Path $RuntimeDir '.output\server\index.mjs'
+          $LogRoot=Join-Path $Root 'runtime\logs\rons-cluster'
+          $OwnershipPath=Join-Path $Root 'runtime\rons-cluster-owned.json'
+          $LocalUrl='http://127.0.0.1:3401/'
+          $PublicUrl='https://youtube.reson8.life/'
+          New-Item -ItemType Directory -Force -Path $LogRoot | Out-Null
+
+          function Get-ListenerPid {
+            $l=Get-NetTCPConnection -LocalPort 3401 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
+            if($l){return [int]$l.OwningProcess}
+            return $null
+          }
+
+          function Test-Url([string]$Url,[int]$Timeout=6){
+            try {
+              $resp=Invoke-WebRequest -UseBasicParsing -Uri $Url -TimeoutSec $Timeout
+              return ($resp.StatusCode -eq 200)
+            } catch { return $false }
+          }
+
+          function Assert-VerifiedYoutubeProcess([int]$Pid){
+            $p=Get-CimInstance Win32_Process -Filter "ProcessId=$Pid" -ErrorAction SilentlyContinue
+            if(-not $p){throw "Listener PID $Pid no longer exists."}
+            if([string]$p.Name -ne 'node.exe'){throw "Port 3401 is owned by unexpected process $($p.Name) PID $Pid; refusing mutation."}
+            $cmd=[string]$p.CommandLine
+            if([string]::IsNullOrWhiteSpace($cmd)){
+              if(-not (Test-Url $LocalUrl)){throw "Port 3401 has unreadable process identity and unhealthy endpoint; refusing mutation."}
+              return
+            }
+            if($cmd -notlike '*youtube-optimizer-stage*'){throw "Port 3401 is owned by unrecognized Node process PID $Pid; refusing mutation."}
+          }
+
+          function Wait-Healthy([int]$Seconds=75){
+            $deadline=(Get-Date).AddSeconds($Seconds)
+            do {
+              if(Test-Url $LocalUrl){return $true}
+              Start-Sleep -Milliseconds 750
+            } while((Get-Date) -lt $deadline)
+            return $false
+          }
+
+          $listenerPid=Get-ListenerPid
+          $localHealthy=Test-Url $LocalUrl
+          Write-Host "Initial YouTube local state: listener=$listenerPid healthy=$localHealthy"
+
+          if($listenerPid){
+            Assert-VerifiedYoutubeProcess $listenerPid
+          }
+
+          if(-not $localHealthy){
+            if($listenerPid){
+              Write-Host "Stopping verified unhealthy YouTube Optimizer PID $listenerPid"
+              Stop-Process -Id $listenerPid -Force -ErrorAction Stop
+              $deadline=(Get-Date).AddSeconds(10)
+              while((Get-Date) -lt $deadline -and (Get-ListenerPid)){Start-Sleep -Milliseconds 250}
+              if(Get-ListenerPid){throw 'Verified YouTube listener did not stop cleanly.'}
+            }
+
+            if(-not (Test-Path -LiteralPath $Entry -PathType Leaf)){
+              throw "YouTube runtime entry is missing: $Entry"
+            }
+
+            $Node=(Get-Command node.exe -ErrorAction Stop).Source
+            $prior=@{}
+            foreach($key in @('PORT','HOST','NODE_ENV','RESONANCE_SOVEREIGN_GATEWAY_URL','RUNNER_TRACKING_ID')){
+              $prior[$key]=[Environment]::GetEnvironmentVariable($key,'Process')
+            }
+            try {
+              $env:PORT='3401'
+              $env:HOST='127.0.0.1'
+              $env:NODE_ENV='production'
+              $env:RESONANCE_SOVEREIGN_GATEWAY_URL='http://127.0.0.1:58600'
+              [Environment]::SetEnvironmentVariable('RUNNER_TRACKING_ID',$null,'Process')
+              $out=Join-Path $LogRoot 'youtube-optimizer.out.log'
+              $err=Join-Path $LogRoot 'youtube-optimizer.err.log'
+              Write-Host '[RONSAS] Starting YouTube Optimizer outside GitHub Actions orphan-process cleanup.'
+              $proc=Start-Process -FilePath $Node -ArgumentList @($Entry) -WorkingDirectory $RuntimeDir -RedirectStandardOutput $out -RedirectStandardError $err -WindowStyle Hidden -PassThru
+            } finally {
+              foreach($key in $prior.Keys){[Environment]::SetEnvironmentVariable($key,$prior[$key],'Process')}
+            }
+
+            if(-not (Wait-Healthy 75)){
+              $tail=''
+              $errFile=Join-Path $LogRoot 'youtube-optimizer.err.log'
+              if(Test-Path -LiteralPath $errFile){$tail=(@(Get-Content -LiteralPath $errFile -Tail 20) -join ' | ')}
+              throw "YouTube Optimizer failed loopback recovery. stderr tail: $tail"
+            }
+
+            $listenerPid=Get-ListenerPid
+            if(-not $listenerPid){throw 'YouTube endpoint became healthy without a listener PID.'}
+            Assert-VerifiedYoutubeProcess $listenerPid
+
+            $owned=@()
+            if(Test-Path -LiteralPath $OwnershipPath -PathType Leaf){
+              try {$owned=@((Get-Content -Raw -LiteralPath $OwnershipPath | ConvertFrom-Json).services)} catch {$owned=@()}
+            }
+            $owned=@($owned | Where-Object {[string]$_.name -ne 'youtube-optimizer'})
+            $owned += [pscustomobject]@{name='youtube-optimizer';pid=[int]$listenerPid}
+            [pscustomobject]@{
+              schema='rons-cluster-ownership-v1'
+              updatedAt=(Get-Date).ToUniversalTime().ToString('o')
+              services=$owned
+            } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $OwnershipPath -Encoding UTF8
+            Write-Host "Recovered YouTube Optimizer PID $listenerPid on loopback port 3401."
+          } else {
+            Write-Host "YouTube Optimizer loopback runtime was already healthy; no process restart required."
+          }
+
+          if(-not (Test-Url $LocalUrl 10)){throw 'Final loopback YouTube verification failed.'}
+
+          if(-not (Test-Url $PublicUrl 10)){
+            $Edge=Join-Path $env:LOCALAPPDATA 'Resonance\RONS-ControlCenter\RONS-Ensure-Public-Edge.ps1'
+            if(Test-Path -LiteralPath $Edge -PathType Leaf){
+              & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $Edge
+            }
+          }
+
+          $deadline=(Get-Date).AddSeconds(60)
+          $publicOk=$false
+          do {
+            if(Test-Url $PublicUrl 12){$publicOk=$true;break}
+            Start-Sleep -Seconds 3
+          } while((Get-Date) -lt $deadline)
+          if(-not $publicOk){throw 'YouTube Optimizer loopback is healthy but the governed public URL still fails.'}
+
+          "pid=$listenerPid" >> $env:GITHUB_OUTPUT
+          Write-Host 'RONSAS YOUTUBE OPTIMIZER: LOCAL + PUBLIC HEALTHY'
+
+      - name: Record recovery evidence
+        if: always()
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ReceiptRoot=Join-Path $env:USERPROFILE 'Resonance\OpenNova\runtime\release-receipts'
+          New-Item -ItemType Directory -Force -Path $ReceiptRoot | Out-Null
+          [pscustomobject]@{
+            schema='ronsas-youtube-recovery-receipt/v1'
+            runId='${{ github.run_id }}'
+            module='youtube-optimizer'
+            pid='${{ steps.recover.outputs.pid }}'
+            conclusion='${{ job.status }}'
+            recordedAt=(Get-Date).ToUniversalTime().ToString('o')
+          } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $ReceiptRoot ("github-youtube-recovery-${{ github.run_id }}.json")) -Encoding UTF8

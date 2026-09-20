@@ -1,0 +1,22 @@
+{
+  "schema": "ronsas-youtube-recovery/v1",
+  "module": "youtube-optimizer",
+  "listenPort": 3401,
+  "localHealth": "http://127.0.0.1:3401/",
+  "publicUrl": "https://youtube.reson8.life/",
+  "runtimeRelative": "runtime\\youtube-optimizer-stage",
+  "entryRelative": ".output\\server\\index.mjs",
+  "confirmation": "RECOVER RONSAS YOUTUBE OPTIMIZER",
+  "evidence": {
+    "priorHubReleaseRun": 35506949756,
+    "publicFailure": "HTTP 502 while Hub, ePublisher, Creative Studio, and Sync Vision returned HTTP 200"
+  },
+  "constraints": {
+    "changeBilling": false,
+    "changeDomains": false,
+    "createService": false,
+    "cloudflareWorkerMigration": false,
+    "rebuildSource": false,
+    "touchOtherSpokes": false
+  }
+}
