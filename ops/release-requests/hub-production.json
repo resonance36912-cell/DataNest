@@ -13,5 +13,7 @@
     "candidateFiles": 340,
     "routeSmoke": "passed"
   },
-  "purpose": "Publish the validated free-promotion Hub bundle so /pricing and /changelog match governed production source."
+  "purpose": "Publish the validated free-promotion Hub bundle so /pricing and /changelog match governed production source.",
+  "retryAttempt": 2,
+  "retryReason": "Windows runner online; retry after explicit GitHub Actions PowerShell execution-policy fix."
 }
