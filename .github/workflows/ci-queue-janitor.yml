@@ -34,7 +34,7 @@ jobs:
 
           $openPullsRaw = & gh.exe api "repos/$repo/pulls?state=open&per_page=100"
           if ($LASTEXITCODE -ne 0) { throw 'Unable to query open pull requests.' }
-          $openPulls = @($openPullsRaw | ConvertFrom-Json)
+          $openPulls = @(($openPullsRaw -join "`n") | ConvertFrom-Json)
 
           $currentPrByBranch = @{}
           foreach ($pr in $openPulls) {
@@ -49,7 +49,8 @@ jobs:
 
           $runsRaw = & gh.exe api "repos/$repo/actions/runs?per_page=100"
           if ($LASTEXITCODE -ne 0) { throw 'Unable to query workflow runs.' }
-          $runs = @(($runsRaw | ConvertFrom-Json).workflow_runs)
+          $runsPayload = ($runsRaw -join "`n") | ConvertFrom-Json
+          $runs = @($runsPayload.workflow_runs)
 
           $active = @('queued','pending','waiting','in_progress','requested')
           $linuxCi = @(
