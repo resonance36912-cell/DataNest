@@ -99,6 +99,30 @@ function Stop-VerifiedHub([int]$Port) {
     return $listenerPid
 }
 
+function Clear-StaleCandidateListener([int]$Port,[string]$ExpectedEntry) {
+    $listenerPid = Get-ListenerPid $Port
+    if (-not $listenerPid) { return $null }
+
+    $proc = Get-CimInstance Win32_Process -Filter "ProcessId=$listenerPid" -ErrorAction SilentlyContinue
+    if (-not $proc -or [string]$proc.Name -ne 'node.exe') {
+        throw "Candidate port $Port is occupied by an unrecognized process; refusing cleanup."
+    }
+
+    $expectedPath = [IO.Path]::GetFullPath($ExpectedEntry)
+    $commandLine = [string]$proc.CommandLine
+    if ([string]::IsNullOrWhiteSpace($commandLine) -or
+        $commandLine.IndexOf($expectedPath,[StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        throw "Candidate port $Port is occupied by Node, but not by the expected RONSAS candidate entry; refusing cleanup."
+    }
+
+    if (-not (Test-Http ("http://127.0.0.1:$Port/") 'RONSAS')) {
+        throw "Candidate port $Port matches the expected entry but failed the RONSAS endpoint fingerprint; refusing cleanup."
+    }
+
+    Write-Host "[RONSAS] Removing stale verified candidate listener on port $Port (PID $listenerPid)."
+    return Stop-VerifiedHub $Port
+}
+
 function Update-State([int]$ProcessId) {
     if (Test-Path -LiteralPath $StatePath) {
         $state = Get-Content -LiteralPath $StatePath -Raw | ConvertFrom-Json
@@ -119,7 +143,7 @@ $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $CandidateEntry).Hash.ToLow
 $candidateProcess = $null
 $rollback = $null
 try {
-    if (Get-ListenerPid $CandidatePort) { throw "Candidate port $CandidatePort is already in use." }
+    Clear-StaleCandidateListener -Port $CandidatePort -ExpectedEntry $CandidateEntry | Out-Null
     Write-Host ("[RONSAS] Validating Hub candidate on port $CandidatePort...")
     $candidateProcess = Start-Hub $CandidateEntry $CandidatePort
     if (-not (Wait-Http ("http://127.0.0.1:$CandidatePort/") 45)) { throw 'Candidate Hub failed isolated health validation.' }

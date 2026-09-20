@@ -19,6 +19,6 @@
     "commercialModeRun": 35483989207
   },
   "purpose": "Publish the validated free-promotion Hub bundle so /pricing and /changelog match governed production source.",
-  "retryAttempt": 5,
-  "retryReason": "Production Hub head advanced by test-only auth-proxy isolation (#48); retry current exact head through full Windows validation and rollback-safe promotion."
+  "retryAttempt": 6,
+  "retryReason": "Exact current Hub head passed build/tests/typecheck/build:local; promoter now safely clears only a verified stale RONSAS candidate listener on port 4175."
 }
