@@ -59,12 +59,18 @@ jobs:
 
           Write-Host ('Railway CLI: ' + (& $Railway --version))
 
+          $ErrorActionPreference='Continue'
           $branchStage=& $Railway environment edit --project $Project --environment $Environment --service-config $Service source.branch $Branch --stage --message 'RONSAS governed ePublisher fallback source repair' --json 2>&1
-          if($LASTEXITCODE -ne 0){throw ('Railway branch staging failed: ' + (($branchStage | Out-String).Trim()))}
+          $branchExit=$LASTEXITCODE
+          $ErrorActionPreference='Stop'
+          if($branchExit -ne 0){throw ('Railway branch staging failed: ' + (($branchStage | Out-String).Trim()))}
           Write-Host (($branchStage | Out-String).Trim())
 
+          $ErrorActionPreference='Continue'
           $commitStage=& $Railway environment edit --project $Project --environment $Environment --service-config $Service source.commitSha $Target --stage --message 'RONSAS governed ePublisher fallback target commit' --json 2>&1
-          if($LASTEXITCODE -ne 0){throw ('Railway commit staging failed: ' + (($commitStage | Out-String).Trim()))}
+          $commitExit=$LASTEXITCODE
+          $ErrorActionPreference='Stop'
+          if($commitExit -ne 0){throw ('Railway commit staging failed: ' + (($commitStage | Out-String).Trim()))}
           Write-Host (($commitStage | Out-String).Trim())
 
           Write-Host ('RONSAS RAILWAY EPUB TARGET STAGED: ' + $Target)
