@@ -1,9 +1,6 @@
 name: Governed Linux runner recovery
 
 on:
-  # workflow_dispatch is the normal manual recovery path. When the connector
-  # cannot dispatch workflows directly, a reviewed no-op change to this file
-  # also triggers the same governed Windows-side recovery via the push path.
   workflow_dispatch:
   push:
     branches: [main]
@@ -12,96 +9,150 @@ on:
       - "ops/ealiophin/ci/START-RONSAS-ACTIONS-RUNNER.ps1"
 
 permissions:
+  actions: write
   contents: read
+  pull-requests: read
 
 concurrency:
   group: ronsas-linux-runner-recovery
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   recover:
     runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
-    timeout-minutes: 10
+    timeout-minutes: 8
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Check out RONSAS control authority
         uses: actions/checkout@v4
 
-      - name: Restore governed Linux Actions runner
-        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
-        run: |
-          $ErrorActionPreference='Stop'
-          $script = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
-          if (-not (Test-Path -LiteralPath $script -PathType Leaf)) { throw "Runner recovery script missing: $script" }
-          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $script
-          if ($LASTEXITCODE -ne 0) { throw "Linux runner recovery failed with exit code $LASTEXITCODE" }
-
-      - name: Verify Linux runner is online
+      - name: Cancel obsolete Linux CI backlog
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
           $repo='resonance36912-cell/RONSAS'
-          $name='Ealiophin-RONSAS-Linux-2'
-          $payload = & gh.exe api "repos/$repo/actions/runners" | ConvertFrom-Json
-          if ($LASTEXITCODE -ne 0) { throw 'Unable to query GitHub runner registration.' }
-          $runner = @($payload.runners | Where-Object { $_.name -eq $name }) | Select-Object -First 1
-          if (-not $runner) { throw "Runner registration not found: $name" }
-          if ([string]$runner.status -ne 'online') { throw "Runner is not online: status=$($runner.status)" }
-          $labels = @($runner.labels | ForEach-Object { [string]$_.name })
-          foreach ($required in @('self-hosted','Linux','X64','ronsas','ealiophin')) {
-            if ($labels -notcontains $required) { throw "Runner missing required label: $required" }
-          }
-          Write-Host "RONSAS Linux runner online: $name"
+          $targetNames=@('Security scan','Verify prebuild','Verify checkout links','Verify ePublisher checkout')
+          $cancelNames=@('Temporary format free promotion')
+          $currentRun=[long]$env:GITHUB_RUN_ID
 
-      - name: Cancel obsolete closed-PR workflow backlog
-        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
-        run: |
-          $ErrorActionPreference='Stop'
-          $repo='resonance36912-cell/RONSAS'
-          $cancelled = 0
-
-          foreach ($status in @('queued','in_progress')) {
-            $runsRaw = & gh.exe api "repos/$repo/actions/runs?status=$status&per_page=100"
-            if ($LASTEXITCODE -ne 0) { throw "Unable to query $status workflow runs." }
-            $runs = @(($runsRaw | ConvertFrom-Json).workflow_runs)
-
-            foreach ($run in $runs) {
-              if ([string]$run.event -ne 'pull_request') { continue }
-
-              # Fail safe: a PR-triggered run must carry an associated PR number.
-              # If GitHub omits that relation, leave the run untouched.
-              $prs = @($run.pull_requests)
-              if ($prs.Count -eq 0) {
-                Write-Host "Keeping $status run $($run.id): no PR relation available."
-                continue
-              }
-
-              $allClosed = $true
-              foreach ($prRef in $prs) {
-                $prNumber = [int]$prRef.number
-                $state = (& gh.exe api "repos/$repo/pulls/$prNumber" --jq .state).Trim()
-                if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($state)) {
-                  Write-Warning "Keeping run $($run.id): unable to verify PR #$prNumber state."
-                  $allClosed = $false
-                  break
-                }
-                if ($state -ne 'closed') {
-                  Write-Host "Keeping run $($run.id): PR #$prNumber is $state."
-                  $allClosed = $false
-                  break
-                }
-              }
-
-              if (-not $allClosed) { continue }
-
-              $head = [string]$run.head_branch
-              Write-Host "Cancelling obsolete $status closed-PR run $($run.id): $($run.name) [$head]"
-              & gh.exe api -X POST "repos/$repo/actions/runs/$($run.id)/cancel" *> $null
-              if ($LASTEXITCODE -eq 0) {
-                $cancelled++
-              } else {
-                Write-Warning "Run $($run.id) could not be cancelled (it may have completed concurrently)."
-              }
+          $openPulls=@((& gh.exe api "repos/$repo/pulls?state=open&per_page=100" | ConvertFrom-Json))
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to query open pull requests.' }
+          $openByHead=@{}
+          foreach ($pr in $openPulls) {
+            $openByHead[[string]$pr.head.ref]=[pscustomobject]@{
+              number=[int]$pr.number
+              sha=[string]$pr.head.sha
             }
           }
 
-          Write-Host "Obsolete closed-PR workflow runs cancelled: $cancelled"
+          $runs=@(((& gh.exe api "repos/$repo/actions/runs?per_page=100" | ConvertFrom-Json).workflow_runs))
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to query workflow runs.' }
+          $active=@('queued','pending','waiting','in_progress','requested')
+          $cancelled=0
+
+          foreach ($run in $runs) {
+            if ($active -notcontains [string]$run.status) { continue }
+            if ([long]$run.id -eq $currentRun) { continue }
+
+            $name=[string]$run.name
+            $event=[string]$run.event
+            $branch=[string]$run.head_branch
+            $sha=[string]$run.head_sha
+            $reason=$null
+
+            if ($targetNames -contains $name) {
+              if ($event -eq 'pull_request') {
+                if (-not $openByHead.ContainsKey($branch)) {
+                  $reason="closed or unmatched PR branch $branch"
+                } else {
+                  $current=$openByHead[$branch]
+                  if ($sha -ne [string]$current.sha) {
+                    $reason="superseded PR #$($current.number) head"
+                  }
+                }
+              } elseif ($event -eq 'push' -and $branch -eq 'main') {
+                $reason='main push CI superseded by exact-head PR validation'
+              }
+            } elseif ($cancelNames -contains $name) {
+              $reason='obsolete temporary formatter'
+            } elseif ($name -eq 'Governed Linux runner recovery' -or $name -eq 'Guarded zombie Linux runner recycle') {
+              $reason='superseded recovery run'
+            }
+
+            if (-not $reason) { continue }
+            Write-Host "Cancelling run $($run.id): $name - $reason"
+            & gh.exe api -X POST "repos/$repo/actions/runs/$($run.id)/cancel" *> $null
+            if ($LASTEXITCODE -eq 0) { $cancelled++ } else { Write-Warning "Could not cancel run $($run.id)." }
+          }
+
+          Write-Host "Cancelled stale/superseded workflow runs: $cancelled"
+
+      - name: Restore governed Linux Actions runner
+        continue-on-error: true
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $script=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
+          if (-not (Test-Path -LiteralPath $script -PathType Leaf)) { throw "Runner recovery script missing: $script" }
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $script
+          if ($LASTEXITCODE -ne 0) { throw "Linux runner recovery attempt exited with code $LASTEXITCODE" }
+
+      - name: Verify Linux runner registration
+        if: always()
+        continue-on-error: true
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $repo='resonance36912-cell/RONSAS'
+          $name='Ealiophin-RONSAS-Linux-2'
+          $payload=& gh.exe api "repos/$repo/actions/runners" | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to query GitHub runner registration.' }
+          $runner=@($payload.runners | Where-Object { $_.name -eq $name }) | Select-Object -First 1
+          if (-not $runner) { throw "Runner registration not found: $name" }
+          Write-Host "Runner status=$($runner.status) busy=$($runner.busy) id=$($runner.id)"
+          if ([string]$runner.status -ne 'online') { throw "Runner is not online: $($runner.status)" }
+
+      - name: Keep Linux runner available while exact-head CI drains
+        if: always()
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $repo='resonance36912-cell/RONSAS'
+          $name='Ealiophin-RONSAS-Linux-2'
+          $script=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
+          $targetNames=@('Security scan','Verify prebuild','Verify checkout links','Verify ePublisher checkout')
+          $idleCycles=0
+
+          for ($i=0; $i -lt 30; $i++) {
+            $runs=@(((& gh.exe api "repos/$repo/actions/runs?per_page=100" | ConvertFrom-Json).workflow_runs))
+            if ($LASTEXITCODE -ne 0) { Write-Warning 'Unable to query CI backlog.'; Start-Sleep -Seconds 10; continue }
+            $active=@($runs | Where-Object {
+              ($targetNames -contains [string]$_.name) -and
+              (@('queued','pending','waiting','in_progress','requested') -contains [string]$_.status)
+            })
+            if ($active.Count -eq 0) {
+              Write-Host 'No active Linux CI backlog remains.'
+              break
+            }
+
+            $payload=& gh.exe api "repos/$repo/actions/runners" | ConvertFrom-Json
+            $runner=@($payload.runners | Where-Object { $_.name -eq $name }) | Select-Object -First 1
+            if (-not $runner -or [string]$runner.status -ne 'online') {
+              $idleCycles=0
+              Write-Host "Runner unavailable; active backlog=$($active.Count). Attempting restore."
+              & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $script
+              if ($LASTEXITCODE -ne 0) { Write-Warning "Restore attempt failed with code $LASTEXITCODE." }
+            } elseif ([bool]$runner.busy) {
+              $idleCycles=0
+              Write-Host "Runner busy; active backlog=$($active.Count)."
+            } else {
+              $idleCycles++
+              Write-Host "Runner online/idle; active backlog=$($active.Count); idle cycles=$idleCycles."
+              if ($idleCycles -ge 2) {
+                Write-Host 'Queued CI is not dispatching; performing guarded recycle.'
+                & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $script -ForceRecycle
+                if ($LASTEXITCODE -ne 0) { Write-Warning "Guarded recycle failed with code $LASTEXITCODE." }
+                $idleCycles=0
+              }
+            }
+            Start-Sleep -Seconds 10
+          }

@@ -1,0 +1,116 @@
+name: CI queue janitor
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/ci-queue-janitor.yml"
+
+permissions:
+  actions: write
+  contents: read
+  pull-requests: read
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPOSITORY: ${{ github.repository }}
+      GH_RUN_ID: ${{ github.run_id }}
+    steps:
+      - name: Prune queue and dispatch recovery
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.request
+
+          token = os.environ["GH_TOKEN"]
+          repository = os.environ["GH_REPOSITORY"]
+          current_run_id = int(os.environ["GH_RUN_ID"])
+          base = f"https://api.github.com/repos/{repository}"
+          headers = {
+              "Authorization": f"Bearer {token}",
+              "Accept": "application/vnd.github+json",
+              "X-GitHub-Api-Version": "2022-11-28",
+              "User-Agent": "ronsas-ci-queue-janitor",
+          }
+
+          def request(path, method="GET", payload=None):
+              data = None if payload is None else json.dumps(payload).encode("utf-8")
+              req = urllib.request.Request(base + path, data=data, headers=headers, method=method)
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as response:
+                      body = response.read().decode("utf-8")
+                      return json.loads(body) if body else None
+              except urllib.error.HTTPError as error:
+                  body = error.read().decode("utf-8", errors="replace")
+                  raise RuntimeError(f"{method} {path} failed: {error.code} {body}") from error
+
+          pulls = request("/pulls?state=open&per_page=100")
+          current_pr_by_branch = {
+              pr["head"]["ref"]: {"number": pr["number"], "sha": pr["head"]["sha"]}
+              for pr in pulls
+          }
+          runs = request("/actions/runs?per_page=100")["workflow_runs"]
+
+          active = {"queued", "pending", "waiting", "in_progress", "requested"}
+          linux_ci = {
+              "Security scan",
+              "Verify prebuild",
+              "Verify checkout links",
+              "Verify ePublisher checkout",
+          }
+          recovery = {
+              "Governed Linux runner recovery",
+              "Guarded zombie Linux runner recycle",
+              "Temporary format free promotion",
+          }
+
+          cancelled = 0
+          for run in runs:
+              if run.get("status") not in active or run["id"] == current_run_id:
+                  continue
+
+              reason = None
+              name = run.get("name", "")
+              event = run.get("event", "")
+              branch = run.get("head_branch") or ""
+              sha = run.get("head_sha") or ""
+
+              if name in linux_ci:
+                  if event == "pull_request":
+                      current = current_pr_by_branch.get(branch)
+                      if current is None:
+                          reason = "closed or unmatched PR branch"
+                      elif sha != current["sha"]:
+                          reason = f"superseded PR #{current['number']} head"
+                  elif event == "push" and branch == "main":
+                      reason = "main push CI superseded by exact-head PR validation"
+              elif name in recovery:
+                  reason = "superseded recovery or formatter run"
+
+              if reason is None:
+                  continue
+
+              print(f"cancel run={run['id']} name={name!r} reason={reason}")
+              try:
+                  request(f"/actions/runs/{run['id']}/cancel", method="POST")
+                  cancelled += 1
+              except Exception as error:
+                  print(f"warning: {error}")
+
+          print(f"cancelled={cancelled}")
+
+          request(
+              "/actions/workflows/windows-recover-linux-runner.yml/dispatches",
+              method="POST",
+              payload={"ref": "main"},
+          )
+          print("dispatched governed Linux runner recovery")
+          PY

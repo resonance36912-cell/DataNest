@@ -26,66 +26,46 @@ jobs:
         run: |
           $ErrorActionPreference='Stop'
           $r=Get-Content -Raw -LiteralPath 'ops/release-requests/railway-epublisher-fallback.json' | ConvertFrom-Json
-          if([string]$r.schema -ne 'ronsas-railway-epublisher-repair/v4'){throw 'Unexpected repair schema.'}
+          if([string]$r.schema -ne 'ronsas-railway-epublisher-repair/v8'){throw 'Unexpected repair schema.'}
           if([string]$r.confirmation -ne 'REPAIR RAILWAY EPUB FALLBACK'){throw 'Explicit repair confirmation missing.'}
           if([string]$r.projectId -ne '70cc7bde-c5ba-4224-9c74-ddb873b27379'){throw 'Unexpected Railway project.'}
           if([string]$r.environmentId -ne '78627988-2f5f-42a8-a507-ee5e221bf10a'){throw 'Unexpected Railway environment.'}
           if([string]$r.serviceId -ne '37312153-7877-4830-85ae-5b48e6275319'){throw 'Unexpected Railway service.'}
-          if([string]$r.governedSource.repo -ne 'resonance36912-cell/rons-epublisher-sovereign-source'){throw 'Unexpected governed source repo.'}
-          if([string]$r.governedSource.revision -ne '5827b0b89abc8e5f13aa29593075edddbf80a9ae'){throw 'Unexpected governed source revision.'}
-          if([string]$r.prebuiltImage -ne 'ghcr.io/resonance36912-cell/rons-epublisher-sovereign-source@sha256:24bd12c56ba0f33b7d615f9860396e094df5c394d0b614d3320b13477ef22da1'){throw 'Unexpected prebuilt image.'}
+          if([string]$r.imageTag -ne 'ghcr.io/resonance36912-cell/rons-epublisher-sovereign-source:5827b0b89abc8e5f13aa29593075edddbf80a9ae'){throw 'Unexpected GHCR tag.'}
+          if([string]$r.verifiedDigest -ne 'sha256:24bd12c56ba0f33b7d615f9860396e094df5c394d0b614d3320b13477ef22da1'){throw 'Unexpected verified digest.'}
+          if([string]$r.targetStartCommand -ne 'sh -c ''npm exec -- vite preview --host 0.0.0.0 --port "${PORT:-3000}"'''){throw 'Unexpected start command.'}
           if([long]$r.verification.workflowRunId -ne 35501093514){throw 'Unexpected verification workflow.'}
           if(-not [bool]$r.verification.anonymousPull -or -not [bool]$r.verification.runtimeSmoke){throw 'Image verification is incomplete.'}
-          if(-not [bool]$r.recovery.switchToPrebuiltImage -or -not [bool]$r.recovery.clearGitSourceBinding -or -not [bool]$r.recovery.clearStartCommandOverride -or -not [bool]$r.recovery.stageOnly){throw 'Prebuilt-image recovery authorization is incomplete.'}
-          if([bool]$r.constraints.changeDomains -or [bool]$r.constraints.changeBilling -or [bool]$r.constraints.changeVariables -or [bool]$r.constraints.createService -or [bool]$r.constraints.cloudflareWorkerMigration -or [bool]$r.constraints.changeHealthcheck -or [bool]$r.constraints.changeReplicas -or [bool]$r.constraints.changeRuntime){throw 'Repair request violates protected constraints.'}
+          if(-not [bool]$r.recovery.refreshSourceSnapshot -or -not [bool]$r.recovery.disconnectExistingSource -or -not [bool]$r.recovery.reconnectVerifiedTag){throw 'Fresh-snapshot authorization is incomplete.'}
+          if([bool]$r.constraints.changeStartCommand -or [bool]$r.constraints.changeDomains -or [bool]$r.constraints.changeBilling -or [bool]$r.constraints.changeVariables -or [bool]$r.constraints.createService -or [bool]$r.constraints.cloudflareWorkerMigration -or [bool]$r.constraints.changeHealthcheck -or [bool]$r.constraints.changeReplicas -or [bool]$r.constraints.changeRuntime -or [bool]$r.constraints.changeBuildSettings){throw 'Repair request violates protected constraints.'}
 
-      - name: Stage immutable prebuilt image source
+      - name: Refresh source snapshot from verified GHCR tag
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
           $Project='70cc7bde-c5ba-4224-9c74-ddb873b27379'
           $Environment='78627988-2f5f-42a8-a507-ee5e221bf10a'
           $Service='37312153-7877-4830-85ae-5b48e6275319'
-          $Image='ghcr.io/resonance36912-cell/rons-epublisher-sovereign-source@sha256:24bd12c56ba0f33b7d615f9860396e094df5c394d0b614d3320b13477ef22da1'
+          $Image='ghcr.io/resonance36912-cell/rons-epublisher-sovereign-source:5827b0b89abc8e5f13aa29593075edddbf80a9ae'
 
           $Railway=(Get-Command railway.cmd -ErrorAction SilentlyContinue).Source
           if(-not $Railway){throw 'railway.cmd is unavailable on the governed Ealiophin runner.'}
           Write-Host ('Railway CLI: ' + (& $Railway --version))
-          $Node=(Get-Command node.exe -ErrorAction Stop).Source
-          $RailwayJs=Join-Path (Split-Path -Parent $Railway) 'node_modules\@railway\cli\bin\railway.js'
-          if(-not (Test-Path -LiteralPath $RailwayJs -PathType Leaf)){throw ('Railway CLI Node entrypoint not found: ' + $RailwayJs)}
 
-          $patch=@{
-            services=@{
-              $Service=@{
-                source=@{
-                  image=$Image
-                  repo=$null
-                  branch=$null
-                  commitSha=$null
-                }
-                deploy=@{
-                  startCommand=$null
-                }
-              }
-            }
-          } | ConvertTo-Json -Depth 10 -Compress
+          $ErrorActionPreference='Continue'
+          $disconnect=& $Railway service source disconnect --service $Service --environment $Environment --project $Project --json 2>&1
+          $disconnectExit=$LASTEXITCODE
+          $ErrorActionPreference='Stop'
+          $disconnectText=(($disconnect | ForEach-Object { $_.ToString() }) -join [Environment]::NewLine).Trim()
+          if($disconnectExit -ne 0){throw ('Railway source disconnect failed: ' + $disconnectText)}
+          if(-not [string]::IsNullOrWhiteSpace($disconnectText)){Write-Host $disconnectText}
 
-          $patchPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-prebuilt-image.json'
-          $stdoutPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-prebuilt-image.stdout'
-          $stderrPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-prebuilt-image.stderr'
-          [IO.File]::WriteAllText($patchPath,$patch,(New-Object Text.UTF8Encoding($false)))
-          Remove-Item -Force -LiteralPath $stdoutPath,$stderrPath -ErrorAction SilentlyContinue
+          $ErrorActionPreference='Continue'
+          $connect=& $Railway service source connect --image $Image --service $Service --environment $Environment --project $Project --json 2>&1
+          $connectExit=$LASTEXITCODE
+          $ErrorActionPreference='Stop'
+          $connectText=(($connect | ForEach-Object { $_.ToString() }) -join [Environment]::NewLine).Trim()
+          if($connectExit -ne 0){throw ('Railway GHCR tag reconnect failed: ' + $connectText)}
+          if(-not [string]::IsNullOrWhiteSpace($connectText)){Write-Host $connectText}
 
-          $args=@($RailwayJs,'environment','edit','--project',$Project,'--environment',$Environment,'--stage','--json')
-          $proc=Start-Process -FilePath $Node -ArgumentList $args -RedirectStandardInput $patchPath -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -NoNewWindow -Wait -PassThru
-          $patchOut=if(Test-Path -LiteralPath $stdoutPath){Get-Content -Raw -LiteralPath $stdoutPath}else{''}
-          $patchErr=if(Test-Path -LiteralPath $stderrPath){Get-Content -Raw -LiteralPath $stderrPath}else{''}
-          if(-not [string]::IsNullOrWhiteSpace($patchErr)){Write-Host $patchErr.Trim()}
-          if($proc.ExitCode -ne 0){throw ('Railway prebuilt-image staging failed: ' + (($patchOut + [Environment]::NewLine + $patchErr).Trim()))}
-
-          $result=$patchOut | ConvertFrom-Json
-          if(-not [bool]$result.staged){throw ('Railway did not stage the prebuilt-image recovery: ' + $patchOut.Trim())}
-          Write-Host $patchOut.Trim()
-          Remove-Item -Force -LiteralPath $patchPath,$stdoutPath,$stderrPath -ErrorAction SilentlyContinue
-          Write-Host ('RONSAS RAILWAY EPUB PREBUILT IMAGE: STAGED ONLY ' + $Image)
+          Write-Host ('RONSAS RAILWAY EPUB FRESH SNAPSHOT: CONNECTED ' + $Image)
