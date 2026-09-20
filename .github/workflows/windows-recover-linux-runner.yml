@@ -22,13 +22,13 @@ jobs:
   recover:
     runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
     timeout-minutes: 8
-    env:
-      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Check out RONSAS control authority
         uses: actions/checkout@v4
 
       - name: Cancel obsolete Linux CI backlog
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
@@ -39,7 +39,7 @@ jobs:
 
           $openPullsRaw=& gh.exe api "repos/$repo/pulls?state=open&per_page=100"
           if ($LASTEXITCODE -ne 0) { throw 'Unable to query open pull requests.' }
-          $openPulls=@(($openPullsRaw -join "`n") | ConvertFrom-Json)
+          $openPulls=($openPullsRaw -join "`n") | ConvertFrom-Json
           $openByHead=@{}
           foreach ($pr in $openPulls) {
             $openByHead[[string]$pr.head.ref]=[pscustomobject]@{
