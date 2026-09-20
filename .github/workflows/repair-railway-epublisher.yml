@@ -26,7 +26,7 @@ jobs:
         run: |
           $ErrorActionPreference='Stop'
           $r=Get-Content -Raw -LiteralPath 'ops/release-requests/railway-epublisher-fallback.json' | ConvertFrom-Json
-          if([string]$r.schema -ne 'ronsas-railway-epublisher-repair/v2'){throw 'Unexpected repair schema.'}
+          if([string]$r.schema -ne 'ronsas-railway-epublisher-repair/v3'){throw 'Unexpected repair schema.'}
           if([string]$r.confirmation -ne 'REPAIR RAILWAY EPUB FALLBACK'){throw 'Explicit repair confirmation missing.'}
           if([string]$r.projectId -ne '70cc7bde-c5ba-4224-9c74-ddb873b27379'){throw 'Unexpected Railway project.'}
           if([string]$r.environmentId -ne '78627988-2f5f-42a8-a507-ee5e221bf10a'){throw 'Unexpected Railway environment.'}
@@ -34,11 +34,12 @@ jobs:
           if([string]$r.repo -ne 'resonance36912-cell/rons-epublisher-sovereign-source'){throw 'Unexpected source repository.'}
           if([string]$r.branch -ne 'main'){throw 'Unexpected source branch.'}
           if([string]$r.targetCommit -ne '5827b0b89abc8e5f13aa29593075edddbf80a9ae'){throw 'Unexpected target commit.'}
-          if(-not [bool]$r.recovery.disableMetalBuildEnvironment){throw 'Metal build fallback is not authorized.'}
+          if(-not [bool]$r.recovery.disableMetalBuildEnvironment){throw 'Legacy build fallback is not authorized.'}
+          if([string]$r.recovery.targetBuildEnvironment -ne 'V2'){throw 'Unexpected target build environment.'}
           if(-not [bool]$r.recovery.stageOnly){throw 'This workflow must remain stage-only.'}
           if([bool]$r.constraints.changeDomains -or [bool]$r.constraints.changeBilling -or [bool]$r.constraints.changeVariables -or [bool]$r.constraints.createService -or [bool]$r.constraints.cloudflareWorkerMigration -or [bool]$r.constraints.changeBuilderType -or [bool]$r.constraints.changeDockerfilePath -or [bool]$r.constraints.changeStartCommand){throw 'Repair request violates protected constraints.'}
 
-      - name: Stage governed non-Metal build fallback
+      - name: Stage governed legacy build fallback
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
@@ -47,6 +48,7 @@ jobs:
           $Service='37312153-7877-4830-85ae-5b48e6275319'
           $Branch='main'
           $Target='5827b0b89abc8e5f13aa29593075edddbf80a9ae'
+          $BuildEnvironment='V2'
 
           $Railway=(Get-Command railway.cmd -ErrorAction SilentlyContinue).Source
           if(-not $Railway){throw 'railway.cmd is unavailable on the governed Ealiophin runner.'}
@@ -63,15 +65,15 @@ jobs:
                   commitSha=$Target
                 }
                 build=@{
-                  buildEnvironment=$null
+                  buildEnvironment=$BuildEnvironment
                 }
               }
             }
           } | ConvertTo-Json -Depth 10 -Compress
 
-          $patchPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-metal-fallback.json'
-          $stdoutPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-metal-fallback.stdout'
-          $stderrPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-metal-fallback.stderr'
+          $patchPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-legacy-build.json'
+          $stdoutPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-legacy-build.stdout'
+          $stderrPath=Join-Path $env:RUNNER_TEMP 'railway-epublisher-legacy-build.stderr'
           [IO.File]::WriteAllText($patchPath,$patch,(New-Object Text.UTF8Encoding($false)))
           Remove-Item -Force -LiteralPath $stdoutPath,$stderrPath -ErrorAction SilentlyContinue
 
@@ -80,10 +82,10 @@ jobs:
           $patchOut=if(Test-Path -LiteralPath $stdoutPath){Get-Content -Raw -LiteralPath $stdoutPath}else{''}
           $patchErr=if(Test-Path -LiteralPath $stderrPath){Get-Content -Raw -LiteralPath $stderrPath}else{''}
           if(-not [string]::IsNullOrWhiteSpace($patchErr)){Write-Host $patchErr.Trim()}
-          if($proc.ExitCode -ne 0){throw ('Railway Metal fallback staging failed: ' + (($patchOut + [Environment]::NewLine + $patchErr).Trim()))}
+          if($proc.ExitCode -ne 0){throw ('Railway legacy build staging failed: ' + (($patchOut + [Environment]::NewLine + $patchErr).Trim()))}
 
           $result=$patchOut | ConvertFrom-Json
-          if(-not [bool]$result.staged){throw ('Railway did not stage the Metal fallback: ' + $patchOut.Trim())}
+          if(-not [bool]$result.staged){throw ('Railway did not stage the legacy build fallback: ' + $patchOut.Trim())}
           Write-Host $patchOut.Trim()
           Remove-Item -Force -LiteralPath $patchPath,$stdoutPath,$stderrPath -ErrorAction SilentlyContinue
-          Write-Host ('RONSAS RAILWAY EPUB METAL FALLBACK: STAGED ONLY at ' + $Target)
+          Write-Host ('RONSAS RAILWAY EPUB LEGACY BUILD: STAGED ONLY at ' + $Target)

@@ -1,5 +1,5 @@
 {
-  "schema": "ronsas-railway-epublisher-repair/v2",
+  "schema": "ronsas-railway-epublisher-repair/v3",
   "projectId": "70cc7bde-c5ba-4224-9c74-ddb873b27379",
   "environmentId": "78627988-2f5f-42a8-a507-ee5e221bf10a",
   "serviceId": "37312153-7877-4830-85ae-5b48e6275319",
@@ -10,7 +10,8 @@
   "recovery": {
     "disableMetalBuildEnvironment": true,
     "stageOnly": true,
-    "reason": "Repeated infrastructure-level failures on Metal builder builder-agfwnb before repository clone or Dockerfile execution."
+    "reason": "Explicit legacy build-environment fallback after Railway defaulted a null buildEnvironment back to V3 and continued assigning the failing Metal builder path.",
+    "targetBuildEnvironment": "V2"
   },
   "constraints": {
     "changeDomains": false,
