@@ -59,15 +59,11 @@ jobs:
 
           Write-Host ('Railway CLI: ' + (& $Railway --version))
 
-          $link=& $Railway link --workspace 'd60eede3-77a8-4dc9-9e7f-19b8f9e938e6' --project $Project --environment $Environment --service $Service --json 2>&1
-          if($LASTEXITCODE -ne 0){throw ('Railway link failed: ' + (($link | Out-String).Trim()))}
-          Write-Host (($link | Out-String).Trim())
-
-          $branchStage=& $Railway environment edit --environment $Environment --service-config $Service source.branch $Branch --stage --message 'RONSAS governed ePublisher fallback source repair' --json 2>&1
+          $branchStage=& $Railway environment edit --project $Project --environment $Environment --service-config $Service source.branch $Branch --stage --message 'RONSAS governed ePublisher fallback source repair' --json 2>&1
           if($LASTEXITCODE -ne 0){throw ('Railway branch staging failed: ' + (($branchStage | Out-String).Trim()))}
           Write-Host (($branchStage | Out-String).Trim())
 
-          $commitStage=& $Railway environment edit --environment $Environment --service-config $Service source.commitSha $Target --stage --message 'RONSAS governed ePublisher fallback target commit' --json 2>&1
+          $commitStage=& $Railway environment edit --project $Project --environment $Environment --service-config $Service source.commitSha $Target --stage --message 'RONSAS governed ePublisher fallback target commit' --json 2>&1
           if($LASTEXITCODE -ne 0){throw ('Railway commit staging failed: ' + (($commitStage | Out-String).Trim()))}
           Write-Host (($commitStage | Out-String).Trim())
 
