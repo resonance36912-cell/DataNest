@@ -63,7 +63,7 @@ jobs:
           function Invoke-RailwayApi([string]$Query,[hashtable]$Variables){
             $varsPath=Join-Path $env:RUNNER_TEMP ('railway-vars-' + [guid]::NewGuid().ToString('N') + '.json')
             try {
-              $Variables | ConvertTo-Json -Depth 10 -Compress | Set-Content -LiteralPath $varsPath -Encoding UTF8
+              [IO.File]::WriteAllText($varsPath,($Variables | ConvertTo-Json -Depth 10 -Compress),(New-Object Text.UTF8Encoding($false)))
               $raw=& $Railway api $Query --variables ('@' + $varsPath) --compact 2>&1
               if($LASTEXITCODE -ne 0){throw ('Railway CLI API call failed: ' + (($raw | Out-String).Trim()))}
               $text=($raw | Out-String).Trim()
