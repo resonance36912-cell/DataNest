@@ -61,16 +61,16 @@ jobs:
             } catch { return $false }
           }
 
-          function Assert-VerifiedYoutubeProcess([int]$Pid){
-            $p=Get-CimInstance Win32_Process -Filter "ProcessId=$Pid" -ErrorAction SilentlyContinue
-            if(-not $p){throw "Listener PID $Pid no longer exists."}
-            if([string]$p.Name -ne 'node.exe'){throw "Port 3401 is owned by unexpected process $($p.Name) PID $Pid; refusing mutation."}
+          function Assert-VerifiedYoutubeProcess([int]$ProcessId){
+            $p=Get-CimInstance Win32_Process -Filter "ProcessId=$ProcessId" -ErrorAction SilentlyContinue
+            if(-not $p){throw "Listener PID $ProcessId no longer exists."}
+            if([string]$p.Name -ne 'node.exe'){throw "Port 3401 is owned by unexpected process $($p.Name) PID $ProcessId; refusing mutation."}
             $cmd=[string]$p.CommandLine
             if([string]::IsNullOrWhiteSpace($cmd)){
               if(-not (Test-Url $LocalUrl)){throw "Port 3401 has unreadable process identity and unhealthy endpoint; refusing mutation."}
               return
             }
-            if($cmd -notlike '*youtube-optimizer-stage*'){throw "Port 3401 is owned by unrecognized Node process PID $Pid; refusing mutation."}
+            if($cmd -notlike '*youtube-optimizer-stage*'){throw "Port 3401 is owned by unrecognized Node process PID $ProcessId; refusing mutation."}
           }
 
           function Wait-Healthy([int]$Seconds=75){
