@@ -19,6 +19,6 @@
     "rebuildSource": false,
     "touchOtherSpokes": false
   },
-  "retryAttempt": 2,
-  "retryReason": "Retrigger the verified YouTube public-edge recovery from the current control-repo head after the prior edge-repair merge was superseded by autonomous main-branch CI maintenance before its workflow instantiated. Local YouTube runtime on 127.0.0.1:3401 is already verified healthy; public youtube.reson8.life remains HTTP 502."
+  "retryAttempt": 3,
+  "retryReason": "Retrigger from the settled current control-repo head after CI queue-maintenance commits completed. The reusable governed edge script is now on main; local YouTube 3401 is healthy and the remaining fault is public-edge only."
 }
