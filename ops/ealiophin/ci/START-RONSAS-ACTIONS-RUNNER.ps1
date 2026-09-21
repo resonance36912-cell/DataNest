@@ -96,7 +96,34 @@ if ($registered -and [bool]$registered.busy -and $ForceRecycle) {
         }) -join ', '
         throw "ForceRecycle refused: GitHub still reports $($otherInProgress.Count) other in-progress workflow run(s): $summary"
     }
-    Write-Host "ForceRecycle was explicitly authorized and GitHub reports no other in-progress workflow runs; ignoring stale busy=True registration state ($($registered.status))." -ForegroundColor Yellow
+
+    Write-Host "ForceRecycle was authorized and no other workflow is in progress, but GitHub still reports busy=True. Waiting for assignment finalization." -ForegroundColor Yellow
+    for ($settleAttempt = 1; $settleAttempt -le 18; $settleAttempt++) {
+        Start-Sleep -Seconds 5
+        $otherInProgress = @(Get-OtherInProgressWorkflowRuns)
+        if ($otherInProgress.Count -gt 0) {
+            $summary = ($otherInProgress | Select-Object -First 10 | ForEach-Object {
+                "$($_.id):$($_.name):$($_.head_branch)"
+            }) -join ', '
+            throw "ForceRecycle aborted during settle window because new in-progress workflow work appeared: $summary"
+        }
+
+        $registered = Get-RegisteredRunner
+        if (-not $registered) {
+            Write-Host 'Runner registration disappeared during settle window; proceeding with fresh registration.' -ForegroundColor Yellow
+            break
+        }
+        if (-not [bool]$registered.busy) {
+            Write-Host "Runner busy state cleared after settle attempt $settleAttempt/18." -ForegroundColor Green
+            break
+        }
+        Write-Host "Runner remains busy during settle attempt $settleAttempt/18; preserving assignment." -ForegroundColor Yellow
+    }
+
+    if ($registered -and [bool]$registered.busy) {
+        Write-Warning 'Runner remained busy throughout the bounded settle window. Deferring recycle rather than deleting an assigned runner.'
+        exit 0
+    }
 } elseif ($registered -and [bool]$registered.busy -and [string]$registered.status -ne 'online') {
     Write-Host "Runner registration is $($registered.status) but busy=True; treating busy state as stale and allowing governed recycle." -ForegroundColor Yellow
 }
@@ -104,8 +131,42 @@ if ($registered -and [bool]$registered.busy -and $ForceRecycle) {
 if ($registered -and ($registered.status -ne 'online' -or $ForceRecycle)) {
     $reason = if ($ForceRecycle) { 'guarded recycle' } else { 'stale offline registration' }
     Write-Host "Removing GitHub runner registration for ${reason}: $RunnerName (id=$($registered.id))" -ForegroundColor Yellow
-    & $gh api -X DELETE "repos/$Repository/actions/runners/$($registered.id)"
-    if ($LASTEXITCODE -ne 0) { throw 'Failed to remove GitHub runner registration.' }
+
+    $deleted = $false
+    for ($deleteAttempt = 1; $deleteAttempt -le 3; $deleteAttempt++) {
+        $deleteOutput = @(& $gh api -X DELETE "repos/$Repository/actions/runners/$($registered.id)" 2>&1)
+        $deleteExit = $LASTEXITCODE
+        if ($deleteExit -eq 0) {
+            $deleted = $true
+            break
+        }
+
+        $deleteText = ($deleteOutput -join [Environment]::NewLine)
+        if ($deleteText -match 'currently running a job' -or $deleteText -match 'HTTP 422') {
+            Write-Warning "GitHub still considers the runner assigned during delete attempt $deleteAttempt/3; waiting before retry."
+            Start-Sleep -Seconds 5
+            $otherInProgress = @(Get-OtherInProgressWorkflowRuns)
+            if ($otherInProgress.Count -gt 0) {
+                $summary = ($otherInProgress | Select-Object -First 10 | ForEach-Object {
+                    "$($_.id):$($_.name):$($_.head_branch)"
+                }) -join ', '
+                throw "Runner deletion retry aborted because workflow work became active: $summary"
+            }
+            $registered = Get-RegisteredRunner
+            if (-not $registered) {
+                $deleted = $true
+                break
+            }
+            continue
+        }
+
+        throw "Failed to remove GitHub runner registration: $deleteText"
+    }
+
+    if (-not $deleted) {
+        Write-Warning 'GitHub continued to reject runner deletion as assigned. Deferring recycle safely; a later guarded pass can retry.'
+        exit 0
+    }
     $registered = $null
 }
 
