@@ -62,7 +62,7 @@ jobs:
               & $mediaPython -c "from huggingface_hub import hf_hub_download; print(hf_hub_download(repo_id='ByteDance/SDXL-Lightning', filename='sdxl_lightning_4step_unet.safetensors', local_dir=r'$unetDir'))"
               if($LASTEXITCODE -ne 0){throw "UNet-only download failed with exit code $LASTEXITCODE"}
             } else {
-              & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer -OpenNovaRuntime $openNova
+              & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer -OpenNovaRuntime $openNova -SkipStoryboardModel
               if($LASTEXITCODE -ne 0){throw "Premium model installer failed with exit code $LASTEXITCODE"}
             }
             $installed=$true

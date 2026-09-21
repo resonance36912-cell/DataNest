@@ -1,14 +1,19 @@
 ﻿[CmdletBinding()]
 param(
-    [string]$OpenNovaRuntime = 'C:\Users\Ashley\Resonance\OpenNova\runtime'
+    [string]$OpenNovaRuntime = 'C:\Users\Ashley\Resonance\OpenNova\runtime',
+    [switch]$SkipStoryboardModel
 )
 $ErrorActionPreference = 'Stop'
 $mediaPython = Join-Path $OpenNovaRuntime 'python-envs\musetalk-0a89dec45a01\Scripts\python.exe'
 if (-not (Test-Path -LiteralPath $mediaPython -PathType Leaf)) { throw "Media Python not found: $mediaPython" }
-$ollama = (Get-Command ollama.exe -ErrorAction Stop).Source
-Write-Host 'Installing Qwen3 8B storyboard model...'
-& $ollama pull qwen3:8b
-if ($LASTEXITCODE -ne 0) { throw 'Ollama failed to pull qwen3:8b' }
+if (-not $SkipStoryboardModel) {
+    $ollama = (Get-Command ollama.exe -ErrorAction Stop).Source
+    Write-Host 'Installing Qwen3 8B storyboard model...'
+    & $ollama pull qwen3:8b
+    if ($LASTEXITCODE -ne 0) { throw 'Ollama failed to pull qwen3:8b' }
+} else {
+    Write-Host 'Skipping Qwen3 storyboard model for image-only premium model deployment.'
+}
 $modelsRoot = Join-Path $OpenNovaRuntime 'models'
 $downloadScript = Join-Path $env:TEMP 'ronsas-premium-model-download.py'
 $py = @"
