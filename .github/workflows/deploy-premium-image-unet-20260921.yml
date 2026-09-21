@@ -18,9 +18,21 @@ concurrency:
 jobs:
   deploy:
     runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
-    timeout-minutes: 30
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
+
+      - name: Record deployment start
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: 217,
+              body: `PREMIUM_IMAGE_UNET_DEPLOYMENT_STARTED run=${context.runId} sha=${context.sha} transport=http-resume timeout=90m`,
+            });
 
       - name: Install, activate, and prove premium UNet
         id: deploy
