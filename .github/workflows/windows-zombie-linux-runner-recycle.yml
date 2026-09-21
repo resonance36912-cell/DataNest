@@ -73,9 +73,12 @@ jobs:
           $payload = ($runnerRaw -join "`n") | ConvertFrom-Json
           $runner = @($payload.runners | Where-Object { $_.name -eq $name }) | Select-Object -First 1
 
-          if ($runner -and [bool]$runner.busy) {
-            Write-Host "GitHub still reports the runner busy; deferring recycle rather than treating busy=True as proof of staleness."
+          if ($runner -and [bool]$runner.busy -and [string]$runner.status -eq 'online') {
+            Write-Host "GitHub reports the runner online and busy; deferring recycle to preserve an active or just-assigned job."
             exit 0
+          }
+          if ($runner -and [bool]$runner.busy -and [string]$runner.status -ne 'online') {
+            Write-Host "GitHub reports an offline busy runner registration; treating it as stale after repository-wide idle proof."
           }
 
           $script = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
