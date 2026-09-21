@@ -108,9 +108,39 @@ jobs:
                       Array.isArray(run.pull_requests) && run.pull_requests.length > 0
                         ? run.pull_requests[0]
                         : null;
-                    const current =
+                    let current =
                       (linkedPr?.number && openByNumber.get(linkedPr.number)) ||
                       openByHead.get(run.head_branch || "");
+                    // The open-PR snapshot can become stale while this janitor is
+                    // running. Re-check the linked PR before cancelling a run that
+                    // otherwise looks unmatched, so a newly-opened PR is preserved.
+                    if (!current && linkedPr?.number) {
+                      try {
+                        const live = await github.rest.pulls.get({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          pull_number: linkedPr.number,
+                        });
+                        if (live.data.state === "open") {
+                          current = {
+                            number: live.data.number,
+                            ref: live.data.head.ref,
+                            sha: live.data.head.sha,
+                          };
+                          openByNumber.set(current.number, current);
+                          openByHead.set(current.ref, current);
+                          core.info(
+                            `PR #${current.number} opened after janitor snapshot; preserving linked validation run ${run.id}.`,
+                          );
+                        }
+                      } catch (error) {
+                        if (error.status !== 404) {
+                          core.warning(
+                            `Live PR lookup failed for #${linkedPr.number}: ${error.status || "error"} ${error.message}`,
+                          );
+                        }
+                      }
+                    }
                     // GitHub pull_request workflow runs execute synthetic merge refs.
                     // Preserve every run linked to an open PR; each validation
                     // workflow's own concurrency group cancels superseded attempts.
