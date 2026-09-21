@@ -258,8 +258,15 @@ jobs:
           }
 
           for ($i=0; $i -lt 60; $i++) {
-            $mainRaw=& gh.exe api "repos/$repo/branches/main"
-            if ($LASTEXITCODE -ne 0) { throw 'Unable to query current main head.' }
+            $mainRaw=$null
+            $mainQueryOk=$false
+            for($queryAttempt=1; $queryAttempt -le 3; $queryAttempt++){
+              $mainRaw=@(& gh.exe api "repos/$repo/branches/main" 2>&1)
+              if($LASTEXITCODE -eq 0){$mainQueryOk=$true;break}
+              Write-Host "Current-main query attempt=$queryAttempt failed; retrying transient control-plane lookup."
+              if($queryAttempt -lt 3){Start-Sleep -Seconds 2}
+            }
+            if (-not $mainQueryOk) { throw 'Unable to query current main head after three attempts.' }
             $mainPayload=($mainRaw -join [Environment]::NewLine) | ConvertFrom-Json
             $latestMainSha=[string]$mainPayload.commit.sha
             if ($env:GITHUB_SHA -ne $latestMainSha) {
