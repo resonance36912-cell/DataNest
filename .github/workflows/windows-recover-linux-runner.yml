@@ -104,76 +104,107 @@ jobs:
 
             core.info(`Cancelled stale/superseded workflow runs: ${cancelled}`);
 
-      - name: Restore governed Linux Actions runner
-        continue-on-error: true
+      - name: Restore existing governed Linux runner container
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
-          $script=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
-          if (-not (Test-Path -LiteralPath $script -PathType Leaf)) { throw "Runner recovery script missing: $script" }
-          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $script
-          if ($LASTEXITCODE -ne 0) { throw "Linux runner recovery attempt exited with code $LASTEXITCODE" }
+          $podman=(Get-Command podman.exe -ErrorAction Stop).Source
+          $container='ronsas-actions-ealiophin'
+          $proxy='ronsas-podman-api'
 
-      - name: Verify Linux runner registration
-        if: always()
-        continue-on-error: true
+          function Test-ContainerExists([string]$Name) {
+            & $podman container exists $Name
+            return ($LASTEXITCODE -eq 0)
+          }
+
+          if (-not (Test-ContainerExists $proxy)) {
+            throw "Governed Podman API proxy is missing: $proxy"
+          }
+          $proxyInfo=(& $podman inspect $proxy | ConvertFrom-Json)[0]
+          if (-not $proxyInfo.State.Running) {
+            Write-Host "Starting governed Podman API proxy: $proxy"
+            & $podman start $proxy | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "Failed to start governed Podman API proxy: $proxy" }
+          }
+
+          if (-not (Test-ContainerExists $container)) {
+            throw "Existing Linux runner container is missing: $container. Re-registration requires repository runner-administration credentials and is intentionally not attempted with GITHUB_TOKEN."
+          }
+
+          $info=(& $podman inspect $container | ConvertFrom-Json)[0]
+          if (-not $info.State.Running) {
+            Write-Host "Starting existing governed Linux runner container: $container"
+            & $podman start $container | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "Failed to start existing Linux runner container: $container" }
+            Start-Sleep -Seconds 4
+            $info=(& $podman inspect $container | ConvertFrom-Json)[0]
+          }
+
+          if (-not $info.State.Running) {
+            throw "Linux runner container is not running after recovery attempt: $container"
+          }
+
+          & $podman exec $container podman --remote version *> $null
+          if ($LASTEXITCODE -ne 0) {
+            throw 'Linux runner container cannot reach the governed Podman API proxy.'
+          }
+
+          Write-Host 'Existing governed Linux runner container is running and can reach the build-engine proxy.'
+          & $podman logs --tail 30 $container
+
+      - name: Verify local Linux runner control state
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
-          $repo='resonance36912-cell/RONSAS'
-          $name='Ealiophin-RONSAS-Linux-2'
-          $payloadRaw=& gh.exe api "repos/$repo/actions/runners"
-          if ($LASTEXITCODE -ne 0) { throw 'Unable to query GitHub runner registration.' }
-          $payload=($payloadRaw -join "`n") | ConvertFrom-Json
-          $runner=@($payload.runners | Where-Object { $_.name -eq $name }) | Select-Object -First 1
-          if (-not $runner) { throw "Runner registration not found: $name" }
-          Write-Host "Runner status=$($runner.status) busy=$($runner.busy) id=$($runner.id)"
-          if ([string]$runner.status -ne 'online') { throw "Runner is not online: $($runner.status)" }
+          $ErrorActionPreference='Stop'
+          $podman=(Get-Command podman.exe -ErrorAction Stop).Source
+          $container='ronsas-actions-ealiophin'
+          & $podman container exists $container
+          if ($LASTEXITCODE -ne 0) { throw "Linux runner container does not exist: $container" }
+          $info=(& $podman inspect $container | ConvertFrom-Json)[0]
+          Write-Host "container=$container running=$($info.State.Running) status=$($info.State.Status)"
+          if (-not $info.State.Running) { throw "Linux runner container is not running: $container" }
 
-      - name: Keep Linux runner available while exact-head CI drains
-        if: always()
+      - name: Keep Linux runner container available while exact-head CI drains
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
+          $ErrorActionPreference='Stop'
           $repo='resonance36912-cell/RONSAS'
-          $name='Ealiophin-RONSAS-Linux-2'
-          $script=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
+          $podman=(Get-Command podman.exe -ErrorAction Stop).Source
+          $container='ronsas-actions-ealiophin'
           $targetNames=@('Security scan','Verify prebuild','Verify checkout links','Verify ePublisher checkout')
-          $idleCycles=0
+          $remaining=-1
 
-          for ($i=0; $i -lt 6; $i++) {
+          for ($i=0; $i -lt 12; $i++) {
             $runsRaw=& gh.exe api "repos/$repo/actions/runs?per_page=100"
-            if ($LASTEXITCODE -ne 0) { Write-Warning 'Unable to query CI backlog.'; Start-Sleep -Seconds 10; continue }
+            if ($LASTEXITCODE -ne 0) { throw 'Unable to query CI backlog.' }
             $runsPayload=($runsRaw -join "`n") | ConvertFrom-Json
             $runs=@($runsPayload.workflow_runs)
             $active=@($runs | Where-Object {
               ($targetNames -contains [string]$_.name) -and
               (@('queued','pending','waiting','in_progress','requested') -contains [string]$_.status)
             })
-            if ($active.Count -eq 0) {
+            $remaining=$active.Count
+
+            if ($remaining -eq 0) {
               Write-Host 'No active Linux CI backlog remains.'
               break
             }
 
-            $payloadRaw=& gh.exe api "repos/$repo/actions/runners"
-            if ($LASTEXITCODE -ne 0) { Write-Warning 'Unable to query runner registration.'; Start-Sleep -Seconds 10; continue }
-            $payload=($payloadRaw -join "`n") | ConvertFrom-Json
-            $runner=@($payload.runners | Where-Object { $_.name -eq $name }) | Select-Object -First 1
-            if (-not $runner -or [string]$runner.status -ne 'online') {
-              $idleCycles=0
-              Write-Host "Runner unavailable; active backlog=$($active.Count). Attempting restore."
-              & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $script
-              if ($LASTEXITCODE -ne 0) { Write-Warning "Restore attempt failed with code $LASTEXITCODE." }
-            } elseif ([bool]$runner.busy) {
-              $idleCycles=0
-              Write-Host "Runner busy; active backlog=$($active.Count)."
+            & $podman container exists $container
+            if ($LASTEXITCODE -ne 0) {
+              throw "Linux runner container disappeared while CI backlog remained: $container"
+            }
+            $info=(& $podman inspect $container | ConvertFrom-Json)[0]
+            if (-not $info.State.Running) {
+              Write-Host "Runner container stopped with active backlog=$remaining; restarting existing container."
+              & $podman start $container | Out-Null
+              if ($LASTEXITCODE -ne 0) { throw "Failed to restart Linux runner container: $container" }
             } else {
-              $idleCycles++
-              Write-Host "Runner online/idle; active backlog=$($active.Count); idle cycles=$idleCycles."
-              if ($idleCycles -ge 2) {
-                Write-Host 'Queued CI is not dispatching; performing guarded recycle.'
-                & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $script -ForceRecycle
-                if ($LASTEXITCODE -ne 0) { Write-Warning "Guarded recycle failed with code $LASTEXITCODE." }
-                $idleCycles=0
-              }
+              Write-Host "Runner container remains running; active Linux CI backlog=$remaining."
             }
             Start-Sleep -Seconds 10
+          }
+
+          if ($remaining -gt 0) {
+            throw "Linux CI backlog did not drain while the governed runner container remained available. Runner registration may require repository-admin repair; refusing to claim recovery."
           }
