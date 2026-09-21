@@ -62,17 +62,25 @@ jobs:
             let cancelled = 0;
             for (let pass = 1; pass <= 4; pass += 1) {
               const runsById = new Map();
+              let successfulQueries = 0;
               for (const status of activeStates) {
-                const statusRuns = await github.paginate(
-                  github.rest.actions.listWorkflowRunsForRepo,
-                  {
+                try {
+                  const { data } = await github.rest.actions.listWorkflowRunsForRepo({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     status,
                     per_page: 100,
-                  },
-                );
-                for (const run of statusRuns) runsById.set(run.id, run);
+                  });
+                  successfulQueries += 1;
+                  for (const run of data.workflow_runs) runsById.set(run.id, run);
+                } catch (error) {
+                  core.warning(
+                    `Unable to query status=${status}: ${error.status || "error"} ${error.message}`,
+                  );
+                }
+              }
+              if (successfulQueries === 0) {
+                throw new Error("Unable to query any active workflow-run state.");
               }
 
               let passCancelled = 0;
