@@ -40,6 +40,8 @@ jobs:
           $expectedUnetSha='39A90A8A2A25C1372633C1E8EB1A96F85EAB937BCB58CFC6EC9BAF66242EC23C'
           $logs=Join-Path $openNova 'logs'
           New-Item -ItemType Directory -Path $logs -Force | Out-Null
+          $priorDisableXet=[Environment]::GetEnvironmentVariable('HF_HUB_DISABLE_XET','Process')
+          [Environment]::SetEnvironmentVariable('HF_HUB_DISABLE_XET','1','Process')
 
           function Get-Health {
             try { return Invoke-RestMethod -Uri 'http://127.0.0.1:7870/health' -TimeoutSec 8 } catch { return $null }
@@ -161,6 +163,7 @@ jobs:
           } | ConvertTo-Json -Compress
           "DEPLOY_REPORT=$report" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           Write-Host "RONSAS PREMIUM IMAGE UNET DEPLOYMENT: PASS $report"
+          [Environment]::SetEnvironmentVariable('HF_HUB_DISABLE_XET',$priorDisableXet,'Process')
 
       - name: Record deployment receipt
         if: always()
