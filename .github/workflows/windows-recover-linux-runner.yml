@@ -258,6 +258,16 @@ jobs:
           }
 
           for ($i=0; $i -lt 60; $i++) {
+            $mainRaw=& gh.exe api "repos/$repo/branches/main"
+            if ($LASTEXITCODE -ne 0) { throw 'Unable to query current main head.' }
+            $mainPayload=($mainRaw -join [Environment]::NewLine) | ConvertFrom-Json
+            $latestMainSha=[string]$mainPayload.commit.sha
+            if ($env:GITHUB_SHA -ne $latestMainSha) {
+              Write-Host "Recovery run is superseded: run_sha=$env:GITHUB_SHA latest_main_sha=$latestMainSha. Exiting watchdog to free the Windows control lane."
+              $remaining=0
+              break
+            }
+
             $runsRaw=& gh.exe api "repos/$repo/actions/runs?per_page=100"
             if ($LASTEXITCODE -ne 0) { throw 'Unable to query CI backlog.' }
             $runsPayload=($runsRaw -join "`n") | ConvertFrom-Json
