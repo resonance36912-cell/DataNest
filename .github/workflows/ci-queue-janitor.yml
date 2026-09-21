@@ -111,8 +111,12 @@ jobs:
                   ) {
                     reason = "superseded main push";
                   }
+                } else if (run.name === "Temporary format free promotion") {
+                  reason = "obsolete temporary formatter";
                 } else if (recoveryNames.has(run.name)) {
-                  reason = "superseded recovery or formatter run";
+                  if (run.head_branch !== "main" || run.head_sha !== latestMainSha) {
+                    reason = "superseded recovery run";
+                  }
                 }
 
                 if (!reason) continue;
