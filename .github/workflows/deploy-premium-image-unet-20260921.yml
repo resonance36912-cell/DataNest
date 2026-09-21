@@ -2,8 +2,7 @@ name: Deploy premium image UNet on Ealiophin
 
 on:
   push:
-    branches:
-      - ronsas/deploy-premium-image-unet-20260921
+    branches: [main]
     paths:
       - ".github/workflows/deploy-premium-image-unet-20260921.yml"
 
@@ -30,7 +29,10 @@ jobs:
           $repoService=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\runtime\epublisher-premium-image-service.py'
           $runtimeService=Join-Path $openNova 'epublisher-premium-image-service.py'
           $mediaPython=Join-Path $openNova 'python-envs\musetalk-0a89dec45a01\Scripts\python.exe'
-          $unet=Join-Path $openNova 'models\sdxl-lightning\sdxl_lightning_4step_unet.safetensors'
+          $base=Join-Path $openNova 'models\sdxl-base\sd_xl_base_1.0.safetensors'
+          $lora=Join-Path $openNova 'models\sdxl-lightning\sdxl_lightning_4step_lora.safetensors'
+          $unetDir=Join-Path $openNova 'models\sdxl-lightning'
+          $unet=Join-Path $unetDir 'sdxl_lightning_4step_unet.safetensors'
           $expectedUnetSha='39A90A8A2A25C1372633C1E8EB1A96F85EAB937BCB58CFC6EC9BAF66242EC23C'
           $logs=Join-Path $openNova 'logs'
           New-Item -ItemType Directory -Path $logs -Force | Out-Null
@@ -49,8 +51,16 @@ jobs:
             }
           }
           if(-not $unetOk){
-            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer -OpenNovaRuntime $openNova
-            if($LASTEXITCODE -ne 0){throw "Premium model installer failed with exit code $LASTEXITCODE"}
+            $baseOk=(Test-Path -LiteralPath $base -PathType Leaf) -and ((Get-Item -LiteralPath $base).Length -gt 5000000000)
+            $loraOk=(Test-Path -LiteralPath $lora -PathType Leaf) -and ((Get-Item -LiteralPath $lora).Length -gt 250000000)
+            if($baseOk -and $loraOk){
+              New-Item -ItemType Directory -Path $unetDir -Force | Out-Null
+              & $mediaPython -c "from huggingface_hub import hf_hub_download; print(hf_hub_download(repo_id='ByteDance/SDXL-Lightning', filename='sdxl_lightning_4step_unet.safetensors', local_dir=r'$unetDir'))"
+              if($LASTEXITCODE -ne 0){throw "UNet-only download failed with exit code $LASTEXITCODE"}
+            } else {
+              & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer -OpenNovaRuntime $openNova
+              if($LASTEXITCODE -ne 0){throw "Premium model installer failed with exit code $LASTEXITCODE"}
+            }
             $installed=$true
           }
 
