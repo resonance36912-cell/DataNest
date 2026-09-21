@@ -16,7 +16,9 @@ $podman = (Get-Command podman.exe -ErrorAction Stop).Source
 $gh = (Get-Command gh.exe -ErrorAction Stop).Source
 
 function Get-RegisteredRunner {
-    $payload = & $gh api "repos/$Repository/actions/runners" | ConvertFrom-Json
+    $runnerRaw = @(& $gh api "repos/$Repository/actions/runners")
+    if ($LASTEXITCODE -ne 0) { throw 'Unable to query GitHub runner registrations.' }
+    $payload = ($runnerRaw -join "`n") | ConvertFrom-Json
     return @($payload.runners | Where-Object { $_.name -eq $RunnerName }) | Select-Object -First 1
 }
 
