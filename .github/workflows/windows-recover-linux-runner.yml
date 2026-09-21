@@ -336,7 +336,10 @@ jobs:
                 $registered=@($runnerPayload.runners | Where-Object { [string]$_.name -eq $runnerName }) | Select-Object -First 1
 
                 if ($registered -and [bool]$registered.busy) {
-                  Write-Host "No repository workflow is in progress, but runner reports status=$($registered.status) busy=True; treating busy state as stale."
+                  Write-Host "GitHub still reports the runner busy; deferring recycle to avoid disrupting an assignment that the workflow API may not expose yet."
+                  $queuedOnlyCycles=0
+                  Start-Sleep -Seconds 10
+                  continue
                 }
                 $launcher=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
                 if (-not (Test-Path -LiteralPath $launcher -PathType Leaf)) {
