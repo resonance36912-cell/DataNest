@@ -13,6 +13,9 @@ const itn = readFileSync("src/routes/api/public/payfast/itn.ts", "utf8");
 test("free promotion disables new and recurring billing", () => {
   expect(request.schema).toBe("ronsas-free-promotion-billing-stop/v1");
   expect(request.confirmation).toBe("STOP RONSAS RECURRING BILLING");
+  expect(request.authority.backend).toBe("sovereign");
+  expect(request.authority.gateway).toBe("http://127.0.0.1:58600");
+  expect(request.authority.billingAdminProcedure).toBe("read_billing_admin");
   expect(request.policy.freePromotion).toBe(true);
   expect(request.policy.newCheckoutLaunches).toBe(false);
   expect(request.policy.existingRecurringCharges).toBe(false);
@@ -22,10 +25,18 @@ test("free promotion disables new and recurring billing", () => {
   expect(checkout).toContain("throw new Error(FREE_PROMOTION_MESSAGE)");
 });
 
-test("recurring cancellation stays on governed Ealiophin production host", () => {
+test("production recurring-billing stop is sovereign-authoritative and fail closed", () => {
   expect(workflow).toContain("ealiophin, production-host");
-  expect(workflow).toContain("ronsas-hub-canonical\\.env.local");
-  expect(workflow).toContain("--execute");
+  expect(workflow).toContain("read_billing_admin");
+  expect(workflow).toContain("gateway-procedure-key");
+  expect(workflow).toContain("non_cancelled_subscription_rows");
+  expect(workflow).toContain("No authoritative recurring-billing candidates exist");
+  expect(workflow).toContain("Refusing the legacy Supabase cancellation worker");
+  expect(workflow).not.toContain("SUPABASE_SERVICE_ROLE_KEY");
+  expect(workflow).not.toContain("--execute");
+});
+
+test("legacy PayFast worker remains redacted and explicit if a reviewed migration needs it", () => {
   expect(worker).toContain('/subscriptions/" + encodeURIComponent(token) + "/cancel"');
   expect(worker).toContain('method: "PUT"');
   expect(worker).toContain("fingerprint");

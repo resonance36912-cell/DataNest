@@ -3,6 +3,11 @@
   "effectiveOn": "2026-09-20",
   "provider": "payfast",
   "confirmation": "STOP RONSAS RECURRING BILLING",
+  "authority": {
+    "backend": "sovereign",
+    "gateway": "http://127.0.0.1:58600",
+    "billingAdminProcedure": "read_billing_admin"
+  },
   "policy": {
     "freePromotion": true,
     "newCheckoutLaunches": false,
