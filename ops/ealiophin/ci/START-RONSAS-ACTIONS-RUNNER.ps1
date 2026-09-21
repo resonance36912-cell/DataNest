@@ -88,7 +88,7 @@ if ($containerReady -and $registered -and $registered.status -eq 'online' -and -
 if ($registered -and [bool]$registered.busy -and [string]$registered.status -eq 'online' -and -not $ForceRecycle) {
     throw 'RONSAS Actions runner is online and busy; refusing unguarded replacement of an active runner.'
 }
-if ($registered -and [bool]$registered.busy -and $ForceRecycle) {
+if ($registered -and [bool]$registered.busy -and [string]$registered.status -eq 'online' -and $ForceRecycle) {
     $otherInProgress = @(Get-OtherInProgressWorkflowRuns)
     if ($otherInProgress.Count -gt 0) {
         $summary = ($otherInProgress | Select-Object -First 10 | ForEach-Object {
