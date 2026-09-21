@@ -16,9 +16,9 @@ concurrency:
 
 jobs:
   prune:
-    # Queue control is GitHub-hosted so it cannot deadlock behind the Ealiophin
-    # Windows production runner or the Linux validation runner it manages.
-    runs-on: ubuntu-latest
+    # GitHub-hosted jobs are currently unavailable for this private repository.
+    # Run queue control on the independent Ealiophin Windows control lane; never on the Linux validation runner it manages.
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
     timeout-minutes: 5
     steps:
       - name: Prune stale CI queue and dispatch governed recovery
