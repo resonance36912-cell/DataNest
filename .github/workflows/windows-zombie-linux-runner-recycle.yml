@@ -30,9 +30,10 @@ jobs:
           $name='Ealiophin-RONSAS-Linux-2'
           $targetNames = @('Security scan','Verify prebuild','Verify checkout links','Verify ePublisher checkout')
 
-          $runsRaw = & gh.exe api "repos/$repo/actions/runs?per_page=100"
+          $runsRaw = @(& gh.exe api "repos/$repo/actions/runs?per_page=100")
           if ($LASTEXITCODE -ne 0) { throw 'Unable to query workflow backlog.' }
-          $runs = @(($runsRaw | ConvertFrom-Json).workflow_runs)
+          $runsPayload = ($runsRaw -join "`n") | ConvertFrom-Json
+          $runs = @($runsPayload.workflow_runs)
           $queued = @($runs | Where-Object {
             ($targetNames -contains [string]$_.name) -and
             (@('queued','pending','waiting') -contains [string]$_.status)
@@ -43,8 +44,9 @@ jobs:
             exit 0
           }
 
-          $payload = & gh.exe api "repos/$repo/actions/runners" | ConvertFrom-Json
+          $runnerRaw = @(& gh.exe api "repos/$repo/actions/runners")
           if ($LASTEXITCODE -ne 0) { throw 'Unable to query GitHub runner registration.' }
+          $payload = ($runnerRaw -join "`n") | ConvertFrom-Json
           $runner = @($payload.runners | Where-Object { $_.name -eq $name }) | Select-Object -First 1
 
           if ($runner -and [bool]$runner.busy) {
