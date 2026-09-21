@@ -21,7 +21,7 @@ concurrency:
 jobs:
   recover:
     runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
-    timeout-minutes: 8
+    timeout-minutes: 20
     steps:
       - name: Check out RONSAS control authority
         uses: actions/checkout@v4
@@ -117,6 +117,12 @@ jobs:
             return ($LASTEXITCODE -eq 0)
           }
 
+          function Test-RunnerListener {
+            $top=@(& $podman top $container 2>$null)
+            if ($LASTEXITCODE -ne 0) { return $false }
+            return (($top -join "`n") -match 'Runner\.Listener')
+          }
+
           if (-not (Test-ContainerExists $proxy)) {
             throw "Governed Podman API proxy is missing: $proxy"
           }
@@ -144,12 +150,22 @@ jobs:
             throw "Linux runner container is not running after recovery attempt: $container"
           }
 
+          if (-not (Test-RunnerListener)) {
+            Write-Host 'Runner.Listener is not active inside the existing container; restarting container once.'
+            & $podman restart $container | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "Failed to restart Linux runner container: $container" }
+            Start-Sleep -Seconds 5
+            if (-not (Test-RunnerListener)) {
+              throw 'Runner.Listener did not become active after local container restart.'
+            }
+          }
+
           & $podman exec $container podman --remote version *> $null
           if ($LASTEXITCODE -ne 0) {
             throw 'Linux runner container cannot reach the governed Podman API proxy.'
           }
 
-          Write-Host 'Existing governed Linux runner container is running and can reach the build-engine proxy.'
+          Write-Host 'Existing governed Linux runner container is running with Runner.Listener active.'
           & $podman logs --tail 30 $container
 
       - name: Verify local Linux runner control state
@@ -161,10 +177,13 @@ jobs:
           & $podman container exists $container
           if ($LASTEXITCODE -ne 0) { throw "Linux runner container does not exist: $container" }
           $info=(& $podman inspect $container | ConvertFrom-Json)[0]
-          Write-Host "container=$container running=$($info.State.Running) status=$($info.State.Status)"
+          $top=@(& $podman top $container 2>$null)
+          $listenerUp=(($top -join "`n") -match 'Runner\.Listener')
+          Write-Host "container=$container running=$($info.State.Running) status=$($info.State.Status) listener=$listenerUp"
           if (-not $info.State.Running) { throw "Linux runner container is not running: $container" }
+          if (-not $listenerUp) { throw 'Runner.Listener is not active inside the Linux runner container.' }
 
-      - name: Keep Linux runner container available while exact-head CI drains
+      - name: Keep Linux runner available while exact-head CI drains
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
@@ -172,9 +191,17 @@ jobs:
           $podman=(Get-Command podman.exe -ErrorAction Stop).Source
           $container='ronsas-actions-ealiophin'
           $targetNames=@('Security scan','Verify prebuild','Verify checkout links','Verify ePublisher checkout')
+          $currentRun=[long]$env:GITHUB_RUN_ID
+          $queuedOnlyCycles=0
           $remaining=-1
 
-          for ($i=0; $i -lt 12; $i++) {
+          function Test-RunnerListener {
+            $top=@(& $podman top $container 2>$null)
+            if ($LASTEXITCODE -ne 0) { return $false }
+            return (($top -join "`n") -match 'Runner\.Listener')
+          }
+
+          for ($i=0; $i -lt 60; $i++) {
             $runsRaw=& gh.exe api "repos/$repo/actions/runs?per_page=100"
             if ($LASTEXITCODE -ne 0) { throw 'Unable to query CI backlog.' }
             $runsPayload=($runsRaw -join "`n") | ConvertFrom-Json
@@ -190,21 +217,50 @@ jobs:
               break
             }
 
+            $targetInProgress=@($active | Where-Object { [string]$_.status -eq 'in_progress' })
+            $otherInProgress=@($runs | Where-Object {
+              ([long]$_.id -ne $currentRun) -and ([string]$_.status -eq 'in_progress')
+            })
+
             & $podman container exists $container
             if ($LASTEXITCODE -ne 0) {
               throw "Linux runner container disappeared while CI backlog remained: $container"
             }
+
             $info=(& $podman inspect $container | ConvertFrom-Json)[0]
             if (-not $info.State.Running) {
               Write-Host "Runner container stopped with active backlog=$remaining; restarting existing container."
               & $podman start $container | Out-Null
               if ($LASTEXITCODE -ne 0) { throw "Failed to restart Linux runner container: $container" }
+              Start-Sleep -Seconds 5
+              $queuedOnlyCycles=0
+            } elseif (-not (Test-RunnerListener)) {
+              Write-Host "Runner.Listener missing with active backlog=$remaining; restarting existing container."
+              & $podman restart $container | Out-Null
+              if ($LASTEXITCODE -ne 0) { throw "Failed to restart Linux runner container: $container" }
+              Start-Sleep -Seconds 5
+              $queuedOnlyCycles=0
+            } elseif ($targetInProgress.Count -gt 0) {
+              $queuedOnlyCycles=0
+              Write-Host "Linux runner actively processing target CI; backlog=$remaining."
+            } elseif ($otherInProgress.Count -eq 0) {
+              $queuedOnlyCycles++
+              Write-Host "Target CI remains queued with no other repository job in progress; idle cycles=$queuedOnlyCycles backlog=$remaining."
+              if ($queuedOnlyCycles -ge 3) {
+                Write-Host 'Guarded local restart: queued target CI has remained idle for three cycles.'
+                & $podman restart $container | Out-Null
+                if ($LASTEXITCODE -ne 0) { throw "Guarded local restart failed for: $container" }
+                Start-Sleep -Seconds 5
+                $queuedOnlyCycles=0
+              }
             } else {
-              Write-Host "Runner container remains running; active Linux CI backlog=$remaining."
+              $queuedOnlyCycles=0
+              Write-Host "Another repository workflow is in progress; preserving runner state. target backlog=$remaining."
             }
+
             Start-Sleep -Seconds 10
           }
 
           if ($remaining -gt 0) {
-            throw "Linux CI backlog did not drain while the governed runner container remained available. Runner registration may require repository-admin repair; refusing to claim recovery."
+            throw "Linux CI backlog did not drain during the ten-minute watchdog window. Runner registration may require repository-admin repair; refusing to claim recovery."
           }
