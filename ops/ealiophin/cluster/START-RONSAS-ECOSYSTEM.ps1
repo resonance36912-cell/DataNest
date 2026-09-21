@@ -33,6 +33,7 @@ $KnownEndpointIdentities = @{
     'local-stt' = @{ url='http://127.0.0.1:7864/health'; process='python.exe'; marker='epublisher-local-stt'; contentType='application/json' }
     'epublisher-stt' = @{ url='http://127.0.0.1:7869/health'; process='python.exe'; marker='127.0.0.1:7869'; contentType='application/json' }
     'local-image' = @{ url='http://127.0.0.1:7865/health'; process='python.exe'; marker='model_complete'; contentType='application/json' }
+    'premium-image' = @{ url='http://127.0.0.1:7870/health'; process='python.exe'; marker='SDXL-Lightning'; contentType='application/json' }
     'local-llm' = @{ url='http://127.0.0.1:7866/health'; process='python.exe'; marker='model_ready'; contentType='application/json' }
     'creative-source' = @{ url='http://127.0.0.1:7867/health'; process='python.exe'; marker='rons-creative-source'; contentType='application/json' }
     'ai-broker' = @{ url='http://127.0.0.1:7868/health'; process='python.exe'; marker='rons-ai-broker'; contentType='application/json' }
@@ -243,10 +244,56 @@ if (-not (Test-BackendReady)) {
 $backendUrl = 'http://127.0.0.1:8787/v1/backend/health'
 $services += [pscustomobject]@{name='sovereign-backend';port=58600;url=$backendUrl;pid=(Get-ListenerPid 58600);owned=$false;root=$AppDev}
 $opsRuntime = Join-Path (Split-Path $PSScriptRoot -Parent) 'runtime'
+$premiumImageTargetPath = Join-Path $Runtime 'epublisher-premium-image-service.py'
+$premiumImageSourceChanged = $false
 foreach ($runtimeName in @('rons-local-llm-service.py','epublisher-premium-image-service.py')) {
     $sourceRuntime = Join-Path $opsRuntime $runtimeName
     if (-not (Test-Path -LiteralPath $sourceRuntime -PathType Leaf)) { throw "Premium runtime source missing: $sourceRuntime" }
-    Copy-Item -LiteralPath $sourceRuntime -Destination (Join-Path $Runtime $runtimeName) -Force
+    $targetRuntime = Join-Path $Runtime $runtimeName
+    if ($runtimeName -eq 'epublisher-premium-image-service.py') {
+        if (-not (Test-Path -LiteralPath $targetRuntime -PathType Leaf)) {
+            $premiumImageSourceChanged = $true
+        } else {
+            $sourceHash = (Get-FileHash -LiteralPath $sourceRuntime -Algorithm SHA256).Hash
+            $targetHash = (Get-FileHash -LiteralPath $targetRuntime -Algorithm SHA256).Hash
+            $premiumImageSourceChanged = ($sourceHash -ne $targetHash)
+        }
+        if ($premiumImageSourceChanged) {
+            Copy-Item -LiteralPath $sourceRuntime -Destination $targetRuntime -Force
+        }
+    } else {
+        Copy-Item -LiteralPath $sourceRuntime -Destination $targetRuntime -Force
+    }
+}
+
+$premiumImageNeedsRestart = $premiumImageSourceChanged
+$premiumListenerPid = Get-ListenerPid 7870
+if (-not $premiumImageNeedsRestart -and $premiumListenerPid -and (Test-Path -LiteralPath $premiumImageTargetPath -PathType Leaf)) {
+    try {
+        $premiumProcess = Get-Process -Id ([int]$premiumListenerPid) -ErrorAction Stop
+        $premiumRuntimeWrite = (Get-Item -LiteralPath $premiumImageTargetPath).LastWriteTimeUtc
+        $premiumProcessStart = $premiumProcess.StartTime.ToUniversalTime()
+        if ($premiumRuntimeWrite -gt $premiumProcessStart) {
+            $premiumImageNeedsRestart = $true
+            Write-Host "[SOURCE REFRESH] premium-image runtime file is newer than the live process; scheduling verified restart." -ForegroundColor Yellow
+        }
+    } catch {
+        Write-Warning "Could not compare premium-image process start time to runtime source; preserving the healthy listener: $($_.Exception.Message)"
+    }
+}
+
+if ($premiumImageNeedsRestart) {
+    $premiumExisting = Assert-KnownPort 'premium-image' 7870 'epublisher-premium-image-service.py'
+    if ($premiumExisting) {
+        Write-Host "[SOURCE REFRESH] restarting verified premium-image listener PID $($premiumExisting.pid)." -ForegroundColor Yellow
+        Stop-Process -Id ([int]$premiumExisting.pid) -Force -ErrorAction Stop
+        $deadline = (Get-Date).AddSeconds(20)
+        do {
+            Start-Sleep -Milliseconds 500
+            $remainingPremiumPid = Get-ListenerPid 7870
+        } while ($remainingPremiumPid -and (Get-Date) -lt $deadline)
+        if ($remainingPremiumPid) { throw "Verified premium-image listener did not release port 7870 after source refresh." }
+    }
 }
 
 $services += Start-LaunchBroker
