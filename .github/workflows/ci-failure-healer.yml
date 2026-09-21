@@ -1,0 +1,159 @@
+name: CI failure healer
+
+on:
+  workflow_run:
+    workflows:
+      - Security scan
+      - Verify prebuild
+      - Verify checkout links
+      - Verify ePublisher checkout
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Failed target workflow run ID to inspect and retry once
+        required: true
+        type: string
+
+permissions:
+  actions: write
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: ronsas-ci-failure-healer-${{ github.event.workflow_run.id || inputs.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  heal:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'failure'
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 10
+    steps:
+      - name: Recover current-head CI and retry failed jobs once
+        uses: actions/github-script@v8
+        env:
+          MANUAL_RUN_ID: ${{ inputs.run_id }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const targets = new Set([
+              "Security scan",
+              "Verify prebuild",
+              "Verify checkout links",
+              "Verify ePublisher checkout",
+            ]);
+
+            const runId =
+              context.eventName === "workflow_run"
+                ? Number(context.payload.workflow_run?.id)
+                : Number(process.env.MANUAL_RUN_ID);
+
+            if (!Number.isInteger(runId) || runId <= 0) {
+              core.setFailed("A valid failed workflow run ID is required.");
+              return;
+            }
+
+            const { data: run } = await github.rest.actions.getWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: runId,
+            });
+
+            core.info(
+              `inspect run=${run.id} name=${run.name} event=${run.event} branch=${run.head_branch} sha=${run.head_sha} attempt=${run.run_attempt} conclusion=${run.conclusion}`,
+            );
+
+            if (!targets.has(run.name)) {
+              core.info("Run is outside the governed CI target set; no action.");
+              return;
+            }
+            if (run.conclusion !== "failure") {
+              core.info("Run is not failed; no action.");
+              return;
+            }
+            if (Number(run.run_attempt || 1) > 1) {
+              core.warning(
+                `Run ${run.id} already reached attempt ${run.run_attempt}; bounded healer will not create a retry loop.`,
+              );
+              return;
+            }
+
+            let currentHead = false;
+            if (run.event === "pull_request") {
+              const linked = Array.isArray(run.pull_requests) ? run.pull_requests[0] : null;
+              if (linked?.number) {
+                const { data: pr } = await github.rest.pulls.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: linked.number,
+                });
+                currentHead = pr.state === "open" && pr.head.sha === run.head_sha;
+                if (!currentHead) {
+                  core.info(
+                    `PR #${linked.number} moved or closed; failed run is stale and will not be retried.`,
+                  );
+                }
+              }
+            } else if (run.event === "push" && run.head_branch === "main") {
+              const { data: main } = await github.rest.repos.getBranch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                branch: "main",
+              });
+              currentHead = main.commit.sha === run.head_sha;
+              if (!currentHead) core.info("Failed main run is superseded; no retry.");
+            } else if (run.event === "push" && run.head_branch) {
+              const pulls = await github.paginate(github.rest.pulls.list, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: "open",
+                head: `${context.repo.owner}:${run.head_branch}`,
+                per_page: 100,
+              });
+              currentHead = pulls.some((pr) => pr.head.sha === run.head_sha);
+              if (!currentHead) core.info("Failed branch run is not the current head of an open PR; no retry.");
+            }
+
+            if (!currentHead) return;
+
+            const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: run.id,
+              per_page: 100,
+              filter: "latest",
+            });
+            const failedJobs = jobs.jobs.filter((job) =>
+              ["failure", "timed_out"].includes(String(job.conclusion)),
+            );
+            if (failedJobs.length === 0) {
+              core.info("No failed/timed-out jobs remain to retry.");
+              return;
+            }
+
+            core.warning(
+              `Current-head CI failed in jobs: ${failedJobs.map((job) => `${job.name}#${job.id}`).join(", ")}`,
+            );
+
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: "windows-recover-linux-runner.yml",
+              ref: "main",
+            });
+            core.info("Dispatched governed Linux runner recovery before retry.");
+
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+
+            await github.request(
+              "POST /repos/{owner}/{repo}/actions/runs/{run_id}/rerun-failed-jobs",
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: run.id,
+              },
+            );
+            core.notice(
+              `Auto-heal requested one bounded retry for workflow run ${run.id}. Any second failure is left intact for code-level diagnosis instead of looping.`,
+            );

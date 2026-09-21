@@ -2,6 +2,8 @@ name: CI queue janitor
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "*/15 * * * *"
   push:
     branches: [main]
 
@@ -220,10 +222,34 @@ jobs:
 
             core.info(`cancelled_total=${cancelled}`);
 
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: "windows-recover-linux-runner.yml",
-              ref: "main",
-            });
-            core.info("dispatched governed Linux runner recovery");
+            const backlogStates = ["queued", "pending", "waiting"];
+            const backlogById = new Map();
+            for (const status of backlogStates) {
+              try {
+                const { data } = await github.rest.actions.listWorkflowRunsForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  status,
+                  per_page: 100,
+                });
+                for (const run of data.workflow_runs) {
+                  if (targetNames.has(run.name)) backlogById.set(run.id, run);
+                }
+              } catch (error) {
+                core.warning(
+                  `Unable to query recovery backlog status=${status}: ${error.status || "error"} ${error.message}`,
+                );
+              }
+            }
+
+            if (backlogById.size === 0) {
+              core.info("No queued/pending/waiting target CI remains; recovery dispatch not required.");
+            } else {
+              await github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: "windows-recover-linux-runner.yml",
+                ref: "main",
+              });
+              core.info(`dispatched governed Linux runner recovery for backlog=${backlogById.size}`);
+            }
