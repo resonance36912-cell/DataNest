@@ -107,20 +107,7 @@ try {
   $cfLines=@(Get-Content -LiteralPath $CloudflaredConfig)
   $hostIndex=-1
   for($i=0;$i -lt $cfLines.Count;$i++){
-    if($cfLines[$i] -match '^\s*-?\s*hostname:\s*youtube\.reson8\.life\s*
-  if(-not (Wait-Url $PublicUrl 75)){throw 'YouTube loopback and Caddy local edge are healthy, but youtube.reson8.life still fails through the existing named tunnel.'}
-
-  Write-Host "PASS public YouTube edge: $PublicUrl"
-  Write-Host 'RONSAS YOUTUBE PUBLIC EDGE: HEALTHY'
-  Write-Receipt 'success' 'Loopback 3401, Caddy 8804, existing cloudflared ingress, and public URL verified.'
-  exit 0
-} catch {
-  $message=$_.Exception.Message
-  Write-Receipt 'failure' $message
-  Write-Error $message
-  exit 2
-}
-){$hostIndex=$i;break}
+    if($cfLines[$i] -match '^\s*-?\s*hostname:\s*youtube\.reson8\.life\s*$'){$hostIndex=$i;break}
   }
   if($hostIndex -lt 0){throw 'Existing cloudflared config has no youtube.reson8.life ingress; refusing domain attachment.'}
 
@@ -128,20 +115,7 @@ try {
   $serviceValue=''
   $end=[Math]::Min($cfLines.Count-1,$hostIndex+5)
   for($i=$hostIndex+1;$i -le $end;$i++){
-    $m=[regex]::Match([string]$cfLines[$i],'^\s*service:\s*(\S+)\s*
-  if(-not (Wait-Url $PublicUrl 75)){throw 'YouTube loopback and Caddy local edge are healthy, but youtube.reson8.life still fails through the existing named tunnel.'}
-
-  Write-Host "PASS public YouTube edge: $PublicUrl"
-  Write-Host 'RONSAS YOUTUBE PUBLIC EDGE: HEALTHY'
-  Write-Receipt 'success' 'Loopback 3401, Caddy 8804, existing cloudflared ingress, and public URL verified.'
-  exit 0
-} catch {
-  $message=$_.Exception.Message
-  Write-Receipt 'failure' $message
-  Write-Error $message
-  exit 2
-}
-)
+    $m=[regex]::Match([string]$cfLines[$i],'^\s*service:\s*(\S+)\s*$')
     if($m.Success){
       $serviceIndex=$i
       $serviceValue=[string]$m.Groups[1].Value
@@ -157,6 +131,7 @@ try {
     if(-not [bool]$request.repairExistingIngressTarget){
       throw "Existing YouTube ingress target is $serviceValue, but governed target repair is not authorized."
     }
+
     $backup=Join-Path $LogRoot ('cloudflared.before-youtube-edge-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '.yml')
     Copy-Item -LiteralPath $CloudflaredConfig -Destination $backup -Force
     $indent=([regex]::Match([string]$cfLines[$serviceIndex],'^\s*')).Value
@@ -175,6 +150,7 @@ try {
   Write-Host 'PASS existing hostname preserved: youtube.reson8.life -> http://127.0.0.1:8804'
 
   if($ingressChanged -or -not (Test-Url $PublicUrl 10)){
+
     $tunnel=Get-CimInstance Win32_Process -Filter "Name='cloudflared.exe'" -ErrorAction SilentlyContinue |
       Where-Object {
         [string]$_.CommandLine -like ('*' + $TunnelName + '*') -and
