@@ -1,0 +1,176 @@
+name: Deploy premium image UNet on Ealiophin
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/deploy-premium-image-unet-20260921.yml"
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install, activate, and prove premium UNet
+        id: deploy
+        continue-on-error: true
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $openNova=Join-Path $env:USERPROFILE 'Resonance\OpenNova\runtime'
+          $installer=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\runtime\INSTALL-PREMIUM-CREATIVE-MODELS.ps1'
+          $repoService=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\runtime\epublisher-premium-image-service.py'
+          $runtimeService=Join-Path $openNova 'epublisher-premium-image-service.py'
+          $mediaPython=Join-Path $openNova 'python-envs\musetalk-0a89dec45a01\Scripts\python.exe'
+          $base=Join-Path $openNova 'models\sdxl-base\sd_xl_base_1.0.safetensors'
+          $lora=Join-Path $openNova 'models\sdxl-lightning\sdxl_lightning_4step_lora.safetensors'
+          $unetDir=Join-Path $openNova 'models\sdxl-lightning'
+          $unet=Join-Path $unetDir 'sdxl_lightning_4step_unet.safetensors'
+          $expectedUnetSha='39A90A8A2A25C1372633C1E8EB1A96F85EAB937BCB58CFC6EC9BAF66242EC23C'
+          $logs=Join-Path $openNova 'logs'
+          New-Item -ItemType Directory -Path $logs -Force | Out-Null
+
+          function Get-Health {
+            try { return Invoke-RestMethod -Uri 'http://127.0.0.1:7870/health' -TimeoutSec 8 } catch { return $null }
+          }
+
+          $installed=$false
+          $unetOk=$false
+          if(Test-Path -LiteralPath $unet -PathType Leaf){
+            $item=Get-Item -LiteralPath $unet
+            if($item.Length -gt 4800000000){
+              $sha=(Get-FileHash -LiteralPath $unet -Algorithm SHA256).Hash
+              $unetOk=($sha -eq $expectedUnetSha)
+            }
+          }
+          if(-not $unetOk){
+            $baseOk=(Test-Path -LiteralPath $base -PathType Leaf) -and ((Get-Item -LiteralPath $base).Length -gt 5000000000)
+            $loraOk=(Test-Path -LiteralPath $lora -PathType Leaf) -and ((Get-Item -LiteralPath $lora).Length -gt 250000000)
+            if($baseOk -and $loraOk){
+              New-Item -ItemType Directory -Path $unetDir -Force | Out-Null
+              & $mediaPython -c "from huggingface_hub import hf_hub_download; print(hf_hub_download(repo_id='ByteDance/SDXL-Lightning', filename='sdxl_lightning_4step_unet.safetensors', local_dir=r'$unetDir'))"
+              if($LASTEXITCODE -ne 0){throw "UNet-only download failed with exit code $LASTEXITCODE"}
+            } else {
+              & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer -OpenNovaRuntime $openNova
+              if($LASTEXITCODE -ne 0){throw "Premium model installer failed with exit code $LASTEXITCODE"}
+            }
+            $installed=$true
+          }
+
+          if(-not (Test-Path -LiteralPath $unet -PathType Leaf)){throw 'UNet file is still missing after installation.'}
+          $unetItem=Get-Item -LiteralPath $unet
+          $unetSha=(Get-FileHash -LiteralPath $unet -Algorithm SHA256).Hash
+          if($unetItem.Length -le 4800000000){throw "UNet file is too small: $($unetItem.Length)"}
+          if($unetSha -ne $expectedUnetSha){throw "UNet SHA256 mismatch: $unetSha"}
+
+          $repoHash=(Get-FileHash -LiteralPath $repoService -Algorithm SHA256).Hash
+          $runtimeHash=if(Test-Path -LiteralPath $runtimeService -PathType Leaf){(Get-FileHash -LiteralPath $runtimeService -Algorithm SHA256).Hash}else{''}
+          $health=Get-Health
+          $mode=if($health -and $health.premium){[string]$health.premium.mode}else{''}
+          $needsRestart=($runtimeHash -ne $repoHash) -or (-not $health) -or ($mode -ne 'unet-checkpoint')
+
+          if($runtimeHash -ne $repoHash){
+            Copy-Item -LiteralPath $repoService -Destination $runtimeService -Force
+          }
+
+          if($needsRestart){
+            $listener=Get-NetTCPConnection -LocalPort 7870 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
+            if($listener){
+              $proc=Get-CimInstance Win32_Process -Filter ("ProcessId=" + $listener.OwningProcess) -ErrorAction Stop
+              if([string]$proc.CommandLine -notlike '*epublisher-premium-image-service.py*'){
+                throw "Port 7870 belongs to an unrecognized process PID $($listener.OwningProcess); refusing restart."
+              }
+              Stop-Process -Id ([int]$listener.OwningProcess) -Force -ErrorAction Stop
+              Start-Sleep -Seconds 2
+            }
+
+            if(-not (Test-Path -LiteralPath $mediaPython -PathType Leaf)){throw "Media Python missing: $mediaPython"}
+            $vars=@{
+              RONS_EPUBLISHER_IMAGE_PORT='7870'
+              RONS_IMAGE_MAX_ACTIVE='1'
+              RONS_IMAGE_IDLE_UNLOAD_SECONDS='90'
+              RONS_EPUBLISHER_MODELS_ROOT=(Join-Path $openNova 'models')
+            }
+            $prior=@{}
+            $priorRunner=[Environment]::GetEnvironmentVariable('RUNNER_TRACKING_ID','Process')
+            try {
+              [Environment]::SetEnvironmentVariable('RUNNER_TRACKING_ID',$null,'Process')
+              foreach($k in $vars.Keys){
+                $prior[$k]=[Environment]::GetEnvironmentVariable($k,'Process')
+                [Environment]::SetEnvironmentVariable($k,[string]$vars[$k],'Process')
+              }
+              Start-Process -FilePath $mediaPython -ArgumentList @($runtimeService) -WorkingDirectory $openNova -RedirectStandardOutput (Join-Path $logs 'premium-image.out.log') -RedirectStandardError (Join-Path $logs 'premium-image.err.log') -WindowStyle Hidden | Out-Null
+            } finally {
+              [Environment]::SetEnvironmentVariable('RUNNER_TRACKING_ID',$priorRunner,'Process')
+              foreach($k in $vars.Keys){[Environment]::SetEnvironmentVariable($k,$prior[$k],'Process')}
+            }
+
+            $health=$null
+            for($i=0;$i -lt 45;$i++){
+              Start-Sleep -Seconds 2
+              $health=Get-Health
+              if($health){break}
+            }
+            if(-not $health){throw 'Premium image service did not recover on port 7870.'}
+          }
+
+          $health=Get-Health
+          if(-not $health){throw 'Premium image health is unreachable after activation.'}
+          if([string]$health.premium.mode -ne 'unet-checkpoint'){throw "Premium health mode is $($health.premium.mode), expected unet-checkpoint."}
+
+          $payload=@{
+            prompt='premium cinematic editorial illustration, cohesive composition, natural anatomy, clean detail, no text'
+            qualityProfile='premium'
+            aspectRatio='16:9'
+            seed=36912
+          } | ConvertTo-Json -Compress
+          $generated=Invoke-RestMethod -Method Post -Uri 'http://127.0.0.1:7870/v1/images/generate' -ContentType 'application/json' -Body $payload -TimeoutSec 300
+          if(-not $generated.ok){throw 'Premium generation response was not ok.'}
+          if([string]$generated.provider -ne 'rons-local-sdxl-lightning-unet'){
+            throw "Premium generation used provider=$($generated.provider), expected rons-local-sdxl-lightning-unet. fallback=$($generated.fallbackReason)"
+          }
+
+          $report=[ordered]@{
+            status='success'
+            installed=$installed
+            restarted=$needsRestart
+            unetBytes=$unetItem.Length
+            unetSha256=$unetSha
+            healthMode=[string]$health.premium.mode
+            provider=[string]$generated.provider
+            model=[string]$generated.model
+            actualQuality=[string]$generated.actualQuality
+            width=[int]$generated.width
+            height=[int]$generated.height
+            seed=[int]$generated.seed
+          } | ConvertTo-Json -Compress
+          "DEPLOY_REPORT=$report" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          Write-Host "RONSAS PREMIUM IMAGE UNET DEPLOYMENT: PASS $report"
+
+      - name: Record deployment receipt
+        if: always()
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const outcome = "${{ steps.deploy.outcome }}";
+            const report = process.env.DEPLOY_REPORT || "{}";
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: 217,
+              body: `PREMIUM_IMAGE_UNET_DEPLOYMENT outcome=${outcome} run=${context.runId}\n${report}`,
+            });
+
+      - name: Fail closed on deployment error
+        if: steps.deploy.outcome != 'success'
+        shell: powershell
+        run: |
+          throw 'Premium image UNet deployment did not succeed.'
