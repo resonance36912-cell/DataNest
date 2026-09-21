@@ -41,6 +41,14 @@ jobs:
             const activeStates = new Set(["queued", "pending", "waiting", "in_progress", "requested"]);
             const currentRun = Number(context.runId);
 
+            const mainBranch = await github.rest.repos.getBranch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              branch: "main",
+            });
+            const latestMainSha = mainBranch.data.commit.sha;
+            core.info(`latest_main_sha=${latestMainSha}`);
+
             const openPulls = await github.paginate(github.rest.pulls.list, {
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -74,8 +82,12 @@ jobs:
                   } else if (run.head_sha !== current.sha) {
                     reason = `superseded PR #${current.number} head`;
                   }
-                } else if (run.event === "push" && run.head_branch === "main") {
-                  reason = "main push CI superseded by exact-head PR validation";
+                } else if (
+                  run.event === "push" &&
+                  run.head_branch === "main" &&
+                  run.head_sha !== latestMainSha
+                ) {
+                  reason = "superseded main push";
                 }
               } else if (cancelNames.has(run.name)) {
                 reason = "obsolete temporary formatter";
@@ -98,6 +110,32 @@ jobs:
               } catch (error) {
                 core.warning(
                   `Could not cancel run ${run.id}: ${error.status || "error"} ${error.message}`,
+                );
+              }
+
+              await new Promise((resolve) => setTimeout(resolve, 750));
+              try {
+                const latest = await github.rest.actions.getWorkflowRun({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: run.id,
+                });
+                if (activeStates.has(latest.data.status)) {
+                  core.warning(
+                    `Run ${run.id} remained ${latest.data.status} after cancellation request; forcing cancellation.`,
+                  );
+                  await github.request(
+                    "POST /repos/{owner}/{repo}/actions/runs/{run_id}/force-cancel",
+                    {
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      run_id: run.id,
+                    },
+                  );
+                }
+              } catch (error) {
+                core.warning(
+                  `Run ${run.id} force-cancel check failed: ${error.status || "error"} ${error.message}`,
                 );
               }
             }
