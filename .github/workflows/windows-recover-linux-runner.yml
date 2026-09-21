@@ -335,11 +335,14 @@ jobs:
                 $runnerPayload=($runnerRaw -join "`n") | ConvertFrom-Json
                 $registered=@($runnerPayload.runners | Where-Object { [string]$_.name -eq $runnerName }) | Select-Object -First 1
 
-                if ($registered -and [bool]$registered.busy) {
-                  Write-Host "GitHub still reports the runner busy; deferring recycle to avoid disrupting an assignment that the workflow API may not expose yet."
+                if ($registered -and [bool]$registered.busy -and [string]$registered.status -eq 'online') {
+                  Write-Host "GitHub reports the runner online and busy; deferring recycle to avoid disrupting an active or just-assigned job."
                   $queuedOnlyCycles=0
                   Start-Sleep -Seconds 10
                   continue
+                }
+                if ($registered -and [bool]$registered.busy -and [string]$registered.status -ne 'online') {
+                  Write-Host "GitHub reports an offline busy runner registration; treating it as stale after repository-wide idle proof and invoking governed recycle."
                 }
                 $launcher=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
                 if (-not (Test-Path -LiteralPath $launcher -PathType Leaf)) {
