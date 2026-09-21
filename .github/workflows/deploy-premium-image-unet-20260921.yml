@@ -78,6 +78,17 @@ jobs:
           if($unetItem.Length -le 4800000000){throw "UNet file is too small: $($unetItem.Length)"}
           if($unetSha -ne $expectedUnetSha){throw "UNet SHA256 mismatch: $unetSha"}
 
+          $loraOk=(Test-Path -LiteralPath $lora -PathType Leaf) -and ((Get-Item -LiteralPath $lora).Length -gt 250000000)
+          if(-not $loraOk){
+            New-Item -ItemType Directory -Path $unetDir -Force | Out-Null
+            & $mediaPython -c "from huggingface_hub import hf_hub_download; print(hf_hub_download(repo_id='ByteDance/SDXL-Lightning', filename='sdxl_lightning_4step_lora.safetensors', local_dir=r'$unetDir'))"
+            if($LASTEXITCODE -ne 0){throw "LoRA fallback download failed with exit code $LASTEXITCODE"}
+            $installed=$true
+          }
+          if(-not (Test-Path -LiteralPath $lora -PathType Leaf) -or (Get-Item -LiteralPath $lora).Length -le 250000000){
+            throw 'SDXL-Lightning LoRA fallback is missing or incomplete after deployment.'
+          }
+
           $repoHash=(Get-FileHash -LiteralPath $repoService -Algorithm SHA256).Hash
           $runtimeHash=if(Test-Path -LiteralPath $runtimeService -PathType Leaf){(Get-FileHash -LiteralPath $runtimeService -Algorithm SHA256).Hash}else{''}
           $health=Get-Health
