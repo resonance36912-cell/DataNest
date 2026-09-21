@@ -17,6 +17,7 @@ from pathlib import Path
 root = Path(r'$modelsRoot')
 items = [
     ('stabilityai/stable-diffusion-xl-base-1.0', 'sd_xl_base_1.0.safetensors', root / 'sdxl-base'),
+    ('ByteDance/SDXL-Lightning', 'sdxl_lightning_4step_unet.safetensors', root / 'sdxl-lightning'),
     ('ByteDance/SDXL-Lightning', 'sdxl_lightning_4step_lora.safetensors', root / 'sdxl-lightning'),
 ]
 for repo, filename, dest in items:
@@ -30,7 +31,9 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Premium image model download failed' }
 } finally { Remove-Item $downloadScript -Force -ErrorAction SilentlyContinue }
 $base = Join-Path $modelsRoot 'sdxl-base\sd_xl_base_1.0.safetensors'
+$unet = Join-Path $modelsRoot 'sdxl-lightning\sdxl_lightning_4step_unet.safetensors'
 $lora = Join-Path $modelsRoot 'sdxl-lightning\sdxl_lightning_4step_lora.safetensors'
 if ((Get-Item $base).Length -lt 5GB) { throw 'SDXL base model is incomplete' }
-if ((Get-Item $lora).Length -lt 250MB) { throw 'SDXL-Lightning LoRA is incomplete' }
+if ((Get-Item $unet).Length -lt 4500MB) { throw 'SDXL-Lightning 4-step UNet checkpoint is incomplete' }
+if ((Get-Item $lora).Length -lt 250MB) { throw 'SDXL-Lightning LoRA fallback is incomplete' }
 Write-Host 'Premium creative models are ready.'

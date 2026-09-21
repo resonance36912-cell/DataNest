@@ -5,6 +5,7 @@ import base64, gc, hashlib, io, json, os, random, threading, time
 import torch
 from PIL import Image, ImageDraw, ImageFilter
 from diffusers import AutoPipelineForText2Image, EulerDiscreteScheduler, StableDiffusionXLPipeline
+from safetensors.torch import load_file
 
 BIND = "127.0.0.1"
 PORT = int(os.getenv("RONS_EPUBLISHER_IMAGE_PORT", "7865"))
@@ -12,6 +13,7 @@ ROOT = Path(os.getenv("RONS_EPUBLISHER_MODELS_ROOT", r"C:\Users\Ashley\Resonance
 FAST_MODEL = os.getenv("RONS_EPUBLISHER_FAST_MODEL", "stabilityai/sd-turbo")
 FAST_DIR = Path(os.getenv("RONS_EPUBLISHER_FAST_MODEL_DIR", str(ROOT / "sd-turbo")))
 PREMIUM_BASE = Path(os.getenv("RONS_EPUBLISHER_PREMIUM_BASE", str(ROOT / "sdxl-base" / "sd_xl_base_1.0.safetensors")))
+PREMIUM_UNET = Path(os.getenv("RONS_EPUBLISHER_PREMIUM_UNET", str(ROOT / "sdxl-lightning" / "sdxl_lightning_4step_unet.safetensors")))
 PREMIUM_LORA = Path(os.getenv("RONS_EPUBLISHER_PREMIUM_LORA", str(ROOT / "sdxl-lightning" / "sdxl_lightning_4step_lora.safetensors")))
 MAX_ACTIVE_GENERATIONS = max(1, int(os.getenv("RONS_IMAGE_MAX_ACTIVE", "1")))
 IDLE_UNLOAD_SECONDS = max(0, int(os.getenv("RONS_IMAGE_IDLE_UNLOAD_SECONDS", "90")))
@@ -22,6 +24,7 @@ _fast_pipe = None
 _premium_pipe = None
 _fast_error = None
 _premium_error = None
+_premium_mode = None
 _idle_timer = None
 
 ALLOWED_ORIGINS = {
@@ -34,13 +37,23 @@ ALLOWED_ORIGINS = {
 def fast_complete():
     return (FAST_DIR / "model_index.json").is_file() and (FAST_DIR / "unet").is_dir()
 
-def premium_complete():
+def lora_fallback_complete():
     return (
         PREMIUM_BASE.is_file()
         and PREMIUM_BASE.stat().st_size > 5_000_000_000
         and PREMIUM_LORA.is_file()
         and PREMIUM_LORA.stat().st_size > 250_000_000
     )
+
+def premium_mode():
+    if PREMIUM_UNET.is_file() and PREMIUM_UNET.stat().st_size > 4_800_000_000:
+        return "unet-checkpoint"
+    if lora_fallback_complete():
+        return "lora-fallback"
+    return None
+
+def premium_complete():
+    return premium_mode() is not None
 
 def _cancel_idle_unload():
     global _idle_timer
@@ -51,10 +64,11 @@ def _cancel_idle_unload():
             timer.cancel()
 
 def _unload_pipelines():
-    global _fast_pipe, _premium_pipe, _idle_timer
+    global _fast_pipe, _premium_pipe, _premium_mode, _idle_timer
     with _lock:
         _fast_pipe = None
         _premium_pipe = None
+        _premium_mode = None
         _idle_timer = None
     gc.collect()
     if torch.cuda.is_available():
@@ -114,27 +128,56 @@ def get_fast_pipe():
                 return None
     return _fast_pipe
 
+def _load_unet_checkpoint_pipe():
+    pipe = StableDiffusionXLPipeline.from_single_file(
+        str(PREMIUM_BASE),
+        torch_dtype=torch.float16,
+        use_safetensors=True,
+    )
+    state_dict = load_file(str(PREMIUM_UNET), device="cpu")
+    pipe.unet.load_state_dict(state_dict)
+    del state_dict
+    gc.collect()
+    return pipe
+
+def _load_lora_fallback_pipe():
+    pipe = StableDiffusionXLPipeline.from_single_file(
+        str(PREMIUM_BASE),
+        torch_dtype=torch.float16,
+        use_safetensors=True,
+    )
+    pipe.load_lora_weights(
+        str(PREMIUM_LORA.parent),
+        weight_name=PREMIUM_LORA.name,
+        adapter_name="lightning",
+    )
+    pipe.fuse_lora(lora_scale=1.0)
+    return pipe
+
 def get_premium_pipe():
-    global _premium_pipe, _premium_error
+    global _premium_pipe, _premium_error, _premium_mode
 
     if _premium_pipe is not None:
         return _premium_pipe
-    if not premium_complete():
+    mode = premium_mode()
+    if mode is None:
         return None
     with _lock:
         if _premium_pipe is None:
+            selected_mode = mode
+            preferred_error = None
             try:
-                pipe = StableDiffusionXLPipeline.from_single_file(
-                    str(PREMIUM_BASE),
-                    torch_dtype=torch.float16,
-                    use_safetensors=True,
-                )
-                pipe.load_lora_weights(
-                    str(PREMIUM_LORA.parent),
-                    weight_name=PREMIUM_LORA.name,
-                    adapter_name="lightning",
-                )
-                pipe.fuse_lora(lora_scale=1.0)
+                if mode == "unet-checkpoint":
+                    try:
+                        pipe = _load_unet_checkpoint_pipe()
+                    except Exception as exc:
+                        preferred_error = str(exc)
+                        if not lora_fallback_complete():
+                            raise
+                        pipe = _load_lora_fallback_pipe()
+                        selected_mode = "lora-fallback"
+                else:
+                    pipe = _load_lora_fallback_pipe()
                 pipe.scheduler = EulerDiscreteScheduler.from_config(
                     pipe.scheduler.config, timestep_spacing="trailing"
                 )
@@ -143,8 +186,21 @@ def get_premium_pipe():
                 pipe.enable_model_cpu_offload()
                 pipe.set_progress_bar_config(disable=True)
                 _premium_pipe = pipe
+                _premium_mode = selected_mode
+                _premium_error = (
+                    f"unet_checkpoint_load_failed; using_lora_fallback: {preferred_error}"
+                    if preferred_error
+                    else None
+                )
             except Exception as exc:
-                _premium_error = str(exc)
+                if preferred_error and str(exc) != preferred_error:
+                    _premium_error = (
+                        f"unet_checkpoint_load_failed: {preferred_error}; "
+                        f"lora_fallback_load_failed: {exc}"
+                    )
+                else:
+                    _premium_error = str(exc)
+                _premium_mode = None
                 return None
     return _premium_pipe
 
@@ -234,8 +290,12 @@ def generate_image(body):
             ).images[0]
 
         image = image.filter(ImageFilter.UnsharpMask(radius=1.1, percent=115, threshold=3))
-        provider = "rons-local-sdxl-lightning"
-        model = "stabilityai/stable-diffusion-xl-base-1.0 + ByteDance/SDXL-Lightning-4step-LoRA"
+        if _premium_mode == "unet-checkpoint":
+            provider = "rons-local-sdxl-lightning-unet"
+            model = "stabilityai/stable-diffusion-xl-base-1.0 + ByteDance/SDXL-Lightning-4step-UNet"
+        else:
+            provider = "rons-local-sdxl-lightning"
+            model = "stabilityai/stable-diffusion-xl-base-1.0 + ByteDance/SDXL-Lightning-4step-LoRA"
 
     return image, {
         "provider": provider,
@@ -289,9 +349,11 @@ class Handler(BaseHTTPRequestHandler):
                 "fast": {"model": FAST_MODEL, "ready": fast_complete(), "loaded": _fast_pipe is not None, "error": _fast_error},
                 "premium": {
 
-                    "model": "SDXL + SDXL-Lightning 4-step LoRA",
+                    "model": "SDXL-Lightning 4-step UNet checkpoint (LoRA fallback)",
                     "ready": premium_complete(),
                     "loaded": _premium_pipe is not None,
+                    "mode": _premium_mode or premium_mode(),
+                    "unet": str(PREMIUM_UNET),
                     "base": str(PREMIUM_BASE),
                     "lora": str(PREMIUM_LORA),
                     "error": _premium_error,

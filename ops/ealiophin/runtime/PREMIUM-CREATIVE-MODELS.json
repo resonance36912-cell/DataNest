@@ -1,4 +1,4 @@
-﻿{
+{
   "schema": "ronsas-premium-creative-models/v1",
   "hardwareProfile": "ealiophin-rtx4060-8gb",
   "storyboard": {
@@ -17,13 +17,22 @@
     "premium": {
       "base": "stabilityai/stable-diffusion-xl-base-1.0",
       "accelerator": "ByteDance/SDXL-Lightning",
-      "acceleratorFile": "sdxl_lightning_4step_lora.safetensors",
+      "acceleratorFile": "sdxl_lightning_4step_unet.safetensors",
       "runtime": "diffusers",
       "scheduler": "EulerDiscreteScheduler/trailing",
       "steps": 4,
       "license": "OpenRAIL++",
-      "cpuOffload": true
+      "cpuOffload": true,
+      "preferredCheckpoint": "sdxl_lightning_4step_unet.safetensors",
+      "preferredMode": "unet-checkpoint",
+      "fallbackAcceleratorFile": "sdxl_lightning_4step_lora.safetensors",
+      "qualityRationale": "Prefer ByteDance's Diffusers-targeted 4-step UNet checkpoint for best SDXL-Lightning quality; retain the LoRA path as runtime fallback."
     }
   },
-  "ports": {"legacyImage": 7865, "premiumImage": 7870, "localLlm": 7866, "aiBroker": 7868}
+  "ports": {
+    "legacyImage": 7865,
+    "premiumImage": 7870,
+    "localLlm": 7866,
+    "aiBroker": 7868
+  }
 }
