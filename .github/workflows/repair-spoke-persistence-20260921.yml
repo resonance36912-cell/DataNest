@@ -1,0 +1,167 @@
+name: Repair spoke persistence 2026-09-21
+
+on:
+  push:
+    branches:
+      - ronsas/repair-spoke-persistence-20260921
+    paths:
+      - "ops/ealiophin/edge/Caddyfile.cgnat-edge"
+      - "ops/release-requests/spoke-persistence-repair-20260921.json"
+      - ".github/workflows/repair-spoke-persistence-20260921.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ronsas-spoke-persistence-repair-20260921
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 12
+    steps:
+      - name: Check out RONSAS control authority
+        uses: actions/checkout@v4
+
+      - name: Validate governed request
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $r=Get-Content -Raw -LiteralPath 'ops\release-requests\spoke-persistence-repair-20260921.json' | ConvertFrom-Json
+          if([string]$r.schema -ne 'ronsas-spoke-persistence-repair/v1'){throw 'Unexpected repair schema.'}
+          if([string]$r.confirmation -ne 'REPAIR RONSAS SPOKE PERSISTENCE'){throw 'Explicit repair confirmation missing.'}
+          if([string]$r.changes.epublisherCaddyUpstream -ne 'http://127.0.0.1:3101'){throw 'Unexpected ePublisher upstream.'}
+          if(-not [bool]$r.changes.rearmExistingSupervisor){throw 'Supervisor rearm authorization missing.'}
+          if([bool]$r.constraints.changeBilling -or [bool]$r.constraints.changeDomains -or [bool]$r.constraints.createService -or [bool]$r.constraints.cloudflareWorkerMigration -or [bool]$r.constraints.changeTunnelIdentity -or [bool]$r.constraints.changeHubRuntime -or [bool]$r.constraints.killUnverifiedProcesses){
+            throw 'Repair request violates protected constraints.'
+          }
+
+      - name: Promote governed Caddy upstream
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $Control=Join-Path $env:LOCALAPPDATA 'Resonance\RONS-ControlCenter'
+          $ControlConfig=Join-Path $Control 'rons-control.json'
+          $Governed=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\edge\Caddyfile.cgnat-edge'
+          if(-not (Test-Path -LiteralPath $ControlConfig -PathType Leaf)){throw "Control config missing: $ControlConfig"}
+          $edge=(Get-Content -Raw -LiteralPath $ControlConfig | ConvertFrom-Json).publicEdge
+          if(-not $edge){throw 'Public edge configuration missing.'}
+          $CaddyExe=[string]$edge.caddyExe
+          $Installed=[string]$edge.caddyConfig
+          foreach($p in @($CaddyExe,$Installed,$Governed)){if(-not (Test-Path -LiteralPath $p -PathType Leaf)){throw "Required Caddy asset missing: $p"}}
+
+          & $CaddyExe validate --config $Governed
+          if($LASTEXITCODE){throw 'Governed Caddyfile validation failed.'}
+          $governedHash=(Get-FileHash -Algorithm SHA256 -LiteralPath $Governed).Hash
+          $installedHash=(Get-FileHash -Algorithm SHA256 -LiteralPath $Installed).Hash
+          Write-Host "Caddy installed SHA256=$installedHash"
+          Write-Host "Caddy governed  SHA256=$governedHash"
+          if($installedHash -ne $governedHash){
+            $backup=Join-Path (Split-Path $Installed -Parent) ('Caddyfile.before-spoke-persistence-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
+            Copy-Item -LiteralPath $Installed -Destination $backup -Force
+            Copy-Item -LiteralPath $Governed -Destination $Installed -Force
+            Write-Host "Promoted governed Caddyfile; backup=$backup"
+          }
+          & $CaddyExe reload --config $Installed
+          if($LASTEXITCODE){throw 'Managed Caddy reload failed.'}
+          Start-Sleep -Seconds 2
+
+      - name: Rearm persistent RONS supervisor
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $taskName='RONS Autonomous Supervisor'
+          $liveSupervisor=Join-Path $env:LOCALAPPDATA 'Resonance\RONS-ControlCenter\RONS-Supervisor.ps1'
+          if(-not (Test-Path -LiteralPath $liveSupervisor -PathType Leaf)){throw "Live supervisor missing: $liveSupervisor"}
+
+          function Get-SupervisorProcess {
+            Get-CimInstance Win32_Process -ErrorAction SilentlyContinue |
+              Where-Object {[string]$_.CommandLine -like '*RONS-Supervisor.ps1*'} |
+              Select-Object -First 1
+          }
+          function Wait-Supervisor([int]$Seconds=20){
+            $deadline=(Get-Date).AddSeconds($Seconds)
+            do{
+              $p=Get-SupervisorProcess
+              if($p){return $p}
+              Start-Sleep -Seconds 1
+            }while((Get-Date) -lt $deadline)
+            return $null
+          }
+
+          $task=Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
+          if(-not $task){
+            $register=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\control-center\REGISTER-RONS-SUPERVISOR-TASK.ps1'
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $register
+            if($LASTEXITCODE){throw "Supervisor task registration failed with code $LASTEXITCODE"}
+          } elseif($task.State -ne 'Running') {
+            Start-ScheduledTask -TaskName $taskName
+          }
+
+          $proc=Wait-Supervisor 20
+          if(-not $proc){
+            $register=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\control-center\REGISTER-RONS-SUPERVISOR-TASK.ps1'
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $register
+            if($LASTEXITCODE){throw "Supervisor task re-registration failed with code $LASTEXITCODE"}
+            $proc=Wait-Supervisor 20
+          }
+          if(-not $proc){throw 'RONS supervisor did not stay running after governed rearm.'}
+          Write-Host "PASS supervisor PID $($proc.ProcessId)"
+
+      - name: Wait for canonical spoke listeners
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          function Wait-Endpoint([string]$Name,[string]$Url,[int]$Port,[string]$Address,[int]$Seconds=210){
+            $deadline=(Get-Date).AddSeconds($Seconds)
+            $last=''
+            do{
+              try{
+                $listener=Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue |
+                  Where-Object {[string]$_.LocalAddress -eq $Address} | Select-Object -First 1
+                if($listener){
+                  $r=Invoke-WebRequest -UseBasicParsing -Uri $Url -TimeoutSec 8
+                  if($r.StatusCode -eq 200){
+                    Write-Host ("PASS {0} {1}:{2} PID {3} HTTP 200" -f $Name,$Address,$Port,$listener.OwningProcess)
+                    return
+                  }
+                }
+                $last='listener/HTTP not ready'
+              }catch{$last=$_.Exception.Message}
+              Start-Sleep -Seconds 3
+            }while((Get-Date) -lt $deadline)
+            throw "$Name failed to become healthy: $last"
+          }
+          Wait-Endpoint 'epublisher' 'http://127.0.0.1:3101/' 3101 '127.0.0.1' 45
+          Wait-Endpoint 'sync-vision' 'http://127.0.0.1:3301/' 3301 '127.0.0.1' 210
+
+      - name: Verify local Caddy and public matrix
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          function Wait-Url([string]$Name,[string]$Url,[int]$Attempts=12,[int]$Delay=5){
+            $last=''
+            for($i=1;$i -le $Attempts;$i++){
+              try{
+                $sep=if($Url.Contains('?')){'&'}else{'?'}
+                $uri=$Url
+                if($Url -like 'https://*'){$uri=$Url+$sep+'ronsas_verify='+[DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()}
+                $r=Invoke-WebRequest -UseBasicParsing -Uri $uri -Headers @{'Cache-Control'='no-cache';'Pragma'='no-cache'} -TimeoutSec 15
+                if($r.StatusCode -eq 200){Write-Host "PASS $Name HTTP 200 attempt=$i";return}
+                $last="HTTP $($r.StatusCode)"
+              }catch{$last=$_.Exception.Message}
+              Write-Host "WAIT $Name attempt=$i last=$last"
+              if($i -lt $Attempts){Start-Sleep -Seconds $Delay}
+            }
+            throw "$Name verification failed: $last"
+          }
+
+          Wait-Url 'caddy-epublisher' 'http://127.0.0.1:8801/' 6 2
+          Wait-Url 'caddy-sync' 'http://127.0.0.1:8803/' 6 2
+          Wait-Url 'public-hub' 'https://reson8.life/' 12 5
+          Wait-Url 'public-epublisher' 'https://epublisher.reson8.life/' 12 5
+          Wait-Url 'public-creative' 'https://creative.reson8.life/' 12 5
+          Wait-Url 'public-sync' 'https://sync.reson8.life/' 12 5
+          Wait-Url 'public-youtube' 'https://youtube.reson8.life/' 12 5
+          Write-Host 'RONSAS SPOKE PERSISTENCE REPAIR: PASS'

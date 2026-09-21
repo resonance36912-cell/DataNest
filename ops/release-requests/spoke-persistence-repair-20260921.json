@@ -1,0 +1,21 @@
+{
+  "schema": "ronsas-spoke-persistence-repair/v1",
+  "effectiveOn": "2026-09-21",
+  "modules": ["epublisher", "sync-vision"],
+  "confirmation": "REPAIR RONSAS SPOKE PERSISTENCE",
+  "purpose": "Restore governed persistent ePublisher and Sync Vision availability without changing domains, billing, or service authority.",
+  "changes": {
+    "epublisherCaddyUpstream": "http://127.0.0.1:3101",
+    "rearmExistingSupervisor": true,
+    "restoreMissingDependencies": false
+  },
+  "constraints": {
+    "changeBilling": false,
+    "changeDomains": false,
+    "createService": false,
+    "cloudflareWorkerMigration": false,
+    "changeTunnelIdentity": false,
+    "changeHubRuntime": false,
+    "killUnverifiedProcesses": false
+  }
+}
