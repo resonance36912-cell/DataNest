@@ -4,6 +4,8 @@ param(
     [switch]$SkipStoryboardModel
 )
 $ErrorActionPreference = 'Stop'
+$priorDisableXet = [Environment]::GetEnvironmentVariable('HF_HUB_DISABLE_XET','Process')
+[Environment]::SetEnvironmentVariable('HF_HUB_DISABLE_XET','1','Process')
 $mediaPython = Join-Path $OpenNovaRuntime 'python-envs\musetalk-0a89dec45a01\Scripts\python.exe'
 if (-not (Test-Path -LiteralPath $mediaPython -PathType Leaf)) { throw "Media Python not found: $mediaPython" }
 if (-not $SkipStoryboardModel) {
@@ -42,3 +44,4 @@ if ((Get-Item $base).Length -lt 5GB) { throw 'SDXL base model is incomplete' }
 if ((Get-Item $unet).Length -lt 4500MB) { throw 'SDXL-Lightning 4-step UNet checkpoint is incomplete' }
 if ((Get-Item $lora).Length -lt 250MB) { throw 'SDXL-Lightning LoRA fallback is incomplete' }
 Write-Host 'Premium creative models are ready.'
+[Environment]::SetEnvironmentVariable('HF_HUB_DISABLE_XET',$priorDisableXet,'Process')
