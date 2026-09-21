@@ -285,10 +285,28 @@ jobs:
               $queuedOnlyCycles++
               Write-Host "Target CI remains queued with no other repository job in progress; idle cycles=$queuedOnlyCycles backlog=$remaining."
               if ($queuedOnlyCycles -ge 3) {
-                Write-Host 'Guarded local restart: queued target CI has remained idle for three cycles.'
-                & $podman restart $container | Out-Null
-                if ($LASTEXITCODE -ne 0) { throw "Guarded local restart failed for: $container" }
-                Start-Sleep -Seconds 5
+                $runnerName='Ealiophin-RONSAS-Linux-2'
+                $runnerRaw=& gh.exe api "repos/$repo/actions/runners"
+                if ($LASTEXITCODE -ne 0) {
+                  throw 'Unable to query GitHub runner registration before guarded recycle.'
+                }
+                $runnerPayload=($runnerRaw -join "`n") | ConvertFrom-Json
+                $registered=@($runnerPayload.runners | Where-Object { [string]$_.name -eq $runnerName }) | Select-Object -First 1
+
+                if ($registered -and [bool]$registered.busy) {
+                  Write-Host "GitHub runner registration reports busy; preserving it. backlog=$remaining"
+                } else {
+                  $launcher=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
+                  if (-not (Test-Path -LiteralPath $launcher -PathType Leaf)) {
+                    throw "Canonical runner launcher missing: $launcher"
+                  }
+                  Write-Host 'Guarded registration recycle: queued target CI has remained idle for three cycles and GitHub reports the runner is not busy.'
+                  & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $launcher -ForceRecycle
+                  if ($LASTEXITCODE -ne 0) {
+                    throw "Guarded Linux registration recycle failed with exit code $LASTEXITCODE"
+                  }
+                  Start-Sleep -Seconds 5
+                }
                 $queuedOnlyCycles=0
               }
             } else {
