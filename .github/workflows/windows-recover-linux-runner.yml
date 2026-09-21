@@ -291,8 +291,15 @@ jobs:
             }
 
             $targetInProgress=@($active | Where-Object { [string]$_.status -eq 'in_progress' })
-            $otherInProgress=@($runs | Where-Object {
-              ([long]$_.id -ne $currentRun) -and ([string]$_.status -eq 'in_progress')
+
+            # Do not infer global idleness from the newest 100 runs. An older
+            # workflow can still own the single Linux runner while falling out
+            # of that recent window. Query in-progress runs directly.
+            $inProgressRaw=@(& gh.exe api "repos/$repo/actions/runs?status=in_progress&per_page=100" 2>&1)
+            if ($LASTEXITCODE -ne 0) { throw 'Unable to query in-progress workflow runs.' }
+            $inProgressPayload=($inProgressRaw -join [Environment]::NewLine) | ConvertFrom-Json
+            $otherInProgress=@($inProgressPayload.workflow_runs | Where-Object {
+              [long]$_.id -ne $currentRun
             })
 
             & $podman container exists $container
@@ -345,7 +352,8 @@ jobs:
               }
             } else {
               $queuedOnlyCycles=0
-              Write-Host "Another repository workflow is in progress; preserving runner state. target backlog=$remaining."
+              $owners=($otherInProgress | Select-Object -First 5 | ForEach-Object { "$($_.id):$($_.name):$($_.head_branch)" }) -join ', '
+              Write-Host "Another repository workflow is in progress; preserving runner state. target backlog=$remaining active=$owners."
             }
 
             Start-Sleep -Seconds 10

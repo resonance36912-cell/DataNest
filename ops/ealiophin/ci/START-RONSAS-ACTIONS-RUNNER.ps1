@@ -27,6 +27,19 @@ function Test-ContainerExists([string]$Name) {
     return ($LASTEXITCODE -eq 0)
 }
 
+function Get-OtherInProgressWorkflowRuns {
+    $raw = @(& $gh api "repos/$Repository/actions/runs?status=in_progress&per_page=100")
+    if ($LASTEXITCODE -ne 0) { throw 'Unable to query in-progress GitHub workflow runs.' }
+    $payload = ($raw -join "`n") | ConvertFrom-Json
+    $currentRunId = 0L
+    if ($env:GITHUB_RUN_ID) {
+        [void][long]::TryParse([string]$env:GITHUB_RUN_ID, [ref]$currentRunId)
+    }
+    return @($payload.workflow_runs | Where-Object {
+        $currentRunId -eq 0L -or [long]$_.id -ne $currentRunId
+    })
+}
+
 function Ensure-RunnerLabels($Runner) {
     if (-not $Runner) { return }
     $present = @($Runner.labels | ForEach-Object { [string]$_.name })
@@ -76,7 +89,14 @@ if ($registered -and [bool]$registered.busy -and [string]$registered.status -eq 
     throw 'RONSAS Actions runner is online and busy; refusing unguarded replacement of an active runner.'
 }
 if ($registered -and [bool]$registered.busy -and $ForceRecycle) {
-    Write-Host "ForceRecycle was explicitly authorized after external idle-work verification; ignoring stale busy=True registration state ($($registered.status))." -ForegroundColor Yellow
+    $otherInProgress = @(Get-OtherInProgressWorkflowRuns)
+    if ($otherInProgress.Count -gt 0) {
+        $summary = ($otherInProgress | Select-Object -First 10 | ForEach-Object {
+            "$($_.id):$($_.name):$($_.head_branch)"
+        }) -join ', '
+        throw "ForceRecycle refused: GitHub still reports $($otherInProgress.Count) other in-progress workflow run(s): $summary"
+    }
+    Write-Host "ForceRecycle was explicitly authorized and GitHub reports no other in-progress workflow runs; ignoring stale busy=True registration state ($($registered.status))." -ForegroundColor Yellow
 } elseif ($registered -and [bool]$registered.busy -and [string]$registered.status -ne 'online') {
     Write-Host "Runner registration is $($registered.status) but busy=True; treating busy state as stale and allowing governed recycle." -ForegroundColor Yellow
 }

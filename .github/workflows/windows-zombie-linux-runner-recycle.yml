@@ -52,6 +52,22 @@ jobs:
             exit 0
           }
 
+          # A non-target or older workflow can own the single Linux runner
+          # while being absent from the newest-100 run window above. Verify
+          # repository-wide in-progress ownership before any ForceRecycle.
+          $inProgressRaw = @(& gh.exe api "repos/$repo/actions/runs?status=in_progress&per_page=100")
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to query in-progress workflow runs.' }
+          $inProgressPayload = ($inProgressRaw -join "`n") | ConvertFrom-Json
+          $currentRun=[long]$env:GITHUB_RUN_ID
+          $otherInProgress=@($inProgressPayload.workflow_runs | Where-Object {
+            [long]$_.id -ne $currentRun
+          })
+          if ($otherInProgress.Count -gt 0) {
+            $owners=($otherInProgress | Select-Object -First 5 | ForEach-Object { "$($_.id):$($_.name):$($_.head_branch)" }) -join ', '
+            Write-Host "Another repository workflow is in progress; preserving Linux runner. active=$owners queued=$($queued.Count)"
+            exit 0
+          }
+
           $runnerRaw = @(& gh.exe api "repos/$repo/actions/runners")
           if ($LASTEXITCODE -ne 0) { throw 'Unable to query GitHub runner registration.' }
           $payload = ($runnerRaw -join "`n") | ConvertFrom-Json
