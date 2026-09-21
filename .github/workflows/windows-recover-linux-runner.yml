@@ -1,5 +1,5 @@
 name: Governed Linux runner recovery
-# Recovery supersession trigger: 2026-09-21T01:34Z (premium image validation backlog)
+# Recovery supersession trigger: 2026-09-21T01:36Z (premium image exact-head validation)
 
 on:
   workflow_dispatch:
