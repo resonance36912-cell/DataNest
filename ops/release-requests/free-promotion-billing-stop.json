@@ -1,0 +1,14 @@
+{
+  "schema": "ronsas-free-promotion-billing-stop/v1",
+  "effectiveOn": "2026-09-20",
+  "provider": "payfast",
+  "confirmation": "STOP RONSAS RECURRING BILLING",
+  "policy": {
+    "freePromotion": true,
+    "newCheckoutLaunches": false,
+    "existingRecurringCharges": false,
+    "cancelProviderTokens": true,
+    "refundPriorPayments": false
+  },
+  "purpose": "Stop future recurring PayFast billing during the RONSAS free promotion while preserving historical billing records."
+}

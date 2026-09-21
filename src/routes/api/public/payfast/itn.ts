@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { createHash } from "crypto";
+import { FREE_PROMOTION_ACTIVE } from "@/lib/commercial-policy";
 
 /**
  * PayFast Instant Transaction Notification (ITN) endpoint.
@@ -15,24 +16,104 @@ const SKU_CATALOG: Record<
   { app: string; tier: string; amountCents: number; cycle: "monthly" }
 > = {
   // Active ecosystem passes (Hub only).
-  "all_access:creator_pass:monthly": { app: "all_access", tier: "creator_pass", amountCents: 49900,  cycle: "monthly" },
-  "all_access:studio_pass:monthly":  { app: "all_access", tier: "studio_pass",  amountCents: 149900, cycle: "monthly" },
-  // Legacy per-app monthly SKUs — retired from UI but kept live so existing
-  // PayFast subscriptions keep renewing.
-  "epublisher:starter:monthly":  { app: "epublisher", tier: "starter",  amountCents: 9900,   cycle: "monthly" },
-  "epublisher:creator:monthly":  { app: "epublisher", tier: "creator",  amountCents: 19900,  cycle: "monthly" },
-  "epublisher:pro:monthly":      { app: "epublisher", tier: "pro",      amountCents: 44900,  cycle: "monthly" },
-  "epublisher:business:monthly": { app: "epublisher", tier: "business", amountCents: 99900,  cycle: "monthly" },
-  "creative_studio:creator:monthly":  { app: "creative_studio", tier: "creator",  amountCents: 14900, cycle: "monthly" },
-  "creative_studio:pro:monthly":      { app: "creative_studio", tier: "pro",      amountCents: 29900, cycle: "monthly" },
-  "creative_studio:business:monthly": { app: "creative_studio", tier: "business", amountCents: 69900, cycle: "monthly" },
-  "sync_vision:creator:monthly":  { app: "sync_vision", tier: "creator",  amountCents: 54900,  cycle: "monthly" },
-  "sync_vision:pro:monthly":      { app: "sync_vision", tier: "pro",      amountCents: 139900, cycle: "monthly" },
-  "sync_vision:business:monthly": { app: "sync_vision", tier: "business", amountCents: 279900, cycle: "monthly" },
-  "youtube_optimizer:starter:monthly":  { app: "youtube_optimizer", tier: "starter",  amountCents: 14900,  cycle: "monthly" },
-  "youtube_optimizer:pro:monthly":      { app: "youtube_optimizer", tier: "pro",      amountCents: 59900,  cycle: "monthly" },
-  "youtube_optimizer:business:monthly": { app: "youtube_optimizer", tier: "business", amountCents: 299900, cycle: "monthly" },
-  "all_access:all_access:monthly": { app: "all_access", tier: "all_access", amountCents: 149900, cycle: "monthly" },
+  "all_access:creator_pass:monthly": {
+    app: "all_access",
+    tier: "creator_pass",
+    amountCents: 49900,
+    cycle: "monthly",
+  },
+  "all_access:studio_pass:monthly": {
+    app: "all_access",
+    tier: "studio_pass",
+    amountCents: 149900,
+    cycle: "monthly",
+  },
+  // Legacy per-app monthly SKUs remain only for historical ITN reconciliation.
+  // Provider renewals are cancelled during the governed free promotion.
+  "epublisher:starter:monthly": {
+    app: "epublisher",
+    tier: "starter",
+    amountCents: 9900,
+    cycle: "monthly",
+  },
+  "epublisher:creator:monthly": {
+    app: "epublisher",
+    tier: "creator",
+    amountCents: 19900,
+    cycle: "monthly",
+  },
+  "epublisher:pro:monthly": {
+    app: "epublisher",
+    tier: "pro",
+    amountCents: 44900,
+    cycle: "monthly",
+  },
+  "epublisher:business:monthly": {
+    app: "epublisher",
+    tier: "business",
+    amountCents: 99900,
+    cycle: "monthly",
+  },
+  "creative_studio:creator:monthly": {
+    app: "creative_studio",
+    tier: "creator",
+    amountCents: 14900,
+    cycle: "monthly",
+  },
+  "creative_studio:pro:monthly": {
+    app: "creative_studio",
+    tier: "pro",
+    amountCents: 29900,
+    cycle: "monthly",
+  },
+  "creative_studio:business:monthly": {
+    app: "creative_studio",
+    tier: "business",
+    amountCents: 69900,
+    cycle: "monthly",
+  },
+  "sync_vision:creator:monthly": {
+    app: "sync_vision",
+    tier: "creator",
+    amountCents: 54900,
+    cycle: "monthly",
+  },
+  "sync_vision:pro:monthly": {
+    app: "sync_vision",
+    tier: "pro",
+    amountCents: 139900,
+    cycle: "monthly",
+  },
+  "sync_vision:business:monthly": {
+    app: "sync_vision",
+    tier: "business",
+    amountCents: 279900,
+    cycle: "monthly",
+  },
+  "youtube_optimizer:starter:monthly": {
+    app: "youtube_optimizer",
+    tier: "starter",
+    amountCents: 14900,
+    cycle: "monthly",
+  },
+  "youtube_optimizer:pro:monthly": {
+    app: "youtube_optimizer",
+    tier: "pro",
+    amountCents: 59900,
+    cycle: "monthly",
+  },
+  "youtube_optimizer:business:monthly": {
+    app: "youtube_optimizer",
+    tier: "business",
+    amountCents: 299900,
+    cycle: "monthly",
+  },
+  "all_access:all_access:monthly": {
+    app: "all_access",
+    tier: "all_access",
+    amountCents: 149900,
+    cycle: "monthly",
+  },
 };
 
 function buildSignature(params: Record<string, string>, passphrase: string): string {
@@ -103,40 +184,59 @@ export const Route = createFileRoute("/api/public/payfast/itn")({
           ? Math.round(parseFloat(params.amount_gross) * 100)
           : null;
 
-        const expectedCents = sku ? SKU_CATALOG[sku]?.amountCents ?? null : null;
+        const expectedCents = sku ? (SKU_CATALOG[sku]?.amountCents ?? null) : null;
 
-        console.log(JSON.stringify({
-          event: "payfast_itn",
-          m_payment_id: mPaymentId,
-          pf_payment_id: pfPaymentId,
-          sku,
-          user_id: userId,
-          received_amount_cents: grossCents,
-          expected_amount_cents: expectedCents,
-          payment_status: paymentStatus,
-          source_ip: sourceIp,
-        }));
+        console.log(
+          JSON.stringify({
+            event: "payfast_itn",
+            m_payment_id: mPaymentId,
+            pf_payment_id: pfPaymentId,
+            sku,
+            user_id: userId,
+            received_amount_cents: grossCents,
+            expected_amount_cents: expectedCents,
+            payment_status: paymentStatus,
+            source_ip: sourceIp,
+          }),
+        );
 
         const baseLog = {
-          sku, user_id: userId, amount_cents: grossCents,
-          payment_status: paymentStatus, pf_payment_id: pfPaymentId,
-          source_ip: sourceIp, raw_payload: params,
+          sku,
+          user_id: userId,
+          amount_cents: grossCents,
+          payment_status: paymentStatus,
+          pf_payment_id: pfPaymentId,
+          source_ip: sourceIp,
+          raw_payload: params,
         };
 
         // 1. Signature
         const expectedSig = buildSignature(params, passphrase);
-        const sigOk = !!params.signature && params.signature.toLowerCase() === expectedSig.toLowerCase();
+        const sigOk =
+          !!params.signature && params.signature.toLowerCase() === expectedSig.toLowerCase();
         if (!sigOk) {
-          await logAttempt({ ...baseLog, signature_valid: false, server_validated: false,
-            outcome: "invalid_signature", http_status: 400, error_message: "Signature mismatch" });
+          await logAttempt({
+            ...baseLog,
+            signature_valid: false,
+            server_validated: false,
+            outcome: "invalid_signature",
+            http_status: 400,
+            error_message: "Signature mismatch",
+          });
           return new Response("invalid signature", { status: 400 });
         }
 
         // 2. Server-to-server validation
         const validated = await validateWithPayfast(rawBody, sandbox);
         if (!validated) {
-          await logAttempt({ ...baseLog, signature_valid: true, server_validated: false,
-            outcome: "validation_failed", http_status: 400, error_message: "PayFast did not return VALID" });
+          await logAttempt({
+            ...baseLog,
+            signature_valid: true,
+            server_validated: false,
+            outcome: "validation_failed",
+            http_status: 400,
+            error_message: "PayFast did not return VALID",
+          });
           return new Response("not validated", { status: 400 });
         }
 
@@ -180,8 +280,11 @@ export const Route = createFileRoute("/api/public/payfast/itn")({
             .maybeSingle();
 
           await logAttempt({
-            ...baseLog, signature_valid: true, server_validated: true,
-            outcome: "duplicate_webhook", http_status: prior?.http_status ?? 200,
+            ...baseLog,
+            signature_valid: true,
+            server_validated: true,
+            outcome: "duplicate_webhook",
+            http_status: prior?.http_status ?? 200,
             error_message: `Replay of ${eventId}; prior outcome=${prior?.outcome ?? "unknown"}`,
           });
           return new Response(prior?.response_body ?? "ok", { status: prior?.http_status ?? 200 });
@@ -189,8 +292,14 @@ export const Route = createFileRoute("/api/public/payfast/itn")({
         if (claimErr) {
           // Claim insert failed for a non-dedup reason — fail closed so
           // PayFast retries rather than silently dropping the event.
-          await logAttempt({ ...baseLog, signature_valid: true, server_validated: true,
-            outcome: "dedup_claim_failed", http_status: 500, error_message: claimErr.message });
+          await logAttempt({
+            ...baseLog,
+            signature_valid: true,
+            server_validated: true,
+            outcome: "dedup_claim_failed",
+            http_status: 500,
+            error_message: claimErr.message,
+          });
           return new Response("dedup claim failed", { status: 500 });
         }
         const webhookRowId = claimed?.id ?? null;
@@ -217,21 +326,38 @@ export const Route = createFileRoute("/api/public/payfast/itn")({
         const def = sku ? SKU_CATALOG[sku] : undefined;
         if (!def) {
           await finalize("unknown_sku", 400, "unknown sku");
-          await logAttempt({ ...baseLog, signature_valid: true, server_validated: true,
-            outcome: "unknown_sku", http_status: 400, error_message: `Unknown SKU: ${sku}` });
+          await logAttempt({
+            ...baseLog,
+            signature_valid: true,
+            server_validated: true,
+            outcome: "unknown_sku",
+            http_status: 400,
+            error_message: `Unknown SKU: ${sku}`,
+          });
           return new Response("unknown sku", { status: 400 });
         }
         if (!userId) {
           await finalize("missing_user", 400, "missing user");
-          await logAttempt({ ...baseLog, signature_valid: true, server_validated: true,
-            outcome: "missing_user", http_status: 400, error_message: "custom_str1 missing" });
+          await logAttempt({
+            ...baseLog,
+            signature_valid: true,
+            server_validated: true,
+            outcome: "missing_user",
+            http_status: 400,
+            error_message: "custom_str1 missing",
+          });
           return new Response("missing user", { status: 400 });
         }
         if (grossCents !== def.amountCents) {
           await finalize("amount_mismatch", 400, "amount mismatch");
-          await logAttempt({ ...baseLog, signature_valid: true, server_validated: true,
-            outcome: "amount_mismatch", http_status: 400,
-            error_message: `Got ${grossCents}, expected ${def.amountCents}` });
+          await logAttempt({
+            ...baseLog,
+            signature_valid: true,
+            server_validated: true,
+            outcome: "amount_mismatch",
+            http_status: 400,
+            error_message: `Got ${grossCents}, expected ${def.amountCents}`,
+          });
           return new Response("amount mismatch", { status: 400 });
         }
 
@@ -242,16 +368,28 @@ export const Route = createFileRoute("/api/public/payfast/itn")({
         //   FAILED    → renewal failed; treat as past_due until retried
         //   anything else → pending
         const isRefund = paymentStatus === "REFUND" || paymentStatus === "REFUNDED";
+        const providerNextStatus =
+          paymentStatus === "COMPLETE"
+            ? "active"
+            : paymentStatus === "CANCELLED"
+              ? "cancelled"
+              : isRefund
+                ? "cancelled"
+                : paymentStatus === "FAILED"
+                  ? "past_due"
+                  : "pending";
+
+        // Preserve late COMPLETE ITNs as financial history below, but never
+        // let a provider renewal restore paid entitlement while the governed
+        // free promotion is active.
         const nextStatus =
-          paymentStatus === "COMPLETE" ? "active" :
-          paymentStatus === "CANCELLED" ? "cancelled" :
-          isRefund ? "cancelled" :
-          paymentStatus === "FAILED" ? "past_due" : "pending";
+          FREE_PROMOTION_ACTIVE && providerNextStatus === "active"
+            ? "cancelled"
+            : providerNextStatus;
 
         const periodEnd = new Date();
         // Monthly-only billing. See note on SKU_CATALOG above.
         periodEnd.setMonth(periodEnd.getMonth() + 1);
-
 
         // Snapshot prior subscription for this (user, app) so we can classify
         // the plan change (upgrade / downgrade / sidegrade / initial) and log
@@ -306,8 +444,14 @@ export const Route = createFileRoute("/api/public/payfast/itn")({
           if (webhookRowId) {
             await supabaseAdmin.from("webhook_events").delete().eq("id", webhookRowId);
           }
-          await logAttempt({ ...baseLog, signature_valid: true, server_validated: true,
-            outcome: "db_error", http_status: 500, error_message: error.message });
+          await logAttempt({
+            ...baseLog,
+            signature_valid: true,
+            server_validated: true,
+            outcome: "db_error",
+            http_status: 500,
+            error_message: error.message,
+          });
           return new Response("db error", { status: 500 });
         }
 
@@ -323,7 +467,6 @@ export const Route = createFileRoute("/api/public/payfast/itn")({
             changeType = "refund";
           } else if (nextStatus === "cancelled") {
             changeType = "cancel";
-
           } else if (!priorRow || priorRow.status !== "active") {
             changeType = "initial";
           } else if (priorTier === def.tier) {
@@ -375,7 +518,11 @@ export const Route = createFileRoute("/api/public/payfast/itn")({
               .neq("app", "all_access" as never)
               .select("id,app,tier");
 
-            for (const row of (superseded as Array<{ id: string; app: string; tier: string }> | null) ?? []) {
+            for (const row of (superseded as Array<{
+              id: string;
+              app: string;
+              tier: string;
+            }> | null) ?? []) {
               await supabaseAdmin.from("plan_changes" as never).insert({
                 user_id: userId,
                 from_sub_id: row.id,
@@ -405,37 +552,33 @@ export const Route = createFileRoute("/api/public/payfast/itn")({
             // Human-readable number keyed off the unique PayFast payment id.
             const invoiceNumber = `INV-${pfPaymentId}`;
 
-            const { error: invErr } = await supabaseAdmin
-              .from("invoices" as never)
-              .upsert(
-                {
-                  user_id: userId,
-                  subscription_id: newSubId,
-                  number: invoiceNumber,
-                  sku,
-                  app: def.app,
-                  tier: def.tier,
-                  billing_cycle: def.cycle,
-                  amount_cents: def.amountCents,
-                  currency: "ZAR",
-                  status: invoiceStatus,
-                  recipient_email: recipient,
-                  pf_payment_id: pfPaymentId,
-                  m_payment_id: mPaymentId,
-                  provider: "payfast",
-                  issued_at: new Date().toISOString(),
-                  refunded_at: isRefund ? new Date().toISOString() : null,
-                  metadata: { payment_status: paymentStatus, source: "payfast_itn" },
-                } as never,
-                { onConflict: "provider,pf_payment_id" },
-              );
+            const { error: invErr } = await supabaseAdmin.from("invoices" as never).upsert(
+              {
+                user_id: userId,
+                subscription_id: newSubId,
+                number: invoiceNumber,
+                sku,
+                app: def.app,
+                tier: def.tier,
+                billing_cycle: def.cycle,
+                amount_cents: def.amountCents,
+                currency: "ZAR",
+                status: invoiceStatus,
+                recipient_email: recipient,
+                pf_payment_id: pfPaymentId,
+                m_payment_id: mPaymentId,
+                provider: "payfast",
+                issued_at: new Date().toISOString(),
+                refunded_at: isRefund ? new Date().toISOString() : null,
+                metadata: { payment_status: paymentStatus, source: "payfast_itn" },
+              } as never,
+              { onConflict: "provider,pf_payment_id" },
+            );
             if (invErr) console.error("invoice upsert failed (non-fatal):", invErr);
           } catch (err) {
             console.error("invoice write failed (non-fatal):", err);
           }
         }
-
-
 
         // Idempotent confirmation-email enqueue (only for active subscriptions with a payment id)
         if (nextStatus === "active" && pfPaymentId) {
@@ -476,11 +619,15 @@ export const Route = createFileRoute("/api/public/payfast/itn")({
 
         const outcomeTag = isRefund ? "subscription_refunded" : `subscription_${nextStatus}`;
         await finalize(outcomeTag, 200, "ok");
-        await logAttempt({ ...baseLog, signature_valid: true, server_validated: true,
-          outcome: outcomeTag, http_status: 200 });
+        await logAttempt({
+          ...baseLog,
+          signature_valid: true,
+          server_validated: true,
+          outcome: outcomeTag,
+          http_status: 200,
+        });
 
         return new Response("ok", { status: 200 });
-
       },
     },
   },

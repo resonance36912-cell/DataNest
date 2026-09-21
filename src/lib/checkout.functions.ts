@@ -27,7 +27,7 @@ export type SkuDef = {
   cycle: Cycle;
   amountCents: number;
   label: string;
-  /** UI classification: `pass` = active ecosystem pass, `legacy_monthly` = retired per-app plan (kept only so existing subscribers keep renewing). */
+  /** UI classification: `pass` = active ecosystem pass, `legacy_monthly` = retired per-app plan retained only for historical reconciliation; provider renewals are disabled during the free promotion. */
   kind: SkuKind;
 };
 
@@ -53,8 +53,8 @@ export const SKU_CATALOG: Record<string, SkuDef> = {
     label: "Studio Pass",
     kind: "pass",
   },
-  // Legacy per-app monthly SKUs — retired from all UI surfaces. Kept in catalog
-  // so existing PayFast subscriptions keep renewing until customers migrate.
+  // Legacy per-app monthly SKUs remain in the catalog only for historical ITN
+  // reconciliation. Provider renewals are cancelled during the free promotion.
   "epublisher:starter:monthly": {
     sku: "epublisher:starter:monthly",
     app: "epublisher",
