@@ -1,5 +1,5 @@
 name: Governed Linux runner recovery
-# Recovery supersession trigger: 2026-09-21T00:56Z (final CI health probe)
+# Recovery supersession trigger: 2026-09-21T01:34Z (premium image validation backlog)
 
 on:
   workflow_dispatch:
