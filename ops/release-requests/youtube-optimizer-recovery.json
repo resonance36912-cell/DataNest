@@ -19,7 +19,7 @@
     "rebuildSource": false,
     "touchOtherSpokes": false
   },
-  "retryAttempt": 5,
-  "retryReason": "The verified root cause is a stale service target inside the already-existing youtube.reson8.life cloudflared ingress. Authorize changing only that target to governed local Caddy port 8804, preserving the existing hostname, tunnel identity, DNS/domain attachment, billing policy, and dormant Worker state.",
+  "retryAttempt": 6,
+  "retryReason": "Retry from current canonical main after PR #177 repaired the PowerShell parser corruption and CI runner recovery was hardened. Execute the same governed target-only repair for the existing youtube.reson8.life ingress, preserving hostname, tunnel identity, DNS/domain attachment, billing policy, dormant Worker state, and all protected constraints.",
   "repairExistingIngressTarget": true
 }
