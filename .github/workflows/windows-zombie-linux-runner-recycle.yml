@@ -49,9 +49,12 @@ jobs:
           $payload = ($runnerRaw -join "`n") | ConvertFrom-Json
           $runner = @($payload.runners | Where-Object { $_.name -eq $name }) | Select-Object -First 1
 
-          if ($runner -and [bool]$runner.busy) {
-            Write-Host "Linux runner is busy; preserving active work. queued=$($queued.Count)"
+          if ($runner -and [bool]$runner.busy -and [string]$runner.status -eq 'online') {
+            Write-Host "Linux runner is online and busy; preserving active work. queued=$($queued.Count)"
             exit 0
+          }
+          if ($runner -and [bool]$runner.busy -and [string]$runner.status -ne 'online') {
+            Write-Host "Linux runner is $($runner.status) with busy=True; treating busy state as stale and continuing governed recycle."
           }
 
           $script = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
