@@ -1,8 +1,7 @@
 ﻿[CmdletBinding()]
 param(
     [string]$OpenNovaRuntime = 'C:\Users\Ashley\Resonance\OpenNova\runtime',
-    [switch]$SkipStoryboardModel,
-    [switch]$SkipLoraFallback
+    [switch]$SkipStoryboardModel
 )
 $ErrorActionPreference = 'Stop'
 $mediaPython = Join-Path $OpenNovaRuntime 'python-envs\musetalk-0a89dec45a01\Scripts\python.exe'
@@ -17,7 +16,6 @@ if (-not $SkipStoryboardModel) {
 }
 $modelsRoot = Join-Path $OpenNovaRuntime 'models'
 $downloadScript = Join-Path $env:TEMP 'ronsas-premium-model-download.py'
-$skipLoraPy = if ($SkipLoraFallback) { 'True' } else { 'False' }
 $py = @"
 from huggingface_hub import hf_hub_download
 from pathlib import Path
@@ -25,9 +23,8 @@ root = Path(r'$modelsRoot')
 items = [
     ('stabilityai/stable-diffusion-xl-base-1.0', 'sd_xl_base_1.0.safetensors', root / 'sdxl-base'),
     ('ByteDance/SDXL-Lightning', 'sdxl_lightning_4step_unet.safetensors', root / 'sdxl-lightning'),
+    ('ByteDance/SDXL-Lightning', 'sdxl_lightning_4step_lora.safetensors', root / 'sdxl-lightning'),
 ]
-if not $skipLoraPy:
-    items.append(('ByteDance/SDXL-Lightning', 'sdxl_lightning_4step_lora.safetensors', root / 'sdxl-lightning'))
 for repo, filename, dest in items:
     dest.mkdir(parents=True, exist_ok=True)
     print(f'Downloading {repo}/{filename}', flush=True)
@@ -43,9 +40,5 @@ $unet = Join-Path $modelsRoot 'sdxl-lightning\sdxl_lightning_4step_unet.safetens
 $lora = Join-Path $modelsRoot 'sdxl-lightning\sdxl_lightning_4step_lora.safetensors'
 if ((Get-Item $base).Length -lt 5GB) { throw 'SDXL base model is incomplete' }
 if ((Get-Item $unet).Length -lt 4500MB) { throw 'SDXL-Lightning 4-step UNet checkpoint is incomplete' }
-if (-not $SkipLoraFallback) {
-    if ((Get-Item $lora).Length -lt 250MB) { throw 'SDXL-Lightning LoRA fallback is incomplete' }
-} else {
-    Write-Host 'Skipping Lightning LoRA fallback validation for UNet-only premium deployment.'
-}
+if ((Get-Item $lora).Length -lt 250MB) { throw 'SDXL-Lightning LoRA fallback is incomplete' }
 Write-Host 'Premium creative models are ready.'
