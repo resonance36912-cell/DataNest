@@ -1,0 +1,12 @@
+{
+  "schema": "ronsas-ci-recovery-pulse/v1",
+  "purpose": "Dispatch CI queue janitor while diagnostic PR #151 has active Linux validation backlog",
+  "target": "Ealiophin-RONSAS-Linux-2",
+  "diagnosticPr": 151,
+  "constraints": {
+    "productionSourceChange": false,
+    "billingChange": false,
+    "domainChange": false,
+    "runnerReregistration": false
+  }
+}
