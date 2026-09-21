@@ -104,12 +104,17 @@ jobs:
                     } else if (run.head_sha !== current.sha) {
                       reason = `superseded PR #${current.number} head`;
                     }
-                  } else if (
-                    run.event === "push" &&
-                    run.head_branch === "main" &&
-                    run.head_sha !== latestMainSha
-                  ) {
-                    reason = "superseded main push";
+                  } else if (run.event === "push" && run.head_branch === "main") {
+                    if (run.head_sha !== latestMainSha) {
+                      reason = "superseded main push";
+                    }
+                  } else if (run.event === "push") {
+                    const current = openByHead.get(run.head_branch || "");
+                    if (!current) {
+                      reason = "orphan non-main branch push";
+                    } else if (run.head_sha !== current.sha) {
+                      reason = `superseded push for PR #${current.number}`;
+                    }
                   }
                 } else if (run.name === "Temporary format free promotion") {
                   reason = "obsolete temporary formatter";
