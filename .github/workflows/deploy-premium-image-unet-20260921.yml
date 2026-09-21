@@ -59,8 +59,12 @@ jobs:
             $loraOk=(Test-Path -LiteralPath $lora -PathType Leaf) -and ((Get-Item -LiteralPath $lora).Length -gt 250000000)
             if($baseOk){
               New-Item -ItemType Directory -Path $unetDir -Force | Out-Null
-              & $mediaPython -c "from huggingface_hub import hf_hub_download; from pathlib import Path; root=Path(r'$unetDir'); print(hf_hub_download(repo_id='ByteDance/SDXL-Lightning', filename='sdxl_lightning_4step_unet.safetensors', local_dir=str(root))); print(hf_hub_download(repo_id='ByteDance/SDXL-Lightning', filename='sdxl_lightning_4step_lora.safetensors', local_dir=str(root))) if not $($loraOk.ToString().ToLower()) else None"
-              if($LASTEXITCODE -ne 0){throw "Premium image checkpoint download failed with exit code $LASTEXITCODE"}
+              & $mediaPython -c "from huggingface_hub import hf_hub_download; print(hf_hub_download(repo_id='ByteDance/SDXL-Lightning', filename='sdxl_lightning_4step_unet.safetensors', local_dir=r'$unetDir'))"
+              if($LASTEXITCODE -ne 0){throw "UNet-only download failed with exit code $LASTEXITCODE"}
+              if(-not $loraOk){
+                & $mediaPython -c "from huggingface_hub import hf_hub_download; print(hf_hub_download(repo_id='ByteDance/SDXL-Lightning', filename='sdxl_lightning_4step_lora.safetensors', local_dir=r'$unetDir'))"
+                if($LASTEXITCODE -ne 0){throw "LoRA fallback download failed with exit code $LASTEXITCODE"}
+              }
             } else {
               & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer -OpenNovaRuntime $openNova -SkipStoryboardModel
               if($LASTEXITCODE -ne 0){throw "Premium model installer failed with exit code $LASTEXITCODE"}
