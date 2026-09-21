@@ -89,11 +89,11 @@ jobs:
                   const current =
                     (linkedPr?.number && openByNumber.get(linkedPr.number)) ||
                     openByHead.get(run.head_branch || "");
-                  const sourceSha = linkedPr?.head?.sha || null;
+                  // GitHub pull_request workflow runs execute synthetic merge refs.
+                  // Preserve every run linked to an open PR; each validation
+                  // workflow's own concurrency group cancels superseded attempts.
                   if (!current) {
                     reason = `closed or unmatched PR branch ${run.head_branch || "(none)"}`;
-                  } else if (sourceSha && sourceSha !== current.sha) {
-                    reason = `superseded PR #${current.number} source head`;
                   }
                 } else if (run.event === "push" && run.head_branch === "main") {
                   if (run.head_sha !== latestMainSha) {
