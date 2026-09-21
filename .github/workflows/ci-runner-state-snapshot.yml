@@ -1,0 +1,109 @@
+name: CI runner state snapshot
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/ci-runner-state-snapshot.yml"
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: ronsas-ci-runner-state-snapshot
+  cancel-in-progress: true
+
+jobs:
+  snapshot:
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 3
+    steps:
+      - name: Collect redacted Linux runner state
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $repo='resonance36912-cell/RONSAS'
+          $runnerName='Ealiophin-RONSAS-Linux-2'
+          $container='ronsas-actions-ealiophin'
+          $proxy='ronsas-podman-api'
+          $targetNames=@('Security scan','Verify prebuild','Verify checkout links','Verify ePublisher checkout')
+
+          $runnerRaw=@(& gh.exe api "repos/$repo/actions/runners")
+          if($LASTEXITCODE -ne 0){throw 'Unable to query runner registrations.'}
+          $runnerPayload=($runnerRaw -join "`n") | ConvertFrom-Json
+          $registered=@($runnerPayload.runners | Where-Object { [string]$_.name -eq $runnerName }) | Select-Object -First 1
+
+          $runsRaw=@(& gh.exe api "repos/$repo/actions/runs?per_page=100")
+          if($LASTEXITCODE -ne 0){throw 'Unable to query workflow runs.'}
+          $runsPayload=($runsRaw -join "`n") | ConvertFrom-Json
+          $active=@($runsPayload.workflow_runs | Where-Object {
+            ($targetNames -contains [string]$_.name) -and
+            (@('queued','pending','waiting','in_progress','requested') -contains [string]$_.status)
+          })
+
+          $podman=(Get-Command podman.exe -ErrorAction Stop).Source
+          & $podman container exists $container
+          $containerExists=($LASTEXITCODE -eq 0)
+          $containerRunning=$false
+          $listenerUp=$false
+          if($containerExists){
+            $info=(& $podman inspect $container | ConvertFrom-Json)[0]
+            $containerRunning=[bool]$info.State.Running
+            $top=@(& $podman top $container 2>$null)
+            if($LASTEXITCODE -eq 0){$listenerUp=(($top -join "`n") -match 'Runner\.Listener')}
+          }
+          & $podman container exists $proxy
+          $proxyExists=($LASTEXITCODE -eq 0)
+          $proxyRunning=$false
+          if($proxyExists){
+            $proxyInfo=(& $podman inspect $proxy | ConvertFrom-Json)[0]
+            $proxyRunning=[bool]$proxyInfo.State.Running
+          }
+
+          $status=if($registered){[string]$registered.status}else{'missing'}
+          $busy=if($registered){[bool]$registered.busy}else{$false}
+          $labels=if($registered){(@($registered.labels | ForEach-Object {[string]$_.name}) -join ', ')}else{'(none)'}
+          $counts=$active | Group-Object status | ForEach-Object {"$($_.Name)=$($_.Count)"}
+          $countText=if($counts){$counts -join ', '}else{'none'}
+
+          $lines=@(
+            '<!-- ronsas-ci-runner-state -->',
+            '## RONSAS CI runner state snapshot',
+            '',
+            "- Runner: `$runnerName`",
+            "- GitHub registration: `$status`",
+            "- GitHub busy: `$busy`",
+            "- Labels: `$labels`",
+            "- Container exists/running: `$containerExists / $containerRunning`",
+            "- Runner.Listener active: `$listenerUp`",
+            "- Podman proxy exists/running: `$proxyExists / $proxyRunning`",
+            "- Active target CI: `$($active.Count)` ($countText)",
+            '',
+            '| Run | Workflow | State | Event | Branch |',
+            '|---:|---|---|---|---|'
+          )
+          foreach($run in ($active | Select-Object -First 20)){
+            $lines += "| $($run.id) | $($run.name) | $($run.status) | $($run.event) | $($run.head_branch) |"
+          }
+          $lines += ''
+          $lines += "Recorded: $((Get-Date).ToUniversalTime().ToString('o'))"
+          $report=$lines -join "`n"
+          $report | Set-Content -LiteralPath "$env:RUNNER_TEMP\ronsas-ci-state.md" -Encoding UTF8
+
+      - name: Publish snapshot to diagnostic PR
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const fs = require("fs");
+            const body = fs.readFileSync(process.env.RUNNER_TEMP + "\\ronsas-ci-state.md", "utf8");
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: 191,
+              body,
+            });
