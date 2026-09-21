@@ -1,5 +1,5 @@
 name: Governed Linux runner recovery
-# Recovery supersession trigger: 2026-09-21T00:24Z (hardened backlog drain)
+# Recovery supersession trigger: 2026-09-21T00:42Z (YouTube parser validation backlog)
 
 on:
   workflow_dispatch:
