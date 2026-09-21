@@ -74,7 +74,8 @@ jobs:
           $runner = @($payload.runners | Where-Object { $_.name -eq $name }) | Select-Object -First 1
 
           if ($runner -and [bool]$runner.busy) {
-            Write-Host "No target CI is in progress, but runner reports status=$($runner.status) busy=True; treating busy state as stale."
+            Write-Host "GitHub still reports the runner busy; deferring recycle rather than treating busy=True as proof of staleness."
+            exit 0
           }
 
           $script = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
