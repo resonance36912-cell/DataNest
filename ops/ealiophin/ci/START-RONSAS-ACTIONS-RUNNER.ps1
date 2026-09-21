@@ -27,6 +27,18 @@ function Test-ContainerExists([string]$Name) {
     return ($LASTEXITCODE -eq 0)
 }
 
+function Get-RunnerProcessState([string]$Name) {
+    $top = @(& $podman top $Name 2>$null)
+    if ($LASTEXITCODE -ne 0) {
+        return [pscustomobject]@{ listener = $false; worker = $false }
+    }
+    $joined = $top -join "`n"
+    return [pscustomobject]@{
+        listener = ($joined -match 'Runner\.Listener')
+        worker = ($joined -match 'Runner\.Worker')
+    }
+}
+
 function Get-OtherInProgressWorkflowRuns {
     $raw = @(& $gh api "repos/$Repository/actions/runs?status=in_progress&per_page=100")
     if ($LASTEXITCODE -ne 0) { throw 'Unable to query in-progress GitHub workflow runs.' }
@@ -75,7 +87,28 @@ if (Test-ContainerExists $Container) {
     $attached = ($info.NetworkSettings.PSObject.Properties.Name -contains 'Networks') -and ($info.NetworkSettings.Networks.PSObject.Properties.Name -contains $Network)
     if ($info.State.Running -and $attached) {
         & $podman exec $Container podman --remote version *> $null
-        $containerReady = ($LASTEXITCODE -eq 0)
+        $engineReady = ($LASTEXITCODE -eq 0)
+        $runnerState = Get-RunnerProcessState $Container
+
+        if ($engineReady -and -not $runnerState.listener) {
+            if ($runnerState.worker) {
+                Write-Host 'Runner.Listener is absent while Runner.Worker is still active; preserving the in-flight assignment and deferring recovery.' -ForegroundColor Yellow
+                exit 0
+            }
+
+            Write-Host 'Runner.Listener is absent with no Runner.Worker; restarting the existing governed runner container once.' -ForegroundColor Yellow
+            & $podman restart $Container | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "Failed to restart governed runner container: $Container" }
+            Start-Sleep -Seconds 5
+
+            $info = (& $podman inspect $Container | ConvertFrom-Json)[0]
+            $attached = ($info.NetworkSettings.PSObject.Properties.Name -contains 'Networks') -and ($info.NetworkSettings.Networks.PSObject.Properties.Name -contains $Network)
+            & $podman exec $Container podman --remote version *> $null
+            $engineReady = ($LASTEXITCODE -eq 0)
+            $runnerState = Get-RunnerProcessState $Container
+        }
+
+        $containerReady = ($info.State.Running -and $attached -and $engineReady -and $runnerState.listener)
     }
 }
 
