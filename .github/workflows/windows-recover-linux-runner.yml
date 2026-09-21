@@ -328,23 +328,19 @@ jobs:
                 $runnerPayload=($runnerRaw -join "`n") | ConvertFrom-Json
                 $registered=@($runnerPayload.runners | Where-Object { [string]$_.name -eq $runnerName }) | Select-Object -First 1
 
-                if ($registered -and [bool]$registered.busy -and [string]$registered.status -eq 'online') {
-                  Write-Host "GitHub runner registration is online and busy; preserving active work. backlog=$remaining"
-                } else {
-                  if ($registered -and [bool]$registered.busy -and [string]$registered.status -ne 'online') {
-                    Write-Host "GitHub runner registration is $($registered.status) with busy=True; treating busy state as stale."
-                  }
-                  $launcher=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
-                  if (-not (Test-Path -LiteralPath $launcher -PathType Leaf)) {
-                    throw "Canonical runner launcher missing: $launcher"
-                  }
-                  Write-Host 'Guarded registration recycle: queued target CI has remained idle for three cycles and GitHub reports the runner is not busy.'
-                  & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $launcher -ForceRecycle
-                  if ($LASTEXITCODE -ne 0) {
-                    throw "Guarded Linux registration recycle failed with exit code $LASTEXITCODE"
-                  }
-                  Start-Sleep -Seconds 5
+                if ($registered -and [bool]$registered.busy) {
+                  Write-Host "No repository workflow is in progress, but runner reports status=$($registered.status) busy=True; treating busy state as stale."
                 }
+                $launcher=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
+                if (-not (Test-Path -LiteralPath $launcher -PathType Leaf)) {
+                  throw "Canonical runner launcher missing: $launcher"
+                }
+                Write-Host 'Guarded registration recycle: target CI has remained queued for three idle cycles with no repository workflow in progress.'
+                & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $launcher -ForceRecycle
+                if ($LASTEXITCODE -ne 0) {
+                  throw "Guarded Linux registration recycle failed with exit code $LASTEXITCODE"
+                }
+                Start-Sleep -Seconds 5
                 $queuedOnlyCycles=0
               }
             } else {

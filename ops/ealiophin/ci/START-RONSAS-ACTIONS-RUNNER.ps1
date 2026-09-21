@@ -72,10 +72,12 @@ if ($containerReady -and $registered -and $registered.status -eq 'online' -and -
     exit 0
 }
 
-if ($registered -and [bool]$registered.busy -and [string]$registered.status -eq 'online') {
-    throw 'RONSAS Actions runner is online and busy; refusing to replace an active runner.'
+if ($registered -and [bool]$registered.busy -and [string]$registered.status -eq 'online' -and -not $ForceRecycle) {
+    throw 'RONSAS Actions runner is online and busy; refusing unguarded replacement of an active runner.'
 }
-if ($registered -and [bool]$registered.busy -and [string]$registered.status -ne 'online') {
+if ($registered -and [bool]$registered.busy -and $ForceRecycle) {
+    Write-Host "ForceRecycle was explicitly authorized after external idle-work verification; ignoring stale busy=True registration state ($($registered.status))." -ForegroundColor Yellow
+} elseif ($registered -and [bool]$registered.busy -and [string]$registered.status -ne 'online') {
     Write-Host "Runner registration is $($registered.status) but busy=True; treating busy state as stale and allowing governed recycle." -ForegroundColor Yellow
 }
 
