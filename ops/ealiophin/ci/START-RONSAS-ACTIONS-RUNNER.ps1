@@ -72,8 +72,11 @@ if ($containerReady -and $registered -and $registered.status -eq 'online' -and -
     exit 0
 }
 
-if ($registered -and [bool]$registered.busy) {
-    throw 'RONSAS Actions runner is busy; refusing to replace an active runner.'
+if ($registered -and [bool]$registered.busy -and [string]$registered.status -eq 'online') {
+    throw 'RONSAS Actions runner is online and busy; refusing to replace an active runner.'
+}
+if ($registered -and [bool]$registered.busy -and [string]$registered.status -ne 'online') {
+    Write-Host "Runner registration is $($registered.status) but busy=True; treating busy state as stale and allowing governed recycle." -ForegroundColor Yellow
 }
 
 if ($registered -and ($registered.status -ne 'online' -or $ForceRecycle)) {
