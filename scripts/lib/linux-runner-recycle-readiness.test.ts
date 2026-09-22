@@ -22,8 +22,9 @@ test("replacement runner waits for container and listener readiness", () => {
   expect(connectivityIndex).toBeGreaterThan(readinessIndex);
 });
 
-test("transient podman exec errors are retryable instead of terminating recovery", () => {
+test("transient podman native errors are retryable instead of terminating recovery", () => {
   expect(launcher).toContain("function Test-GovernedPodmanProxyConnectivity");
+  expect(launcher).toContain("function Get-RunnerProcessState");
   expect(launcher).toContain("$ErrorActionPreference = 'Continue'");
   expect(launcher).toContain("function Wait-GovernedPodmanProxyConnectivity");
   expect(launcher).toContain("for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++)");
@@ -40,4 +41,11 @@ test("existing safety gates remain intact", () => {
   expect(launcher).toContain(
     "Deferring recycle rather than deleting an assigned runner",
   );
+});
+
+test("default production labels remain unchanged while canary labels can be isolated", () => {
+  expect(launcher).toContain(
+    "[string]$RunnerLabels = 'ronsas,ealiophin,sovereign'",
+  );
+  expect(launcher).toContain('"RUNNER_LABELS=$RunnerLabels"');
 });
