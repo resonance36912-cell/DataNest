@@ -9,11 +9,17 @@ const startScript = readFileSync(
 test("ePublisher STT runtime is refreshed from governed source before listeners start", () => {
   expect(startScript).toContain("$sttSource = Join-Path $opsRuntime 'syncvision-local-stt.py'");
   expect(startScript).toContain("$sttTarget = Join-Path $Runtime 'syncvision-local-stt.py'");
-  expect(startScript).toContain("Copy-Item -LiteralPath $sttSource -Destination $sttTarget -Force");
+  expect(startScript).toContain(
+    "Copy-Item -LiteralPath $sttSource -Destination $sttTarget -Force",
+  );
 
-  const copyIndex = startScript.indexOf("Copy-Item -LiteralPath $sttSource -Destination $sttTarget -Force");
+  const copyIndex = startScript.indexOf(
+    "Copy-Item -LiteralPath $sttSource -Destination $sttTarget -Force",
+  );
   const localStartIndex = startScript.indexOf("Start-PythonService 'local-stt' 7864");
-  const epublisherStartIndex = startScript.indexOf("Start-PythonService 'epublisher-stt' 7869");
+  const epublisherStartIndex = startScript.indexOf(
+    "Start-PythonService 'epublisher-stt' 7869",
+  );
 
   expect(copyIndex).toBeGreaterThan(-1);
   expect(copyIndex).toBeLessThan(localStartIndex);
@@ -23,6 +29,10 @@ test("ePublisher STT runtime is refreshed from governed source before listeners 
 test("changed STT runtime restarts only verified governed listeners", () => {
   expect(startScript).toContain("$sttSourceChanged");
   expect(startScript).toContain("Assert-KnownPort 'local-stt' 7864 'syncvision-local-stt.py'");
-  expect(startScript).toContain("Assert-KnownPort 'epublisher-stt' 7869 'syncvision-local-stt.py'");
-  expect(startScript).toContain("Stop-Process -Id ([int]$sttExisting.pid) -Force -ErrorAction Stop");
+  expect(startScript).toContain(
+    "Assert-KnownPort 'epublisher-stt' 7869 'syncvision-local-stt.py'",
+  );
+  expect(startScript).toContain(
+    "Stop-Process -Id ([int]$sttExisting.pid) -Force -ErrorAction Stop",
+  );
 });
