@@ -16,10 +16,25 @@ $env:RONS_STT_MODELS_ROOT = Join-Path $Runtime 'models'
 $env:HF_HUB_DISABLE_XET = '1'
 
 Set-Location -LiteralPath $Runtime
+
+# Windows PowerShell 5.1 can promote native stderr into a terminating
+# NativeCommandError when ErrorActionPreference is Stop. yt-dlp emits
+# deprecation/advisory messages on stderr even when it is still usable.
+# Keep those diagnostics in the service log without killing the long-lived
+# Python listener, then enforce the real native exit code after it returns.
+$priorErrorActionPreference = $ErrorActionPreference
+$nativeExitCode = 0
 try {
+    $ErrorActionPreference = 'Continue'
     & $Python $Script *>> $Log
-    exit $LASTEXITCODE
-} catch {
-    Add-Content -LiteralPath $Log -Value ((Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + ' task runner error: ' + $_.Exception.Message)
-    throw
+    $nativeExitCode = [int]$LASTEXITCODE
+} finally {
+    $ErrorActionPreference = $priorErrorActionPreference
 }
+
+if ($nativeExitCode -ne 0) {
+    Add-Content -LiteralPath $Log -Value ((Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + " ePublisher STT process exited with code $nativeExitCode")
+    exit $nativeExitCode
+}
+
+exit 0
