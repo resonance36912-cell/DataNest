@@ -244,6 +244,42 @@ if (-not (Test-BackendReady)) {
 $backendUrl = 'http://127.0.0.1:8787/v1/backend/health'
 $services += [pscustomobject]@{name='sovereign-backend';port=58600;url=$backendUrl;pid=(Get-ListenerPid 58600);owned=$false;root=$AppDev}
 $opsRuntime = Join-Path (Split-Path $PSScriptRoot -Parent) 'runtime'
+$sttSource = Join-Path $opsRuntime 'syncvision-local-stt.py'
+if (-not (Test-Path -LiteralPath $sttSource -PathType Leaf)) { throw "STT runtime source missing: $sttSource" }
+$sttTarget = Join-Path $Runtime 'syncvision-local-stt.py'
+$sttSourceChanged = -not (Test-Path -LiteralPath $sttTarget -PathType Leaf)
+if (-not $sttSourceChanged) {
+    $sttSourceHash = (Get-FileHash -LiteralPath $sttSource -Algorithm SHA256).Hash
+    $sttTargetHash = (Get-FileHash -LiteralPath $sttTarget -Algorithm SHA256).Hash
+    $sttSourceChanged = ($sttSourceHash -ne $sttTargetHash)
+}
+if ($sttSourceChanged) {
+    Copy-Item -LiteralPath $sttSource -Destination $sttTarget -Force
+
+    $sttExisting = Assert-KnownPort 'local-stt' 7864 'syncvision-local-stt.py'
+    if ($sttExisting) {
+        Write-Host "[SOURCE REFRESH] restarting verified local-stt listener PID $($sttExisting.pid)." -ForegroundColor Yellow
+        Stop-Process -Id ([int]$sttExisting.pid) -Force -ErrorAction Stop
+        $deadline = (Get-Date).AddSeconds(20)
+        do {
+            Start-Sleep -Milliseconds 500
+            $remainingSttPid = Get-ListenerPid 7864
+        } while ($remainingSttPid -and (Get-Date) -lt $deadline)
+        if ($remainingSttPid) { throw "Verified local-stt listener did not release port 7864 after source refresh." }
+    }
+
+    $sttExisting = Assert-KnownPort 'epublisher-stt' 7869 'syncvision-local-stt.py'
+    if ($sttExisting) {
+        Write-Host "[SOURCE REFRESH] restarting verified epublisher-stt listener PID $($sttExisting.pid)." -ForegroundColor Yellow
+        Stop-Process -Id ([int]$sttExisting.pid) -Force -ErrorAction Stop
+        $deadline = (Get-Date).AddSeconds(20)
+        do {
+            Start-Sleep -Milliseconds 500
+            $remainingSttPid = Get-ListenerPid 7869
+        } while ($remainingSttPid -and (Get-Date) -lt $deadline)
+        if ($remainingSttPid) { throw "Verified epublisher-stt listener did not release port 7869 after source refresh." }
+    }
+}
 $premiumImageTargetPath = Join-Path $Runtime 'epublisher-premium-image-service.py'
 $premiumImageSourceChanged = $false
 foreach ($runtimeName in @('rons-local-llm-service.py','epublisher-premium-image-service.py')) {
