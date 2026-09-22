@@ -13,7 +13,7 @@ concurrency:
 jobs:
   verify:
     name: ePublisher tier amount checks
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     timeout-minutes: 10
     steps:
       - name: Check out repository
