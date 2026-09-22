@@ -62,10 +62,11 @@
 		}
 	}
 	handle {
-		# Match the canonical RONSAS supervisor contract: ePublisher is bound
-		# persistently on the IPv4 loopback address.
-		reverse_proxy 127.0.0.1:3101 {
-			header_up Host localhost:3101
+		# Emergency production cutover 2026-09-22: preserve the Ealiophin
+		# Cloudflare tunnel, session bridge, and sovereign service routes while
+		# sourcing only the ePublisher SPA/root from the verified Railway fallback.
+		reverse_proxy https://epublisher-fallback-production.up.railway.app {
+			header_up Host epublisher-fallback-production.up.railway.app
 			header_up X-Forwarded-Host epublisher.reson8.life
 			header_up X-Forwarded-Proto https
 		}
