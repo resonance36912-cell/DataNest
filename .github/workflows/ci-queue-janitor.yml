@@ -242,10 +242,7 @@ jobs:
               }
             }
 
-            if (backlogById.size === 0) {
-              core.info("No queued/pending/waiting target CI remains; recovery dispatch not required.");
-            } else {
-              let activeTargetWork = false;
+            const detectActiveTargetWork = async (backlogRuns) => {
               try {
                 const { data: activeRuns } = await github.rest.actions.listWorkflowRunsForRepo({
                   owner: context.repo.owner,
@@ -255,10 +252,10 @@ jobs:
                 });
                 const activeTargets = activeRuns.workflow_runs.filter((run) => targetNames.has(run.name));
                 if (activeTargets.length > 0) {
-                  activeTargetWork = true;
                   core.info(
                     `Target CI is already draining: ${activeTargets.map((run) => `${run.id}:${run.name}`).join(", ")}`,
                   );
+                  return true;
                 }
               } catch (error) {
                 core.warning(
@@ -266,35 +263,82 @@ jobs:
                 );
               }
 
+              for (const run of backlogRuns.values()) {
+                try {
+                  const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    run_id: run.id,
+                    per_page: 100,
+                    filter: "latest",
+                  });
+                  const activeJobs = jobs.jobs.filter((job) => job.status === "in_progress");
+                  if (activeJobs.length > 0) {
+                    core.info(
+                      `Queued workflow ${run.id} has active job(s): ${activeJobs.map((job) => job.name).join(", ")}`,
+                    );
+                    return true;
+                  }
+                } catch (error) {
+                  core.warning(
+                    `Unable to inspect jobs for queued target run ${run.id}: ${error.status || "error"} ${error.message}`,
+                  );
+                }
+              }
+              return false;
+            };
+
+            let settledBacklogById = backlogById;
+            if (settledBacklogById.size === 0) {
+              core.info("No queued/pending/waiting target CI remains; recovery dispatch not required.");
+            } else {
+              let activeTargetWork = await detectActiveTargetWork(settledBacklogById);
+
               if (!activeTargetWork) {
-                for (const run of backlogById.values()) {
+                core.info(
+                  `Idle target backlog observed (${settledBacklogById.size}); waiting 15 seconds to rule out a normal runner handoff.`,
+                );
+                await new Promise((resolve) => setTimeout(resolve, 15000));
+
+                const refreshedBacklog = new Map();
+                let refreshedQueries = 0;
+                for (const status of backlogStates) {
                   try {
-                    const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
+                    const { data } = await github.rest.actions.listWorkflowRunsForRepo({
                       owner: context.repo.owner,
                       repo: context.repo.repo,
-                      run_id: run.id,
+                      status,
                       per_page: 100,
-                      filter: "latest",
                     });
-                    const activeJobs = jobs.jobs.filter((job) => job.status === "in_progress");
-                    if (activeJobs.length > 0) {
-                      activeTargetWork = true;
-                      core.info(
-                        `Queued workflow ${run.id} has active job(s): ${activeJobs.map((job) => job.name).join(", ")}`,
-                      );
-                      break;
+                    refreshedQueries += 1;
+                    for (const run of data.workflow_runs) {
+                      if (targetNames.has(run.name)) refreshedBacklog.set(run.id, run);
                     }
                   } catch (error) {
                     core.warning(
-                      `Unable to inspect jobs for queued target run ${run.id}: ${error.status || "error"} ${error.message}`,
+                      `Unable to recheck recovery backlog status=${status}: ${error.status || "error"} ${error.message}`,
                     );
+                  }
+                }
+
+                if (refreshedQueries === 0) {
+                  core.warning(
+                    "Backlog recheck failed for every state; preserving runner state instead of dispatching speculative recovery.",
+                  );
+                  activeTargetWork = true;
+                } else {
+                  settledBacklogById = refreshedBacklog;
+                  if (settledBacklogById.size > 0) {
+                    activeTargetWork = await detectActiveTargetWork(settledBacklogById);
                   }
                 }
               }
 
-              if (activeTargetWork) {
+              if (settledBacklogById.size === 0) {
+                core.info("Target backlog drained during handoff settle window; recovery dispatch not required.");
+              } else if (activeTargetWork) {
                 core.info(
-                  `Target backlog=${backlogById.size}, but governed CI is actively draining; recovery dispatch not required.`,
+                  `Target backlog=${settledBacklogById.size}, but governed CI is actively draining or recovery state is uncertain; recovery dispatch not required.`,
                 );
               } else {
                 await github.rest.actions.createWorkflowDispatch({
@@ -303,6 +347,8 @@ jobs:
                   workflow_id: "windows-recover-linux-runner.yml",
                   ref: "main",
                 });
-                core.info(`dispatched governed Linux runner recovery for idle backlog=${backlogById.size}`);
+                core.info(
+                  `dispatched governed Linux runner recovery after idle settle window for backlog=${settledBacklogById.size}`,
+                );
               }
             }
