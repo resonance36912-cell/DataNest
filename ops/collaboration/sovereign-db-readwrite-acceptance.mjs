@@ -1,4 +1,4 @@
-import { toJSONAsync } from "seroval";
+import { fromCrossJSON, toJSONAsync } from "seroval";
 import crypto from "node:crypto";
 
 const base = process.env.RONS_ACCEPTANCE_BASE ?? "http://127.0.0.1:4186";
@@ -11,22 +11,6 @@ function fnId(file, exportName) {
   const functionName = `${exportName}_createServerFn_handler`;
   const entryId = `${relativeFilename}--${functionName}`;
   return crypto.createHash("sha256").update(entryId).digest("hex");
-}
-
-function walk(node) {
-  if (node === null || typeof node !== "object") return node;
-  if (node.t === 1 || node.t === 2 || node.t === 3) return node.s;
-  if (node.t === 4) return null;
-  if (node.t === 5) return undefined;
-  if (node.p && Array.isArray(node.p.k) && Array.isArray(node.p.v)) {
-    const out = {};
-    node.p.k.forEach((key, index) => {
-      out[key] = walk(node.p.v[index]);
-    });
-    return out;
-  }
-  if (Array.isArray(node.a)) return node.a.map(walk);
-  return node;
 }
 
 async function callServerFn(file, exportName, payload) {
@@ -45,7 +29,7 @@ async function callServerFn(file, exportName, payload) {
   if (response.status !== 200 || !body.startsWith("{")) {
     throw new Error(`${exportName} returned HTTP ${response.status}: ${body.slice(0, 500)}`);
   }
-  const envelope = walk(JSON.parse(body));
+  const envelope = fromCrossJSON(JSON.parse(body), { plugins: [] });
   if (envelope?.error) {
     const message =
       typeof envelope.error === "string"

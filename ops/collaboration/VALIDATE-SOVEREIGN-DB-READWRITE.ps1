@@ -90,7 +90,8 @@ foreach($name in @(
   'POSTGRES_PASSWORD','AUTH_DB','AUTH_SIGNING_KEY_FILE','AUTH_EXCHANGE_KEY_FILE','AUTH_URL',
   'DATABASE_URL','POSTGRES_PASSWORD_FILE','GATEWAY_PROCEDURE_KEY_FILE',
   'VITE_RONS_AUTH_MODE','RONS_SOVEREIGN_PROXY_ENABLED','RESONANCE_SOVEREIGN_GATEWAY_URL',
-  'RONS_GATEWAY_PROCEDURE_KEY_FILE','RONS_PRODUCTION_AUTH_COOKIE','RESONANCE_BACKEND_PROVIDER',
+  'RESONANCE_SOVEREIGN_AUTH_URL','RONS_GATEWAY_PROCEDURE_KEY_FILE','RONS_PRODUCTION_AUTH_COOKIE',
+  'RESONANCE_BACKEND_PROVIDER',
   'HOST','PORT','NODE_ENV','RONS_ACCEPTANCE_BASE','RONS_ACCEPTANCE_TOKEN','RONS_ACCEPTANCE_USER_ID'
 )){
   $old[$name]=[Environment]::GetEnvironmentVariable($name,'Process')
@@ -233,15 +234,15 @@ AS $$ SELECT NULLIF(current_setting('request.jwt.claim.sub', true), '')::uuid $$
   $wranglerConfig=Join-Path $workerDir 'wrangler.json'
   $wrangler=(Get-Content -LiteralPath $wranglerConfig -Raw | ConvertFrom-Json)
   if(-not $wrangler.PSObject.Properties['vars']){$wrangler | Add-Member -NotePropertyName vars -NotePropertyValue ([pscustomobject]@{})}
-  $wrangler.vars.VITE_RONS_AUTH_MODE='sovereign'
-  $wrangler.vars.RONS_SOVEREIGN_PROXY_ENABLED='1'
-  $wrangler.vars.RESONANCE_SOVEREIGN_GATEWAY_URL="http://127.0.0.1:$gatewayPort"
-  $wrangler.vars.RESONANCE_SOVEREIGN_AUTH_URL="http://127.0.0.1:$authPort"
-  $wrangler.vars.RONS_PRODUCTION_AUTH_COOKIE='0'
-  $wrangler.vars.RESONANCE_BACKEND_PROVIDER='sovereign'
-  $wrangler.vars.HOST='127.0.0.1'
-  $wrangler.vars.PORT=[string]$hubPort
-  $wrangler.vars.NODE_ENV='production'
+  $wrangler.vars | Add-Member -NotePropertyName VITE_RONS_AUTH_MODE -NotePropertyValue 'sovereign' -Force
+  $wrangler.vars | Add-Member -NotePropertyName RONS_SOVEREIGN_PROXY_ENABLED -NotePropertyValue '1' -Force
+  $wrangler.vars | Add-Member -NotePropertyName RESONANCE_SOVEREIGN_GATEWAY_URL -NotePropertyValue "http://127.0.0.1:$gatewayPort" -Force
+  $wrangler.vars | Add-Member -NotePropertyName RESONANCE_SOVEREIGN_AUTH_URL -NotePropertyValue "http://127.0.0.1:$authPort" -Force
+  $wrangler.vars | Add-Member -NotePropertyName RONS_PRODUCTION_AUTH_COOKIE -NotePropertyValue '0' -Force
+  $wrangler.vars | Add-Member -NotePropertyName RESONANCE_BACKEND_PROVIDER -NotePropertyValue 'sovereign' -Force
+  $wrangler.vars | Add-Member -NotePropertyName HOST -NotePropertyValue '127.0.0.1' -Force
+  $wrangler.vars | Add-Member -NotePropertyName PORT -NotePropertyValue ([string]$hubPort) -Force
+  $wrangler.vars | Add-Member -NotePropertyName NODE_ENV -NotePropertyValue 'production' -Force
   $wrangler | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $wranglerConfig -Encoding UTF8
   if(-not (Test-Path -LiteralPath (Join-Path $workerDir 'wrangler.json'))){throw 'Generated Wrangler config is missing.'}
   $hubProc=Start-Process -FilePath $bun -ArgumentList @('x','wrangler','dev','--config','wrangler.json','--port',[string]$hubPort,'--ip','127.0.0.1') -WorkingDirectory $workerDir -RedirectStandardOutput $hubOut -RedirectStandardError $hubErr -PassThru -WindowStyle Hidden
