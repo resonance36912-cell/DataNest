@@ -12,62 +12,45 @@ permissions:
 
 jobs:
   diagnose:
-    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
     timeout-minutes: 10
     steps:
       - name: Check out RONSAS control authority
         uses: actions/checkout@v5
 
-      - name: Inspect governed ePublisher STT runtime files and logs
+      - name: Inspect ePublisher STT process and logs
         id: probe
-        shell: bash
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
-          set -euo pipefail
-          cat > /tmp/epublisher-stt-log-probe.sh <<'SH'
-          set -eu
-          echo '=== runtime existence ==='
-          for p in \
-            /runtime/syncvision-local-stt.py \
-            /runtime/python-envs/epublisher-stt/Scripts/python.exe \
-            /logs/epublisher-stt.out.log \
-            /logs/epublisher-stt.err.log \
-            /logs/local-stt.out.log \
-            /logs/local-stt.err.log; do
-            if [ -e "$p" ]; then
-              ls -l "$p"
-            else
-              echo "MISSING $p"
-            fi
-          done
-          echo '=== epublisher-stt stderr tail ==='
-          if [ -f /logs/epublisher-stt.err.log ]; then tail -n 120 /logs/epublisher-stt.err.log; fi
-          echo '=== epublisher-stt stdout tail ==='
-          if [ -f /logs/epublisher-stt.out.log ]; then tail -n 80 /logs/epublisher-stt.out.log; fi
-          echo '=== local-stt stderr tail ==='
-          if [ -f /logs/local-stt.err.log ]; then tail -n 80 /logs/local-stt.err.log; fi
-          SH
+          $ErrorActionPreference = 'Continue'
+          $root = Join-Path $env:USERPROFILE 'Resonance\OpenNova'
+          $runtime = Join-Path $root 'runtime'
+          $logs = Join-Path $runtime 'logs\rons-cluster'
+          $python = Join-Path $runtime 'python-envs\epublisher-stt\Scripts\python.exe'
+          $script = Join-Path $runtime 'syncvision-local-stt.py'
+          $result = [ordered]@{}
 
-          podman --remote run --rm -i --entrypoint sh \
-            -v /mnt/c/Users/Ashley/Resonance/OpenNova/runtime:/runtime:ro \
-            -v /mnt/c/Users/Ashley/Resonance/OpenNova/runtime/logs/rons-cluster:/logs:ro \
-            localhost/ronsas-actions-runner:2.337.0-r2 -s < /tmp/epublisher-stt-log-probe.sh > /tmp/epublisher-stt-log-result.txt
-          cat /tmp/epublisher-stt-log-result.txt
-          python3 - <<'PY'
-          import json, pathlib
-          p=pathlib.Path('/tmp/epublisher-stt-log-result.txt')
-          s=p.read_text(encoding='utf-8',errors='replace')
-          print(json.dumps({'log_excerpt':s[-12000:]},separators=(',',':')))
-          PY
-          python3 - <<'PY' > /tmp/diagnostic.json
-          import json, pathlib
-          s=pathlib.Path('/tmp/epublisher-stt-log-result.txt').read_text(encoding='utf-8',errors='replace')
-          print(json.dumps({'log_excerpt':s[-12000:]},separators=(',',':')))
-          PY
-          {
-            echo 'diagnostic_json<<EOF'
-            cat /tmp/diagnostic.json
-            echo 'EOF'
-          } >> "$GITHUB_OUTPUT"
+          $listener = Get-NetTCPConnection -LocalPort 7869 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
+          $result.listener = if ($listener) { [ordered]@{ address=[string]$listener.LocalAddress; pid=[int]$listener.OwningProcess } } else { $null }
+          $result.python_exists = Test-Path -LiteralPath $python -PathType Leaf
+          $result.script_exists = Test-Path -LiteralPath $script -PathType Leaf
+          if ($result.python_exists) {
+            try { $result.python_version = (& $python --version 2>&1 | Out-String).Trim() } catch { $result.python_version = $_.Exception.Message }
+          }
+
+          foreach ($name in @('epublisher-stt.err.log','epublisher-stt.out.log','local-stt.err.log','local-stt.out.log')) {
+            $path = Join-Path $logs $name
+            if (Test-Path -LiteralPath $path -PathType Leaf) {
+              $text = (Get-Content -LiteralPath $path -Tail 120 -ErrorAction SilentlyContinue | Out-String)
+              if ($text.Length -gt 10000) { $text = $text.Substring($text.Length - 10000) }
+              $result[$name] = $text
+            } else {
+              $result[$name] = '<missing>'
+            }
+          }
+
+          $compact = $result | ConvertTo-Json -Depth 6 -Compress
+          "diagnostic_json=$compact" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
       - name: Publish sanitized diagnostic receipt
         if: always()
