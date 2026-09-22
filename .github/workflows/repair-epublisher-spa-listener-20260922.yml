@@ -45,31 +45,65 @@ jobs:
             Write-Host 'EPUBLISHER_PRECHECK_REPAIR_REQUIRED=true'
           }
 
-      - name: Run existing governed suite recovery
+      - name: Request recovery through existing governed supervisor task
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference='Stop'
-          $recovery='C:\Users\Ashley\AppData\Local\Resonance\RONS-ControlCenter\RONS-Recover-Suite.ps1'
-          if(-not (Test-Path -LiteralPath $recovery -PathType Leaf)){throw ('Governed recovery script missing: ' + $recovery)}
-          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $recovery -Attempts 1 -DelaySeconds 5 -StepTimeoutSeconds 180 -AcceptanceSettleSeconds 240 -AcceptancePollSeconds 10
-          if($LASTEXITCODE -ne 0){throw ('Governed recovery exited ' + $LASTEXITCODE)}
-
-      - name: Verify local listener, local edge and public domain
-        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
-        run: |
-          $ErrorActionPreference='Stop'
-          function Require200([string]$Name,[string]$Url,[hashtable]$Headers=@{}) {
-            $r=Invoke-WebRequest -UseBasicParsing -Uri $Url -Headers $Headers -TimeoutSec 20
-            Write-Host ($Name + '_status=' + [int]$r.StatusCode)
-            if([int]$r.StatusCode -ne 200){throw ($Name + ' expected HTTP 200')}
-            return $r
+          $taskName='RONS Autonomous Supervisor'
+          $task=Get-ScheduledTask -TaskName $taskName -ErrorAction Stop
+          $action=@($task.Actions) | Select-Object -First 1
+          if(-not $action){throw 'Governed supervisor task has no action.'}
+          $execute=[string]$action.Execute
+          $arguments=[string]$action.Arguments
+          if($execute -notlike '*powershell*' -or $arguments -notlike '*RONS-Supervisor.ps1*'){
+            throw ('Governed supervisor task identity mismatch: ' + $execute + ' ' + $arguments)
           }
-          $local=Require200 'local_3101' 'http://127.0.0.1:3101/'
-          if($local.Content -notlike '*Resonance ePublisher*'){throw 'ePublisher local listener fingerprint mismatch.'}
-          $edge=Require200 'edge_8801' 'http://127.0.0.1:8801/' @{Host='epublisher.reson8.life'}
-          $session=Require200 'public_session' 'https://epublisher.reson8.life/_rons/session'
-          $public=Require200 'public_root' 'https://epublisher.reson8.life/'
+          Write-Host ('supervisor_task_state_before=' + [string]$task.State)
+          Write-Host ('supervisor_task_user=' + [string]$task.Principal.UserId)
+          Start-ScheduledTask -TaskName $taskName
+          Start-Sleep -Seconds 3
+          $task=Get-ScheduledTask -TaskName $taskName -ErrorAction Stop
+          $info=Get-ScheduledTaskInfo -TaskName $taskName -ErrorAction Stop
+          Write-Host ('supervisor_task_state_after=' + [string]$task.State)
+          Write-Host ('supervisor_task_last_result=' + [int]$info.LastTaskResult)
+          Write-Host 'EPUBLISHER_GOVERNED_SUPERVISOR_REQUESTED=true'
+
+      - name: Wait for durable listener and verify full public path
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          function Probe([string]$Name,[string]$Url,[hashtable]$Headers=@{}) {
+            try {
+              $r=Invoke-WebRequest -UseBasicParsing -Uri $Url -Headers $Headers -TimeoutSec 15
+              return [pscustomobject]@{Name=$Name;Status=[int]$r.StatusCode;Content=[string]$r.Content}
+            } catch {
+              $code=0
+              if($_.Exception.Response -and $_.Exception.Response.StatusCode){$code=[int]$_.Exception.Response.StatusCode}
+              return [pscustomobject]@{Name=$Name;Status=$code;Content=''}
+            }
+          }
+          $deadline=(Get-Date).AddMinutes(9)
+          $healthy=$false
+          do {
+            $local=Probe 'local_3101' 'http://127.0.0.1:3101/'
+            $edge=Probe 'edge_8801' 'http://127.0.0.1:8801/' @{Host='epublisher.reson8.life'}
+            $session=Probe 'public_session' 'https://epublisher.reson8.life/_rons/session'
+            $public=Probe 'public_root' 'https://epublisher.reson8.life/'
+            Write-Host ('probe local_3101=' + $local.Status + ' edge_8801=' + $edge.Status + ' public_session=' + $session.Status + ' public_root=' + $public.Status)
+            if($session.Status -ne 200){throw 'Launch-broker/session boundary became unhealthy during listener repair.'}
+            if($local.Status -eq 200 -and $edge.Status -eq 200 -and $public.Status -eq 200){
+              if($local.Content -notlike '*Resonance ePublisher*'){throw 'ePublisher local listener fingerprint mismatch.'}
+              $healthy=$true
+              break
+            }
+            Start-Sleep -Seconds 10
+          } while((Get-Date) -lt $deadline)
+          if(-not $healthy){throw 'ePublisher listener did not become healthy through the governed supervisor task within 9 minutes.'}
           $listener=Get-NetTCPConnection -State Listen -LocalPort 3101 -ErrorAction Stop | Select-Object -First 1
+          if(-not $listener){throw 'ePublisher endpoint is healthy but no port-3101 listener is visible.'}
+          if(@('127.0.0.1','::1') -notcontains [string]$listener.LocalAddress){throw ('ePublisher listener is not loopback-bound: ' + [string]$listener.LocalAddress)}
+          $process=Get-CimInstance Win32_Process -Filter ('ProcessId=' + [int]$listener.OwningProcess) -ErrorAction Stop
+          if([string]$process.Name -ne 'node.exe'){throw ('Unexpected port-3101 process: ' + [string]$process.Name)}
           Write-Host ('local_3101_pid=' + [int]$listener.OwningProcess)
           Write-Host 'EPUBLISHER_LISTENER_RECOVERY_VERIFIED=true'
 
@@ -78,6 +112,7 @@ jobs:
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $paths=@(
+            ('C:\Users\Ashley\AppData\Local\Resonance\RONS-ControlCenter\logs\supervisor-' + (Get-Date -Format 'yyyyMMdd') + '.log'),
             'C:\Users\Ashley\AppData\Local\Resonance\RONS-ControlCenter\logs\recovery.log',
             'C:\Users\Ashley\Resonance\OpenNova\runtime\logs\rons-cluster\epublisher.out.log',
             'C:\Users\Ashley\Resonance\OpenNova\runtime\logs\rons-cluster\epublisher.err.log',
@@ -86,7 +121,7 @@ jobs:
           foreach($path in $paths){
             Write-Host ('--- ' + $path + ' ---')
             if(Test-Path -LiteralPath $path -PathType Leaf){
-              Get-Content -LiteralPath $path -Tail 25 -ErrorAction SilentlyContinue |
+              Get-Content -LiteralPath $path -Tail 40 -ErrorAction SilentlyContinue |
                 ForEach-Object { $_ -replace '(?i)(token|secret|key|password)=\S+','$1=[REDACTED]' }
             } else {
               Write-Host 'missing'
