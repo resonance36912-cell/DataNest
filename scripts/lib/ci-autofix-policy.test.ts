@@ -46,7 +46,7 @@ describe("guarded CI autofix policy", () => {
 
   test("runs remediation after state write even when current heads are green", () => {
     const stateWrite = monitor.indexOf("$state | ConvertTo-Json");
-    const remediation = monitor.indexOf('if ($AutoRemediate)');
+    const remediation = monitor.indexOf("if ($AutoRemediate)");
     const failureBranch = monitor.indexOf("if ($currentFailures.Count -gt 0)");
     expect(stateWrite).toBeGreaterThan(-1);
     expect(remediation).toBeGreaterThan(stateWrite);
