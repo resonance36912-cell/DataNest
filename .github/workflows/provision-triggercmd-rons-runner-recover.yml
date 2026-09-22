@@ -56,7 +56,7 @@ jobs:
                 $escaped = $false
                 continue
               }
-              if ($ch -eq '\\') {
+              if ($ch -eq [char]92) {
                 [void]$builder.Append($ch)
                 $escaped = $true
                 continue
