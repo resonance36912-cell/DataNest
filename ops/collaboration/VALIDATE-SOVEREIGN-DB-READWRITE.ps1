@@ -134,7 +134,7 @@ try {
 
   for($i=1;$i -le 60;$i++){
     Start-Sleep -Milliseconds 500
-    & $containerCli exec -e "PGPASSWORD=$dbPassword" $containerName psql -h 127.0.0.1 -p 5432 -U resonance -d resonance -t -A -c 'SELECT 1;' *> $null
+    & $containerCli exec $containerName pg_isready -h 127.0.0.1 -p 5432 -U resonance -d resonance *> $null
     if($LASTEXITCODE -eq 0){break}
     if($i -eq 60){throw 'Disposable Postgres did not become ready.'}
   }
