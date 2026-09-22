@@ -1,6 +1,7 @@
 import { auth, defineMcp } from "@lovable.dev/mcp-js";
 import echoTool from "./tools/echo";
 import listUpdatesTool from "./tools/list-updates";
+import { bridgeTools } from "./tools/bridge";
 
 // OAuth issuer MUST be the direct Supabase host — the `.lovable.cloud` proxy
 // fails RFC 8414 issuer discovery. VITE_SUPABASE_PROJECT_ID is inlined by Vite
@@ -11,12 +12,12 @@ const projectRef = import.meta.env.VITE_SUPABASE_PROJECT_ID ?? "project-ref-unse
 export default defineMcp({
   name: "reson8-hub-mcp",
   title: "Reson8 Hub MCP",
-  version: "0.1.0",
+  version: "0.2.0",
   instructions:
-    "Tools for the Reson8 hub. Use `echo` to verify connectivity and `list_updates` to fetch recent Reson8 project updates.",
+    "Tools for the Reson8 hub and the RONSAS shared execution bridge. Bridge tools are fail-closed, caller-scoped, auditable, and queue work for paired connectors rather than exposing raw computer control.",
   auth: auth.oauth.issuer({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated",
   }),
-  tools: [echoTool, listUpdatesTool],
+  tools: [echoTool, listUpdatesTool, ...bridgeTools],
 });

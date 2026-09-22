@@ -68,6 +68,17 @@ def logs(container: str) -> str:
     return raw.decode("utf-8", errors="replace").replace("\x00", "")
 
 
+
+def wait_for_exec(exec_id: str, timeout_seconds: int = 30) -> dict:
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        state = get_json(f"/exec/{exec_id}/json")
+        if not state.get("Running", False):
+            return state
+        time.sleep(0.1)
+    raise RuntimeError(f"exec_timeout:{exec_id}")
+
+
 def upload_file(container: str, source: Path, destination_dir: str = "/tmp") -> str:
     if not source.is_file():
         raise RuntimeError(f"missing_runtime_input:{source}")
@@ -110,7 +121,7 @@ def exec_command(container: str, command: list[str], label: str) -> str:
         payload={"Detach": False, "Tty": True},
         timeout=180,
     ).decode("utf-8", errors="replace")
-    state = get_json(f"/exec/{exec_id}/json")
+    state = wait_for_exec(exec_id, timeout_seconds=180)
     exit_code = state.get("ExitCode")
     if output:
         print(output, end="" if output.endswith("\n") else "\n", flush=True)
@@ -201,7 +212,7 @@ def main() -> int:
                     payload={"Detach": False, "Tty": True},
                     timeout=30,
                 )
-                if get_json(f"/exec/{exec_id}/json").get("ExitCode") == 0:
+                if wait_for_exec(exec_id, timeout_seconds=30).get("ExitCode") == 0:
                     break
             except RuntimeError:
                 pass
