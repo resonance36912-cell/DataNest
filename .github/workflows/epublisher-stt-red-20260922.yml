@@ -12,6 +12,10 @@ permissions:
   contents: read
   issues: write
 
+concurrency:
+  group: epublisher-stt-runtime-sync-focused-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   red:
     runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
