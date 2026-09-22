@@ -244,6 +244,10 @@ if (-not (Test-BackendReady)) {
 $backendUrl = 'http://127.0.0.1:8787/v1/backend/health'
 $services += [pscustomobject]@{name='sovereign-backend';port=58600;url=$backendUrl;pid=(Get-ListenerPid 58600);owned=$false;root=$AppDev}
 $opsRuntime = Join-Path (Split-Path $PSScriptRoot -Parent) 'runtime'
+$sttSource = Join-Path $opsRuntime 'syncvision-local-stt.py'
+$sttTarget = Join-Path $Runtime 'syncvision-local-stt.py'
+if (-not (Test-Path -LiteralPath $sttSource -PathType Leaf)) { throw "Governed STT runtime source missing: $sttSource" }
+Copy-Item -LiteralPath $sttSource -Destination $sttTarget -Force
 $premiumImageTargetPath = Join-Path $Runtime 'epublisher-premium-image-service.py'
 $premiumImageSourceChanged = $false
 foreach ($runtimeName in @('rons-local-llm-service.py','epublisher-premium-image-service.py')) {
