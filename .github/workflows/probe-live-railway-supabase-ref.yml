@@ -1,0 +1,51 @@
+name: Probe live Railway Supabase ref
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/probe-live-railway-supabase-ref.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 8
+    steps:
+      - name: Probe live public frontend for Supabase hostname
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $base='https://ronsas-hub-fallback-production.up.railway.app'
+          $health=Invoke-WebRequest -UseBasicParsing -Uri ($base + '/api/health') -TimeoutSec 20
+          Write-Host ('health_status=' + [int]$health.StatusCode)
+
+          $home=Invoke-WebRequest -UseBasicParsing -Uri $base -TimeoutSec 20
+          Write-Host ('home_status=' + [int]$home.StatusCode)
+
+          $refs=New-Object System.Collections.Generic.HashSet[string]
+          function Add-Refs([string]$text) {
+            if([string]::IsNullOrWhiteSpace($text)){return}
+            foreach($m in [regex]::Matches($text,'https://([a-z0-9]{20})\.supabase\.co')){
+              [void]$refs.Add($m.Groups[1].Value)
+            }
+          }
+
+          Add-Refs $home.Content
+          $scripts=[regex]::Matches($home.Content,'<script[^>]+src=["'']([^"'']+)["'']','IgnoreCase')
+          foreach($m in $scripts){
+            $src=$m.Groups[1].Value
+            try{
+              $uri=if($src -match '^https?://'){$src}else{([Uri]::new([Uri]$base,$src)).AbsoluteUri}
+              $asset=Invoke-WebRequest -UseBasicParsing -Uri $uri -TimeoutSec 20
+              Add-Refs $asset.Content
+            }catch{
+              Write-Host ('asset_probe_failed=' + $src)
+            }
+          }
+
+          $sorted=@($refs | Sort-Object)
+          Write-Host ('supabase_project_refs=' + ($sorted -join ','))
+          if($sorted.Count -eq 0){throw 'No public Supabase project ref found in live frontend assets.'}
