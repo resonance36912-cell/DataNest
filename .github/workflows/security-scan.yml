@@ -104,12 +104,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: "pip"
-      - name: Verify Python 3.12
+      - name: Verify sovereign runner Python 3.12
         run: |
           python --version
           python -c 'import sys; assert sys.version_info[:2] == (3, 12), sys.version'
