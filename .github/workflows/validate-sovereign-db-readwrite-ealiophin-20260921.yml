@@ -1,0 +1,52 @@
+name: Validate sovereign DB authenticated read-write 2026-09-21
+# Clean Hub candidate runtime: production build + generated Wrangler preview.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ronsas/sovereign-db-certification-20260922]
+    paths:
+      - .github/workflows/validate-sovereign-db-readwrite-ealiophin-20260921.yml
+      - ops/collaboration/VALIDATE-SOVEREIGN-DB-READWRITE.ps1
+      - ops/collaboration/sovereign-db-readwrite-acceptance.mjs
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ronsas-sovereign-db-readwrite-ealiophin
+  cancel-in-progress: true
+
+jobs:
+  authenticated-readwrite:
+    if: github.repository == 'resonance36912-cell/RONSAS' && github.event.repository.private == true
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 45
+    steps:
+      - name: Run exact-source isolated sovereign DB acceptance
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version Latest
+          if($env:COMPUTERNAME -ine 'Ealiophin'){throw 'Wrong host.'}
+          if((& gh api user --jq .login).Trim() -ne 'resonance36912-cell'){throw 'Unexpected GitHub identity.'}
+
+          $control=Join-Path $env:RUNNER_TEMP "ronsas-db-rw-control-$($env:GITHUB_RUN_ID)-$($env:GITHUB_RUN_ATTEMPT)"
+          if(Test-Path -LiteralPath $control){throw "Control temp root already exists: $control"}
+          $git=(Get-Command git.exe -ErrorAction Stop).Source
+          try {
+            & gh repo clone resonance36912-cell/RONSAS $control -- --no-tags
+            if($LASTEXITCODE -ne 0){throw 'Control clone failed.'}
+            & $git -C $control checkout --detach $env:GITHUB_SHA
+            if($LASTEXITCODE -ne 0){throw 'Control exact-head checkout failed.'}
+            if((& $git -C $control rev-parse HEAD).Trim() -ne $env:GITHUB_SHA){throw 'Control HEAD mismatch.'}
+
+            $script=Join-Path $control 'ops\collaboration\VALIDATE-SOVEREIGN-DB-READWRITE.ps1'
+            $harness=Join-Path $control 'ops\collaboration\sovereign-db-readwrite-acceptance.mjs'
+            & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $script -BackendSha 'bd032b213de48f45e8adfb5d52d8a77803a21993' -HubSha '9a5460b219b7f4800051ba29657d2a4ebe5bc89e' -HarnessPath $harness
+            if($LASTEXITCODE -ne 0){throw 'Isolated sovereign DB read-write acceptance failed.'}
+          } finally {
+            if(Test-Path -LiteralPath $control){
+              Remove-Item -LiteralPath $control -Recurse -Force -ErrorAction SilentlyContinue
+            }
+          }
