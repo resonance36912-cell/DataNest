@@ -23,142 +23,27 @@ jobs:
     runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
     timeout-minutes: 20
     steps:
-      - name: Check out RONSAS control authority
-        uses: actions/checkout@v5
-
-      - name: Cancel obsolete Linux CI backlog
-        uses: actions/github-script@v8
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            const targetNames = new Set([
-              "Security scan",
-              "Verify prebuild",
-              "Verify checkout links",
-              "Verify ePublisher checkout",
-            ]);
-            const cancelNames = new Set(["Temporary format free promotion"]);
-            const activeStates = new Set(["queued", "pending", "waiting", "in_progress", "requested"]);
-            const currentRun = Number(context.runId);
-
-            const mainBranch = await github.rest.repos.getBranch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              branch: "main",
-            });
-            const latestMainSha = mainBranch.data.commit.sha;
-            core.info(`latest_main_sha=${latestMainSha}`);
-
-            const openPulls = await github.paginate(github.rest.pulls.list, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: "open",
-              per_page: 100,
-            });
-            const openByNumber = new Map(
-              openPulls.map((pr) => [
-                pr.number,
-                { number: pr.number, ref: pr.head.ref, sha: pr.head.sha },
-              ]),
-            );
-            const openByHead = new Map(
-              openPulls.map((pr) => [
-                pr.head.ref,
-                { number: pr.number, ref: pr.head.ref, sha: pr.head.sha },
-              ]),
-            );
-
-            const { data: runsPage } = await github.rest.actions.listWorkflowRunsForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              per_page: 100,
-            });
-            const runs = runsPage.workflow_runs;
-
-            let cancelled = 0;
-            for (const run of runs) {
-              if (!activeStates.has(run.status) || run.id === currentRun) continue;
-
-              let reason = null;
-              if (targetNames.has(run.name)) {
-                if (run.event === "pull_request") {
-                  const linkedPr =
-                    Array.isArray(run.pull_requests) && run.pull_requests.length > 0
-                      ? run.pull_requests[0]
-                      : null;
-                  const current =
-                    (linkedPr?.number && openByNumber.get(linkedPr.number)) ||
-                    openByHead.get(run.head_branch || "");
-                  // GitHub pull_request workflow runs execute synthetic merge refs.
-                  // Preserve every run linked to an open PR; each validation
-                  // workflow's own concurrency group cancels superseded attempts.
-                  if (!current) {
-                    reason = `closed or unmatched PR branch ${run.head_branch || "(none)"}`;
-                  }
-                } else if (run.event === "push" && run.head_branch === "main") {
-                  if (run.head_sha !== latestMainSha) {
-                    reason = "superseded main push";
-                  }
-                } else if (run.event === "push") {
-                  const current = openByHead.get(run.head_branch || "");
-                  if (!current) {
-                    reason = `orphan non-main branch push ${run.head_branch || "(none)"}`;
-                  } else if (run.head_sha !== current.sha) {
-                    reason = `superseded push for PR #${current.number}`;
-                  }
-                }
-              } else if (cancelNames.has(run.name)) {
-                reason = "obsolete temporary formatter";
-              } else if (
-                run.name === "Governed Linux runner recovery" ||
-                run.name === "Guarded zombie Linux runner recycle"
-              ) {
-                reason = "superseded recovery run";
-              }
-
-              if (!reason) continue;
-              core.info(`Cancelling run ${run.id}: ${run.name} - ${reason}`);
-              try {
-                await github.rest.actions.cancelWorkflowRun({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  run_id: run.id,
-                });
-                cancelled += 1;
-              } catch (error) {
-                core.warning(
-                  `Could not cancel run ${run.id}: ${error.status || "error"} ${error.message}`,
-                );
-              }
-
-              await new Promise((resolve) => setTimeout(resolve, 750));
-              try {
-                const latest = await github.rest.actions.getWorkflowRun({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  run_id: run.id,
-                });
-                if (activeStates.has(latest.data.status)) {
-                  core.warning(
-                    `Run ${run.id} remained ${latest.data.status} after cancellation request; forcing cancellation.`,
-                  );
-                  await github.request(
-                    "POST /repos/{owner}/{repo}/actions/runs/{run_id}/force-cancel",
-                    {
-                      owner: context.repo.owner,
-                      repo: context.repo.repo,
-                      run_id: run.id,
-                    },
-                  );
-                }
-              } catch (error) {
-                core.warning(
-                  `Run ${run.id} force-cancel check failed: ${error.status || "error"} ${error.message}`,
-                );
-              }
+      - name: Validate existing governed local recovery authority
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $script='C:\Users\Ashley\Documents\GitHub\rons-sovereign-codebase\ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
+          if(-not (Test-Path -LiteralPath $script -PathType Leaf)){
+            throw "Governed local recovery script missing: $script"
+          }
+          $source=Get-Content -Raw -LiteralPath $script
+          $requiredMarkers=@(
+            'Runner.Worker',
+            'Get-ActiveRunnerAssignments',
+            'for ($settleAttempt = 1; $settleAttempt -le 18; $settleAttempt++)',
+            'ForceRecycle deferred because online runner registration deletion was not proven safe.'
+          )
+          foreach($marker in $requiredMarkers){
+            if(-not $source.Contains($marker)){
+              throw "Governed recovery safeguard marker missing; refusing recovery: $marker"
             }
-
-            core.info(`Cancelled stale/superseded workflow runs: ${cancelled}`);
+          }
+          Write-Host 'Existing governed local recovery authority verified without marketplace action downloads.'
 
       - name: Restore existing governed Linux runner container
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
@@ -344,7 +229,7 @@ jobs:
                 if ($registered -and [bool]$registered.busy -and [string]$registered.status -ne 'online') {
                   Write-Host "GitHub reports an offline busy runner registration; treating it as stale after repository-wide idle proof and invoking governed recycle."
                 }
-                $launcher=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
+                $launcher='C:\Users\Ashley\Documents\GitHub\rons-sovereign-codebase\ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
                 if (-not (Test-Path -LiteralPath $launcher -PathType Leaf)) {
                   throw "Canonical runner launcher missing: $launcher"
                 }
