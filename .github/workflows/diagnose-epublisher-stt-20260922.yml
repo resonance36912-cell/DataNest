@@ -2,10 +2,6 @@ name: Diagnose ePublisher STT source
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/diagnose-epublisher-stt-20260922.yml"
 
 permissions:
   contents: read
@@ -50,13 +46,57 @@ jobs:
           }
           $json = $result | ConvertTo-Json -Depth 8 -Compress
           "diagnostic_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-      - name: Publish diagnostic receipt
+      - name: Record diagnostic summary
         if: always()
+        env:
+          DIAGNOSTIC_JSON: ${{ steps.probe.outputs.diagnostic_json }}
+        shell: bash
+        run: |
+          {
+            echo "### ePublisher STT source diagnostic"
+            echo
+            echo "\`\`\`json"
+            echo "${DIAGNOSTIC_JSON:-{}}"
+            echo "\`\`\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Update sticky failure receipt
+        if: always() && steps.probe.outputs.diagnostic_json != '' && !contains(steps.probe.outputs.diagnostic_json, '"source":{"status":200,"ok":true')
         uses: actions/github-script@v8
         env:
           DIAGNOSTIC_JSON: ${{ steps.probe.outputs.diagnostic_json }}
         with:
           github-token: ${{ github.token }}
           script: |
-            const body = ["EPUBLISHER_STT_SOURCE_DIAGNOSTIC", "", "Run: " + context.runId, "SHA: " + context.sha, "", process.env.DIAGNOSTIC_JSON || "{}"].join("\n");
-            await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
+            const marker = "<!-- epublisher-stt-source-diagnostic -->";
+            const body = [
+              marker,
+              "EPUBLISHER_STT_SOURCE_DIAGNOSTIC_FAILURE",
+              "",
+              "Run: " + context.runId,
+              "SHA: " + context.sha,
+              "",
+              process.env.DIAGNOSTIC_JSON || "{}",
+            ].join("\n");
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: 273,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) => comment.body && comment.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: 273,
+                body,
+              });
+            }
