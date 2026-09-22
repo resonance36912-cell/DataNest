@@ -154,9 +154,16 @@ jobs:
             throw 'TRIGGERcmd command verification failed; restored backup.'
           }
 
-          if ([string]$saved[0].allowParams -ne 'false') {
+          $allowParamsRaw = $saved[0].allowParams
+          if ($null -eq $allowParamsRaw) {
             Copy-Item -LiteralPath $backupPath -Destination $commandsPath -Force
-            throw 'TRIGGERcmd recovery command unexpectedly permits parameters; restored backup.'
+            throw 'TRIGGERcmd recovery command is missing allowParams; restored backup.'
+          }
+          $allowParamsText = ([string]$allowParamsRaw).Trim().ToLowerInvariant()
+          Write-Host "Validated allowParams representation: '$allowParamsText'"
+          if ($allowParamsText -notin @('false', '0', 'no')) {
+            Copy-Item -LiteralPath $backupPath -Destination $commandsPath -Force
+            throw "TRIGGERcmd recovery command permits or ambiguously defines parameters ('$allowParamsText'); restored backup."
           }
 
           if ([string]$saved[0].command -ne $expectedCommand) {
