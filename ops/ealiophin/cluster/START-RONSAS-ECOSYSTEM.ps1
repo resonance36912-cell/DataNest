@@ -280,10 +280,6 @@ if ($sttSourceChanged) {
         if ($remainingSttPid) { throw "Verified epublisher-stt listener did not release port 7869 after source refresh." }
     }
 }
-$sttSource = Join-Path $opsRuntime 'syncvision-local-stt.py'
-$sttTarget = Join-Path $Runtime 'syncvision-local-stt.py'
-if (-not (Test-Path -LiteralPath $sttSource -PathType Leaf)) { throw "Governed STT runtime source missing: $sttSource" }
-Copy-Item -LiteralPath $sttSource -Destination $sttTarget -Force
 $premiumImageTargetPath = Join-Path $Runtime 'epublisher-premium-image-service.py'
 $premiumImageSourceChanged = $false
 foreach ($runtimeName in @('rons-local-llm-service.py','epublisher-premium-image-service.py')) {
