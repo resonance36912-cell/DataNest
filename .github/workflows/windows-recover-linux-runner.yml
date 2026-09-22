@@ -1,5 +1,5 @@
 name: Governed Linux runner recovery
-# Recovery supersession trigger: 2026-09-22T18:09Z (queued Linux CI recovery)
+# Recovery supersession trigger: 2026-09-22T18:25Z (release stale Windows assignment)
 
 on:
   workflow_dispatch:
