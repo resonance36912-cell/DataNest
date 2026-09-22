@@ -36,6 +36,9 @@ describe("guarded CI autofix policy", () => {
   test("closes only stale monitor-owned triage issues", () => {
     expect(remediate).toContain("Resolve-StaleTriageIssues");
     expect(remediate).toContain("StartsWith('[RONSAS CI] ')");
+    expect(remediate).toContain("Automated RONSAS CI monitor detected a current-head failure.");
+    expect(remediate).toContain("'number,title,body,url'");
+    expect(remediate).toContain("Contains($monitorMarker)");
     expect(remediate).toContain("$activeTitles.ContainsKey");
     expect(remediate).toContain("gh issue close");
     expect(remediate).toContain("Resolve-StaleTriageIssues -CurrentFailures $failures");
