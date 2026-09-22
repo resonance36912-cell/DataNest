@@ -44,20 +44,7 @@ jobs:
             $event=Get-Content -LiteralPath $env:GITHUB_EVENT_PATH -Raw | ConvertFrom-Json
             $controlSha=[string]$event.pull_request.head.sha
           }
-          if($controlSha -notmatch '^[0-9a-fA-F]{40}
-
-            $script=Join-Path $control 'ops\collaboration\VALIDATE-SOVEREIGN-DB-READWRITE.ps1'
-            $harness=Join-Path $control 'ops\collaboration\sovereign-db-readwrite-acceptance.mjs'
-            & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $script -BackendSha 'bd032b213de48f45e8adfb5d52d8a77803a21993' -HubSha 'df82ca5d495408933566e837af425a974a1dd125' -HarnessPath $harness
-            if($LASTEXITCODE -ne 0){throw 'Isolated sovereign DB read-write acceptance failed.'}
-          } finally {
-            if(Test-Path -LiteralPath $control){
-              Remove-Item -LiteralPath $control -Recurse -Force -ErrorAction SilentlyContinue
-            }
-          }
-
-# certification gate: exact-source isolated Postgres + authenticated Nova/DataNest read-write
-){throw 'Control source SHA is invalid.'}
+          if($controlSha -notmatch '^[0-9a-fA-F]{40}$'){throw 'Control source SHA is invalid.'}
           $git=(Get-Command git.exe -ErrorAction Stop).Source
           try {
             & gh repo clone resonance36912-cell/RONSAS $control -- --no-tags
