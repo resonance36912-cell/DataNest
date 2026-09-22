@@ -5,6 +5,23 @@ Set-StrictMode -Version Latest
 
 $Base = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Config = Get-Content -Raw -LiteralPath (Join-Path $Base 'rons-control.json') | ConvertFrom-Json
+
+# The dedicated ePublisher STT listener is a governed required service. Older
+# local control configs predate port 7869, so keep the supervisor fail-safe
+# even before the persisted config is reconciled.
+$epublisherStt = @($Config.services | Where-Object {
+    ([string]$_.key -eq 'epublisher-stt') -or ([int]$_.port -eq 7869)
+}) | Select-Object -First 1
+if ($epublisherStt) {
+    $epublisherStt.required = $true
+} else {
+    $Config.services += [pscustomobject]@{
+        key='epublisher-stt'
+        name='ePublisher Speech-to-Text'
+        port=7869
+        required=$true
+    }
+}
 $LogDir = Join-Path $Base 'logs'
 New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 $SupervisorLog = Join-Path $LogDir ('supervisor-' + (Get-Date -Format 'yyyyMMdd') + '.log')
