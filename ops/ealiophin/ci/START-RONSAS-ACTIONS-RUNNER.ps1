@@ -127,7 +127,8 @@ if ($registered -and [bool]$registered.busy -and [string]$registered.status -eq 
         $summary = ($otherInProgress | Select-Object -First 10 | ForEach-Object {
             "$($_.id):$($_.name):$($_.head_branch)"
         }) -join ', '
-        throw "ForceRecycle refused: GitHub still reports $($otherInProgress.Count) other in-progress workflow run(s): $summary"
+        Write-Host "ForceRecycle deferred because GitHub reports $($otherInProgress.Count) in-progress workflow run(s): $summary" -ForegroundColor Yellow
+        exit 0
     }
 
     Write-Host "ForceRecycle was authorized and no other workflow is in progress, but GitHub still reports busy=True. Waiting for assignment finalization." -ForegroundColor Yellow
@@ -138,7 +139,8 @@ if ($registered -and [bool]$registered.busy -and [string]$registered.status -eq 
             $summary = ($otherInProgress | Select-Object -First 10 | ForEach-Object {
                 "$($_.id):$($_.name):$($_.head_branch)"
             }) -join ', '
-            throw "ForceRecycle aborted during settle window because new in-progress workflow work appeared: $summary"
+            Write-Host "ForceRecycle deferred during settle window because new in-progress workflow work appeared: $summary" -ForegroundColor Yellow
+            exit 0
         }
 
         $registered = Get-RegisteredRunner
@@ -183,7 +185,8 @@ if ($registered -and ($registered.status -ne 'online' -or $ForceRecycle)) {
                 $summary = ($otherInProgress | Select-Object -First 10 | ForEach-Object {
                     "$($_.id):$($_.name):$($_.head_branch)"
                 }) -join ', '
-                throw "Runner deletion retry aborted because workflow work became active: $summary"
+                Write-Host "Runner deletion retry deferred because workflow work became active: $summary" -ForegroundColor Yellow
+                exit 0
             }
             $registered = Get-RegisteredRunner
             if (-not $registered) {

@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Check out RONSAS control authority
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Cancel obsolete Linux CI backlog
         uses: actions/github-script@v8
@@ -366,5 +366,26 @@ jobs:
           }
 
           if ($remaining -gt 0) {
-            throw "Linux CI backlog did not drain during the ten-minute watchdog window. Runner registration may require repository-admin repair; refusing to claim recovery."
+            $runnerName='Ealiophin-RONSAS-Linux-2'
+            $runnerRaw=@(& gh.exe api "repos/$repo/actions/runners" 2>&1)
+            if ($LASTEXITCODE -ne 0) {
+              throw 'Unable to query runner registration after watchdog window.'
+            }
+            $runnerPayload=($runnerRaw -join [Environment]::NewLine) | ConvertFrom-Json
+            $registered=@($runnerPayload.runners | Where-Object { [string]$_.name -eq $runnerName }) | Select-Object -First 1
+            & $podman container exists $container
+            $containerExists=($LASTEXITCODE -eq 0)
+            $containerRunning=$false
+            $listenerUp=$false
+            if($containerExists){
+              $info=(& $podman inspect $container | ConvertFrom-Json)[0]
+              $containerRunning=[bool]$info.State.Running
+              if($containerRunning){$listenerUp=Test-RunnerListener}
+            }
+            $runnerOnline=($registered -and [string]$registered.status -eq 'online')
+            if($containerRunning -and $listenerUp -and $runnerOnline){
+              Write-Warning "Watchdog window ended with active backlog=$remaining, but the governed Linux runner is online with Runner.Listener active. Treating this as healthy capacity serialization; the janitor will continue monitoring."
+            } else {
+              throw "Linux CI backlog remained after the watchdog window and runner health is degraded: backlog=$remaining container=$containerRunning listener=$listenerUp runnerOnline=$runnerOnline"
+            }
           }
