@@ -22,8 +22,8 @@ jobs:
           $health=Invoke-WebRequest -UseBasicParsing -Uri ($base + '/api/health') -TimeoutSec 20
           Write-Host ('health_status=' + [int]$health.StatusCode)
 
-          $home=Invoke-WebRequest -UseBasicParsing -Uri $base -TimeoutSec 20
-          Write-Host ('home_status=' + [int]$home.StatusCode)
+          $page=Invoke-WebRequest -UseBasicParsing -Uri $base -TimeoutSec 20
+          Write-Host ('home_status=' + [int]$page.StatusCode)
 
           $refs=New-Object System.Collections.Generic.HashSet[string]
           function Add-Refs([string]$text) {
@@ -33,8 +33,8 @@ jobs:
             }
           }
 
-          Add-Refs $home.Content
-          $scripts=[regex]::Matches($home.Content,'<script[^>]+src=["'']([^"'']+)["'']','IgnoreCase')
+          Add-Refs $page.Content
+          $scripts=[regex]::Matches($page.Content,'<script[^>]+src=["'']([^"'']+)["'']','IgnoreCase')
           foreach($m in $scripts){
             $src=$m.Groups[1].Value
             try{
