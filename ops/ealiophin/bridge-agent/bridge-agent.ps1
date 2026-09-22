@@ -16,7 +16,6 @@ function Get-RequiredEnv([string]$Name) {
 
 $SupabaseUrl = (Get-RequiredEnv "SUPABASE_URL").TrimEnd("/")
 $PublishableKey = Get-RequiredEnv "SUPABASE_PUBLISHABLE_KEY"
-$AccessToken = Get-RequiredEnv "RONSAS_BRIDGE_ACCESS_TOKEN"
 $config = Get-Content -Raw -LiteralPath $ConfigPath | ConvertFrom-Json -Depth 20
 $deviceId = [string]$config.deviceId
 
@@ -24,16 +23,148 @@ if ($deviceId -notmatch '^[0-9a-fA-F-]{36}$') {
   throw "bridge-agent.json must contain a real paired deviceId"
 }
 
-$headers = @{
-  "apikey" = $PublishableKey
-  "Authorization" = "Bearer $AccessToken"
-  "Content-Type" = "application/json"
+$script:BridgeAccessToken = [Environment]::GetEnvironmentVariable("RONSAS_BRIDGE_ACCESS_TOKEN")
+$script:BridgeRefreshToken = $null
+$script:BridgeRefreshTokenFile = [Environment]::GetEnvironmentVariable("RONSAS_BRIDGE_REFRESH_TOKEN_FILE")
+if ([string]::IsNullOrWhiteSpace($script:BridgeRefreshTokenFile)) {
+  $localAppData = [Environment]::GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)
+  if ([string]::IsNullOrWhiteSpace($localAppData)) {
+    throw "Unable to resolve LocalApplicationData for bridge credential storage"
+  }
+  $script:BridgeRefreshTokenFile = Join-Path $localAppData "Resonance\RONSAS\bridge-agent-refresh-token.xml"
 }
+
+function ConvertFrom-BridgeSecureString([Security.SecureString]$SecureString) {
+  $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
+  try {
+    return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
+  } finally {
+    [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
+  }
+}
+
+function Get-BridgeRefreshToken {
+  if (Test-Path -LiteralPath $script:BridgeRefreshTokenFile -PathType Leaf) {
+    try {
+      $secure = Import-Clixml -LiteralPath $script:BridgeRefreshTokenFile
+      if ($secure -isnot [Security.SecureString]) {
+        throw "refresh_token_store_invalid"
+      }
+      return ConvertFrom-BridgeSecureString $secure
+    } catch {
+      throw "Unable to load the DPAPI-protected bridge refresh token: $($_.Exception.Message)"
+    }
+  }
+
+  $bootstrap = [Environment]::GetEnvironmentVariable("RONSAS_BRIDGE_REFRESH_TOKEN")
+  if (-not [string]::IsNullOrWhiteSpace($bootstrap)) {
+    return $bootstrap
+  }
+  return $null
+}
+
+function Save-BridgeRefreshToken([string]$RefreshToken) {
+  if ([string]::IsNullOrWhiteSpace($RefreshToken)) { return }
+
+  $parent = Split-Path -Parent $script:BridgeRefreshTokenFile
+  if (-not (Test-Path -LiteralPath $parent -PathType Container)) {
+    New-Item -ItemType Directory -Force -Path $parent | Out-Null
+  }
+
+  $temp = "$($script:BridgeRefreshTokenFile).tmp"
+  try {
+    $secure = ConvertTo-SecureString $RefreshToken -AsPlainText -Force
+    $secure | Export-Clixml -LiteralPath $temp
+    Move-Item -LiteralPath $temp -Destination $script:BridgeRefreshTokenFile -Force
+  } finally {
+    Remove-Item -LiteralPath $temp -Force -ErrorAction SilentlyContinue
+  }
+}
+
+function Invoke-BridgeTokenRefresh {
+  if ([string]::IsNullOrWhiteSpace($script:BridgeRefreshToken)) {
+    $script:BridgeRefreshToken = Get-BridgeRefreshToken
+  }
+  if ([string]::IsNullOrWhiteSpace($script:BridgeRefreshToken)) {
+    throw "Bridge access token expired and no refresh token is configured"
+  }
+
+  $uri = "$SupabaseUrl/auth/v1/token?grant_type=refresh_token"
+  $headers = @{
+    "apikey" = $PublishableKey
+    "Content-Type" = "application/json"
+    "Accept" = "application/json"
+  }
+  $body = @{ refresh_token = $script:BridgeRefreshToken } | ConvertTo-Json -Compress
+  $response = Invoke-RestMethod -Method Post -Uri $uri -Headers $headers -Body $body
+
+  $accessToken = [string]$response.access_token
+  if ([string]::IsNullOrWhiteSpace($accessToken)) {
+    throw "Supabase refresh response did not include an access token"
+  }
+  $script:BridgeAccessToken = $accessToken
+
+  $rotatedRefreshToken = [string]$response.refresh_token
+  if ([string]::IsNullOrWhiteSpace($rotatedRefreshToken)) {
+    $rotatedRefreshToken = $script:BridgeRefreshToken
+  }
+  $script:BridgeRefreshToken = $rotatedRefreshToken
+  Save-BridgeRefreshToken $script:BridgeRefreshToken
+}
+
+function Initialize-BridgeCredential {
+  $script:BridgeRefreshToken = Get-BridgeRefreshToken
+  if ([string]::IsNullOrWhiteSpace($script:BridgeAccessToken)) {
+    if ([string]::IsNullOrWhiteSpace($script:BridgeRefreshToken)) {
+      throw "Set RONSAS_BRIDGE_ACCESS_TOKEN or bootstrap RONSAS_BRIDGE_REFRESH_TOKEN"
+    }
+    Invoke-BridgeTokenRefresh
+  }
+}
+
+function Get-BridgeAuthHeaders {
+  if ([string]::IsNullOrWhiteSpace($script:BridgeAccessToken)) {
+    throw "bridge_access_token_unavailable"
+  }
+  return @{
+    "apikey" = $PublishableKey
+    "Authorization" = "Bearer $($script:BridgeAccessToken)"
+    "Content-Type" = "application/json"
+  }
+}
+
+function Test-BridgeUnauthorizedError($ErrorRecord) {
+  $responseProperty = $ErrorRecord.Exception.PSObject.Properties["Response"]
+  if ($null -eq $responseProperty -or $null -eq $responseProperty.Value) { return $false }
+  $statusProperty = $responseProperty.Value.PSObject.Properties["StatusCode"]
+  if ($null -eq $statusProperty) { return $false }
+  try {
+    return ([int]$statusProperty.Value -eq 401)
+  } catch {
+    return $false
+  }
+}
+
+Initialize-BridgeCredential
 
 function Invoke-BridgeRpc([string]$FunctionName, [hashtable]$Body) {
   $uri = "$SupabaseUrl/rest/v1/rpc/$FunctionName"
   $json = $Body | ConvertTo-Json -Depth 30 -Compress
-  return Invoke-RestMethod -Method Post -Uri $uri -Headers $headers -Body $json
+
+  for ($attempt = 1; $attempt -le 2; $attempt++) {
+    try {
+      return Invoke-RestMethod -Method Post -Uri $uri -Headers (Get-BridgeAuthHeaders) -Body $json
+    } catch {
+      $canRefresh = (
+        $attempt -eq 1 -and
+        (Test-BridgeUnauthorizedError $_) -and
+        -not [string]::IsNullOrWhiteSpace($script:BridgeRefreshToken)
+      )
+      if (-not $canRefresh) { throw }
+      Invoke-BridgeTokenRefresh
+    }
+  }
+  throw "bridge_rpc_retry_exhausted"
 }
 
 function Get-Workspace([string]$WorkspaceId) {
