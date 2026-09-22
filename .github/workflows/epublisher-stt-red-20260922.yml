@@ -5,6 +5,7 @@ on:
     branches: [ronsas/epublisher-stt-runtime-sync-20260922]
     paths:
       - "scripts/lib/epublisher-stt-runtime-sync.test.ts"
+      - "ops/ealiophin/cluster/START-RONSAS-ECOSYSTEM.ps1"
       - ".github/workflows/epublisher-stt-red-20260922.yml"
 
 permissions:
