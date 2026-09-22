@@ -1,5 +1,5 @@
 name: Governed Linux runner recovery
-# Recovery supersession trigger: 2026-09-22 (Desktop Commander quota fallback; refresh stale Linux CI assignment)
+# Recovery supersession trigger: 2026-09-21T01:49Z (post-prebuild stale-busy recycle)
 
 on:
   workflow_dispatch:
