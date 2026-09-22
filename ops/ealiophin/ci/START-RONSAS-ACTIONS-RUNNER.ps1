@@ -39,6 +39,52 @@ function Get-RunnerProcessState([string]$Name) {
     }
 }
 
+function Test-GovernedPodmanProxyConnectivity([string]$Name) {
+    $priorErrorActionPreference = $ErrorActionPreference
+    $exitCode = 1
+    try {
+        # Windows PowerShell 5.1 can promote transient native stderr into a
+        # terminating NativeCommandError while the replacement container is
+        # still transitioning. Treat that as a retryable readiness signal.
+        $ErrorActionPreference = 'Continue'
+        & $podman exec $Name podman --remote version *> $null
+        $exitCode = [int]$LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $priorErrorActionPreference
+    }
+    return ($exitCode -eq 0)
+}
+
+function Wait-RunnerContainerReady([string]$Name, [int]$MaxAttempts = 30, [int]$DelaySeconds = 2) {
+    for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
+        if (Test-ContainerExists $Name) {
+            $info = (& $podman inspect $Name | ConvertFrom-Json)[0]
+            if ($info.State.Running) {
+                $runnerState = Get-RunnerProcessState $Name
+                if ($runnerState.listener) {
+                    Write-Host "Runner container ready after attempt $attempt/$MaxAttempts." -ForegroundColor Green
+                    return $true
+                }
+            }
+        }
+        Write-Host "Runner container not fully ready yet; attempt $attempt/$MaxAttempts." -ForegroundColor Yellow
+        Start-Sleep -Seconds $DelaySeconds
+    }
+    return $false
+}
+
+function Wait-GovernedPodmanProxyConnectivity([string]$Name, [int]$MaxAttempts = 30, [int]$DelaySeconds = 2) {
+    for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
+        if (Test-GovernedPodmanProxyConnectivity $Name) {
+            Write-Host "Governed Podman connectivity ready after attempt $attempt/$MaxAttempts." -ForegroundColor Green
+            return $true
+        }
+        Write-Host "Governed Podman connectivity not ready yet; attempt $attempt/$MaxAttempts." -ForegroundColor Yellow
+        Start-Sleep -Seconds $DelaySeconds
+    }
+    return $false
+}
+
 function Get-OtherInProgressWorkflowRuns {
     $raw = @(& $gh api "repos/$Repository/actions/runs?status=in_progress&per_page=100")
     if ($LASTEXITCODE -ne 0) { throw 'Unable to query in-progress GitHub workflow runs.' }
@@ -86,8 +132,7 @@ if (Test-ContainerExists $Container) {
     $info = (& $podman inspect $Container | ConvertFrom-Json)[0]
     $attached = ($info.NetworkSettings.PSObject.Properties.Name -contains 'Networks') -and ($info.NetworkSettings.Networks.PSObject.Properties.Name -contains $Network)
     if ($info.State.Running -and $attached) {
-        & $podman exec $Container podman --remote version *> $null
-        $engineReady = ($LASTEXITCODE -eq 0)
+        $engineReady = Test-GovernedPodmanProxyConnectivity $Container
         $runnerState = Get-RunnerProcessState $Container
 
         if ($engineReady -and -not $runnerState.listener) {
@@ -103,8 +148,7 @@ if (Test-ContainerExists $Container) {
 
             $info = (& $podman inspect $Container | ConvertFrom-Json)[0]
             $attached = ($info.NetworkSettings.PSObject.Properties.Name -contains 'Networks') -and ($info.NetworkSettings.Networks.PSObject.Properties.Name -contains $Network)
-            & $podman exec $Container podman --remote version *> $null
-            $engineReady = ($LASTEXITCODE -eq 0)
+            $engineReady = Test-GovernedPodmanProxyConnectivity $Container
             $runnerState = Get-RunnerProcessState $Container
         }
 
@@ -238,8 +282,12 @@ for ($i = 0; $i -lt 45; $i++) {
 if (-not $online) { throw 'RONSAS Actions runner did not become online.' }
 Ensure-RunnerLabels $registered
 
-& $podman exec $Container podman --remote version *> $null
-if ($LASTEXITCODE -ne 0) { throw 'Runner cannot reach governed Podman API proxy.' }
+if (-not (Wait-RunnerContainerReady $Container 30 2)) {
+    throw 'Replacement runner container did not become running with Runner.Listener active within the bounded readiness window.'
+}
+if (-not (Wait-GovernedPodmanProxyConnectivity $Container 30 2)) {
+    throw 'Runner cannot reach governed Podman API proxy after the bounded readiness window.'
+}
 
 Write-Host "RONSAS Actions runner online: $RunnerName on $Network" -ForegroundColor Green
 Write-Host "Container: $Container | Image: $Image | Proxy: $Proxy"
