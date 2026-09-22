@@ -58,6 +58,8 @@ function Get-BridgeRefreshToken {
 
   $bootstrap = [Environment]::GetEnvironmentVariable("RONSAS_BRIDGE_REFRESH_TOKEN")
   if (-not [string]::IsNullOrWhiteSpace($bootstrap)) {
+    Save-BridgeRefreshToken $bootstrap
+    [Environment]::SetEnvironmentVariable("RONSAS_BRIDGE_REFRESH_TOKEN", $null, "Process")
     return $bootstrap
   }
   return $null
