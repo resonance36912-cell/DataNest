@@ -1,0 +1,25 @@
+{
+  "schema": "ronsas-railway-hub-source-refresh/v1",
+  "projectId": "70cc7bde-c5ba-4224-9c74-ddb873b27379",
+  "environmentId": "78627988-2f5f-42a8-a507-ee5e221bf10a",
+  "serviceId": "0d511033-eae2-46a5-8d54-6085a0b6166b",
+  "repo": "resonance36912-cell/resonance-hub",
+  "branch": "ronsas/ealiophin-production",
+  "expectedCommit": "211943c95e92a236d754d636651cab18f02ec1f0",
+  "confirmation": "REFRESH RAILWAY HUB FALLBACK SOURCE",
+  "recovery": {
+    "refreshSourceSnapshot": true,
+    "disconnectExistingSource": true,
+    "reconnectSameGitHubSource": true
+  },
+  "constraints": {
+    "createService": false,
+    "changeServiceIdentity": false,
+    "changeDomains": false,
+    "changeBilling": false,
+    "changeVariables": false,
+    "changeCloudflare": false,
+    "changeHealthcheck": false,
+    "changeReplicas": false
+  }
+}
