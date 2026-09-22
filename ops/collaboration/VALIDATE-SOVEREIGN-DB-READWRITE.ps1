@@ -76,7 +76,7 @@ function Wait-Http([string]$Url,[string]$Expected,[System.Diagnostics.Process]$P
 }
 
 function Invoke-PsqlText([string]$Sql){
-  $Sql | & $containerCli exec -i $containerName psql -v ON_ERROR_STOP=1 -U resonance -d resonance
+  $Sql | & $containerCli exec -i -e "PGPASSWORD=$dbPassword" $containerName psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -p 5432 -U resonance -d resonance
   if($LASTEXITCODE -ne 0){throw 'Postgres SQL execution failed.'}
 }
 
@@ -134,7 +134,7 @@ try {
 
   for($i=1;$i -le 60;$i++){
     Start-Sleep -Milliseconds 500
-    & $containerCli exec $containerName pg_isready -U resonance -d resonance *> $null
+    & $containerCli exec -e "PGPASSWORD=$dbPassword" $containerName psql -h 127.0.0.1 -p 5432 -U resonance -d resonance -t -A -c 'SELECT 1;' *> $null
     if($LASTEXITCODE -eq 0){break}
     if($i -eq 60){throw 'Disposable Postgres did not become ready.'}
   }
@@ -262,8 +262,8 @@ AS $$ SELECT NULLIF(current_setting('request.jwt.claim.sub', true), '')::uuid $$
     if($LASTEXITCODE -ne 0){throw 'Authenticated sovereign DB harness failed.'}
   } finally {Pop-Location}
 
-  $projectCount=((& $containerCli exec $containerName psql -t -A -U resonance -d resonance -c 'SELECT count(*) FROM nova_projects;') -join '').Trim()
-  $artifactCount=((& $containerCli exec $containerName psql -t -A -U resonance -d resonance -c 'SELECT count(*) FROM datanest_artifacts;') -join '').Trim()
+  $projectCount=((& $containerCli exec -e "PGPASSWORD=$dbPassword" $containerName psql -h 127.0.0.1 -p 5432 -t -A -U resonance -d resonance -c 'SELECT count(*) FROM nova_projects;') -join '').Trim()
+  $artifactCount=((& $containerCli exec -e "PGPASSWORD=$dbPassword" $containerName psql -h 127.0.0.1 -p 5432 -t -A -U resonance -d resonance -c 'SELECT count(*) FROM datanest_artifacts;') -join '').Trim()
   if($projectCount -ne '1'){throw "Expected one isolated Nova project, found $projectCount."}
   if($artifactCount -ne '1'){throw "Expected one isolated DataNest artifact, found $artifactCount."}
   Write-Host 'RONSAS_ISOLATED_DB_COUNTS_PASS=1'
