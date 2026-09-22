@@ -4,7 +4,7 @@ name: Validate sovereign DB authenticated read-write 2026-09-21
 on:
   workflow_dispatch:
   push:
-    branches: [ronsas/sovereign-db-certification-20260922]
+    branches: [main, ronsas/sovereign-db-certification-20260922]
     paths:
       - .github/workflows/validate-sovereign-db-readwrite-ealiophin-20260921.yml
       - ops/collaboration/VALIDATE-SOVEREIGN-DB-READWRITE.ps1
