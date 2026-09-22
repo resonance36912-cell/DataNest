@@ -1,5 +1,5 @@
 name: One-shot Windows runner bootstrap staging
-# Restage trigger: 2026-09-21 Windows runner handoff recovery
+# Restage trigger: 2026-09-22 ePublisher production repair
 
 on:
   push:
