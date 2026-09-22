@@ -17,7 +17,7 @@ concurrency:
 jobs:
   verify:
     name: Run all prebuild verification scripts
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     timeout-minutes: 10
     steps:
       - name: Check out repository
@@ -302,7 +302,7 @@ jobs:
   security-scan-integration:
     name: Security scan RPC integration tests (${{ matrix.mode }})
     needs: verify
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     timeout-minutes: 15
     strategy:
       fail-fast: false
