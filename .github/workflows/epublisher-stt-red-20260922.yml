@@ -6,6 +6,9 @@ on:
     paths:
       - "scripts/lib/epublisher-stt-runtime-sync.test.ts"
       - "ops/ealiophin/cluster/START-RONSAS-ECOSYSTEM.ps1"
+      - "ops/ealiophin/control-center/RONS-Supervisor.ps1"
+      - "ops/ealiophin/control-center/RONS-ePublisher-STT.ps1"
+      - "ops/ealiophin/control-center/REGISTER-RONS-EPUBLISHER-STT-TASK.ps1"
       - ".github/workflows/epublisher-stt-red-20260922.yml"
 
 permissions:
@@ -17,93 +20,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  red:
+  verify:
     runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
-      - name: Run focused regression assertion
-        id: test
-        continue-on-error: true
-        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
-        run: |
-          $path = 'ops\ealiophin\cluster\START-RONSAS-ECOSYSTEM.ps1'
-          $text = Get-Content -LiteralPath $path -Raw
-          $needles = @(
-            "`$sttSource = Join-Path `$opsRuntime 'syncvision-local-stt.py'",
-            "`$sttTarget = Join-Path `$Runtime 'syncvision-local-stt.py'",
-            "Copy-Item -LiteralPath `$sttSource -Destination `$sttTarget -Force"
-          )
-          $missing = @($needles | Where-Object { -not $text.Contains($_) })
-          $lines = @(
-            'Focused runtime-sync regression',
-            ('missing_count=' + $missing.Count),
-            ($missing | ForEach-Object { 'MISSING: ' + $_ })
-          )
-          $lines | Set-Content -LiteralPath $env:RUNNER_TEMP\epublisher-stt-red.txt -Encoding UTF8
-          "exit_code=" + $(if ($missing.Count) { 1 } else { 0 }) | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-          if ($missing.Count) { exit 1 }
-      - name: Publish RED receipt
-        if: always()
-        uses: actions/github-script@v8
-        env:
-          EXIT_CODE: ${{ steps.test.outputs.exit_code }}
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            const fs = require("fs");
-            const p = process.env.RUNNER_TEMP + "\\epublisher-stt-red.txt";
-            let out = fs.existsSync(p) ? fs.readFileSync(p, "utf8") : "<missing test output>";
-            const body = ["EPUBLISHER_STT_FOCUSED_CHECK", "", "SHA: " + context.sha, "exit_code=" + (process.env.EXIT_CODE || "unknown"), "", "```", out, "```"].join("\n");
-            await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
-      - name: Capture supervisor control state
-        if: steps.test.outcome == 'success'
-        id: supervisor
+
+      - name: Verify runtime-sync implementation
+        id: regression
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $ErrorActionPreference = 'Stop'
-          $control = Join-Path $env:LOCALAPPDATA 'Resonance\RONS-ControlCenter'
-          $configPath = Join-Path $control 'rons-control.json'
-          $state = [ordered]@{
-            config_exists = (Test-Path -LiteralPath $configPath -PathType Leaf)
-            ensure_suite = $null
-            ensure_public_edge = $null
-            services = @()
-            port_7869_listening = $false
+          $path = 'ops\ealiophin\cluster\START-RONSAS-ECOSYSTEM.ps1'
+          $text = Get-Content -LiteralPath $path -Raw
+          $needles = @(
+            "$sttSource = Join-Path $opsRuntime 'syncvision-local-stt.py'",
+            "$sttTarget = Join-Path $Runtime 'syncvision-local-stt.py'",
+            "Copy-Item -LiteralPath $sttSource -Destination $sttTarget -Force",
+            "Assert-KnownPort 'epublisher-stt' 7869 'syncvision-local-stt.py'",
+            "Start-PythonService 'epublisher-stt' 7869"
+          )
+          $missing = @($needles | Where-Object { -not $text.Contains($_) })
+          if ($missing.Count) {
+            throw ("Missing governed STT runtime-sync assertions: " + ($missing -join '; '))
           }
-          if ($state.config_exists) {
-            $cfg = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
-            if ($cfg.autonomy) {
-              $state['ensure_suite'] = [bool]$cfg.autonomy.ensureSuite
-              $state['ensure_public_edge'] = [bool]$cfg.autonomy.ensurePublicEdge
-            }
-            $state['services'] = @($cfg.services | ForEach-Object {
-              [ordered]@{
-                key = [string]$_.key
-                name = [string]$_.name
-                port = [int]$_.port
-                required = [bool]$_.required
-              }
-            })
-          }
-          $netstat = (& netstat.exe -ano -p tcp | Out-String)
-          $state['port_7869_listening'] = [bool]($netstat -match '(?m)^\s*TCP\s+\S+:7869\s+\S+\s+LISTENING\s+\d+\s*$')
-          $json = $state | ConvertTo-Json -Depth 8 -Compress
-          "supervisor_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          'regression_json={"ok":true,"missing_count":0}' | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
-      - name: Publish supervisor control state
-        if: always() && steps.test.outcome == 'success'
-        uses: actions/github-script@v8
-        env:
-          SUPERVISOR_JSON: ${{ steps.supervisor.outputs.supervisor_json }}
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            const body = ["EPUBLISHER_STT_SUPERVISOR_STATE", "", "SHA: " + context.sha, "", process.env.SUPERVISOR_JSON || "{}"].join("\n");
-            await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
-
-      - name: Reconcile live STT supervision
-        if: steps.test.outcome == 'success'
+      - name: Reconcile persistent ePublisher STT supervision
         id: repair
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
@@ -113,11 +56,11 @@ jobs:
           $control = Join-Path $env:LOCALAPPDATA 'Resonance\RONS-ControlCenter'
           $configPath = Join-Path $control 'rons-control.json'
           $liveSupervisor = Join-Path $control 'RONS-Supervisor.ps1'
+          $liveTaskRunner = Join-Path $control 'RONS-ePublisher-STT.ps1'
+          $liveTaskInstaller = Join-Path $control 'REGISTER-RONS-EPUBLISHER-STT-TASK.ps1'
           $sourceSupervisor = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\control-center\RONS-Supervisor.ps1'
           $sourceTaskRunner = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\control-center\RONS-ePublisher-STT.ps1'
           $sourceTaskInstaller = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\control-center\REGISTER-RONS-EPUBLISHER-STT-TASK.ps1'
-          $liveTaskRunner = Join-Path $control 'RONS-ePublisher-STT.ps1'
-          $liveTaskInstaller = Join-Path $control 'REGISTER-RONS-EPUBLISHER-STT-TASK.ps1'
           $runtimeSource = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\runtime\syncvision-local-stt.py'
           $runtimeTarget = Join-Path $runtime 'syncvision-local-stt.py'
 
@@ -125,40 +68,27 @@ jobs:
             if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) { throw "Required governed path missing: $requiredPath" }
           }
 
-          $cfg = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
-          $entry = @($cfg.services | Where-Object {
-            ([string]$_.key -eq 'epublisher-stt') -or ([int]$_.port -eq 7869)
-          }) | Select-Object -First 1
-          $configChanged = $false
-          if ($entry) {
-            if (-not [bool]$entry.required) {
-              $entry.required = $true
-              $configChanged = $true
-            }
-          } else {
-            $cfg.services += [pscustomobject]@{
-              key = 'epublisher-stt'
-              name = 'ePublisher Speech-to-Text'
-              port = 7869
-              required = $true
-            }
-            $configChanged = $true
-          }
-          if ($configChanged) {
-            $json = $cfg | ConvertTo-Json -Depth 20
-            [IO.File]::WriteAllText($configPath, $json, (New-Object Text.UTF8Encoding($false)))
-          }
-
-          function Sync-GovernedFile([string]$Source,[string]$Target) {
+          function Sync-GovernedFile([string]$Source, [string]$Target) {
             $changed = $true
             if (Test-Path -LiteralPath $Target -PathType Leaf) {
-              $changed = (
-                (Get-FileHash -LiteralPath $Source -Algorithm SHA256).Hash -ne
-                (Get-FileHash -LiteralPath $Target -Algorithm SHA256).Hash
-              )
+              $changed = ((Get-FileHash -LiteralPath $Source -Algorithm SHA256).Hash -ne (Get-FileHash -LiteralPath $Target -Algorithm SHA256).Hash)
             }
             if ($changed) { Copy-Item -LiteralPath $Source -Destination $Target -Force }
             return $changed
+          }
+
+          $cfg = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
+          $entry = @($cfg.services | Where-Object { ([string]$_.key -eq 'epublisher-stt') -or ([int]$_.port -eq 7869) }) | Select-Object -First 1
+          $configChanged = $false
+          if ($entry) {
+            if (-not [bool]$entry.required) { $entry.required = $true; $configChanged = $true }
+          } else {
+            $cfg.services += [pscustomobject]@{ key='epublisher-stt'; name='ePublisher Speech-to-Text'; port=7869; required=$true }
+            $configChanged = $true
+          }
+          if ($configChanged) {
+            $cfgJson = $cfg | ConvertTo-Json -Depth 20
+            [IO.File]::WriteAllText($configPath, $cfgJson, (New-Object Text.UTF8Encoding($false)))
           }
 
           $supervisorChanged = Sync-GovernedFile $sourceSupervisor $liveSupervisor
@@ -167,214 +97,109 @@ jobs:
           $runtimeChanged = Sync-GovernedFile $runtimeSource $runtimeTarget
 
           $taskOutput = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $liveTaskInstaller 2>&1
-          if ($LASTEXITCODE -ne 0) {
-            throw ("ePublisher STT scheduled task install failed: " + (($taskOutput | Select-Object -Last 12) -join ' | '))
-          }
+          if ($LASTEXITCODE -ne 0) { throw ("ePublisher STT scheduled task install failed: " + (($taskOutput | Select-Object -Last 12) -join ' | ')) }
 
-          try {
-            $health = Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:7869/health' -TimeoutSec 5
-            $healthy = ([int]$health.StatusCode -eq 200)
-          } catch {
-            $healthy = $false
-          }
-          if (-not $healthy) { throw "ePublisher STT scheduled task is not healthy on port 7869" }
+          $deadline = (Get-Date).AddSeconds(90)
+          $healthy = $false
+          do {
+            try {
+              $health = Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:7869/health' -TimeoutSec 5
+              $healthy = ([int]$health.StatusCode -eq 200)
+            } catch { $healthy = $false }
+            if (-not $healthy) { Start-Sleep -Seconds 2 }
+          } while (-not $healthy -and (Get-Date) -lt $deadline)
+          if (-not $healthy) { throw 'Persistent ePublisher STT task is not healthy on port 7869' }
 
-          $result = [ordered]@{
-            config_changed = $configChanged
-            supervisor_changed = $supervisorChanged
-            task_runner_changed = $taskRunnerChanged
-            task_installer_changed = $taskInstallerChanged
-            runtime_changed = $runtimeChanged
-            scheduled_task_registered = $true
-            port_7869_healthy = $healthy
-          }
+          $result = [ordered]@{ config_changed=$configChanged; supervisor_changed=$supervisorChanged; task_runner_changed=$taskRunnerChanged; task_installer_changed=$taskInstallerChanged; runtime_changed=$runtimeChanged; scheduled_task_registered=$true; port_7869_healthy=$true }
           $json = $result | ConvertTo-Json -Compress
           "repair_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
-      - name: Publish governed recovery result
-        if: always() && steps.test.outcome == 'success'
-        uses: actions/github-script@v8
-        env:
-          REPAIR_JSON: ${{ steps.repair.outputs.repair_json }}
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            const body = ["EPUBLISHER_STT_GOVERNED_RECOVERY", "", "SHA: " + context.sha, "", process.env.REPAIR_JSON || "{}"].join("\n");
-            await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
-
-      - name: Capture bounded STT acceptance result
-        if: steps.test.outcome == 'success'
-        id: source
+      - name: Run bounded STT acceptance probe
+        id: acceptance
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
-          $runtime = Join-Path $env:USERPROFILE 'Resonance\OpenNova\runtime'
-          $python = Join-Path $runtime 'python-envs\epublisher-stt\Scripts\python.exe'
-          $probe = Join-Path $env:RUNNER_TEMP 'epublisher-source-probe.py'
-          @'
-          import json, urllib.request, urllib.error, time
-          out={}
-          def get_json(url, timeout=10):
-              try:
-                  with urllib.request.urlopen(url, timeout=timeout) as resp:
-                      raw=resp.read().decode('utf-8','replace')
-                      return {'status':resp.status,'ok':True,'body':json.loads(raw)}
-              except urllib.error.HTTPError as exc:
-                  raw=exc.read().decode('utf-8','replace')
-                  return {'status':exc.code,'ok':False,'detail':raw[:1200]}
-              except Exception as exc:
-                  return {'status':None,'ok':False,'detail':str(exc)[:1200]}
-          def post_url(url, video_url, timeout=180):
-              payload=json.dumps({'url':video_url,'mode':'fast'}).encode('utf-8')
-              req=urllib.request.Request(url,data=payload,method='POST',headers={'Content-Type':'application/json'})
-              try:
-                  with urllib.request.urlopen(req,timeout=timeout) as resp:
-                      raw=resp.read().decode('utf-8','replace')
-                      obj=json.loads(raw)
-                      return {'status':resp.status,'ok':True,'text_length':len(str(obj.get('text') or '')),'provider':(obj.get('quality') or {}).get('provider'),'video_id':obj.get('video_id')}
-              except urllib.error.HTTPError as exc:
-                  raw=exc.read().decode('utf-8','replace')
-                  return {'status':exc.code,'ok':False,'detail':raw[:1600]}
-              except Exception as exc:
-                  return {'status':None,'ok':False,'detail':str(exc)[:1600]}
-          out['direct_health_before']=get_json('http://127.0.0.1:7869/health')
-          out['public_proxy_health']=get_json('https://epublisher.reson8.life/open-nova-stt/health', 20)
-          # Known public source that has previously exercised the full yt-dlp -> local STT path.
-          out['public_source']=post_url('http://127.0.0.1:7869/transcribe-url','https://www.youtube.com/watch?v=1CGlQSzPXRM',180)
-          time.sleep(3)
-          out['direct_health_after']=get_json('http://127.0.0.1:7869/health')
-          # The screenshot's Part 1 URL is age-restricted. Probe it briefly and
-          # preserve source-unavailable as a content-access result, not an infrastructure 502.
-          out['restricted_source']=post_url('http://127.0.0.1:7869/transcribe-url','https://www.youtube.com/watch?v=CxKEyVgYBpk',30)
-          print(json.dumps(out,separators=(',',':')))
-          '@ | Set-Content -LiteralPath $probe -Encoding UTF8
-          $json = & $python $probe
-          "source_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-      - name: Publish bounded STT acceptance result
-        if: always() && steps.test.outcome == 'success'
-        uses: actions/github-script@v8
-        env:
-          SOURCE_JSON: ${{ steps.source.outputs.source_json }}
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            const body = ["EPUBLISHER_STT_SOURCE_DIAGNOSTIC", "", "SHA: " + context.sha, "", process.env.SOURCE_JSON || "{}"].join("\n");
-            await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
+          $ErrorActionPreference = 'Stop'
+          function Get-HttpResult([string]$Url, [int]$TimeoutSec = 10) {
+            try {
+              $response = Invoke-WebRequest -UseBasicParsing -Uri $Url -TimeoutSec $TimeoutSec
+              return [ordered]@{ status=[int]$response.StatusCode; ok=([int]$response.StatusCode -eq 200) }
+            } catch {
+              $status = $null
+              if ($_.Exception.Response -and $_.Exception.Response.StatusCode) { $status = [int]$_.Exception.Response.StatusCode }
+              return [ordered]@{ status=$status; ok=$false; detail=$_.Exception.Message }
+            }
+          }
+          function Post-SttUrl([string]$VideoUrl, [int]$TimeoutSec) {
+            $body = @{ url=$VideoUrl; mode='fast' } | ConvertTo-Json -Compress
+            try {
+              $response = Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:7869/transcribe-url' -Method Post -ContentType 'application/json' -Body $body -TimeoutSec $TimeoutSec
+              $payload = $response.Content | ConvertFrom-Json
+              return [ordered]@{ status=[int]$response.StatusCode; ok=([int]$response.StatusCode -eq 200 -and [bool]([string]$payload.text)); text_length=([string]$payload.text).Length; provider=[string]$payload.quality.provider; video_id=[string]$payload.video_id }
+            } catch {
+              $status = $null
+              $detail = $_.Exception.Message
+              if ($_.Exception.Response) {
+                if ($_.Exception.Response.StatusCode) { $status = [int]$_.Exception.Response.StatusCode }
+                try {
+                  $reader = New-Object IO.StreamReader($_.Exception.Response.GetResponseStream())
+                  $detail = $reader.ReadToEnd()
+                  $reader.Dispose()
+                } catch { }
+              }
+              return [ordered]@{ status=$status; ok=$false; detail=$detail }
+            }
+          }
 
-      - name: Capture persistent STT task state
-        if: always() && steps.test.outcome == 'success'
+          $result = [ordered]@{}
+          $result.direct_health_before = Get-HttpResult 'http://127.0.0.1:7869/health' 10
+          $result.public_proxy_health = Get-HttpResult 'https://epublisher.reson8.life/open-nova-stt/health' 20
+          $result.public_source = Post-SttUrl 'https://www.youtube.com/watch?v=1CGlQSzPXRM' 180
+          Start-Sleep -Seconds 3
+          $result.direct_health_after = Get-HttpResult 'http://127.0.0.1:7869/health' 10
+          $result.restricted_source = Post-SttUrl 'https://www.youtube.com/watch?v=CxKEyVgYBpk' 30
+          $acceptanceOk = ($result.direct_health_before.ok -and $result.public_proxy_health.ok -and $result.public_source.ok -and $result.direct_health_after.ok -and ($result.restricted_source.status -ne 502) -and ($null -ne $result.restricted_source.status))
+          $result.acceptance_ok = [bool]$acceptanceOk
+          $json = $result | ConvertTo-Json -Depth 8 -Compress
+          "acceptance_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          if (-not $acceptanceOk) { throw "ePublisher STT bounded acceptance failed: $json" }
+
+      - name: Capture persistent task state
         id: persistent
+        if: always()
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
           $runtime = Join-Path $env:USERPROFILE 'Resonance\OpenNova\runtime'
           $log = Join-Path $runtime 'logs\rons-cluster\epublisher-stt-task.log'
-          $state = [ordered]@{
-            port_7869_listening = $false
-            task_query = ''
-            log_tail = ''
-          }
           $netstat = (& netstat.exe -ano -p tcp | Out-String)
-          $state['port_7869_listening'] = [bool]($netstat -match '(?m)^\s*TCP\s+\S+:7869\s+\S+\s+LISTENING\s+\d+\s*
+          $listening = [bool]($netstat -match '(?m)^\s*TCP\s+\S+:7869\s+\S+\s+LISTENING\s+\d+\s*$')
           $taskText = (& schtasks.exe /Query /TN "RONS ePublisher STT" /FO LIST /V 2>&1 | Out-String)
-          if ($taskText.Length -gt 3000) { $taskText = $taskText.Substring($taskText.Length - 3000) }
-          $state['task_query'] = $taskText
+          if ($taskText.Length -gt 2500) { $taskText = $taskText.Substring($taskText.Length - 2500) }
+          $logTail = ''
           if (Test-Path -LiteralPath $log -PathType Leaf) {
-            $tail = (Get-Content -LiteralPath $log -Tail 80 -ErrorAction SilentlyContinue | Out-String)
-            if ($tail.Length -gt 6000) { $tail = $tail.Substring($tail.Length - 6000) }
-            $tail = $tail -replace '(?im)^.*cookie.*
-            $state['log_tail'] = $tail
+            $logTail = (Get-Content -LiteralPath $log -Tail 60 -ErrorAction SilentlyContinue | Out-String)
+            $logTail = $logTail -replace '(?im)^.*cookie.*$', '[cookie-related log line redacted]'
+            if ($logTail.Length -gt 4000) { $logTail = $logTail.Substring($logTail.Length - 4000) }
           }
+          $state = [ordered]@{ port_7869_listening=$listening; task_query=$taskText; log_tail=$logTail }
           $json = $state | ConvertTo-Json -Depth 6 -Compress
           "persistent_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
-      - name: Publish persistent STT task state
-        if: always() && steps.test.outcome == 'success'
+      - name: Publish validation receipt
+        if: always()
         uses: actions/github-script@v8
         env:
+          REGRESSION_JSON: ${{ steps.regression.outputs.regression_json }}
+          REPAIR_JSON: ${{ steps.repair.outputs.repair_json }}
+          ACCEPTANCE_JSON: ${{ steps.acceptance.outputs.acceptance_json }}
           PERSISTENT_JSON: ${{ steps.persistent.outputs.persistent_json }}
         with:
           github-token: ${{ github.token }}
           script: |
-            const body = ["EPUBLISHER_STT_PERSISTENT_STATE", "", "SHA: " + context.sha, "", process.env.PERSISTENT_JSON || "{}"].join("\n");
+            const payload = {
+              regression: JSON.parse(process.env.REGRESSION_JSON || "{}"),
+              repair: JSON.parse(process.env.REPAIR_JSON || "{}"),
+              acceptance: JSON.parse(process.env.ACCEPTANCE_JSON || "{}"),
+              persistent: JSON.parse(process.env.PERSISTENT_JSON || "{}"),
+            };
+            const body = ["EPUBLISHER_STT_ACCEPTANCE", "", "SHA: " + context.sha, "", JSON.stringify(payload)].join("\n");
             await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
-
-      - name: Preserve focused check state
-        if: steps.test.outcome == 'failure'
-        run: exit 1
-)
-          $taskText = (& schtasks.exe /Query /TN "RONS ePublisher STT" /FO LIST /V 2>&1 | Out-String)
-          if ($taskText.Length -gt 3000) { $taskText = $taskText.Substring($taskText.Length - 3000) }
-          $state['task_query'] = $taskText
-          if (Test-Path -LiteralPath $log -PathType Leaf) {
-            $tail = (Get-Content -LiteralPath $log -Tail 80 -ErrorAction SilentlyContinue | Out-String)
-            if ($tail.Length -gt 6000) { $tail = $tail.Substring($tail.Length - 6000) }
-            $tail = $tail -replace '(?im)^.*cookie.*        if: steps.test.outcome == 'failure'
-        run: exit 1
-, '[cookie-related log line redacted]'
-            $state['log_tail'] = $tail
-          }
-          $json = $state | ConvertTo-Json -Depth 6 -Compress
-          "persistent_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-
-      - name: Publish persistent STT task state
-        if: always() && steps.test.outcome == 'success'
-        uses: actions/github-script@v8
-        env:
-          PERSISTENT_JSON: ${{ steps.persistent.outputs.persistent_json }}
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            const body = ["EPUBLISHER_STT_PERSISTENT_STATE", "", "SHA: " + context.sha, "", process.env.PERSISTENT_JSON || "{}"].join("\n");
-            await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
-
-      - name: Preserve focused check state
-        if: steps.test.outcome == 'failure'
-        run: exit 1
-, '[cookie-related log line redacted]'
-            $state['log_tail'] = $tail
-          }
-          $json = $state | ConvertTo-Json -Depth 6 -Compress
-          "persistent_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-
-      - name: Publish persistent STT task state
-        if: always() && steps.test.outcome == 'success'
-        uses: actions/github-script@v8
-        env:
-          PERSISTENT_JSON: ${{ steps.persistent.outputs.persistent_json }}
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            const body = ["EPUBLISHER_STT_PERSISTENT_STATE", "", "SHA: " + context.sha, "", process.env.PERSISTENT_JSON || "{}"].join("\n");
-            await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
-
-      - name: Preserve focused check state
-        if: steps.test.outcome == 'failure'
-        run: exit 1
-)
-          $taskText = (& schtasks.exe /Query /TN "RONS ePublisher STT" /FO LIST /V 2>&1 | Out-String)
-          if ($taskText.Length -gt 3000) { $taskText = $taskText.Substring($taskText.Length - 3000) }
-          $state['task_query'] = $taskText
-          if (Test-Path -LiteralPath $log -PathType Leaf) {
-            $tail = (Get-Content -LiteralPath $log -Tail 80 -ErrorAction SilentlyContinue | Out-String)
-            if ($tail.Length -gt 6000) { $tail = $tail.Substring($tail.Length - 6000) }
-            $tail = $tail -replace '(?im)^.*cookie.*        if: steps.test.outcome == 'failure'
-        run: exit 1
-, '[cookie-related log line redacted]'
-            $state['log_tail'] = $tail
-          }
-          $json = $state | ConvertTo-Json -Depth 6 -Compress
-          "persistent_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-
-      - name: Publish persistent STT task state
-        if: always() && steps.test.outcome == 'success'
-        uses: actions/github-script@v8
-        env:
-          PERSISTENT_JSON: ${{ steps.persistent.outputs.persistent_json }}
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            const body = ["EPUBLISHER_STT_PERSISTENT_STATE", "", "SHA: " + context.sha, "", process.env.PERSISTENT_JSON || "{}"].join("\n");
-            await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
-
-      - name: Preserve focused check state
-        if: steps.test.outcome == 'failure'
-        run: exit 1
