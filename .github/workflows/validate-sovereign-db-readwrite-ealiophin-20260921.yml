@@ -50,3 +50,5 @@ jobs:
               Remove-Item -LiteralPath $control -Recurse -Force -ErrorAction SilentlyContinue
             }
           }
+
+# certification gate: exact-source isolated Postgres + authenticated Nova/DataNest read-write
