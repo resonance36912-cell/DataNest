@@ -111,22 +111,23 @@ try {
     }
     $state | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $StatePath -Encoding UTF8
 
+    if ($AutoRemediate) {
+        if ([string]::IsNullOrWhiteSpace($RemediatorPath)) {
+            $RemediatorPath = Join-Path $RepoRoot 'scripts\Invoke-RonsasCiAutofix.ps1'
+        }
+        if (-not (Test-Path -LiteralPath $RemediatorPath -PathType Leaf)) {
+            throw "RONSAS CI remediator missing: $RemediatorPath"
+        }
+        Write-MonitorLog "AUTO-REMEDIATE invoking $RemediatorPath"
+        & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $RemediatorPath -RepoRoot $RepoRoot -Repository $Repository -MonitorStatePath $StatePath
+        $remediationExit = $LASTEXITCODE
+        Write-MonitorLog "AUTO-REMEDIATE completed exit=$remediationExit"
+    }
+
     if ($currentFailures.Count -gt 0) {
         Write-MonitorLog ("CURRENT FAILURE count={0}; account={1}; main={2}" -f $currentFailures.Count, $account, $mainSha)
         foreach ($failure in $currentFailures) {
             Write-MonitorLog ("run={0} workflow='{1}' branch='{2}' sha={3} conclusion={4}" -f $failure.run_id, $failure.workflow, $failure.head_branch, $failure.head_sha, $failure.conclusion)
-        }
-        if ($AutoRemediate) {
-            if ([string]::IsNullOrWhiteSpace($RemediatorPath)) {
-                $RemediatorPath = Join-Path $RepoRoot 'scripts\Invoke-RonsasCiAutofix.ps1'
-            }
-            if (-not (Test-Path -LiteralPath $RemediatorPath -PathType Leaf)) {
-                throw "RONSAS CI remediator missing: $RemediatorPath"
-            }
-            Write-MonitorLog "AUTO-REMEDIATE invoking $RemediatorPath"
-            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $RemediatorPath -RepoRoot $RepoRoot -Repository $Repository -MonitorStatePath $StatePath
-            $remediationExit = $LASTEXITCODE
-            Write-MonitorLog "AUTO-REMEDIATE completed exit=$remediationExit"
         }
         Write-Output "RONSAS CI: $($currentFailures.Count) current failure(s). State: $StatePath"
         exit 2

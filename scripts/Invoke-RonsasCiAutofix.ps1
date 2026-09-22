@@ -104,6 +104,35 @@ The monitor does not paste raw CI logs into issues, to avoid propagating secrets
     return [pscustomobject]@{ number=$null; url=$url; created=$true }
 }
 
+function Resolve-StaleTriageIssues {
+    param([object[]]$CurrentFailures)
+
+    $activeTitles = @{}
+    foreach ($failure in @($CurrentFailures)) {
+        $branch = if ($failure.head_branch) { [string]$failure.head_branch } else { 'unknown' }
+        $title = "[RONSAS CI] $($failure.workflow) failure on $branch"
+        $activeTitles[$title] = $true
+    }
+
+    $monitorMarker = 'Automated RONSAS CI monitor detected a current-head failure.'
+    $issuesRaw = Invoke-GhJson -Arguments @('issue','list','--repo',$Repository,'--state','open','--limit','200','--json','number,title,body,url')
+    $issues = if ([string]::IsNullOrWhiteSpace($issuesRaw)) { @() } else { @($issuesRaw | ConvertFrom-Json) }
+    $staleIssues = @(
+        $issues | Where-Object {
+            ([string]$_.title).StartsWith('[RONSAS CI] ') -and
+            ([string]$_.body).Contains($monitorMarker) -and
+            -not $activeTitles.ContainsKey([string]$_.title)
+        }
+    )
+
+    foreach ($issue in $staleIssues) {
+        $resolution = 'Automated RONSAS CI monitor resolved this alert because it is no longer present in the authoritative current-head failure set. Historical run evidence remains above.'
+        & gh issue close ([string]$issue.number) --repo $Repository --reason completed --comment $resolution | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "Unable to close resolved CI triage issue #$($issue.number)." }
+        Write-RemediationLog "closed stale CI triage issue #$($issue.number): $($issue.title)"
+    }
+}
+
 function Invoke-TransientRerun {
     param([object]$Failure)
     & gh run rerun ([string]$Failure.run_id) --repo $Repository --failed 2>&1 | Out-Null
@@ -223,6 +252,7 @@ try {
 
     $monitor = Get-Content -Raw -LiteralPath $MonitorStatePath | ConvertFrom-Json
     $failures = @($monitor.current_failures)
+    Resolve-StaleTriageIssues -CurrentFailures $failures
     if (-not $failures.Count) {
         Write-RemediationLog 'No current CI failures; no remediation required.'
         Write-Output 'RONSAS CI autofix: no current failures.'

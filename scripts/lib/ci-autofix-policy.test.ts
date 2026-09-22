@@ -33,6 +33,26 @@ describe("guarded CI autofix policy", () => {
     expect(remediate).toContain("gh run rerun");
   });
 
+  test("closes only stale monitor-owned triage issues", () => {
+    expect(remediate).toContain("Resolve-StaleTriageIssues");
+    expect(remediate).toContain("StartsWith('[RONSAS CI] ')");
+    expect(remediate).toContain("Automated RONSAS CI monitor detected a current-head failure.");
+    expect(remediate).toContain("'number,title,body,url'");
+    expect(remediate).toContain("Contains($monitorMarker)");
+    expect(remediate).toContain("$activeTitles.ContainsKey");
+    expect(remediate).toContain("gh issue close");
+    expect(remediate).toContain("Resolve-StaleTriageIssues -CurrentFailures $failures");
+  });
+
+  test("runs remediation after state write even when current heads are green", () => {
+    const stateWrite = monitor.indexOf("$state | ConvertTo-Json");
+    const remediation = monitor.indexOf("if ($AutoRemediate)");
+    const failureBranch = monitor.indexOf("if ($currentFailures.Count -gt 0)");
+    expect(stateWrite).toBeGreaterThan(-1);
+    expect(remediation).toBeGreaterThan(stateWrite);
+    expect(failureBranch).toBeGreaterThan(remediation);
+  });
+
   test("monitor remediation is opt-in and scheduled installer enables it", () => {
     expect(monitor).toContain("AutoRemediate");
     expect(installer).toContain("-AutoRemediate");
