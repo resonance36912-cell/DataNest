@@ -12,7 +12,9 @@ const readme = readFileSync(
 
 test("bridge agent can bootstrap from a refresh token without requiring a long-lived access token", () => {
   expect(agent).toContain("RONSAS_BRIDGE_REFRESH_TOKEN");
-  expect(agent).toContain(\n    "Set RONSAS_BRIDGE_ACCESS_TOKEN or bootstrap RONSAS_BRIDGE_REFRESH_TOKEN",\n  );
+  expect(agent).toContain(
+    "Set RONSAS_BRIDGE_ACCESS_TOKEN or bootstrap RONSAS_BRIDGE_REFRESH_TOKEN",
+  );
   expect(agent).not.toContain('Get-RequiredEnv "RONSAS_BRIDGE_ACCESS_TOKEN"');
   expect(agent).toContain("/auth/v1/token?grant_type=refresh_token");
 });
