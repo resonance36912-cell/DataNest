@@ -233,6 +233,11 @@ AS $$ SELECT NULLIF(current_setting('request.jwt.claim.sub', true), '')::uuid $$
   # observes sovereign mode and the exact ephemeral gateway/auth endpoints during the isolated acceptance run.
   $wranglerConfig=Join-Path $workerDir 'wrangler.json'
   $wrangler=(Get-Content -LiteralPath $wranglerConfig -Raw | ConvertFrom-Json)
+  if(-not $wrangler.PSObject.Properties['compatibility_flags']){
+    $wrangler | Add-Member -NotePropertyName compatibility_flags -NotePropertyValue @('nodejs_compat')
+  } elseif(@($wrangler.compatibility_flags) -notcontains 'nodejs_compat') {
+    $wrangler.compatibility_flags=@($wrangler.compatibility_flags) + 'nodejs_compat'
+  }
   if(-not $wrangler.PSObject.Properties['vars']){$wrangler | Add-Member -NotePropertyName vars -NotePropertyValue ([pscustomobject]@{})}
   $wrangler.vars | Add-Member -NotePropertyName VITE_RONS_AUTH_MODE -NotePropertyValue 'sovereign' -Force
   $wrangler.vars | Add-Member -NotePropertyName RONS_SOVEREIGN_PROXY_ENABLED -NotePropertyValue '1' -Force

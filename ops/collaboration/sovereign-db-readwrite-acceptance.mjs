@@ -13,17 +13,21 @@ function fnId(file, exportName) {
   return crypto.createHash("sha256").update(entryId).digest("hex");
 }
 
-async function callServerFn(file, exportName, payload) {
+async function callServerFn(file, exportName, payload, method = "POST") {
   const serialized = await toJSONAsync(payload);
   const id = fnId(file, exportName);
-  const response = await fetch(`${base}/_serverFn/${id}`, {
-    method: "POST",
+  const endpoint = new URL(`${base}/_serverFn/${id}`);
+  if (method === "GET") {
+    endpoint.searchParams.set("payload", JSON.stringify(serialized));
+  }
+  const response = await fetch(endpoint, {
+    method,
     headers: {
-      "Content-Type": "application/json",
+      ...(method === "POST" ? { "Content-Type": "application/json" } : {}),
       "x-tsr-serverFn": "true",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(serialized),
+    ...(method === "POST" ? { body: JSON.stringify(serialized) } : {}),
   });
   const body = await response.text();
   if (response.status !== 200 || !body.startsWith("{")) {
@@ -58,6 +62,7 @@ const readBack = await callServerFn(
   "/src/lib/nova/functions.ts",
   "getNovaProject",
   { data: { project_id: project.id } },
+  "GET",
 );
 if (readBack?.project?.id !== project.id || readBack.project.name !== projectName) {
   throw new Error("Nova project read-back mismatch");
@@ -106,6 +111,7 @@ const coverage = await callServerFn(
   "/src/lib/datanest/functions.ts",
   "getDataNestCoverage",
   {},
+  "GET",
 );
 const row = coverage?.coverage?.find((entry) => entry.source_key === sourceKey);
 if (!row || Number(row.ingested) < 1 || Number(row.duplicates) < 1 || Number(row.indexed) < 1) {
