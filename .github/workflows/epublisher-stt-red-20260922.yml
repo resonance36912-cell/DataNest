@@ -202,7 +202,7 @@ jobs:
             const body = ["EPUBLISHER_STT_GOVERNED_RECOVERY", "", "SHA: " + context.sha, "", process.env.REPAIR_JSON || "{}"].join("\n");
             await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
 
-      - name: Capture exact source acquisition result
+      - name: Capture bounded STT acceptance result
         if: steps.test.outcome == 'success'
         id: source
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
@@ -211,33 +211,45 @@ jobs:
           $python = Join-Path $runtime 'python-envs\epublisher-stt\Scripts\python.exe'
           $probe = Join-Path $env:RUNNER_TEMP 'epublisher-source-probe.py'
           @'
-          import json, urllib.request, urllib.error
-          import yt_dlp
-          url='https://www.youtube.com/watch?v=CxKEyVgYBpk'
+          import json, urllib.request, urllib.error, time
           out={}
-          try:
-              with yt_dlp.YoutubeDL({'quiet':True,'no_warnings':True,'skip_download':True,'noplaylist':True}) as ydl:
-                  info=ydl.extract_info(url,download=False)
-              out['metadata']={'id':info.get('id'),'duration':info.get('duration'),'availability':info.get('availability'),'live_status':info.get('live_status')}
-          except Exception as exc:
-              out['metadata_error']=str(exc)[-1200:]
-          payload=json.dumps({'url':url,'mode':'fast'}).encode('utf-8')
-          req=urllib.request.Request('http://127.0.0.1:7869/transcribe-url',data=payload,method='POST',headers={'Content-Type':'application/json'})
-          try:
-              with urllib.request.urlopen(req,timeout=90) as resp:
-                  raw=resp.read().decode('utf-8','replace')
-                  obj=json.loads(raw)
-                  out['transcribe']={'status':resp.status,'ok':True,'text_length':len(str(obj.get('text') or '')),'provider':(obj.get('quality') or {}).get('provider')}
-          except urllib.error.HTTPError as exc:
-              raw=exc.read().decode('utf-8','replace')
-              out['transcribe']={'status':exc.code,'ok':False,'detail':raw[:2000]}
-          except Exception as exc:
-              out['transcribe']={'status':None,'ok':False,'detail':str(exc)[:2000]}
+          def get_json(url, timeout=10):
+              try:
+                  with urllib.request.urlopen(url, timeout=timeout) as resp:
+                      raw=resp.read().decode('utf-8','replace')
+                      return {'status':resp.status,'ok':True,'body':json.loads(raw)}
+              except urllib.error.HTTPError as exc:
+                  raw=exc.read().decode('utf-8','replace')
+                  return {'status':exc.code,'ok':False,'detail':raw[:1200]}
+              except Exception as exc:
+                  return {'status':None,'ok':False,'detail':str(exc)[:1200]}
+          def post_url(url, video_url, timeout=180):
+              payload=json.dumps({'url':video_url,'mode':'fast'}).encode('utf-8')
+              req=urllib.request.Request(url,data=payload,method='POST',headers={'Content-Type':'application/json'})
+              try:
+                  with urllib.request.urlopen(req,timeout=timeout) as resp:
+                      raw=resp.read().decode('utf-8','replace')
+                      obj=json.loads(raw)
+                      return {'status':resp.status,'ok':True,'text_length':len(str(obj.get('text') or '')),'provider':(obj.get('quality') or {}).get('provider'),'video_id':obj.get('video_id')}
+              except urllib.error.HTTPError as exc:
+                  raw=exc.read().decode('utf-8','replace')
+                  return {'status':exc.code,'ok':False,'detail':raw[:1600]}
+              except Exception as exc:
+                  return {'status':None,'ok':False,'detail':str(exc)[:1600]}
+          out['direct_health_before']=get_json('http://127.0.0.1:7869/health')
+          out['public_proxy_health']=get_json('https://epublisher.reson8.life/open-nova-stt/health', 20)
+          # Known public source that has previously exercised the full yt-dlp -> local STT path.
+          out['public_source']=post_url('http://127.0.0.1:7869/transcribe-url','https://www.youtube.com/watch?v=1CGlQSzPXRM',180)
+          time.sleep(3)
+          out['direct_health_after']=get_json('http://127.0.0.1:7869/health')
+          # The screenshot's Part 1 URL is age-restricted. Probe it briefly and
+          # preserve source-unavailable as a content-access result, not an infrastructure 502.
+          out['restricted_source']=post_url('http://127.0.0.1:7869/transcribe-url','https://www.youtube.com/watch?v=CxKEyVgYBpk',30)
           print(json.dumps(out,separators=(',',':')))
           '@ | Set-Content -LiteralPath $probe -Encoding UTF8
           $json = & $python $probe
           "source_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-      - name: Publish exact source result
+      - name: Publish bounded STT acceptance result
         if: always() && steps.test.outcome == 'success'
         uses: actions/github-script@v8
         env:
