@@ -273,7 +273,81 @@ jobs:
             log_tail = ''
           }
           $netstat = (& netstat.exe -ano -p tcp | Out-String)
-          $state['port_7869_listening'] = [bool]($netstat -match '(?m)^\s*TCP\s+\S+:7869\s+\S+\s+LISTENING\s+\d+\s*        if: steps.test.outcome == 'failure'
+          $state['port_7869_listening'] = [bool]($netstat -match '(?m)^\s*TCP\s+\S+:7869\s+\S+\s+LISTENING\s+\d+\s*
+          $taskText = (& schtasks.exe /Query /TN "RONS ePublisher STT" /FO LIST /V 2>&1 | Out-String)
+          if ($taskText.Length -gt 3000) { $taskText = $taskText.Substring($taskText.Length - 3000) }
+          $state['task_query'] = $taskText
+          if (Test-Path -LiteralPath $log -PathType Leaf) {
+            $tail = (Get-Content -LiteralPath $log -Tail 80 -ErrorAction SilentlyContinue | Out-String)
+            if ($tail.Length -gt 6000) { $tail = $tail.Substring($tail.Length - 6000) }
+            $tail = $tail -replace '(?im)^.*cookie.*
+            $state['log_tail'] = $tail
+          }
+          $json = $state | ConvertTo-Json -Depth 6 -Compress
+          "persistent_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Publish persistent STT task state
+        if: always() && steps.test.outcome == 'success'
+        uses: actions/github-script@v8
+        env:
+          PERSISTENT_JSON: ${{ steps.persistent.outputs.persistent_json }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const body = ["EPUBLISHER_STT_PERSISTENT_STATE", "", "SHA: " + context.sha, "", process.env.PERSISTENT_JSON || "{}"].join("\n");
+            await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
+
+      - name: Preserve focused check state
+        if: steps.test.outcome == 'failure'
+        run: exit 1
+)
+          $taskText = (& schtasks.exe /Query /TN "RONS ePublisher STT" /FO LIST /V 2>&1 | Out-String)
+          if ($taskText.Length -gt 3000) { $taskText = $taskText.Substring($taskText.Length - 3000) }
+          $state['task_query'] = $taskText
+          if (Test-Path -LiteralPath $log -PathType Leaf) {
+            $tail = (Get-Content -LiteralPath $log -Tail 80 -ErrorAction SilentlyContinue | Out-String)
+            if ($tail.Length -gt 6000) { $tail = $tail.Substring($tail.Length - 6000) }
+            $tail = $tail -replace '(?im)^.*cookie.*        if: steps.test.outcome == 'failure'
+        run: exit 1
+, '[cookie-related log line redacted]'
+            $state['log_tail'] = $tail
+          }
+          $json = $state | ConvertTo-Json -Depth 6 -Compress
+          "persistent_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Publish persistent STT task state
+        if: always() && steps.test.outcome == 'success'
+        uses: actions/github-script@v8
+        env:
+          PERSISTENT_JSON: ${{ steps.persistent.outputs.persistent_json }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const body = ["EPUBLISHER_STT_PERSISTENT_STATE", "", "SHA: " + context.sha, "", process.env.PERSISTENT_JSON || "{}"].join("\n");
+            await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
+
+      - name: Preserve focused check state
+        if: steps.test.outcome == 'failure'
+        run: exit 1
+, '[cookie-related log line redacted]'
+            $state['log_tail'] = $tail
+          }
+          $json = $state | ConvertTo-Json -Depth 6 -Compress
+          "persistent_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Publish persistent STT task state
+        if: always() && steps.test.outcome == 'success'
+        uses: actions/github-script@v8
+        env:
+          PERSISTENT_JSON: ${{ steps.persistent.outputs.persistent_json }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const body = ["EPUBLISHER_STT_PERSISTENT_STATE", "", "SHA: " + context.sha, "", process.env.PERSISTENT_JSON || "{}"].join("\n");
+            await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
+
+      - name: Preserve focused check state
+        if: steps.test.outcome == 'failure'
         run: exit 1
 )
           $taskText = (& schtasks.exe /Query /TN "RONS ePublisher STT" /FO LIST /V 2>&1 | Out-String)
