@@ -12,69 +12,76 @@ permissions:
 
 jobs:
   diagnose:
-    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
     timeout-minutes: 15
     steps:
       - name: Check out RONSAS control authority
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Probe ePublisher STT boundaries
+      - name: Probe Ealiophin host from governed Linux runner
         id: probe
-        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        shell: bash
         run: |
-          $ErrorActionPreference = 'Continue'
-          $videoUrl = 'https://www.youtube.com/watch?v=CxKEyVgYBpk'
-          $results = [ordered]@{}
+          set -euo pipefail
+          cat > /tmp/epublisher-stt-probe.py <<'PY'
+          import json, urllib.request, urllib.error
 
-          function Invoke-HealthProbe([string]$Name, [string]$Uri) {
-            try {
-              $response = Invoke-WebRequest -UseBasicParsing -Uri $Uri -TimeoutSec 15
-              $body = [string]$response.Content
-              if ($body.Length -gt 800) { $body = $body.Substring(0, 800) }
-              $results[$Name] = [ordered]@{ status = [int]$response.StatusCode; ok = $true; detail = $body }
-            } catch {
-              $status = $null
-              if ($_.Exception.Response -and $_.Exception.Response.StatusCode) {
-                try { $status = [int]$_.Exception.Response.StatusCode.value__ } catch {}
-              }
-              $results[$Name] = [ordered]@{ status = $status; ok = $false; detail = [string]$_.Exception.Message }
-            }
-          }
+          VIDEO = 'https://www.youtube.com/watch?v=CxKEyVgYBpk'
+          results = {}
 
-          Invoke-HealthProbe 'direct_health' 'http://127.0.0.1:7869/health'
-          Invoke-HealthProbe 'local_proxy_health' 'http://127.0.0.1:3101/open-nova-stt/health'
-          Invoke-HealthProbe 'public_proxy_health' 'https://epublisher.reson8.life/open-nova-stt/health'
+          def request(name, url, method='GET', payload=None, timeout=20):
+              data = None if payload is None else json.dumps(payload).encode('utf-8')
+              req = urllib.request.Request(url, data=data, method=method, headers={'Content-Type':'application/json'})
+              try:
+                  with urllib.request.urlopen(req, timeout=timeout) as resp:
+                      raw = resp.read().decode('utf-8','replace')
+                      item = {'status': resp.status, 'ok': True}
+                      if name.endswith('transcribe'):
+                          try:
+                              obj = json.loads(raw)
+                          except Exception:
+                              obj = {}
+                          item['text_length'] = len(str(obj.get('text') or ''))
+                          q = obj.get('quality') or {}
+                          item['provider'] = q.get('provider')
+                      else:
+                          item['detail'] = raw[:800]
+                      results[name] = item
+                      return True
+              except urllib.error.HTTPError as exc:
+                  raw = exc.read().decode('utf-8','replace')
+                  results[name] = {'status': exc.code, 'ok': False, 'detail': raw[:1200]}
+              except Exception as exc:
+                  results[name] = {'status': None, 'ok': False, 'detail': str(exc)[:1200]}
+              return False
 
-          $payload = @{ url = $videoUrl; mode = 'fast' } | ConvertTo-Json -Compress
-          try {
-            $response = Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:7869/transcribe-url' -Method POST -ContentType 'application/json' -Body $payload -TimeoutSec 420
-            $parsed = $null
-            try { $parsed = $response.Content | ConvertFrom-Json } catch {}
-            $textLength = 0
-            $provider = $null
-            if ($parsed -and $parsed.text) { $textLength = ([string]$parsed.text).Length }
-            if ($parsed -and $parsed.quality -and $parsed.quality.provider) { $provider = [string]$parsed.quality.provider }
-            $results['direct_transcribe'] = [ordered]@{ status = [int]$response.StatusCode; ok = $true; text_length = $textLength; provider = $provider }
-          } catch {
-            $status = $null
-            $detail = [string]$_.Exception.Message
-            if ($_.Exception.Response -and $_.Exception.Response.StatusCode) {
-              try { $status = [int]$_.Exception.Response.StatusCode.value__ } catch {}
-              try {
-                $reader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream())
-                $raw = $reader.ReadToEnd()
-                $reader.Dispose()
-                if ($raw) {
-                  if ($raw.Length -gt 1200) { $raw = $raw.Substring(0,1200) }
-                  $detail = $raw
-                }
-              } catch {}
-            }
-            $results['direct_transcribe'] = [ordered]@{ status = $status; ok = $false; detail = $detail }
-          }
+          hosts = ['host.containers.internal', 'host.docker.internal']
+          chosen = None
+          for host in hosts:
+              key = 'direct_health_' + host.replace('.','_')
+              if request(key, f'http://{host}:7869/health'):
+                  chosen = host
+                  break
 
-          $compact = $results | ConvertTo-Json -Depth 8 -Compress
-          "diagnostic_json=$compact" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          request('public_proxy_health', 'https://epublisher.reson8.life/open-nova-stt/health')
+          if chosen:
+              request('direct_transcribe', f'http://{chosen}:7869/transcribe-url', method='POST', payload={'url': VIDEO, 'mode':'fast'}, timeout=420)
+              request('local_proxy_health', f'http://{chosen}:3101/open-nova-stt/health')
+          else:
+              results['direct_transcribe'] = {'status': None, 'ok': False, 'detail':'No governed host alias reached port 7869'}
+
+          print(json.dumps(results, separators=(',',':')))
+          PY
+
+          podman --remote run --rm -i --entrypoint python3 \
+            -v /tmp/epublisher-stt-probe.py:/probe.py:ro \
+            localhost/ronsas-actions-runner:2.337.0-r2 /probe.py > /tmp/epublisher-stt-result.json
+          cat /tmp/epublisher-stt-result.json
+          {
+            echo 'diagnostic_json<<EOF'
+            cat /tmp/epublisher-stt-result.json
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
 
       - name: Publish sanitized diagnostic receipt
         if: always()
@@ -86,9 +93,4 @@ jobs:
           script: |
             const data = process.env.DIAGNOSTIC_JSON || "{}";
             const body = ["EPUBLISHER_STT_DIAGNOSTIC", "", "Run: " + context.runId, "SHA: " + context.sha, "", data].join("\n");
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: 273,
-              body,
-            });
+            await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
