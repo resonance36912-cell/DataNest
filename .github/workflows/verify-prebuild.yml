@@ -226,6 +226,29 @@ jobs:
           tail -40 /tmp/preview-server.log >&2
           exit 1
 
+      - name: Verify local preview accepts HTTP before smoke
+        if: steps.smoke_target.outputs.needs_local == 'true'
+        env:
+          BASE_URL: ${{ steps.smoke_target.outputs.base_url }}
+        run: |
+          set -euo pipefail
+          probe_out=/tmp/local-preview-probe.out
+          probe_err=/tmp/local-preview-probe.err
+          if curl -svL --connect-timeout 2 --max-time 10 "$BASE_URL/" >"$probe_out" 2>"$probe_err"; then
+            echo "Local preview accepted an HTTP request."
+            exit 0
+          fi
+          echo "::group::local preview curl stderr"
+          cat "$probe_err" || true
+          echo "::endgroup::"
+          echo "::group::local preview response body"
+          cat "$probe_out" || true
+          echo "::endgroup::"
+          echo "::group::wrangler preview server log"
+          tail -200 /tmp/preview-server.log || true
+          echo "::endgroup::"
+          exit 1
+
       - name: Wait for remote preview to respond
         if: steps.smoke_target.outputs.needs_local == 'false'
         env:
