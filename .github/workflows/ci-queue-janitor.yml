@@ -245,11 +245,64 @@ jobs:
             if (backlogById.size === 0) {
               core.info("No queued/pending/waiting target CI remains; recovery dispatch not required.");
             } else {
-              await github.rest.actions.createWorkflowDispatch({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                workflow_id: "windows-recover-linux-runner.yml",
-                ref: "main",
-              });
-              core.info(`dispatched governed Linux runner recovery for backlog=${backlogById.size}`);
+              let activeTargetWork = false;
+              try {
+                const { data: activeRuns } = await github.rest.actions.listWorkflowRunsForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  status: "in_progress",
+                  per_page: 100,
+                });
+                const activeTargets = activeRuns.workflow_runs.filter((run) => targetNames.has(run.name));
+                if (activeTargets.length > 0) {
+                  activeTargetWork = true;
+                  core.info(
+                    `Target CI is already draining: ${activeTargets.map((run) => `${run.id}:${run.name}`).join(", ")}`,
+                  );
+                }
+              } catch (error) {
+                core.warning(
+                  `Unable to query in-progress target runs: ${error.status || "error"} ${error.message}`,
+                );
+              }
+
+              if (!activeTargetWork) {
+                for (const run of backlogById.values()) {
+                  try {
+                    const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      run_id: run.id,
+                      per_page: 100,
+                      filter: "latest",
+                    });
+                    const activeJobs = jobs.jobs.filter((job) => job.status === "in_progress");
+                    if (activeJobs.length > 0) {
+                      activeTargetWork = true;
+                      core.info(
+                        `Queued workflow ${run.id} has active job(s): ${activeJobs.map((job) => job.name).join(", ")}`,
+                      );
+                      break;
+                    }
+                  } catch (error) {
+                    core.warning(
+                      `Unable to inspect jobs for queued target run ${run.id}: ${error.status || "error"} ${error.message}`,
+                    );
+                  }
+                }
+              }
+
+              if (activeTargetWork) {
+                core.info(
+                  `Target backlog=${backlogById.size}, but governed CI is actively draining; recovery dispatch not required.`,
+                );
+              } else {
+                await github.rest.actions.createWorkflowDispatch({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  workflow_id: "windows-recover-linux-runner.yml",
+                  ref: "main",
+                });
+                core.info(`dispatched governed Linux runner recovery for idle backlog=${backlogById.size}`);
+              }
             }
