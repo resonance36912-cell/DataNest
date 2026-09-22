@@ -109,7 +109,7 @@ jobs:
           } catch {
             throw "TRIGGERcmd commands.json remains invalid after bounded legacy repair: $($_.Exception.Message)"
           }
-          $commands = @($parsed)
+          $commands = @(foreach ($item in $parsed) { $item })
 
           $expectedCommand = 'powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "' + $runnerScript + '" -ForceRecycle'
           $entry = [pscustomobject][ordered]@{
@@ -147,7 +147,8 @@ jobs:
             [Text.UTF8Encoding]::new($false)
           )
 
-          $verify = @(Get-Content -Raw -LiteralPath $commandsPath | ConvertFrom-Json)
+          $verifyParsed = Get-Content -Raw -LiteralPath $commandsPath | ConvertFrom-Json -ErrorAction Stop
+          $verify = @(foreach ($item in $verifyParsed) { $item })
           $saved = @($verify | Where-Object { $_.trigger -eq 'RONS Runner Recover' })
           if ($saved.Count -ne 1) {
             Copy-Item -LiteralPath $backupPath -Destination $commandsPath -Force
