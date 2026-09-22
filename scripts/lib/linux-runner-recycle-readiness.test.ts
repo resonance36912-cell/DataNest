@@ -32,20 +32,12 @@ test("transient podman native errors are retryable instead of terminating recove
 });
 
 test("existing safety gates remain intact", () => {
-  expect(launcher).toContain(
-    "refusing unguarded replacement of an active runner",
-  );
-  expect(launcher).toContain(
-    "ForceRecycle deferred because GitHub reports",
-  );
-  expect(launcher).toContain(
-    "Deferring recycle rather than deleting an assigned runner",
-  );
+  expect(launcher).toContain("refusing unguarded replacement of an active runner");
+  expect(launcher).toContain("ForceRecycle deferred because GitHub reports");
+  expect(launcher).toContain("Deferring recycle rather than deleting an assigned runner");
 });
 
 test("default production labels remain unchanged while canary labels can be isolated", () => {
-  expect(launcher).toContain(
-    "[string]$RunnerLabels = 'ronsas,ealiophin,sovereign'",
-  );
+  expect(launcher).toContain("[string]$RunnerLabels = 'ronsas,ealiophin,sovereign'");
   expect(launcher).toContain('"RUNNER_LABELS=$RunnerLabels"');
 });
