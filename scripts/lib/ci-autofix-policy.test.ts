@@ -33,6 +33,14 @@ describe("guarded CI autofix policy", () => {
     expect(remediate).toContain("gh run rerun");
   });
 
+  test("closes only stale monitor-owned triage issues", () => {
+    expect(remediate).toContain("Resolve-StaleTriageIssues");
+    expect(remediate).toContain("StartsWith('[RONSAS CI] ')");
+    expect(remediate).toContain("$activeTitles.ContainsKey");
+    expect(remediate).toContain("gh issue close");
+    expect(remediate).toContain("Resolve-StaleTriageIssues -CurrentFailures $failures");
+  });
+
   test("monitor remediation is opt-in and scheduled installer enables it", () => {
     expect(monitor).toContain("AutoRemediate");
     expect(installer).toContain("-AutoRemediate");
