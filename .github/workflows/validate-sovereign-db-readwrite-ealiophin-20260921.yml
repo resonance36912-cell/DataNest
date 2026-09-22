@@ -43,7 +43,7 @@ jobs:
 
             $script=Join-Path $control 'ops\collaboration\VALIDATE-SOVEREIGN-DB-READWRITE.ps1'
             $harness=Join-Path $control 'ops\collaboration\sovereign-db-readwrite-acceptance.mjs'
-            & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $script -BackendSha 'bd032b213de48f45e8adfb5d52d8a77803a21993' -HubSha 'ba46bcddd51e436a9324e3bac84932b0d99161b0' -HarnessPath $harness
+            & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $script -BackendSha 'bd032b213de48f45e8adfb5d52d8a77803a21993' -HubSha 'df82ca5d495408933566e837af425a974a1dd125' -HarnessPath $harness
             if($LASTEXITCODE -ne 0){throw 'Isolated sovereign DB read-write acceptance failed.'}
           } finally {
             if(Test-Path -LiteralPath $control){
