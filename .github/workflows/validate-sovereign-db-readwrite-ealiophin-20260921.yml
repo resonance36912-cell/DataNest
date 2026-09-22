@@ -20,7 +20,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ronsas-sovereign-db-readwrite-ealiophin-${{ github.event_name }}-${{ github.ref }}
+  group: ronsas-sovereign-db-readwrite-ealiophin
   cancel-in-progress: true
 
 jobs:
