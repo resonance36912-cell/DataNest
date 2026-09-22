@@ -61,63 +61,33 @@ jobs:
         id: supervisor
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
-          $ErrorActionPreference = 'Continue'
+          $ErrorActionPreference = 'Stop'
           $control = Join-Path $env:LOCALAPPDATA 'Resonance\RONS-ControlCenter'
           $configPath = Join-Path $control 'rons-control.json'
           $state = [ordered]@{
             config_exists = (Test-Path -LiteralPath $configPath -PathType Leaf)
-            task = $null
+            ensure_suite = $null
+            ensure_public_edge = $null
             services = @()
-            port_7869 = $null
-            supervisor_log_tail = @()
+            port_7869_listening = $false
           }
           if ($state.config_exists) {
-            try {
-              $cfg = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
-              $state.ensureSuite = if ($cfg.autonomy) { [bool]$cfg.autonomy.ensureSuite } else { $null }
-              $state.ensurePublicEdge = if ($cfg.autonomy) { [bool]$cfg.autonomy.ensurePublicEdge } else { $null }
-              $state.services = @($cfg.services | ForEach-Object {
-                [ordered]@{
-                  key = [string]$_.key
-                  name = [string]$_.name
-                  port = [int]$_.port
-                  required = [bool]$_.required
-                }
-              })
-            } catch {
-              $state.config_error = $_.Exception.Message
+            $cfg = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
+            if ($cfg.autonomy) {
+              $state['ensure_suite'] = [bool]$cfg.autonomy.ensureSuite
+              $state['ensure_public_edge'] = [bool]$cfg.autonomy.ensurePublicEdge
             }
+            $state['services'] = @($cfg.services | ForEach-Object {
+              [ordered]@{
+                key = [string]$_.key
+                name = [string]$_.name
+                port = [int]$_.port
+                required = [bool]$_.required
+              }
+            })
           }
-          try {
-            $task = Get-ScheduledTask -TaskName 'RONS Autonomous Supervisor' -ErrorAction Stop
-            $info = Get-ScheduledTaskInfo -TaskName 'RONS Autonomous Supervisor' -ErrorAction Stop
-            $state.task = [ordered]@{
-              state = [string]$task.State
-              last_result = [int]$info.LastTaskResult
-              last_run = [string]$info.LastRunTime
-            }
-          } catch {
-            $state.task = [ordered]@{ error = $_.Exception.Message }
-          }
-          try {
-            $conn = Get-NetTCPConnection -State Listen -LocalPort 7869 -ErrorAction Stop | Select-Object -First 1
-            $proc = Get-Process -Id ([int]$conn.OwningProcess) -ErrorAction SilentlyContinue
-            $state.port_7869 = [ordered]@{
-              listening = $true
-              pid = [int]$conn.OwningProcess
-              process = if ($proc) { [string]$proc.ProcessName } else { $null }
-            }
-          } catch {
-            $state.port_7869 = [ordered]@{ listening = $false }
-          }
-          $logDir = Join-Path $control 'logs'
-          $latestLog = Get-ChildItem -LiteralPath $logDir -Filter 'supervisor-*.log' -File -ErrorAction SilentlyContinue |
-            Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
-          if ($latestLog) {
-            $state.supervisor_log_tail = @(Get-Content -LiteralPath $latestLog.FullName -Tail 40 -ErrorAction SilentlyContinue |
-              Where-Object { $_ -match '(?i)(stt|7869|recovery|required services|supervisor)' } |
-              Select-Object -Last 20)
-          }
+          $netstat = (& netstat.exe -ano -p tcp | Out-String)
+          $state['port_7869_listening'] = [bool]($netstat -match '(?m)^\s*TCP\s+\S+:7869\s+\S+\s+LISTENING\s+\d+\s*$')
           $json = $state | ConvertTo-Json -Depth 8 -Compress
           "supervisor_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
