@@ -68,7 +68,7 @@ function Wait-RecoveryAcceptance {
   $probe = 0
   do {
     $probe++
-    $ok = Invoke-BoundedProcess -Name ('acceptance-' + $probe) -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',$Acceptance) -TimeoutSeconds 45 -SuccessMarker 'RONS ACCEPTANCE PASSED:'
+    $ok = Invoke-BoundedProcess -Name ('acceptance-' + $probe) -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',$Acceptance) -TimeoutSeconds 45 -SuccessMarker 'RONSAS ACCEPTANCE PASSED:'
     if ($ok) { Log ('Recovery acceptance settled on probe ' + $probe + '.'); return $true }
     if ((Get-Date) -ge $deadline) { break }
     Log ('Recovery acceptance not ready on probe ' + $probe + '; waiting ' + $PollSeconds + ' seconds.')
