@@ -1,3 +1,4 @@
+# Exact-head acceptance workflow
 name: ePublisher STT runtime sync focused
 
 on:
