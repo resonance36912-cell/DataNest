@@ -1,5 +1,5 @@
 name: Governed Linux runner recovery
-# Recovery supersession trigger: 2026-09-22T18:25Z (release stale Windows assignment)
+# Recovery supersession trigger: 2026-09-22T18:29Z (supersede rerun stale recovery attempt)
 
 on:
   workflow_dispatch:
