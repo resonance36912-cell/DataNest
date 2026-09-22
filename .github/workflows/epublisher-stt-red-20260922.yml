@@ -154,7 +154,7 @@ jobs:
           $result = [ordered]@{}
           $result.direct_health_before = Get-HttpResult 'http://127.0.0.1:7869/health' 10
           $result.public_proxy_health = Get-HttpResult 'https://epublisher.reson8.life/open-nova-stt/health' 20
-          $result.public_source = Post-SttUrl 'https://www.youtube.com/watch?v=1CGlQSzPXRM' 180
+          $result.public_source = Post-SttUrl 'https://www.youtube.com/watch?v=jNQXAC9IVRw' 180
           Start-Sleep -Seconds 3
           $result.direct_health_after = Get-HttpResult 'http://127.0.0.1:7869/health' 10
           $result.restricted_source = Post-SttUrl 'https://www.youtube.com/watch?v=CxKEyVgYBpk' 30
