@@ -1,4 +1,4 @@
-name: ePublisher STT runtime sync RED
+name: ePublisher STT runtime sync focused
 
 on:
   push:
@@ -7,6 +7,7 @@ on:
       - "scripts/lib/epublisher-stt-runtime-sync.test.ts"
       - "ops/ealiophin/cluster/START-RONSAS-ECOSYSTEM.ps1"
       - ".github/workflows/epublisher-stt-red-20260922.yml"
+      - "ops/ealiophin/cluster/START-RONSAS-ECOSYSTEM.ps1"
 
 permissions:
   contents: read
@@ -50,8 +51,8 @@ jobs:
             const fs = require("fs");
             const p = process.env.RUNNER_TEMP + "\\epublisher-stt-red.txt";
             let out = fs.existsSync(p) ? fs.readFileSync(p, "utf8") : "<missing test output>";
-            const body = ["EPUBLISHER_STT_TDD_RED", "", "SHA: " + context.sha, "exit_code=" + (process.env.EXIT_CODE || "unknown"), "", "```", out, "```"].join("\n");
+            const body = ["EPUBLISHER_STT_FOCUSED_CHECK", "", "SHA: " + context.sha, "exit_code=" + (process.env.EXIT_CODE || "unknown"), "", "```", out, "```"].join("\n");
             await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
-      - name: Preserve RED state
+      - name: Preserve focused check state
         if: steps.test.outcome == 'failure'
         run: exit 1
