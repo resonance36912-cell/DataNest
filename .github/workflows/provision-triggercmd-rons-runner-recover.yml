@@ -1,0 +1,91 @@
+name: Provision TRIGGERcmd RONS Runner Recover
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/provision-triggercmd-rons-runner-recover.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: provision-triggercmd-rons-runner-recover
+  cancel-in-progress: true
+
+jobs:
+  provision:
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 10
+    steps:
+      - name: Check out RONSAS control authority
+        uses: actions/checkout@v5
+
+      - name: Provision fail-closed TRIGGERcmd recovery command
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $commandsPath = Join-Path $env:USERPROFILE '.TRIGGERcmdData\commands.json'
+          if (-not (Test-Path -LiteralPath $commandsPath -PathType Leaf)) {
+            throw "TRIGGERcmd commands.json not found at $commandsPath"
+          }
+
+          $runnerScript = Join-Path $env:USERPROFILE 'Documents\GitHub\rons-sovereign-codebase\ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
+          if (-not (Test-Path -LiteralPath $runnerScript -PathType Leaf)) {
+            throw "Governed runner recovery script not found at $runnerScript"
+          }
+
+          $raw = Get-Content -Raw -LiteralPath $commandsPath
+          $parsed = $raw | ConvertFrom-Json
+          $commands = @($parsed)
+
+          $backupPath = "$commandsPath.bak-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+          Copy-Item -LiteralPath $commandsPath -Destination $backupPath -Force
+
+          $entry = [pscustomobject][ordered]@{
+            trigger = 'RONS Runner Recover'
+            command = ('powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "' + $runnerScript + '"')
+            ground = 'background'
+            voice = 'rons runner recover'
+            allowParams = 'false'
+          }
+
+          $matches = @($commands | Where-Object { $_.trigger -eq 'RONS Runner Recover' })
+          if ($matches.Count -gt 1) {
+            throw 'Duplicate RONS Runner Recover entries already exist; refusing automatic rewrite.'
+          }
+
+          if ($matches.Count -eq 1) {
+            $updated = foreach ($item in $commands) {
+              if ($item.trigger -eq 'RONS Runner Recover') { $entry } else { $item }
+            }
+            $commands = @($updated)
+            Write-Host 'Updated existing RONS Runner Recover command.'
+          } else {
+            $commands = @($commands) + @($entry)
+            Write-Host 'Added RONS Runner Recover command.'
+          }
+
+          $json = $commands | ConvertTo-Json -Depth 20
+          [IO.File]::WriteAllText(
+            $commandsPath,
+            $json + [Environment]::NewLine,
+            [Text.UTF8Encoding]::new($false)
+          )
+
+          $verify = @(Get-Content -Raw -LiteralPath $commandsPath | ConvertFrom-Json)
+          $saved = @($verify | Where-Object { $_.trigger -eq 'RONS Runner Recover' })
+          if ($saved.Count -ne 1) {
+            Copy-Item -LiteralPath $backupPath -Destination $commandsPath -Force
+            throw 'TRIGGERcmd command verification failed; restored backup.'
+          }
+
+          if ([string]$saved[0].allowParams -ne 'false') {
+            Copy-Item -LiteralPath $backupPath -Destination $commandsPath -Force
+            throw 'TRIGGERcmd recovery command unexpectedly permits parameters; restored backup.'
+          }
+
+          Write-Host "TRIGGERcmd provisioning complete. Backup: $backupPath"
+          Write-Host 'The TRIGGERcmd agent reloads commands.json after it is saved.'
