@@ -7,6 +7,7 @@ on:
       - Verify prebuild
       - Verify checkout links
       - Verify ePublisher checkout
+      - Governed Linux runner recovery
     types: [completed]
   workflow_dispatch:
     inputs:
@@ -43,6 +44,7 @@ jobs:
               "Verify checkout links",
               "Verify ePublisher checkout",
             ]);
+            const recoveryName = "Governed Linux runner recovery";
 
             const runId =
               context.eventName === "workflow_run"
@@ -64,23 +66,24 @@ jobs:
               `inspect run=${run.id} name=${run.name} event=${run.event} branch=${run.head_branch} sha=${run.head_sha} attempt=${run.run_attempt} conclusion=${run.conclusion}`,
             );
 
-            if (!targets.has(run.name)) {
-              core.info("Run is outside the governed CI target set; no action.");
+            if (!targets.has(run.name) && run.name !== recoveryName) {
+              core.info("Run is outside the governed CI/recovery set; no action.");
               return;
             }
             if (run.conclusion !== "failure") {
               core.info("Run is not failed; no action.");
               return;
             }
-            if (Number(run.run_attempt || 1) > 1) {
-              core.warning(
-                `Run ${run.id} already reached attempt ${run.run_attempt}; bounded healer will not create a retry loop.`,
-              );
-              return;
-            }
-
             let currentHead = false;
-            if (run.event === "pull_request") {
+            if (run.name === recoveryName) {
+              const { data: main } = await github.rest.repos.getBranch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                branch: "main",
+              });
+              currentHead = run.head_branch === "main" && main.commit.sha === run.head_sha;
+              if (!currentHead) core.info("Failed recovery run is superseded; no retry or alert.");
+            } else if (run.event === "pull_request") {
               const linked = Array.isArray(run.pull_requests) ? run.pull_requests[0] : null;
               if (linked?.number) {
                 const { data: pr } = await github.rest.pulls.get({
@@ -117,6 +120,52 @@ jobs:
 
             if (!currentHead) return;
 
+            if (run.name === recoveryName) {
+              const { data: recoveryRuns } = await github.rest.actions.listWorkflowRuns({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: "windows-recover-linux-runner.yml",
+                branch: "main",
+                per_page: 100,
+              });
+              const failedCurrentHeadRecoveries = recoveryRuns.workflow_runs.filter(
+                (candidate) =>
+                  candidate.head_sha === run.head_sha &&
+                  candidate.conclusion === "failure",
+              );
+              const secondFailure =
+                Number(run.run_attempt || 1) > 1 ||
+                failedCurrentHeadRecoveries.length >= 2;
+
+              if (secondFailure) {
+                core.setFailed(
+                  `CI HEALTH ALERT: governed Linux runner recovery failed twice for current main ${run.head_sha}. Automatic recovery is bounded; manual diagnosis is required. Failed recovery runs: ${failedCurrentHeadRecoveries.map((candidate) => candidate.id).join(", ") || run.id}`,
+                );
+                return;
+              }
+
+              core.warning(
+                `First governed recovery failure for current main ${run.head_sha}; dispatching one bounded automatic retry.`,
+              );
+              await github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: "windows-recover-linux-runner.yml",
+                ref: "main",
+              });
+              core.notice(
+                `Recovery retry dispatched after first failure of run ${run.id}. A second failure will become the health alert.`,
+              );
+              return;
+            }
+
+            if (Number(run.run_attempt || 1) > 1) {
+              core.setFailed(
+                `CI HEALTH ALERT: current-head workflow ${run.name} failed again after its one bounded retry. run=${run.id} attempt=${run.run_attempt} sha=${run.head_sha}. Automatic healing is exhausted; code-level diagnosis is required.`,
+              );
+              return;
+            }
+
             const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -128,7 +177,9 @@ jobs:
               ["failure", "timed_out"].includes(String(job.conclusion)),
             );
             if (failedJobs.length === 0) {
-              core.info("No failed/timed-out jobs remain to retry.");
+              core.setFailed(
+                `CI HEALTH ALERT: current-head workflow ${run.name} concluded failure but exposed no failed/timed-out job that the bounded healer can retry. run=${run.id} sha=${run.head_sha}.`,
+              );
               return;
             }
 
@@ -155,5 +206,5 @@ jobs:
               },
             );
             core.notice(
-              `Auto-heal requested one bounded retry for workflow run ${run.id}. Any second failure is left intact for code-level diagnosis instead of looping.`,
+              `Auto-heal requested one bounded retry for workflow run ${run.id}. Any second current-head failure will fail this healer as the health alert instead of looping.`,
             );
