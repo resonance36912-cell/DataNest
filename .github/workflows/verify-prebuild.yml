@@ -206,46 +206,34 @@ jobs:
       - name: Build production bundle
         run: bun run build
 
-      # Nitro's build output recommends Vite preview for local verification.
-      # Serve the checked-out production bundle directly on loopback for smoke tests.
-      - name: Start production preview (vite preview) for smoke test
+      # This build targets Cloudflare/Nitro and emits .output/server/wrangler.json.
+      # Use the generated worker config for PR-local smoke validation.
+      - name: Start production preview (wrangler dev) for smoke test
         if: steps.smoke_target.outputs.needs_local == 'true'
+        working-directory: .output/server
         run: |
-          bun x vite preview --host 127.0.0.1 --port 8080 > /tmp/preview-server.log 2>&1 &
+          bun x wrangler dev --config wrangler.json --port 8080 --ip 127.0.0.1 > /tmp/preview-server.log 2>&1 &
           echo $! > /tmp/preview-server.pid
           for i in {1..90}; do
-            if curl -sf --connect-timeout 2 --max-time 5 http://127.0.0.1:8080/ > /dev/null; then
+            if grep -q "Ready on http://127.0.0.1:8080" /tmp/preview-server.log; then
               echo "Preview server ready after ${i}s"
               exit 0
+            fi
+            if ! kill -0 "$(cat /tmp/preview-server.pid)" 2>/dev/null; then
+              echo "Preview server exited before becoming ready" >&2
+              tail -80 /tmp/preview-server.log >&2
+              exit 1
             fi
             sleep 1
           done
           echo "Preview server failed to start" >&2
-          tail -40 /tmp/preview-server.log >&2
+          tail -80 /tmp/preview-server.log >&2
           exit 1
 
       - name: Verify local preview accepts HTTP before smoke
         if: steps.smoke_target.outputs.needs_local == 'true'
-        env:
-          BASE_URL: ${{ steps.smoke_target.outputs.base_url }}
         run: |
-          set -euo pipefail
-          probe_out=/tmp/local-preview-probe.out
-          probe_err=/tmp/local-preview-probe.err
-          if curl -svL --connect-timeout 2 --max-time 10 "$BASE_URL/" >"$probe_out" 2>"$probe_err"; then
-            echo "Local preview accepted an HTTP request."
-            exit 0
-          fi
-          echo "::group::local preview curl stderr"
-          cat "$probe_err" || true
-          echo "::endgroup::"
-          echo "::group::local preview response body"
-          cat "$probe_out" || true
-          echo "::endgroup::"
-          echo "::group::wrangler preview server log"
-          tail -200 /tmp/preview-server.log || true
-          echo "::endgroup::"
-          exit 1
+          curl -v --fail --connect-timeout 5 --max-time 20 http://127.0.0.1:8080/ > /tmp/preview-home.html
 
       - name: Wait for remote preview to respond
         if: steps.smoke_target.outputs.needs_local == 'false'
@@ -383,20 +371,26 @@ jobs:
         if: matrix.mode == 'live' && steps.live_auth.outputs.enabled == 'true' && steps.smoke_target.outputs.needs_local == 'true'
         run: bun run build
 
-      - name: Start production preview (live, vite preview)
+      - name: Start production preview (live, wrangler dev)
         if: matrix.mode == 'live' && steps.live_auth.outputs.enabled == 'true' && steps.smoke_target.outputs.needs_local == 'true'
+        working-directory: .output/server
         run: |
-          bun x vite preview --host 127.0.0.1 --port 8080 > /tmp/preview-server.log 2>&1 &
+          bun x wrangler dev --config wrangler.json --port 8080 --ip 127.0.0.1 > /tmp/preview-server.log 2>&1 &
           echo $! > /tmp/preview-server.pid
           for i in {1..90}; do
-            if curl -sf --connect-timeout 2 --max-time 5 http://127.0.0.1:8080/ > /dev/null; then
+            if grep -q "Ready on http://127.0.0.1:8080" /tmp/preview-server.log; then
               echo "Preview server ready after ${i}s"
               exit 0
+            fi
+            if ! kill -0 "$(cat /tmp/preview-server.pid)" 2>/dev/null; then
+              echo "Preview server exited before becoming ready" >&2
+              tail -80 /tmp/preview-server.log >&2
+              exit 1
             fi
             sleep 1
           done
           echo "Preview server failed to start" >&2
-          tail -40 /tmp/preview-server.log >&2
+          tail -80 /tmp/preview-server.log >&2
           exit 1
 
       - name: Wait for remote preview (live)
