@@ -8,6 +8,19 @@ from urllib.parse import parse_qs, urlparse
 RUNTIME_ROOT = Path(__file__).resolve().parent
 MODELS_ROOT = Path(os.environ.get('RONS_STT_MODELS_ROOT', str(RUNTIME_ROOT / 'models')))
 PORT = int(os.environ.get('RONS_STT_PORT', '7864'))
+HOST = (os.environ.get('RONS_STT_HOST', '127.0.0.1').strip() or '127.0.0.1')
+SERVICE_NAME = (os.environ.get('RONS_STT_SERVICE_NAME', 'epublisher-local-stt').strip() or 'epublisher-local-stt')
+PROVIDER_NAME = (os.environ.get('RONS_STT_PROVIDER', 'rons-local-faster-whisper').strip() or 'rons-local-faster-whisper')
+YTDLP_JS_RUNTIME = (os.environ.get('RONS_YTDLP_JS_RUNTIME', 'node').strip().lower() or 'node')
+_DEFAULT_ALLOWED_ORIGINS = (
+    'http://127.0.0.1:3301', 'http://localhost:3301',
+    'http://127.0.0.1:3101', 'http://localhost:3101',
+)
+_EXTRA_ALLOWED_ORIGINS = tuple(
+    origin.strip() for origin in os.environ.get('RONS_STT_ALLOWED_ORIGINS', '').split(',') if origin.strip()
+)
+ALLOWED_ORIGINS = tuple(dict.fromkeys(_DEFAULT_ALLOWED_ORIGINS + _EXTRA_ALLOWED_ORIGINS))
+REQUIRE_ORIGIN = os.environ.get('RONS_STT_REQUIRE_ORIGIN', '').strip().lower() in ('1', 'true', 'yes', 'on')
 YOUTUBE_MAX_DURATION = int(os.environ.get('RONS_YOUTUBE_STT_MAX_SECONDS', '3600'))
 MAX_ACTIVE_STT = max(1, int(os.environ.get('RONS_STT_MAX_ACTIVE', '1')))
 VALIDATION_PATH = Path(os.environ.get('RONS_STT_VALIDATION', str(MODELS_ROOT / 'epublisher-stt-validation.json')))
@@ -137,8 +150,8 @@ def health_payload():
     elif not validated: reason = 'large-v3 is installed but has not passed the production smoke validation.'
     elif not _cuda_runtime_ready(): reason = 'large-v3 is validated but the governed CUDA runtime is unavailable.'
     return {
-        'ok': service_ready, 'model_ready': service_ready, 'service': 'epublisher-local-stt', 'status': 'up' if service_ready else 'degraded',
-        'endpoint': f'127.0.0.1:{PORT}', 'backend': backend, 'models': inv,
+        'ok': service_ready, 'model_ready': service_ready, 'service': SERVICE_NAME, 'status': 'up' if service_ready else 'degraded',
+        'endpoint': f'{HOST}:{PORT}', 'backend': backend, 'models': inv,
         'defaultResolvedModel': resolution.get('resolvedModel'), 'productionReady': production_ready,
         'maximumQualityAvailable': resolution['maximumQualityAvailable'], 'validation': validation or None,
         'cudaRuntimeReady': _cuda_runtime_ready(), 'cudaRuntimeDirs': NVIDIA_RUNTIME_DIRS,
@@ -238,7 +251,7 @@ def transcribe(raw: bytes, suffix: str, mode: str, profile=None):
         probs = [w['probability'] for w in words if w.get('probability') is not None]
         raw_conf = round(mean(probs), 6) if probs else None
         quality = {
-            'provider': 'rons-local-faster-whisper', 'backend': 'faster-whisper',
+            'provider': PROVIDER_NAME, 'backend': 'faster-whisper',
             **resolution, **runtime, 'mode': mode, 'has_content': bool(text),
             'has_timestamps': bool(words), 'timestampSource': 'asr-word-timestamps',
             'alignmentStatus': 'not-run', 'diarizationStatus': 'not-run',
@@ -289,7 +302,7 @@ def transcribe_youtube_url(url_text: str, mode: str, profile=None):
     with tempfile.TemporaryDirectory(prefix='rons-youtube-stt-') as td:
         output = str(Path(td) / '%(id)s.%(ext)s')
         base_options = {
-            'noplaylist': True, 'js_runtimes': {'node': {}}, 'socket_timeout': 15,
+            'noplaylist': True, 'js_runtimes': {YTDLP_JS_RUNTIME: {}}, 'socket_timeout': 15,
             'retries': 2, 'fragment_retries': 2, 'max_filesize': 220 * 1024 * 1024,
             'match_filter': yt_dlp.utils.match_filter_func(f'duration <= {YOUTUBE_MAX_DURATION}'),
             'outtmpl': output, 'quiet': True, 'no_warnings': True,
@@ -334,8 +347,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def _cors(self):
         origin = self._origin()
-        allowed = ('http://127.0.0.1:3301', 'http://localhost:3301', 'http://127.0.0.1:3101', 'http://localhost:3101')
-        if origin in allowed:
+        if origin in ALLOWED_ORIGINS:
             self.send_header('Access-Control-Allow-Origin', origin)
         self.send_header('Vary', 'Origin')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type,X-Filename,X-Mode,X-Profile')
@@ -354,14 +366,17 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path in ('/health', '/health/stt'):
             self._json(200, health_payload())
+        elif self.path == '/health/ready':
+            payload = health_payload()
+            self._json(200 if payload.get('ok') else 503, payload)
         else:
             self._json(404, {'error': 'not found'})
 
     def do_POST(self):
         if self.path not in ('/transcribe', '/transcribe-url'):
             self._json(404, {'error': 'not found'}); return
-        allowed = ('http://127.0.0.1:3301', 'http://localhost:3301', 'http://127.0.0.1:3101', 'http://localhost:3101', '')
-        if self._origin() not in allowed:
+        origin = self._origin()
+        if origin not in ALLOWED_ORIGINS and (origin or REQUIRE_ORIGIN):
             self._json(403, {'error': 'origin denied'}); return
         try:
             if not _backend_info().get('available'):
@@ -391,12 +406,12 @@ class Handler(BaseHTTPRequestHandler):
             try: self._json(200, transcribe(raw, suffix, mode, profile))
             finally: _STT_GATE.release()
         except SourceAcquisitionError as exc:
-            self._json(exc.status, {'error': exc.code, 'reason': exc.reason, 'retryable': exc.retryable, 'provider': 'rons-local-faster-whisper'})
+            self._json(exc.status, {'error': exc.code, 'reason': exc.reason, 'retryable': exc.retryable, 'provider': PROVIDER_NAME})
         except ValueError as exc:
-            self._json(422, {'error': 'invalid_source_request', 'reason': str(exc), 'retryable': False, 'provider': 'rons-local-faster-whisper'})
+            self._json(422, {'error': 'invalid_source_request', 'reason': str(exc), 'retryable': False, 'provider': PROVIDER_NAME})
         except Exception as exc:
             traceback.print_exc()
-            self._json(500, {'error': 'transcription_failed', 'reason': str(exc), 'retryable': False, 'provider': 'rons-local-faster-whisper'})
+            self._json(500, {'error': 'transcription_failed', 'reason': str(exc), 'retryable': False, 'provider': PROVIDER_NAME})
 
     def log_message(self, fmt, *args):
         print('[RONS-STT]', self.address_string(), fmt % args, flush=True)
@@ -409,5 +424,5 @@ class RonsThreadingHTTPServer(ThreadingHTTPServer):
 
 if __name__ == '__main__':
     health = health_payload()
-    print(f"[RONS-STT] localhost:{PORT} backend={health['backend']} model={health['defaultResolvedModel']}", flush=True)
-    RonsThreadingHTTPServer(('127.0.0.1', PORT), Handler).serve_forever()
+    print(f"[RONS-STT] {HOST}:{PORT} service={SERVICE_NAME} backend={health['backend']} model={health['defaultResolvedModel']}", flush=True)
+    RonsThreadingHTTPServer((HOST, PORT), Handler).serve_forever()
