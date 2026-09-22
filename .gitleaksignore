@@ -1,2 +1,5 @@
 # Historical false positive: non-secret localStorage preference key in admin.ci-health.tsx.
 db2817e581e3bf8830bc5020fc9a9d00a2b50048:src/routes/admin.ci-health.tsx:generic-api-key:40
+
+# Historical false positive: fixed audit evidence hash in PR50 native sovereign auth workflow.
+57b1ca42386ac2d9f17442b38399588101043ea6:.github/workflows/share-pr50-native-sovereign-auth-20260921.yml:generic-api-key:54
