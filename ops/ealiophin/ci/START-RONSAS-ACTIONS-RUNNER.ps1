@@ -4,6 +4,7 @@ param(
     [string]$Image = 'localhost/ronsas-actions-runner:2.337.0-r2',
     [string]$Container = 'ronsas-actions-ealiophin',
     [string]$RunnerName = 'Ealiophin-RONSAS-Linux-2',
+    [string]$RunnerLabels = 'ronsas,ealiophin,sovereign',
     [string]$Network = 'ronsas-ci',
     [string]$Proxy = 'ronsas-podman-api',
     [string]$Volume = 'ronsas-actions-work',
@@ -28,8 +29,17 @@ function Test-ContainerExists([string]$Name) {
 }
 
 function Get-RunnerProcessState([string]$Name) {
-    $top = @(& $podman top $Name 2>$null)
-    if ($LASTEXITCODE -ne 0) {
+    $priorErrorActionPreference = $ErrorActionPreference
+    $top = @()
+    $exitCode = 1
+    try {
+        $ErrorActionPreference = 'Continue'
+        $top = @(& $podman top $Name 2>$null)
+        $exitCode = [int]$LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $priorErrorActionPreference
+    }
+    if ($exitCode -ne 0) {
         return [pscustomobject]@{ listener = $false; worker = $false }
     }
     $joined = $top -join "`n"
@@ -101,7 +111,8 @@ function Get-OtherInProgressWorkflowRuns {
 function Ensure-RunnerLabels($Runner) {
     if (-not $Runner) { return }
     $present = @($Runner.labels | ForEach-Object { [string]$_.name })
-    $missing = @('ronsas','ealiophin','sovereign' | Where-Object { $present -notcontains $_ })
+    $required = @($RunnerLabels -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+    $missing = @($required | Where-Object { $present -notcontains $_ })
     if ($missing.Count -eq 0) { return }
     $args = @('api','-X','POST',"repos/$Repository/actions/runners/$($Runner.id)/labels")
     foreach ($label in $missing) { $args += @('-f',"labels[]=$label") }
@@ -267,7 +278,7 @@ $repoUrl = "https://github.com/$Repository"
 $apiUrl = "tcp://$Proxy`:2375"
 $args = @('run','-d','--name',$Container,'--restart','unless-stopped','--network',$Network,
     '-e',"REPO_URL=$repoUrl",'-e',"RUNNER_TOKEN=$token",'-e',"RUNNER_NAME=$RunnerName",
-    '-e','RUNNER_LABELS=ronsas,ealiophin,sovereign','-e',"DOCKER_HOST=$apiUrl",'-e',"CONTAINER_HOST=$apiUrl",
+    '-e',"RUNNER_LABELS=$RunnerLabels",'-e',"DOCKER_HOST=$apiUrl",'-e',"CONTAINER_HOST=$apiUrl",
     '-v',"${Volume}:/home/runner/_work",$Image)
 & $podman @args | Out-Null
 if ($LASTEXITCODE -ne 0) { throw 'Failed to start RONSAS Actions runner container.' }
