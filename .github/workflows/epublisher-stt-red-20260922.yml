@@ -56,6 +56,82 @@ jobs:
             let out = fs.existsSync(p) ? fs.readFileSync(p, "utf8") : "<missing test output>";
             const body = ["EPUBLISHER_STT_FOCUSED_CHECK", "", "SHA: " + context.sha, "exit_code=" + (process.env.EXIT_CODE || "unknown"), "", "```", out, "```"].join("\n");
             await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
+      - name: Capture supervisor control state
+        if: steps.test.outcome == 'success'
+        id: supervisor
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference = 'Continue'
+          $control = Join-Path $env:LOCALAPPDATA 'Resonance\RONS-ControlCenter'
+          $configPath = Join-Path $control 'rons-control.json'
+          $state = [ordered]@{
+            config_exists = (Test-Path -LiteralPath $configPath -PathType Leaf)
+            task = $null
+            services = @()
+            port_7869 = $null
+            supervisor_log_tail = @()
+          }
+          if ($state.config_exists) {
+            try {
+              $cfg = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
+              $state.ensureSuite = if ($cfg.autonomy) { [bool]$cfg.autonomy.ensureSuite } else { $null }
+              $state.ensurePublicEdge = if ($cfg.autonomy) { [bool]$cfg.autonomy.ensurePublicEdge } else { $null }
+              $state.services = @($cfg.services | ForEach-Object {
+                [ordered]@{
+                  key = [string]$_.key
+                  name = [string]$_.name
+                  port = [int]$_.port
+                  required = [bool]$_.required
+                }
+              })
+            } catch {
+              $state.config_error = $_.Exception.Message
+            }
+          }
+          try {
+            $task = Get-ScheduledTask -TaskName 'RONS Autonomous Supervisor' -ErrorAction Stop
+            $info = Get-ScheduledTaskInfo -TaskName 'RONS Autonomous Supervisor' -ErrorAction Stop
+            $state.task = [ordered]@{
+              state = [string]$task.State
+              last_result = [int]$info.LastTaskResult
+              last_run = [string]$info.LastRunTime
+            }
+          } catch {
+            $state.task = [ordered]@{ error = $_.Exception.Message }
+          }
+          try {
+            $conn = Get-NetTCPConnection -State Listen -LocalPort 7869 -ErrorAction Stop | Select-Object -First 1
+            $proc = Get-Process -Id ([int]$conn.OwningProcess) -ErrorAction SilentlyContinue
+            $state.port_7869 = [ordered]@{
+              listening = $true
+              pid = [int]$conn.OwningProcess
+              process = if ($proc) { [string]$proc.ProcessName } else { $null }
+            }
+          } catch {
+            $state.port_7869 = [ordered]@{ listening = $false }
+          }
+          $logDir = Join-Path $control 'logs'
+          $latestLog = Get-ChildItem -LiteralPath $logDir -Filter 'supervisor-*.log' -File -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
+          if ($latestLog) {
+            $state.supervisor_log_tail = @(Get-Content -LiteralPath $latestLog.FullName -Tail 40 -ErrorAction SilentlyContinue |
+              Where-Object { $_ -match '(?i)(stt|7869|recovery|required services|supervisor)' } |
+              Select-Object -Last 20)
+          }
+          $json = $state | ConvertTo-Json -Depth 8 -Compress
+          "supervisor_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Publish supervisor control state
+        if: always() && steps.test.outcome == 'success'
+        uses: actions/github-script@v8
+        env:
+          SUPERVISOR_JSON: ${{ steps.supervisor.outputs.supervisor_json }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const body = ["EPUBLISHER_STT_SUPERVISOR_STATE", "", "SHA: " + context.sha, "", process.env.SUPERVISOR_JSON || "{}"].join("\n");
+            await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
+
       - name: Capture exact source acquisition result
         if: steps.test.outcome == 'success'
         id: source
