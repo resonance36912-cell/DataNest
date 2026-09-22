@@ -232,7 +232,7 @@ AS $$ SELECT NULLIF(current_setting('request.jwt.claim.sub', true), '')::uuid $$
   # observes sovereign mode and the exact ephemeral gateway/auth endpoints during the isolated acceptance run.
   $wranglerConfig=Join-Path $workerDir 'wrangler.json'
   $wrangler=(Get-Content -LiteralPath $wranglerConfig -Raw | ConvertFrom-Json)
-  if(-not $wrangler.vars){$wrangler | Add-Member -NotePropertyName vars -NotePropertyValue ([pscustomobject]@{})}
+  if(-not $wrangler.PSObject.Properties['vars']){$wrangler | Add-Member -NotePropertyName vars -NotePropertyValue ([pscustomobject]@{})}
   $wrangler.vars.VITE_RONS_AUTH_MODE='sovereign'
   $wrangler.vars.RONS_SOVEREIGN_PROXY_ENABLED='1'
   $wrangler.vars.RESONANCE_SOVEREIGN_GATEWAY_URL="http://127.0.0.1:$gatewayPort"
