@@ -19,3 +19,10 @@ test("ePublisher STT runtime is refreshed from governed source before listeners 
   expect(copyIndex).toBeLessThan(localStartIndex);
   expect(copyIndex).toBeLessThan(epublisherStartIndex);
 });
+
+test("changed STT runtime restarts only verified governed listeners", () => {
+  expect(startScript).toContain("$sttSourceChanged");
+  expect(startScript).toContain("Assert-KnownPort 'local-stt' 7864 'syncvision-local-stt.py'");
+  expect(startScript).toContain("Assert-KnownPort 'epublisher-stt' 7869 'syncvision-local-stt.py'");
+  expect(startScript).toContain("Stop-Process -Id ([int]$sttExisting.pid) -Force -ErrorAction Stop");
+});
