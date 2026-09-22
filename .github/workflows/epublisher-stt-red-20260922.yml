@@ -53,6 +53,52 @@ jobs:
             let out = fs.existsSync(p) ? fs.readFileSync(p, "utf8") : "<missing test output>";
             const body = ["EPUBLISHER_STT_FOCUSED_CHECK", "", "SHA: " + context.sha, "exit_code=" + (process.env.EXIT_CODE || "unknown"), "", "```", out, "```"].join("\n");
             await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
+      - name: Capture exact source acquisition result
+        if: steps.test.outcome == 'success'
+        id: source
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $runtime = Join-Path $env:USERPROFILE 'Resonance\OpenNova\runtime'
+          $python = Join-Path $runtime 'python-envs\epublisher-stt\Scripts\python.exe'
+          $probe = Join-Path $env:RUNNER_TEMP 'epublisher-source-probe.py'
+          @'
+import json, urllib.request, urllib.error
+import yt_dlp
+url='https://www.youtube.com/watch?v=CxKEyVgYBpk'
+out={}
+try:
+    with yt_dlp.YoutubeDL({'quiet':True,'no_warnings':True,'skip_download':True,'noplaylist':True}) as ydl:
+        info=ydl.extract_info(url,download=False)
+    out['metadata']={'id':info.get('id'),'duration':info.get('duration'),'availability':info.get('availability'),'live_status':info.get('live_status')}
+except Exception as exc:
+    out['metadata_error']=str(exc)[-1200:]
+payload=json.dumps({'url':url,'mode':'fast'}).encode('utf-8')
+req=urllib.request.Request('http://127.0.0.1:7869/transcribe-url',data=payload,method='POST',headers={'Content-Type':'application/json'})
+try:
+    with urllib.request.urlopen(req,timeout=90) as resp:
+        raw=resp.read().decode('utf-8','replace')
+        obj=json.loads(raw)
+        out['transcribe']={'status':resp.status,'ok':True,'text_length':len(str(obj.get('text') or '')),'provider':(obj.get('quality') or {}).get('provider')}
+except urllib.error.HTTPError as exc:
+    raw=exc.read().decode('utf-8','replace')
+    out['transcribe']={'status':exc.code,'ok':False,'detail':raw[:2000]}
+except Exception as exc:
+    out['transcribe']={'status':None,'ok':False,'detail':str(exc)[:2000]}
+print(json.dumps(out,separators=(',',':')))
+'@ | Set-Content -LiteralPath $probe -Encoding UTF8
+          $json = & $python $probe
+          "source_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+      - name: Publish exact source result
+        if: always() && steps.test.outcome == 'success'
+        uses: actions/github-script@v8
+        env:
+          SOURCE_JSON: ${{ steps.source.outputs.source_json }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const body = ["EPUBLISHER_STT_SOURCE_DIAGNOSTIC", "", "SHA: " + context.sha, "", process.env.SOURCE_JSON || "{}"].join("\n");
+            await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
+
       - name: Preserve focused check state
         if: steps.test.outcome == 'failure'
         run: exit 1
