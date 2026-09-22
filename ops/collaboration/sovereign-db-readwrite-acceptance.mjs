@@ -29,7 +29,7 @@ async function callServerFn(file, exportName, payload) {
   if (response.status !== 200 || !body.startsWith("{")) {
     throw new Error(`${exportName} returned HTTP ${response.status}: ${body.slice(0, 500)}`);
   }
-  const envelope = fromCrossJSON(JSON.parse(body));
+  const envelope = fromCrossJSON(JSON.parse(body), { plugins: [] });
   if (envelope?.error) {
     const message =
       typeof envelope.error === "string"
