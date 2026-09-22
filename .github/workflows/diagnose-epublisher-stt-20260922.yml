@@ -27,30 +27,31 @@ jobs:
           $python=Join-Path $runtime 'python-envs\epublisher-stt\Scripts\python.exe'
           $probe=Join-Path $env:RUNNER_TEMP 'probe-epublisher-stt.py'
           @'
-          import json, urllib.request, urllib.error
-                    import yt_dlp
-          url='https://www.youtube.com/watch?v=CxKEyVgYBpk'
-          out={}
-          try:
-              with yt_dlp.YoutubeDL({'quiet':True,'no_warnings':True,'skip_download':True,'noplaylist':True,'js_runtimes':{'node':{}}}) as ydl:
-                  info=ydl.extract_info(url,download=False)
-              out['metadata']={'id':info.get('id'),'duration':info.get('duration'),'availability':info.get('availability'),'live_status':info.get('live_status')}
-          except Exception as exc:
-              out['metadata_error']=str(exc)[-1200:]
-          payload=json.dumps({'url':url,'mode':'fast'}).encode('utf-8')
-          req=urllib.request.Request('http://127.0.0.1:7869/transcribe-url',data=payload,method='POST',headers={'Content-Type':'application/json'})
-          try:
-              with urllib.request.urlopen(req,timeout=180) as resp:
-                  raw=resp.read().decode('utf-8','replace')
-                  obj=json.loads(raw)
-                  out['transcribe']={'status':resp.status,'ok':True,'text_length':len(str(obj.get('text') or ''))}
-          except urllib.error.HTTPError as exc:
-              raw=exc.read().decode('utf-8','replace')
-              out['transcribe']={'status':exc.code,'ok':False,'detail':raw[:2000]}
-          except Exception as exc:
-              out['transcribe']={'status':None,'ok':False,'detail':str(exc)[:2000]}
-          print(json.dumps(out,separators=(',',':')))
-          '@ | Set-Content -LiteralPath $probe -Encoding UTF8
+import json, urllib.request, urllib.error
+from pathlib import Path
+import yt_dlp
+url='https://www.youtube.com/watch?v=CxKEyVgYBpk'
+out={}
+try:
+    with yt_dlp.YoutubeDL({'quiet':True,'no_warnings':True,'skip_download':True,'noplaylist':True,'js_runtimes':{'node':{}}}) as ydl:
+        info=ydl.extract_info(url,download=False)
+    out['metadata']={'id':info.get('id'),'duration':info.get('duration'),'availability':info.get('availability'),'live_status':info.get('live_status')}
+except Exception as exc:
+    out['metadata_error']=str(exc)[-1200:]
+payload=json.dumps({'url':url,'mode':'fast'}).encode('utf-8')
+req=urllib.request.Request('http://127.0.0.1:7869/transcribe-url',data=payload,method='POST',headers={'Content-Type':'application/json'})
+try:
+    with urllib.request.urlopen(req,timeout=60) as resp:
+        raw=resp.read().decode('utf-8','replace')
+        obj=json.loads(raw)
+        out['transcribe']={'status':resp.status,'ok':True,'text_length':len(str(obj.get('text') or ''))}
+except urllib.error.HTTPError as exc:
+    raw=exc.read().decode('utf-8','replace')
+    out['transcribe']={'status':exc.code,'ok':False,'detail':raw[:2000]}
+except Exception as exc:
+    out['transcribe']={'status':None,'ok':False,'detail':str(exc)[:2000]}
+print(json.dumps(out,separators=(',',':')))
+'@ | Set-Content -LiteralPath $probe -Encoding UTF8
           $json=& $python $probe
           "diagnostic_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
