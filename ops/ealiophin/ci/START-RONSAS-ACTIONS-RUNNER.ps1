@@ -40,10 +40,11 @@ function Get-RunnerProcessState([string]$Name) {
         $ErrorActionPreference = $priorErrorActionPreference
     }
     if ($exitCode -ne 0) {
-        return [pscustomobject]@{ listener = $false; worker = $false }
+        return [pscustomobject]@{ observed = $false; listener = $false; worker = $false }
     }
     $joined = $top -join "`n"
     return [pscustomobject]@{
+        observed = $true
         listener = ($joined -match 'Runner\.Listener')
         worker = ($joined -match 'Runner\.Worker')
     }
@@ -96,16 +97,97 @@ function Wait-GovernedPodmanProxyConnectivity([string]$Name, [int]$MaxAttempts =
 }
 
 function Get-OtherInProgressWorkflowRuns {
-    $raw = @(& $gh api "repos/$Repository/actions/runs?status=in_progress&per_page=100")
-    if ($LASTEXITCODE -ne 0) { throw 'Unable to query in-progress GitHub workflow runs.' }
-    $payload = ($raw -join "`n") | ConvertFrom-Json
     $currentRunId = 0L
     if ($env:GITHUB_RUN_ID) {
         [void][long]::TryParse([string]$env:GITHUB_RUN_ID, [ref]$currentRunId)
     }
-    return @($payload.workflow_runs | Where-Object {
-        $currentRunId -eq 0L -or [long]$_.id -ne $currentRunId
-    })
+
+    $active = @()
+    $seen = @{}
+    foreach ($status in @('in_progress','queued','waiting','pending','requested')) {
+        $raw = @(& $gh api "repos/$Repository/actions/runs?status=$status&per_page=100")
+        if ($LASTEXITCODE -ne 0) { throw "Unable to query GitHub workflow runs for status=$status." }
+        $payload = ($raw -join "`n") | ConvertFrom-Json
+
+        foreach ($run in @($payload.workflow_runs)) {
+            if ($currentRunId -ne 0L -and [long]$run.id -eq $currentRunId) { continue }
+            if ($seen.ContainsKey([string]$run.id)) { continue }
+
+            $jobsRaw = @(& $gh api "repos/$Repository/actions/runs/$($run.id)/jobs?filter=latest&per_page=100")
+            if ($LASTEXITCODE -ne 0) {
+                throw "Unable to inspect jobs for workflow run $($run.id) while proving runner ownership."
+            }
+            $jobsPayload = ($jobsRaw -join "`n") | ConvertFrom-Json
+            $owned = @($jobsPayload.jobs | Where-Object {
+                [string]$_.runner_name -eq $RunnerName -and
+                ([string]$_.status -eq 'queued' -or [string]$_.status -eq 'in_progress')
+            }).Count -gt 0
+
+            if ($owned) {
+                $seen[[string]$run.id] = $true
+                $active += $run
+            }
+        }
+    }
+    return @($active)
+}
+
+function Get-ActiveRunnerAssignments {
+    $runsRaw = @(& $gh api "repos/$Repository/actions/runs?per_page=100")
+    if ($LASTEXITCODE -ne 0) { throw 'Unable to query GitHub workflow runs for runner assignment proof.' }
+    $runsPayload = ($runsRaw -join "`n") | ConvertFrom-Json
+    $activeRunStates = @('queued','pending','waiting','requested','in_progress')
+    $activeJobStates = @('queued','in_progress')
+    $currentRunId = 0L
+    if ($env:GITHUB_RUN_ID) {
+        [void][long]::TryParse([string]$env:GITHUB_RUN_ID, [ref]$currentRunId)
+    }
+
+    $assignments = @()
+    foreach ($run in @($runsPayload.workflow_runs | Where-Object {
+        $activeRunStates -contains [string]$_.status -and
+        ($currentRunId -eq 0L -or [long]$_.id -ne $currentRunId)
+    })) {
+        $jobsRaw = @(& $gh api "repos/$Repository/actions/runs/$($run.id)/jobs?filter=latest&per_page=100")
+        if ($LASTEXITCODE -ne 0) { throw "Unable to query jobs for workflow run $($run.id)." }
+        $jobsPayload = ($jobsRaw -join "`n") | ConvertFrom-Json
+        foreach ($job in @($jobsPayload.jobs)) {
+            if (
+                [string]$job.runner_name -eq $RunnerName -and
+                $activeJobStates -contains [string]$job.status
+            ) {
+                $assignments += [pscustomobject]@{
+                    run_id = [long]$run.id
+                    run_name = [string]$run.name
+                    branch = [string]$run.head_branch
+                    job_id = [long]$job.id
+                    job_name = [string]$job.name
+                    job_status = [string]$job.status
+                }
+            }
+        }
+    }
+    return @($assignments)
+}
+
+function Restore-PreservedRunnerContainer {
+    if (-not (Test-ContainerExists $Container)) {
+        throw "Preserved runner container disappeared during guarded recycle: $Container"
+    }
+
+    $info = (& $podman inspect $Container | ConvertFrom-Json)[0]
+    if (-not $info.State.Running) {
+        & $podman start $Container | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "Failed to restart preserved runner container: $Container" }
+    }
+
+    if (-not (Wait-RunnerContainerReady $Container 30 2)) {
+        throw 'Preserved runner container did not restore Runner.Listener before guarded recycle returned.'
+    }
+    if (-not (Wait-GovernedPodmanProxyConnectivity $Container 30 2)) {
+        throw 'Preserved runner container did not restore governed Podman connectivity before guarded recycle returned.'
+    }
+    Write-Host 'Preserved runner container restored and verified before guarded recycle deferral.' -ForegroundColor Green
 }
 
 function Ensure-RunnerLabels($Runner) {
@@ -176,6 +258,9 @@ if ($containerReady -and $registered -and $registered.status -eq 'online' -and -
 if ($registered -and [bool]$registered.busy -and [string]$registered.status -eq 'online' -and -not $ForceRecycle) {
     throw 'RONSAS Actions runner is online and busy; refusing unguarded replacement of an active runner.'
 }
+
+$staleBusyProven = $false
+$forceRecycleDeleteReady = $false
 if ($registered -and [bool]$registered.busy -and [string]$registered.status -eq 'online' -and $ForceRecycle) {
     $otherInProgress = @(Get-OtherInProgressWorkflowRuns)
     if ($otherInProgress.Count -gt 0) {
@@ -186,7 +271,27 @@ if ($registered -and [bool]$registered.busy -and [string]$registered.status -eq 
         exit 0
     }
 
-    Write-Host "ForceRecycle was authorized and no other workflow is in progress, but GitHub still reports busy=True. Waiting for assignment finalization." -ForegroundColor Yellow
+    $activeAssignments = @(Get-ActiveRunnerAssignments)
+    if ($activeAssignments.Count -gt 0) {
+        $summary = ($activeAssignments | Select-Object -First 10 | ForEach-Object {
+            "$($_.run_id):$($_.run_name):$($_.job_id):$($_.job_name):$($_.job_status)"
+        }) -join ', '
+        Write-Host "ForceRecycle deferred because GitHub reports active job assignment(s) on ${RunnerName}: $summary" -ForegroundColor Yellow
+        exit 0
+    }
+
+    $runnerState = Get-RunnerProcessState $Container
+    if (-not $runnerState.observed) {
+        Write-Host 'ForceRecycle deferred because the local runner process state could not be observed safely.' -ForegroundColor Yellow
+        exit 0
+    }
+    if ($runnerState.worker) {
+        Write-Host 'ForceRecycle deferred because local Runner.Worker is active even though the repository workflow query is idle.' -ForegroundColor Yellow
+        exit 0
+    }
+
+    Write-Host "ForceRecycle was authorized; GitHub reports busy=True while repository workflows are idle and no local Runner.Worker is active. Building a sustained stale-busy proof before recycle." -ForegroundColor Yellow
+    $idleProofAttempts = 0
     for ($settleAttempt = 1; $settleAttempt -le 18; $settleAttempt++) {
         Start-Sleep -Seconds 5
         $otherInProgress = @(Get-OtherInProgressWorkflowRuns)
@@ -194,38 +299,143 @@ if ($registered -and [bool]$registered.busy -and [string]$registered.status -eq 
             $summary = ($otherInProgress | Select-Object -First 10 | ForEach-Object {
                 "$($_.id):$($_.name):$($_.head_branch)"
             }) -join ', '
-            Write-Host "ForceRecycle deferred during settle window because new in-progress workflow work appeared: $summary" -ForegroundColor Yellow
+            Write-Host "ForceRecycle deferred during stale-busy proof because new in-progress workflow work appeared: $summary" -ForegroundColor Yellow
+            exit 0
+        }
+
+        $activeAssignments = @(Get-ActiveRunnerAssignments)
+        if ($activeAssignments.Count -gt 0) {
+            $summary = ($activeAssignments | Select-Object -First 10 | ForEach-Object {
+                "$($_.run_id):$($_.run_name):$($_.job_id):$($_.job_name):$($_.job_status)"
+            }) -join ', '
+            Write-Host "ForceRecycle deferred during stale-busy proof because GitHub assigned work to ${RunnerName}: $summary" -ForegroundColor Yellow
+            exit 0
+        }
+
+        $runnerState = Get-RunnerProcessState $Container
+        if (-not $runnerState.observed) {
+            Write-Host "ForceRecycle deferred during stale-busy proof because local runner process state became unobservable on attempt $settleAttempt/18." -ForegroundColor Yellow
+            exit 0
+        }
+        if ($runnerState.worker) {
+            Write-Host "ForceRecycle deferred during stale-busy proof because Runner.Worker became active on attempt $settleAttempt/18." -ForegroundColor Yellow
+            exit 0
+        }
+
+        $activeAssignments = @(Get-ActiveRunnerAssignments)
+        if ($activeAssignments.Count -gt 0) {
+            Write-Warning 'GitHub assigned work to the production runner while it was disconnected; restoring the preserved runner container and deferring recycle.'
+            Restore-PreservedRunnerContainer
             exit 0
         }
 
         $registered = Get-RegisteredRunner
         if (-not $registered) {
-            Write-Host 'Runner registration disappeared during settle window; proceeding with fresh registration.' -ForegroundColor Yellow
+            Write-Host 'Runner registration disappeared during stale-busy proof; proceeding with fresh registration.' -ForegroundColor Yellow
             break
         }
         if (-not [bool]$registered.busy) {
             Write-Host "Runner busy state cleared after settle attempt $settleAttempt/18." -ForegroundColor Green
             break
         }
-        Write-Host "Runner remains busy during settle attempt $settleAttempt/18; preserving assignment." -ForegroundColor Yellow
+
+        $idleProofAttempts++
+        Write-Host "Runner remains busy, but repository workflows are idle and no Runner.Worker is active; stale-busy proof $idleProofAttempts/18." -ForegroundColor Yellow
     }
 
     if ($registered -and [bool]$registered.busy) {
-        Write-Warning 'Runner remained busy throughout the bounded settle window. Deferring recycle rather than deleting an assigned runner.'
+        if ($idleProofAttempts -lt 18) {
+            Write-Warning 'Runner remained busy without a complete stale-busy proof. Deferring recycle rather than deleting an assigned runner.'
+            exit 0
+        }
+        Write-Warning 'Runner remained busy for the full bounded proof window while repository workflows stayed idle and no Runner.Worker was observed. Treating the GitHub busy flag as stale and proceeding with guarded recycle.'
+        $staleBusyProven = $true
+    }
+
+    if ($registered -and [string]$registered.status -eq 'online' -and -not [bool]$registered.busy) {
+        Write-Host 'Runner busy state self-cleared during stale-busy proof; preserving the healthy online runner without recycle.' -ForegroundColor Green
         exit 0
     }
 } elseif ($registered -and [bool]$registered.busy -and [string]$registered.status -ne 'online') {
     Write-Host "Runner registration is $($registered.status) but busy=True; treating busy state as stale and allowing governed recycle." -ForegroundColor Yellow
 }
 
-if ($registered -and ($registered.status -ne 'online' -or $ForceRecycle)) {
-    $reason = if ($ForceRecycle) { 'guarded recycle' } else { 'stale offline registration' }
+if ($staleBusyProven -and $registered -and [bool]$registered.busy -and [string]$registered.status -eq 'online') {
+    $runnerState = Get-RunnerProcessState $Container
+    if (-not $runnerState.observed -or $runnerState.worker) {
+        Write-Warning 'Stale-busy proof cannot transition to disconnect because local runner state is no longer safely idle.'
+        exit 0
+    }
+
+    $otherInProgress = @(Get-OtherInProgressWorkflowRuns)
+    if ($otherInProgress.Count -gt 0) {
+        Write-Host 'Stale-busy disconnect deferred because workflow work became active after the proof window.' -ForegroundColor Yellow
+        exit 0
+    }
+    $activeAssignments = @(Get-ActiveRunnerAssignments)
+    if ($activeAssignments.Count -gt 0) {
+        Write-Host 'Stale-busy disconnect deferred because GitHub assigned work to the production runner after the proof window.' -ForegroundColor Yellow
+        exit 0
+    }
+
+    Write-Host 'Stopping the proven-idle runner container so GitHub can release the stale assignment before registration deletion.' -ForegroundColor Yellow
+    & $podman stop --time 10 $Container | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "Failed to stop proven-idle runner container: $Container" }
+
+    for ($disconnectAttempt = 1; $disconnectAttempt -le 12; $disconnectAttempt++) {
+        Start-Sleep -Seconds 5
+        $otherInProgress = @(Get-OtherInProgressWorkflowRuns)
+        if ($otherInProgress.Count -gt 0) {
+            Write-Warning 'Workflow work appeared while waiting for the stale assignment to clear; restoring the preserved runner container and deferring recycle.'
+            Restore-PreservedRunnerContainer
+            exit 0
+        }
+
+        $registered = Get-RegisteredRunner
+        if (-not $registered) {
+            Write-Host "Runner registration disappeared after proven-idle disconnect on attempt $disconnectAttempt/12." -ForegroundColor Green
+            break
+        }
+        if (-not [bool]$registered.busy -or [string]$registered.status -ne 'online') {
+            Write-Host "GitHub released the stale assignment after proven-idle disconnect on attempt $disconnectAttempt/12." -ForegroundColor Green
+            $forceRecycleDeleteReady = $true
+            break
+        }
+        Write-Host "Waiting for GitHub to release the stale assignment after proven-idle disconnect; attempt $disconnectAttempt/12." -ForegroundColor Yellow
+    }
+
+    if ($registered -and [bool]$registered.busy -and [string]$registered.status -eq 'online') {
+        Write-Warning 'GitHub did not release the stale assignment within the bounded disconnect window; restoring the preserved runner container and deferring recycle.'
+        Restore-PreservedRunnerContainer
+        exit 0
+    }
+}
+
+if ($ForceRecycle -and $registered -and [string]$registered.status -eq 'online' -and -not $forceRecycleDeleteReady) {
+    Write-Host 'ForceRecycle deferred because online runner registration deletion was not proven safe.' -ForegroundColor Yellow
+    exit 0
+}
+
+if ($registered -and ($registered.status -ne 'online' -or $forceRecycleDeleteReady)) {
+    $reason = if ($forceRecycleDeleteReady) { 'guarded recycle' } else { 'stale offline registration' }
     Write-Host "Removing GitHub runner registration for ${reason}: $RunnerName (id=$($registered.id))" -ForegroundColor Yellow
 
     $deleted = $false
     for ($deleteAttempt = 1; $deleteAttempt -le 3; $deleteAttempt++) {
-        $deleteOutput = @(& $gh api -X DELETE "repos/$Repository/actions/runners/$($registered.id)" 2>&1)
-        $deleteExit = $LASTEXITCODE
+        $priorErrorActionPreference = $ErrorActionPreference
+        $deleteOutput = @()
+        $deleteExit = 1
+        try {
+            # Windows PowerShell can promote native stderr (including GitHub's
+            # expected HTTP 422 assigned-runner response) into a terminating
+            # NativeCommandError. Capture it as data so the guarded retry logic
+            # below can fail closed instead of escaping the recovery path.
+            $ErrorActionPreference = 'Continue'
+            $deleteOutput = @(& $gh api -X DELETE "repos/$Repository/actions/runners/$($registered.id)" 2>&1)
+            $deleteExit = [int]$LASTEXITCODE
+        } finally {
+            $ErrorActionPreference = $priorErrorActionPreference
+        }
         if ($deleteExit -eq 0) {
             $deleted = $true
             break
@@ -241,8 +451,16 @@ if ($registered -and ($registered.status -ne 'online' -or $ForceRecycle)) {
                     "$($_.id):$($_.name):$($_.head_branch)"
                 }) -join ', '
                 Write-Host "Runner deletion retry deferred because workflow work became active: $summary" -ForegroundColor Yellow
+                Restore-PreservedRunnerContainer
                 exit 0
             }
+            $activeAssignments = @(Get-ActiveRunnerAssignments)
+            if ($activeAssignments.Count -gt 0) {
+                Write-Host 'Runner deletion retry deferred because GitHub assigned work to the production runner.' -ForegroundColor Yellow
+                Restore-PreservedRunnerContainer
+                exit 0
+            }
+
             $registered = Get-RegisteredRunner
             if (-not $registered) {
                 $deleted = $true
@@ -255,7 +473,8 @@ if ($registered -and ($registered.status -ne 'online' -or $ForceRecycle)) {
     }
 
     if (-not $deleted) {
-        Write-Warning 'GitHub continued to reject runner deletion as assigned. Deferring recycle safely; a later guarded pass can retry.'
+        Write-Warning 'GitHub continued to reject runner deletion as assigned. Restoring the preserved runner before deferring; a later guarded pass can retry.'
+        Restore-PreservedRunnerContainer
         exit 0
     }
     $registered = $null
