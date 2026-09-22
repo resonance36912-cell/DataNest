@@ -17,6 +17,10 @@ test("bridge agent can bootstrap from a refresh token without requiring a long-l
   );
   expect(agent).not.toContain('Get-RequiredEnv "RONSAS_BRIDGE_ACCESS_TOKEN"');
   expect(agent).toContain("/auth/v1/token?grant_type=refresh_token");
+  expect(agent).toContain("Save-BridgeRefreshToken $bootstrap");
+  expect(agent).toContain(
+    '[Environment]::SetEnvironmentVariable("RONSAS_BRIDGE_REFRESH_TOKEN", $null, "Process")',
+  );
 });
 
 test("rotated bridge refresh tokens are stored with Windows DPAPI protection", () => {
