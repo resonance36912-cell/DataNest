@@ -2,18 +2,23 @@ $ErrorActionPreference = 'Stop'
 
 $Root = Join-Path $env:USERPROFILE 'Resonance\OpenNova'
 $Runtime = Join-Path $Root 'runtime'
-$Python = Join-Path $Runtime 'python-envs\epublisher-stt\Scripts\python.exe'
+$PreferredPython = Join-Path $Runtime 'python-envs\epublisher-stt-py311\Scripts\python.exe'
+$FallbackPython = Join-Path $Runtime 'python-envs\epublisher-stt\Scripts\python.exe'
+$Python = if (Test-Path -LiteralPath $PreferredPython -PathType Leaf) { $PreferredPython } else { $FallbackPython }
 $Script = Join-Path $Runtime 'syncvision-local-stt.py'
 $LogDir = Join-Path $Runtime 'logs\rons-cluster'
 $Log = Join-Path $LogDir 'epublisher-stt-task.log'
 
 New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
-if (-not (Test-Path -LiteralPath $Python -PathType Leaf)) { throw "ePublisher STT Python missing: $Python" }
+if (-not (Test-Path -LiteralPath $Python -PathType Leaf)) { throw "ePublisher STT Python missing. Preferred=$PreferredPython Fallback=$FallbackPython" }
 if (-not (Test-Path -LiteralPath $Script -PathType Leaf)) { throw "ePublisher STT runtime missing: $Script" }
 
 $env:RONS_STT_PORT = '7869'
 $env:RONS_STT_MODELS_ROOT = Join-Path $Runtime 'models'
 $env:HF_HUB_DISABLE_XET = '1'
+
+$pythonVersion = (& $Python -c 'import platform; print(platform.python_version())' 2>$null | Select-Object -First 1)
+Add-Content -LiteralPath $Log -Value ((Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + " ePublisher STT interpreter=$Python version=$pythonVersion")
 
 Set-Location -LiteralPath $Runtime
 
