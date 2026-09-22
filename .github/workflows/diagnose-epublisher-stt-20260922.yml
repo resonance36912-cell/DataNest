@@ -1,4 +1,4 @@
-name: Recover ePublisher STT 502
+name: Diagnose ePublisher STT source 422
 
 on:
   push:
@@ -11,102 +11,58 @@ permissions:
   issues: write
 
 jobs:
-  recover:
+  diagnose:
     runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - name: Check out RONSAS control authority
         uses: actions/checkout@v5
 
-      - name: Recover dedicated ePublisher STT if absent
-        id: recover
+      - name: Capture exact STT source error
+        id: probe
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
-          $ErrorActionPreference = 'Stop'
-          $root = Join-Path $env:USERPROFILE 'Resonance\OpenNova'
-          $runtime = Join-Path $root 'runtime'
-          $logs = Join-Path $runtime 'logs\rons-cluster'
-          $python = Join-Path $runtime 'python-envs\epublisher-stt\Scripts\python.exe'
-          $script = Join-Path $runtime 'syncvision-local-stt.py'
-          $modelRoot = Join-Path $runtime 'models'
-          $result = [ordered]@{}
+          $ErrorActionPreference='Stop'
+          $runtime=Join-Path $env:USERPROFILE 'Resonance\OpenNova\runtime'
+          $python=Join-Path $runtime 'python-envs\epublisher-stt\Scripts\python.exe'
+          $probe=Join-Path $env:RUNNER_TEMP 'probe-epublisher-stt.py'
+          @'
+import json, urllib.request, urllib.error
+from pathlib import Path
+import yt_dlp
+url='https://www.youtube.com/watch?v=CxKEyVgYBpk'
+out={}
+try:
+    with yt_dlp.YoutubeDL({'quiet':True,'no_warnings':True,'skip_download':True,'noplaylist':True,'js_runtimes':{'node':{}}}) as ydl:
+        info=ydl.extract_info(url,download=False)
+    out['metadata']={'id':info.get('id'),'duration':info.get('duration'),'availability':info.get('availability'),'live_status':info.get('live_status')}
+except Exception as exc:
+    out['metadata_error']=str(exc)[-1200:]
+payload=json.dumps({'url':url,'mode':'fast'}).encode('utf-8')
+req=urllib.request.Request('http://127.0.0.1:7869/transcribe-url',data=payload,method='POST',headers={'Content-Type':'application/json'})
+try:
+    with urllib.request.urlopen(req,timeout=60) as resp:
+        raw=resp.read().decode('utf-8','replace')
+        obj=json.loads(raw)
+        out['transcribe']={'status':resp.status,'ok':True,'text_length':len(str(obj.get('text') or ''))}
+except urllib.error.HTTPError as exc:
+    raw=exc.read().decode('utf-8','replace')
+    out['transcribe']={'status':exc.code,'ok':False,'detail':raw[:2000]}
+except Exception as exc:
+    out['transcribe']={'status':None,'ok':False,'detail':str(exc)[:2000]}
+print(json.dumps(out,separators=(',',':')))
+'@ | Set-Content -LiteralPath $probe -Encoding UTF8
+          $json=& $python $probe
+          "diagnostic_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
-          function Probe([string]$Name,[string]$Uri,[int]$Timeout=12) {
-            try {
-              $r=Invoke-WebRequest -UseBasicParsing -Uri $Uri -TimeoutSec $Timeout
-              $result[$Name]=[ordered]@{status=[int]$r.StatusCode;ok=$true;detail=([string]$r.Content).Substring(0,[Math]::Min(800,([string]$r.Content).Length))}
-              return $true
-            } catch {
-              $status=$null
-              if ($_.Exception.Response -and $_.Exception.Response.StatusCode) { try {$status=[int]$_.Exception.Response.StatusCode.value__} catch {} }
-              $result[$Name]=[ordered]@{status=$status;ok=$false;detail=[string]$_.Exception.Message}
-              return $false
-            }
-          }
-
-          $healthy = Probe 'before_direct_health' 'http://127.0.0.1:7869/health'
-          if (-not $healthy) {
-            if (-not (Test-Path -LiteralPath $python -PathType Leaf)) { throw "Missing governed STT Python: $python" }
-            if (-not (Test-Path -LiteralPath $script -PathType Leaf)) { throw "Missing governed STT script: $script" }
-            New-Item -ItemType Directory -Force -Path $logs | Out-Null
-            $stamp=Get-Date -Format 'yyyyMMdd-HHmmss'
-            $outLog=Join-Path $logs ("epublisher-stt-recovery-$stamp.out.log")
-            $errLog=Join-Path $logs ("epublisher-stt-recovery-$stamp.err.log")
-            $priorPort=$env:RONS_STT_PORT
-            $priorModels=$env:RONS_STT_MODELS_ROOT
-            $priorXet=$env:HF_HUB_DISABLE_XET
-            $priorTracking=$env:RUNNER_TRACKING_ID
-            try {
-              $env:RONS_STT_PORT='7869'
-              $env:RONS_STT_MODELS_ROOT=$modelRoot
-              $env:HF_HUB_DISABLE_XET='1'
-              $env:RUNNER_TRACKING_ID=''
-              $proc=Start-Process -FilePath $python -ArgumentList @($script) -WorkingDirectory $runtime -RedirectStandardOutput $outLog -RedirectStandardError $errLog -WindowStyle Hidden -PassThru
-              $result.started_pid=[int]$proc.Id
-              $result.recovery_out_log=$outLog
-              $result.recovery_err_log=$errLog
-            } finally {
-              $env:RONS_STT_PORT=$priorPort
-              $env:RONS_STT_MODELS_ROOT=$priorModels
-              $env:HF_HUB_DISABLE_XET=$priorXet
-              $env:RUNNER_TRACKING_ID=$priorTracking
-            }
-            $deadline=(Get-Date).AddSeconds(90)
-            do { Start-Sleep -Milliseconds 750; $healthy=Probe 'startup_direct_health' 'http://127.0.0.1:7869/health' } while (-not $healthy -and (Get-Date) -lt $deadline)
-            if (-not $healthy) {
-              if (Test-Path -LiteralPath $errLog) { $result.startup_stderr=(Get-Content -LiteralPath $errLog -Tail 100 | Out-String) }
-              throw 'Dedicated ePublisher STT did not become healthy on port 7869.'
-            }
-          }
-
-          Probe 'local_proxy_health' 'http://127.0.0.1:3101/open-nova-stt/health' | Out-Null
-          Probe 'public_proxy_health' 'https://epublisher.reson8.life/open-nova-stt/health' | Out-Null
-
-          $payload=@{url='https://www.youtube.com/watch?v=CxKEyVgYBpk';mode='fast'} | ConvertTo-Json -Compress
-          try {
-            $r=Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:7869/transcribe-url' -Method POST -ContentType 'application/json' -Body $payload -TimeoutSec 420
-            $obj=$r.Content | ConvertFrom-Json
-            $result.direct_transcribe=[ordered]@{status=[int]$r.StatusCode;ok=$true;text_length=([string]$obj.text).Length;provider=[string]$obj.quality.provider}
-          } catch {
-            $status=$null;$detail=[string]$_.Exception.Message
-            if ($_.Exception.Response -and $_.Exception.Response.StatusCode) {
-              try {$status=[int]$_.Exception.Response.StatusCode.value__} catch {}
-              try {$reader=New-Object IO.StreamReader($_.Exception.Response.GetResponseStream());$raw=$reader.ReadToEnd();$reader.Dispose();if($raw){$detail=$raw.Substring(0,[Math]::Min(1200,$raw.Length))}} catch {}
-            }
-            $result.direct_transcribe=[ordered]@{status=$status;ok=$false;detail=$detail}
-          }
-
-          $compact=$result | ConvertTo-Json -Depth 8 -Compress
-          "diagnostic_json=$compact" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-
-      - name: Publish recovery receipt
+      - name: Publish source diagnostic receipt
         if: always()
         uses: actions/github-script@v8
         env:
-          DIAGNOSTIC_JSON: ${{ steps.recover.outputs.diagnostic_json }}
+          DIAGNOSTIC_JSON: ${{ steps.probe.outputs.diagnostic_json }}
         with:
           github-token: ${{ github.token }}
           script: |
             const data = process.env.DIAGNOSTIC_JSON || "{}";
-            const body = ["EPUBLISHER_STT_RECOVERY", "", "Run: " + context.runId, "SHA: " + context.sha, "", data].join("\n");
+            const body = ["EPUBLISHER_STT_SOURCE_DIAGNOSTIC", "", "Run: " + context.runId, "SHA: " + context.sha, "", data].join("\n");
             await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
