@@ -13,7 +13,7 @@ concurrency:
 jobs:
   verify:
     name: ePublisher tier amount checks
-    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Check out repository
@@ -22,7 +22,7 @@ jobs:
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: 1.3.3
           no-cache: true
 
       - name: Install dependencies
