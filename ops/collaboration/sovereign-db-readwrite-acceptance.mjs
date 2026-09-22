@@ -1,4 +1,4 @@
-import { fromJSON, toJSONAsync } from "seroval";
+import { fromCrossJSON, toJSONAsync } from "seroval";
 import crypto from "node:crypto";
 
 const base = process.env.RONS_ACCEPTANCE_BASE ?? "http://127.0.0.1:4186";
@@ -29,7 +29,7 @@ async function callServerFn(file, exportName, payload) {
   if (response.status !== 200 || !body.startsWith("{")) {
     throw new Error(`${exportName} returned HTTP ${response.status}: ${body.slice(0, 500)}`);
   }
-  const envelope = fromJSON(JSON.parse(body));
+  const envelope = fromCrossJSON(JSON.parse(body));
   if (envelope?.error) {
     const message =
       typeof envelope.error === "string"
