@@ -1,0 +1,176 @@
+name: Provision TRIGGERcmd RONS Runner Recover
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/provision-triggercmd-rons-runner-recover.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: provision-triggercmd-rons-runner-recover
+  cancel-in-progress: true
+
+jobs:
+  provision:
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 10
+    steps:
+      - name: Check out RONSAS control authority
+        uses: actions/checkout@v5
+
+      - name: Provision fail-closed TRIGGERcmd recovery command
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $commandsPath = Join-Path $env:USERPROFILE '.TRIGGERcmdData\commands.json'
+          if (-not (Test-Path -LiteralPath $commandsPath -PathType Leaf)) {
+            throw "TRIGGERcmd commands.json not found at $commandsPath"
+          }
+
+          $runnerScript = Join-Path $env:USERPROFILE 'Documents\GitHub\rons-sovereign-codebase\ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
+          if (-not (Test-Path -LiteralPath $runnerScript -PathType Leaf)) {
+            throw "Governed runner recovery script not found at $runnerScript"
+          }
+
+          $raw = Get-Content -Raw -LiteralPath $commandsPath
+
+          $backupPath = "$commandsPath.bak-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+          Copy-Item -LiteralPath $commandsPath -Destination $backupPath -Force
+
+          # Older hand-edited TRIGGERcmd entries on Ealiophin contain literal
+          # CR/LF characters inside JSON strings. Normalize only those illegal
+          # in-string line breaks to spaces, leaving structural line breaks intact.
+          $builder = [Text.StringBuilder]::new()
+          $inString = $false
+          $escaped = $false
+          for ($i = 0; $i -lt $raw.Length; $i++) {
+            $ch = $raw[$i]
+            if ($inString) {
+              if ($escaped) {
+                [void]$builder.Append($ch)
+                $escaped = $false
+                continue
+              }
+              if ($ch -eq [char]92) {
+                [void]$builder.Append($ch)
+                $escaped = $true
+                continue
+              }
+              if ($ch -eq '"') {
+                [void]$builder.Append($ch)
+                $inString = $false
+                continue
+              }
+              if ($ch -eq "`r" -or $ch -eq "`n") {
+                if ($ch -eq "`r" -and $i + 1 -lt $raw.Length -and $raw[$i + 1] -eq "`n") {
+                  $i++
+                }
+                [void]$builder.Append(' ')
+                continue
+              }
+              [void]$builder.Append($ch)
+              continue
+            }
+
+            if ($ch -eq '"') { $inString = $true }
+            [void]$builder.Append($ch)
+          }
+          if ($inString) {
+            throw 'TRIGGERcmd commands.json contains an unterminated JSON string; refusing automatic repair.'
+          }
+
+          $normalized = $builder.ToString()
+
+          # A known legacy append left the RONS Status object without its final
+          # closing brace immediately before RONS Install Windows Runner.
+          $legacyPattern = [regex]::new(
+            '("trigger"\s*:\s*"RONS Status".*?"icon"\s*:\s*"")\s*,\s*(\{\s*"trigger"\s*:\s*"RONS Install Windows Runner")',
+            [Text.RegularExpressions.RegexOptions]::Singleline
+          )
+          if ($legacyPattern.IsMatch($normalized)) {
+            $normalized = $legacyPattern.Replace(
+              $normalized,
+              {
+                param($match)
+                $match.Groups[1].Value + '},' + [Environment]::NewLine + $match.Groups[2].Value
+              },
+              1
+            )
+            Write-Host 'Repaired known legacy RONS Status JSON boundary.'
+          }
+
+          try {
+            $parsed = $normalized | ConvertFrom-Json -ErrorAction Stop
+          } catch {
+            throw "TRIGGERcmd commands.json remains invalid after bounded legacy repair: $($_.Exception.Message)"
+          }
+          $commands = @(foreach ($item in $parsed) { $item })
+
+          $expectedCommand = 'powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "' + $runnerScript + '" -ForceRecycle'
+          $entry = [pscustomobject][ordered]@{
+            trigger = 'RONS Runner Recover'
+            command = $expectedCommand
+            ground = 'background'
+            voice = 'rons runner recover'
+            voiceReply = ''
+            allowParams = 'false'
+            quoteParams = 'false'
+            mcpToolDescription = 'Recover the governed RONSAS Linux GitHub Actions runner on Ealiophin'
+            icon = ''
+          }
+
+          $matches = @($commands | Where-Object { $_.trigger -eq 'RONS Runner Recover' })
+          if ($matches.Count -gt 1) {
+            throw 'Duplicate RONS Runner Recover entries already exist; refusing automatic rewrite.'
+          }
+
+          if ($matches.Count -eq 1) {
+            $updated = foreach ($item in $commands) {
+              if ($item.trigger -eq 'RONS Runner Recover') { $entry } else { $item }
+            }
+            $commands = @($updated)
+            Write-Host 'Updated existing RONS Runner Recover command.'
+          } else {
+            $commands = @($commands) + @($entry)
+            Write-Host 'Added RONS Runner Recover command.'
+          }
+
+          $json = $commands | ConvertTo-Json -Depth 20
+          [IO.File]::WriteAllText(
+            $commandsPath,
+            $json + [Environment]::NewLine,
+            [Text.UTF8Encoding]::new($false)
+          )
+
+          $verifyParsed = Get-Content -Raw -LiteralPath $commandsPath | ConvertFrom-Json -ErrorAction Stop
+          $verify = @(foreach ($item in $verifyParsed) { $item })
+          $saved = @($verify | Where-Object { $_.trigger -eq 'RONS Runner Recover' })
+          if ($saved.Count -ne 1) {
+            Copy-Item -LiteralPath $backupPath -Destination $commandsPath -Force
+            throw 'TRIGGERcmd command verification failed; restored backup.'
+          }
+
+          $allowParamsRaw = $saved[0].allowParams
+          if ($null -eq $allowParamsRaw) {
+            Copy-Item -LiteralPath $backupPath -Destination $commandsPath -Force
+            throw 'TRIGGERcmd recovery command is missing allowParams; restored backup.'
+          }
+          $allowParamsText = ([string]$allowParamsRaw).Trim().ToLowerInvariant()
+          Write-Host "Validated allowParams representation: '$allowParamsText'"
+          if ($allowParamsText -notin @('false', '0', 'no')) {
+            Copy-Item -LiteralPath $backupPath -Destination $commandsPath -Force
+            throw "TRIGGERcmd recovery command permits or ambiguously defines parameters ('$allowParamsText'); restored backup."
+          }
+
+          if ([string]$saved[0].command -ne $expectedCommand) {
+            Copy-Item -LiteralPath $backupPath -Destination $commandsPath -Force
+            throw 'TRIGGERcmd recovery command does not match the governed runner command; restored backup.'
+          }
+
+          Write-Host "TRIGGERcmd provisioning complete. Backup: $backupPath"
+          Write-Host 'The TRIGGERcmd agent reloads commands.json after it is saved.'
