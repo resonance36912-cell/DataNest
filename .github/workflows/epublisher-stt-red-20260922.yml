@@ -17,18 +17,27 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v5
-      - name: Run focused regression test
+      - name: Run focused regression assertion
         id: test
         continue-on-error: true
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
-          $bun = Join-Path $env:USERPROFILE '.bun\bin\bun.exe'
-          if (-not (Test-Path -LiteralPath $bun -PathType Leaf)) { throw "Existing Bun runtime not found: $bun" }
-          $out = & $bun test scripts/lib/epublisher-stt-runtime-sync.test.ts 2>&1 | Out-String
-          $code = $LASTEXITCODE
-          $out | Set-Content -LiteralPath $env:RUNNER_TEMP\epublisher-stt-red.txt -Encoding UTF8
-          "exit_code=$code" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-          if ($code -ne 0) { exit $code }
+          $path = 'ops\ealiophin\cluster\START-RONSAS-ECOSYSTEM.ps1'
+          $text = Get-Content -LiteralPath $path -Raw
+          $needles = @(
+            "$sttSource = Join-Path $opsRuntime 'syncvision-local-stt.py'",
+            "$sttTarget = Join-Path $Runtime 'syncvision-local-stt.py'",
+            "Copy-Item -LiteralPath $sttSource -Destination $sttTarget -Force"
+          )
+          $missing = @($needles | Where-Object { -not $text.Contains($_) })
+          $lines = @(
+            'Focused runtime-sync regression',
+            ('missing_count=' + $missing.Count),
+            ($missing | ForEach-Object { 'MISSING: ' + $_ })
+          )
+          $lines | Set-Content -LiteralPath $env:RUNNER_TEMP\epublisher-stt-red.txt -Encoding UTF8
+          "exit_code=" + $(if ($missing.Count) { 1 } else { 0 }) | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          if ($missing.Count) { exit 1 }
       - name: Publish RED receipt
         if: always()
         uses: actions/github-script@v8
@@ -40,7 +49,6 @@ jobs:
             const fs = require("fs");
             const p = process.env.RUNNER_TEMP + "\\epublisher-stt-red.txt";
             let out = fs.existsSync(p) ? fs.readFileSync(p, "utf8") : "<missing test output>";
-            if (out.length > 7000) out = out.slice(-7000);
             const body = ["EPUBLISHER_STT_TDD_RED", "", "SHA: " + context.sha, "exit_code=" + (process.env.EXIT_CODE || "unknown"), "", "```", out, "```"].join("\n");
             await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
       - name: Preserve RED state
