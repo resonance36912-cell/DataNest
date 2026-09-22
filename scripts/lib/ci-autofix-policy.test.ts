@@ -44,6 +44,15 @@ describe("guarded CI autofix policy", () => {
     expect(remediate).toContain("Resolve-StaleTriageIssues -CurrentFailures $failures");
   });
 
+  test("runs remediation after state write even when current heads are green", () => {
+    const stateWrite = monitor.indexOf("$state | ConvertTo-Json");
+    const remediation = monitor.indexOf('if ($AutoRemediate)');
+    const failureBranch = monitor.indexOf("if ($currentFailures.Count -gt 0)");
+    expect(stateWrite).toBeGreaterThan(-1);
+    expect(remediation).toBeGreaterThan(stateWrite);
+    expect(failureBranch).toBeGreaterThan(remediation);
+  });
+
   test("monitor remediation is opt-in and scheduled installer enables it", () => {
     expect(monitor).toContain("AutoRemediate");
     expect(installer).toContain("-AutoRemediate");
