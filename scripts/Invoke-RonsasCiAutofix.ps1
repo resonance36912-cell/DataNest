@@ -114,11 +114,13 @@ function Resolve-StaleTriageIssues {
         $activeTitles[$title] = $true
     }
 
-    $issuesRaw = Invoke-GhJson -Arguments @('issue','list','--repo',$Repository,'--state','open','--limit','200','--json','number,title,url')
+    $monitorMarker = 'Automated RONSAS CI monitor detected a current-head failure.'
+    $issuesRaw = Invoke-GhJson -Arguments @('issue','list','--repo',$Repository,'--state','open','--limit','200','--json','number,title,body,url')
     $issues = if ([string]::IsNullOrWhiteSpace($issuesRaw)) { @() } else { @($issuesRaw | ConvertFrom-Json) }
     $staleIssues = @(
         $issues | Where-Object {
             ([string]$_.title).StartsWith('[RONSAS CI] ') -and
+            ([string]$_.body).Contains($monitorMarker) -and
             -not $activeTitles.ContainsKey([string]$_.title)
         }
     )
