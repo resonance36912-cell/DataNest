@@ -20,7 +20,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ronsas-sovereign-db-readwrite-ealiophin-${{ github.event_name }}-${{ github.ref }}
+  group: ronsas-sovereign-db-readwrite-ealiophin
   cancel-in-progress: true
 
 jobs:
@@ -55,8 +55,18 @@ jobs:
 
             $script=Join-Path $control 'ops\collaboration\VALIDATE-SOVEREIGN-DB-READWRITE.ps1'
             $harness=Join-Path $control 'ops\collaboration\sovereign-db-readwrite-acceptance.mjs'
-            & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $script -BackendSha 'bd032b213de48f45e8adfb5d52d8a77803a21993' -HubSha 'c89ef905ad2056d41d47c4e003b0e664737aa892' -HarnessPath $harness
+            $backendSha=(& gh api repos/resonance36912-cell/rons-sovereign-backend-source/commits/main --jq .sha).Trim()
+            $hubSha=(& gh api repos/resonance36912-cell/resonance-hub/commits/main --jq .sha).Trim()
+            if($backendSha -notmatch '^[0-9a-fA-F]{40}$'){throw 'Backend main SHA is invalid.'}
+            if($hubSha -notmatch '^[0-9a-fA-F]{40}$'){throw 'Hub main SHA is invalid.'}
+            Write-Host "RONSAS_EXACT_BACKEND_MAIN_SOURCE=$backendSha"
+            Write-Host "RONSAS_EXACT_HUB_MAIN_SOURCE=$hubSha"
+            & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $script -BackendSha $backendSha -HubSha $hubSha -HarnessPath $harness
             if($LASTEXITCODE -ne 0){throw 'Isolated sovereign DB read-write acceptance failed.'}
+            $backendMainAfter=(& gh api repos/resonance36912-cell/rons-sovereign-backend-source/commits/main --jq .sha).Trim()
+            $hubMainAfter=(& gh api repos/resonance36912-cell/resonance-hub/commits/main --jq .sha).Trim()
+            if($backendMainAfter -ne $backendSha){throw "Backend main advanced during certification: start=$backendSha end=$backendMainAfter"}
+            if($hubMainAfter -ne $hubSha){throw "Hub main advanced during certification: start=$hubSha end=$hubMainAfter"}
           } finally {
             if(Test-Path -LiteralPath $control){
               Remove-Item -LiteralPath $control -Recurse -Force -ErrorAction SilentlyContinue
