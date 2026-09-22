@@ -13,73 +13,59 @@ permissions:
 jobs:
   diagnose:
     runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - name: Check out RONSAS control authority
         uses: actions/checkout@v5
 
-      - name: Probe Ealiophin host from governed Linux runner
+      - name: Inspect governed ePublisher STT runtime files and logs
         id: probe
         shell: bash
         run: |
           set -euo pipefail
-          cat > /tmp/epublisher-stt-probe.py <<'PY'
-          import json, urllib.request, urllib.error
+          cat > /tmp/epublisher-stt-log-probe.sh <<'SH'
+          set -eu
+          echo '=== runtime existence ==='
+          for p in \
+            /runtime/syncvision-local-stt.py \
+            /runtime/python-envs/epublisher-stt/Scripts/python.exe \
+            /logs/epublisher-stt.out.log \
+            /logs/epublisher-stt.err.log \
+            /logs/local-stt.out.log \
+            /logs/local-stt.err.log; do
+            if [ -e "$p" ]; then
+              ls -l "$p"
+            else
+              echo "MISSING $p"
+            fi
+          done
+          echo '=== epublisher-stt stderr tail ==='
+          if [ -f /logs/epublisher-stt.err.log ]; then tail -n 120 /logs/epublisher-stt.err.log; fi
+          echo '=== epublisher-stt stdout tail ==='
+          if [ -f /logs/epublisher-stt.out.log ]; then tail -n 80 /logs/epublisher-stt.out.log; fi
+          echo '=== local-stt stderr tail ==='
+          if [ -f /logs/local-stt.err.log ]; then tail -n 80 /logs/local-stt.err.log; fi
+          SH
 
-          VIDEO = 'https://www.youtube.com/watch?v=CxKEyVgYBpk'
-          results = {}
-
-          def request(name, url, method='GET', payload=None, timeout=20):
-              data = None if payload is None else json.dumps(payload).encode('utf-8')
-              req = urllib.request.Request(url, data=data, method=method, headers={'Content-Type':'application/json'})
-              try:
-                  with urllib.request.urlopen(req, timeout=timeout) as resp:
-                      raw = resp.read().decode('utf-8','replace')
-                      item = {'status': resp.status, 'ok': True}
-                      if name.endswith('transcribe'):
-                          try:
-                              obj = json.loads(raw)
-                          except Exception:
-                              obj = {}
-                          item['text_length'] = len(str(obj.get('text') or ''))
-                          q = obj.get('quality') or {}
-                          item['provider'] = q.get('provider')
-                      else:
-                          item['detail'] = raw[:800]
-                      results[name] = item
-                      return True
-              except urllib.error.HTTPError as exc:
-                  raw = exc.read().decode('utf-8','replace')
-                  results[name] = {'status': exc.code, 'ok': False, 'detail': raw[:1200]}
-              except Exception as exc:
-                  results[name] = {'status': None, 'ok': False, 'detail': str(exc)[:1200]}
-              return False
-
-          hosts = ['host.containers.internal', 'host.docker.internal']
-          chosen = None
-          for host in hosts:
-              key = 'direct_health_' + host.replace('.','_')
-              if request(key, f'http://{host}:7869/health'):
-                  chosen = host
-                  break
-
-          request('public_proxy_health', 'https://epublisher.reson8.life/open-nova-stt/health')
-          if chosen:
-              request('direct_transcribe', f'http://{chosen}:7869/transcribe-url', method='POST', payload={'url': VIDEO, 'mode':'fast'}, timeout=420)
-              request('local_proxy_health', f'http://{chosen}:3101/open-nova-stt/health')
-          else:
-              results['direct_transcribe'] = {'status': None, 'ok': False, 'detail':'No governed host alias reached port 7869'}
-
-          print(json.dumps(results, separators=(',',':')))
+          podman --remote run --rm -i --entrypoint sh \
+            -v /mnt/c/Users/Ashley/Resonance/OpenNova/runtime:/runtime:ro \
+            -v /mnt/c/Users/Ashley/Resonance/OpenNova/runtime/logs/rons-cluster:/logs:ro \
+            localhost/ronsas-actions-runner:2.337.0-r2 -s < /tmp/epublisher-stt-log-probe.sh > /tmp/epublisher-stt-log-result.txt
+          cat /tmp/epublisher-stt-log-result.txt
+          python3 - <<'PY'
+          import json, pathlib
+          p=pathlib.Path('/tmp/epublisher-stt-log-result.txt')
+          s=p.read_text(encoding='utf-8',errors='replace')
+          print(json.dumps({'log_excerpt':s[-12000:]},separators=(',',':')))
           PY
-
-          podman --remote run --rm -i --entrypoint python3 \
-            -v /tmp/epublisher-stt-probe.py:/probe.py:ro \
-            localhost/ronsas-actions-runner:2.337.0-r2 /probe.py > /tmp/epublisher-stt-result.json
-          cat /tmp/epublisher-stt-result.json
+          python3 - <<'PY' > /tmp/diagnostic.json
+          import json, pathlib
+          s=pathlib.Path('/tmp/epublisher-stt-log-result.txt').read_text(encoding='utf-8',errors='replace')
+          print(json.dumps({'log_excerpt':s[-12000:]},separators=(',',':')))
+          PY
           {
             echo 'diagnostic_json<<EOF'
-            cat /tmp/epublisher-stt-result.json
+            cat /tmp/diagnostic.json
             echo 'EOF'
           } >> "$GITHUB_OUTPUT"
 
@@ -92,5 +78,5 @@ jobs:
           github-token: ${{ github.token }}
           script: |
             const data = process.env.DIAGNOSTIC_JSON || "{}";
-            const body = ["EPUBLISHER_STT_DIAGNOSTIC", "", "Run: " + context.runId, "SHA: " + context.sha, "", data].join("\n");
+            const body = ["EPUBLISHER_STT_LOG_DIAGNOSTIC", "", "Run: " + context.runId, "SHA: " + context.sha, "", data].join("\n");
             await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
