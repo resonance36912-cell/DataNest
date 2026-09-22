@@ -11,11 +11,11 @@ permissions:
 
 jobs:
   probe:
-    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
       - name: Probe live public frontend for Supabase hostname
-        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        shell: pwsh
         run: |
           $ErrorActionPreference='Stop'
           $base='https://ronsas-hub-fallback-production.up.railway.app'
