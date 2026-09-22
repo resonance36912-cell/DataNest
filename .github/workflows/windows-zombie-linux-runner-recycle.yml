@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Check out RONSAS control authority
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Recycle only an idle Linux runner with queued CI
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
