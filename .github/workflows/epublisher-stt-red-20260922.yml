@@ -114,13 +114,14 @@ jobs:
           $configPath = Join-Path $control 'rons-control.json'
           $liveSupervisor = Join-Path $control 'RONS-Supervisor.ps1'
           $sourceSupervisor = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\control-center\RONS-Supervisor.ps1'
+          $sourceTaskRunner = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\control-center\RONS-ePublisher-STT.ps1'
+          $sourceTaskInstaller = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\control-center\REGISTER-RONS-EPUBLISHER-STT-TASK.ps1'
+          $liveTaskRunner = Join-Path $control 'RONS-ePublisher-STT.ps1'
+          $liveTaskInstaller = Join-Path $control 'REGISTER-RONS-EPUBLISHER-STT-TASK.ps1'
           $runtimeSource = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\runtime\syncvision-local-stt.py'
           $runtimeTarget = Join-Path $runtime 'syncvision-local-stt.py'
-          $python = Join-Path $runtime 'python-envs\epublisher-stt\Scripts\python.exe'
-          $modelRoot = Join-Path $runtime 'models'
-          $logs = Join-Path $runtime 'logs\rons-cluster'
 
-          foreach ($requiredPath in @($configPath, $sourceSupervisor, $runtimeSource, $python)) {
+          foreach ($requiredPath in @($configPath, $sourceSupervisor, $sourceTaskRunner, $sourceTaskInstaller, $runtimeSource)) {
             if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) { throw "Required governed path missing: $requiredPath" }
           }
 
@@ -148,85 +149,43 @@ jobs:
             [IO.File]::WriteAllText($configPath, $json, (New-Object Text.UTF8Encoding($false)))
           }
 
-          $supervisorChanged = $true
-          if (Test-Path -LiteralPath $liveSupervisor -PathType Leaf) {
-            $supervisorChanged = (
-              (Get-FileHash -LiteralPath $sourceSupervisor -Algorithm SHA256).Hash -ne
-              (Get-FileHash -LiteralPath $liveSupervisor -Algorithm SHA256).Hash
-            )
-          }
-          if ($supervisorChanged) {
-            Copy-Item -LiteralPath $sourceSupervisor -Destination $liveSupervisor -Force
-          }
-
-          $runtimeChanged = $true
-          if (Test-Path -LiteralPath $runtimeTarget -PathType Leaf) {
-            $runtimeChanged = (
-              (Get-FileHash -LiteralPath $runtimeSource -Algorithm SHA256).Hash -ne
-              (Get-FileHash -LiteralPath $runtimeTarget -Algorithm SHA256).Hash
-            )
-          }
-          if ($runtimeChanged) {
-            Copy-Item -LiteralPath $runtimeSource -Destination $runtimeTarget -Force
-          }
-
-          function Test-SttHealth {
-            try {
-              $response = Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:7869/health' -TimeoutSec 5
-              return ([int]$response.StatusCode -eq 200)
-            } catch {
-              return $false
+          function Sync-GovernedFile([string]$Source,[string]$Target) {
+            $changed = $true
+            if (Test-Path -LiteralPath $Target -PathType Leaf) {
+              $changed = (
+                (Get-FileHash -LiteralPath $Source -Algorithm SHA256).Hash -ne
+                (Get-FileHash -LiteralPath $Target -Algorithm SHA256).Hash
+              )
             }
+            if ($changed) { Copy-Item -LiteralPath $Source -Destination $Target -Force }
+            return $changed
           }
 
-          $healthy = Test-SttHealth
-          $directStarted = $false
-          if (-not $healthy) {
-            $listener = Get-NetTCPConnection -LocalPort 7869 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
-            if ($listener) {
-              $listenerPid = [int]$listener.OwningProcess
-              $commandLine = [string](Get-CimInstance Win32_Process -Filter "ProcessId=$listenerPid" -ErrorAction SilentlyContinue).CommandLine
-              if ($commandLine -notmatch 'syncvision-local-stt\.py') { throw "Port 7869 is occupied by an unverified process" }
-              Stop-Process -Id $listenerPid -Force -ErrorAction Stop
-              Start-Sleep -Seconds 2
-            }
+          $supervisorChanged = Sync-GovernedFile $sourceSupervisor $liveSupervisor
+          $taskRunnerChanged = Sync-GovernedFile $sourceTaskRunner $liveTaskRunner
+          $taskInstallerChanged = Sync-GovernedFile $sourceTaskInstaller $liveTaskInstaller
+          $runtimeChanged = Sync-GovernedFile $runtimeSource $runtimeTarget
 
-            New-Item -ItemType Directory -Force -Path $logs | Out-Null
-            $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-            $outLog = Join-Path $logs ("epublisher-stt-governed-$stamp.out.log")
-            $errLog = Join-Path $logs ("epublisher-stt-governed-$stamp.err.log")
-            $priorPort = $env:RONS_STT_PORT
-            $priorModels = $env:RONS_STT_MODELS_ROOT
-            $priorXet = $env:HF_HUB_DISABLE_XET
-            $priorTracking = $env:RUNNER_TRACKING_ID
-            try {
-              $env:RONS_STT_PORT = '7869'
-              $env:RONS_STT_MODELS_ROOT = $modelRoot
-              $env:HF_HUB_DISABLE_XET = '1'
-              $env:RUNNER_TRACKING_ID = ''
-              Start-Process -FilePath $python -ArgumentList @($runtimeTarget) -WorkingDirectory $runtime -RedirectStandardOutput $outLog -RedirectStandardError $errLog -WindowStyle Hidden | Out-Null
-              $directStarted = $true
-            } finally {
-              $env:RONS_STT_PORT = $priorPort
-              $env:RONS_STT_MODELS_ROOT = $priorModels
-              $env:HF_HUB_DISABLE_XET = $priorXet
-              $env:RUNNER_TRACKING_ID = $priorTracking
-            }
-
-            $deadline = (Get-Date).AddSeconds(90)
-            do {
-              $healthy = Test-SttHealth
-              if (-not $healthy) { Start-Sleep -Seconds 2 }
-            } while (-not $healthy -and (Get-Date) -lt $deadline)
+          $taskOutput = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $liveTaskInstaller 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            throw ("ePublisher STT scheduled task install failed: " + (($taskOutput | Select-Object -Last 12) -join ' | '))
           }
 
-          if (-not $healthy) { throw "ePublisher STT did not become healthy on port 7869" }
+          try {
+            $health = Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:7869/health' -TimeoutSec 5
+            $healthy = ([int]$health.StatusCode -eq 200)
+          } catch {
+            $healthy = $false
+          }
+          if (-not $healthy) { throw "ePublisher STT scheduled task is not healthy on port 7869" }
 
           $result = [ordered]@{
             config_changed = $configChanged
             supervisor_changed = $supervisorChanged
+            task_runner_changed = $taskRunnerChanged
+            task_installer_changed = $taskInstallerChanged
             runtime_changed = $runtimeChanged
-            direct_started = $directStarted
+            scheduled_task_registered = $true
             port_7869_healthy = $healthy
           }
           $json = $result | ConvertTo-Json -Compress
