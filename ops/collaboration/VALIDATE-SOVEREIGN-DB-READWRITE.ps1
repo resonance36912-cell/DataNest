@@ -225,6 +225,24 @@ AS $$ SELECT NULLIF(current_setting('request.jwt.claim.sub', true), '')::uuid $$
   $hubOut=Join-Path $root 'hub.out.log'
   $hubErr=Join-Path $root 'hub.err.log'
   $workerDir=Join-Path $hub '.output\server'
+
+
+  # Wrangler/Cloudflare worker runtime receives configuration through bindings rather than Node process.env.
+  # Inject the non-secret local acceptance variables into the generated worker config so the server middleware
+  # observes sovereign mode and the exact ephemeral gateway/auth endpoints during the isolated acceptance run.
+  $wranglerConfig=Join-Path $workerDir 'wrangler.json'
+  $wrangler=(Get-Content -LiteralPath $wranglerConfig -Raw | ConvertFrom-Json)
+  if(-not $wrangler.vars){$wrangler | Add-Member -NotePropertyName vars -NotePropertyValue ([pscustomobject]@{})}
+  $wrangler.vars.VITE_RONS_AUTH_MODE='sovereign'
+  $wrangler.vars.RONS_SOVEREIGN_PROXY_ENABLED='1'
+  $wrangler.vars.RESONANCE_SOVEREIGN_GATEWAY_URL="http://127.0.0.1:$gatewayPort"
+  $wrangler.vars.RESONANCE_SOVEREIGN_AUTH_URL="http://127.0.0.1:$authPort"
+  $wrangler.vars.RONS_PRODUCTION_AUTH_COOKIE='0'
+  $wrangler.vars.RESONANCE_BACKEND_PROVIDER='sovereign'
+  $wrangler.vars.HOST='127.0.0.1'
+  $wrangler.vars.PORT=[string]$hubPort
+  $wrangler.vars.NODE_ENV='production'
+  $wrangler | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $wranglerConfig -Encoding UTF8
   if(-not (Test-Path -LiteralPath (Join-Path $workerDir 'wrangler.json'))){throw 'Generated Wrangler config is missing.'}
   $hubProc=Start-Process -FilePath $bun -ArgumentList @('x','wrangler','dev','--config','wrangler.json','--port',[string]$hubPort,'--ip','127.0.0.1') -WorkingDirectory $workerDir -RedirectStandardOutput $hubOut -RedirectStandardError $hubErr -PassThru -WindowStyle Hidden
   Wait-Http "http://127.0.0.1:$hubPort/" '200' $hubProc
