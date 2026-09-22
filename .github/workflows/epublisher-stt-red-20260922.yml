@@ -27,9 +27,9 @@ jobs:
           $path = 'ops\ealiophin\cluster\START-RONSAS-ECOSYSTEM.ps1'
           $text = Get-Content -LiteralPath $path -Raw
           $needles = @(
-            "$sttSource = Join-Path $opsRuntime 'syncvision-local-stt.py'",
-            "$sttTarget = Join-Path $Runtime 'syncvision-local-stt.py'",
-            "Copy-Item -LiteralPath $sttSource -Destination $sttTarget -Force"
+            "`$sttSource = Join-Path `$opsRuntime 'syncvision-local-stt.py'",
+            "`$sttTarget = Join-Path `$Runtime 'syncvision-local-stt.py'",
+            "Copy-Item -LiteralPath `$sttSource -Destination `$sttTarget -Force"
           )
           $missing = @($needles | Where-Object { -not $text.Contains($_) })
           $lines = @(
