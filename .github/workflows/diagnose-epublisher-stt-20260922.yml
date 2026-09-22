@@ -1,6 +1,7 @@
-name: Diagnose ePublisher STT source 422
+name: Diagnose ePublisher STT source
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
@@ -15,47 +16,41 @@ jobs:
     runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
     timeout-minutes: 10
     steps:
-      - name: Check out RONSAS control authority
-        uses: actions/checkout@v5
-
-      - name: Capture exact STT source error
+      - uses: actions/checkout@v5
+      - name: Capture STT boundary
         id: probe
         shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
         run: |
-          $ErrorActionPreference='Stop'
-          $runtime=Join-Path $env:USERPROFILE 'Resonance\OpenNova\runtime'
-          $python=Join-Path $runtime 'python-envs\epublisher-stt\Scripts\python.exe'
-          $probe=Join-Path $env:RUNNER_TEMP 'probe-epublisher-stt.py'
-          @'
-import json, urllib.request, urllib.error
-from pathlib import Path
-import yt_dlp
-url='https://www.youtube.com/watch?v=CxKEyVgYBpk'
-out={}
-try:
-    with yt_dlp.YoutubeDL({'quiet':True,'no_warnings':True,'skip_download':True,'noplaylist':True,'js_runtimes':{'node':{}}}) as ydl:
-        info=ydl.extract_info(url,download=False)
-    out['metadata']={'id':info.get('id'),'duration':info.get('duration'),'availability':info.get('availability'),'live_status':info.get('live_status')}
-except Exception as exc:
-    out['metadata_error']=str(exc)[-1200:]
-payload=json.dumps({'url':url,'mode':'fast'}).encode('utf-8')
-req=urllib.request.Request('http://127.0.0.1:7869/transcribe-url',data=payload,method='POST',headers={'Content-Type':'application/json'})
-try:
-    with urllib.request.urlopen(req,timeout=60) as resp:
-        raw=resp.read().decode('utf-8','replace')
-        obj=json.loads(raw)
-        out['transcribe']={'status':resp.status,'ok':True,'text_length':len(str(obj.get('text') or ''))}
-except urllib.error.HTTPError as exc:
-    raw=exc.read().decode('utf-8','replace')
-    out['transcribe']={'status':exc.code,'ok':False,'detail':raw[:2000]}
-except Exception as exc:
-    out['transcribe']={'status':None,'ok':False,'detail':str(exc)[:2000]}
-print(json.dumps(out,separators=(',',':')))
-'@ | Set-Content -LiteralPath $probe -Encoding UTF8
-          $json=& $python $probe
+          $result = [ordered]@{}
+          try {
+            $health = Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:7869/health' -TimeoutSec 10
+            $result.direct_health = [ordered]@{ status=[int]$health.StatusCode; ok=([int]$health.StatusCode -eq 200) }
+          } catch {
+            $status = $null
+            if ($_.Exception.Response -and $_.Exception.Response.StatusCode) { $status = [int]$_.Exception.Response.StatusCode }
+            $result.direct_health = [ordered]@{ status=$status; ok=$false; detail=$_.Exception.Message }
+          }
+          $body = @{ url='https://www.youtube.com/watch?v=CxKEyVgYBpk'; mode='fast' } | ConvertTo-Json -Compress
+          try {
+            $response = Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:7869/transcribe-url' -Method Post -ContentType 'application/json' -Body $body -TimeoutSec 45
+            $payload = $response.Content | ConvertFrom-Json
+            $result.source = [ordered]@{ status=[int]$response.StatusCode; ok=$true; text_length=([string]$payload.text).Length; video_id=[string]$payload.video_id }
+          } catch {
+            $status = $null
+            $detail = $_.Exception.Message
+            if ($_.Exception.Response) {
+              if ($_.Exception.Response.StatusCode) { $status = [int]$_.Exception.Response.StatusCode }
+              try {
+                $reader = New-Object IO.StreamReader($_.Exception.Response.GetResponseStream())
+                $detail = $reader.ReadToEnd()
+                $reader.Dispose()
+              } catch { }
+            }
+            $result.source = [ordered]@{ status=$status; ok=$false; detail=$detail }
+          }
+          $json = $result | ConvertTo-Json -Depth 8 -Compress
           "diagnostic_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-
-      - name: Publish source diagnostic receipt
+      - name: Publish diagnostic receipt
         if: always()
         uses: actions/github-script@v8
         env:
@@ -63,6 +58,5 @@ print(json.dumps(out,separators=(',',':')))
         with:
           github-token: ${{ github.token }}
           script: |
-            const data = process.env.DIAGNOSTIC_JSON || "{}";
-            const body = ["EPUBLISHER_STT_SOURCE_DIAGNOSTIC", "", "Run: " + context.runId, "SHA: " + context.sha, "", data].join("\n");
+            const body = ["EPUBLISHER_STT_SOURCE_DIAGNOSTIC", "", "Run: " + context.runId, "SHA: " + context.sha, "", process.env.DIAGNOSTIC_JSON || "{}"].join("\n");
             await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 273, body});
