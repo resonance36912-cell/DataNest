@@ -8,7 +8,29 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$ClusterRoot = Join-Path $Root 'integrations\rons-cluster'
+$LiveClusterRoot = Join-Path $Root 'integrations\rons-cluster'
+$SourceClusterRoot = Join-Path $env:USERPROFILE 'Documents\GitHub\rons-sovereign-codebase\ops\ealiophin\cluster'
+$ControlCandidates = @($LiveClusterRoot, $SourceClusterRoot)
+
+function Test-CompleteControlRoot {
+  param([string]$Path)
+  if (-not (Test-Path -LiteralPath $Path -PathType Container)) { return $false }
+  foreach ($name in @(
+    'START-RONSAS-ECOSYSTEM.ps1',
+    'STATUS-RONSAS-ECOSYSTEM.ps1',
+    'STOP-RONSAS-ECOSYSTEM.ps1',
+    'RONSAS-MODULES.json'
+  )) {
+    if (-not (Test-Path -LiteralPath (Join-Path $Path $name) -PathType Leaf)) { return $false }
+  }
+  return $true
+}
+
+$ClusterRoot = @($ControlCandidates | Where-Object { Test-CompleteControlRoot $_ } | Select-Object -First 1)
+if ($ClusterRoot.Count -ne 1) {
+  throw ('No complete RONSAS control root is available. Checked: ' + ($ControlCandidates -join '; '))
+}
+$ClusterRoot = [string]$ClusterRoot[0]
 $StartScript = Join-Path $ClusterRoot 'START-RONSAS-ECOSYSTEM.ps1'
 $StatusScript = Join-Path $ClusterRoot 'STATUS-RONSAS-ECOSYSTEM.ps1'
 $StopScript = Join-Path $ClusterRoot 'STOP-RONSAS-ECOSYSTEM.ps1'
