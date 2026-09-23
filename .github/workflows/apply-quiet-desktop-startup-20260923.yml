@@ -1,0 +1,86 @@
+name: Apply quiet desktop startup 20260923
+
+on:
+  push:
+    branches:
+      - ronsas/quiet-desktop-startup-20260923
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ronsas-quiet-desktop-apply-ealiophin
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    name: Install and verify RONS - ALL
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin]
+    timeout-minutes: 12
+    steps:
+      - name: Check out exact candidate
+        uses: actions/checkout@v4
+
+      - name: Guard Ealiophin target
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:COMPUTERNAME -notmatch '(?i)^Ealiophin$') {
+            throw "Refusing desktop install on unexpected host: $env:COMPUTERNAME"
+          }
+          if ("$env:GITHUB_SHA" -ne "${{ github.sha }}") {
+            throw "Workflow SHA mismatch."
+          }
+
+      - name: Install hidden desktop control entry point
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $source = Join-Path $env:GITHUB_WORKSPACE 'scripts\Start-RonsasDesktop.ps1'
+          if (-not (Test-Path -LiteralPath $source -PathType Leaf)) {
+            throw "Candidate desktop control helper missing: $source"
+          }
+
+          $launcherRoot = Join-Path $env:LOCALAPPDATA 'Resonance\RONSAS\Launcher'
+          New-Item -ItemType Directory -Force -Path $launcherRoot | Out-Null
+          $target = Join-Path $launcherRoot 'Start-RonsasDesktop.ps1'
+          Copy-Item -LiteralPath $source -Destination $target -Force
+
+          $desktop = [Environment]::GetFolderPath('Desktop')
+          $shortcutPath = Join-Path $desktop 'RONS - ALL.lnk'
+          $powershell = Join-Path $PSHOME 'powershell.exe'
+          $shell = New-Object -ComObject WScript.Shell
+          $preservedIcon = ''
+          if (Test-Path -LiteralPath $shortcutPath -PathType Leaf) {
+            try { $preservedIcon = [string]$shell.CreateShortcut($shortcutPath).IconLocation } catch { }
+          }
+
+          $shortcut = $shell.CreateShortcut($shortcutPath)
+          $shortcut.TargetPath = $powershell
+          $shortcut.Arguments = ('-NoLogo -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File "{0}" -Action Start' -f $target)
+          $shortcut.WorkingDirectory = $launcherRoot
+          $shortcut.Description = 'Start the complete RONSAS suite through the canonical hidden control plane.'
+          $shortcut.WindowStyle = 7
+          $shortcut.IconLocation = if ([string]::IsNullOrWhiteSpace($preservedIcon)) { "$powershell,0" } else { $preservedIcon }
+          $shortcut.Save()
+
+      - name: Verify shortcut and governed status path
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $launcherRoot = Join-Path $env:LOCALAPPDATA 'Resonance\RONSAS\Launcher'
+          $target = Join-Path $launcherRoot 'Start-RonsasDesktop.ps1'
+          $shortcutPath = Join-Path ([Environment]::GetFolderPath('Desktop')) 'RONS - ALL.lnk'
+          $shell = New-Object -ComObject WScript.Shell
+          $shortcut = $shell.CreateShortcut($shortcutPath)
+
+          if ($shortcut.Arguments -notlike '*-WindowStyle Hidden*') { throw 'RONS - ALL is not hidden.' }
+          if ($shortcut.Arguments -notlike '*Start-RonsasDesktop.ps1*') { throw 'RONS - ALL does not target the governed desktop helper.' }
+          if ([int]$shortcut.WindowStyle -ne 7) { throw "Unexpected shortcut window style: $($shortcut.WindowStyle)" }
+
+          & $target -Action Status
+          if ($LASTEXITCODE -ne 0) { throw "RONSAS governed status failed with exit code $LASTEXITCODE." }
+
+          $receipt = Join-Path $env:LOCALAPPDATA 'Resonance\RONSAS\logs\desktop-control\last-operation.txt'
+          if (-not (Test-Path -LiteralPath $receipt -PathType Leaf)) { throw 'Desktop-control receipt was not written.' }
+          Get-Content -LiteralPath $receipt
