@@ -185,10 +185,12 @@ function Ensure-WindowsGitHubRunner {
         $installerSource = Get-Content -Raw -LiteralPath $installer -ErrorAction Stop
         $requiredWindowsMarkers = @(
             'function Get-LocalRunnerWorker',
+            'function Get-ActiveRunnerAssignments',
             'Multiple GitHub runner registrations found for $RunnerName; refusing automatic recovery.',
             'GitHub reports the Windows runner online while the expected local Runner.Listener is absent',
             'GitHub runner registration is missing while Runner.Worker PID',
-            'RONSAS Windows runner process is running locally but GitHub did not report it online within the bounded verification window.'
+            'Windows runner remained offline after the bounded restart with no Worker, busy flag, or active assignment.',
+            'RONSAS Windows runner still did not become online after one guarded stale-offline registration recycle.'
         )
         foreach ($marker in $requiredWindowsMarkers) {
             if (-not $installerSource.Contains($marker)) {
