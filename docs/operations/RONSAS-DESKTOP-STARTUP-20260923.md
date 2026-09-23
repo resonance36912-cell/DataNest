@@ -16,7 +16,7 @@ The desktop entry point must start RONSAS without leaving a stack of Vite, Pytho
 
 The helper does not start individual modules itself. Separate processes and ports remain fault-isolation boundaries behind the single RONSAS control plane.
 
-The desktop helper prefers the live machine control bundle at `%USERPROFILE%\Resonance\OpenNova\integrations\rons-cluster` only when that directory contains all three canonical controls plus `RONSAS-MODULES.json`. If the live bundle is incomplete, it falls back to the governed source checkout at `%USERPROFILE%\Documents\GitHub\rons-sovereign-codebase\ops\ealiophin\cluster`. It never mixes controls across directories. This protects startup from the partial live-control drift found on Ealiophin on 2026-09-23.
+The shortcut installer also copies a topology-preserving control bundle into `%LOCALAPPDATA%\Resonance\RONSAS\Launcher\Control\ops\ealiophin`. The desktop helper prefers that installer-copied bundle when it contains all three canonical controls, `RONSAS-MODULES.json`, and the runtime source files required by the supervisor. It then considers a complete live bundle and, finally, the governed source checkout at `%USERPROFILE%\Documents\GitHub\rons-sovereign-codebase\ops\ealiophin\cluster`. It never mixes controls across directories. The repository remains the source authority; the LocalAppData bundle is a stable execution copy refreshed by the installer. This protects startup from the partial live-control and stale-checkout drift found on Ealiophin on 2026-09-23.
 
 ## Window and log behavior
 
