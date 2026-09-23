@@ -43,8 +43,13 @@ $commanderFailures = 0
 $nextCommanderAttempt = [datetime]::MinValue
 $runnerFailures = 0
 $nextRunnerAttempt = [datetime]::MinValue
+$windowsRunnerFailures = 0
+$nextWindowsRunnerAttempt = [datetime]::MinValue
 $chromeEnrollmentWarned = $false
 $DefaultGitHubRunnerStartup = Join-Path $env:USERPROFILE 'Documents\GitHub\rons-sovereign-codebase\ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
+$DefaultWindowsRunnerInstaller = Join-Path $env:USERPROFILE 'Documents\GitHub\rons-sovereign-codebase\ops\ealiophin\ci\INSTALL-RONSAS-WINDOWS-RUNNER.ps1'
+$DefaultWindowsRunnerRoot = Join-Path $env:LOCALAPPDATA 'Resonance\RONS-GitHubRunner-Windows'
+$DefaultWindowsRunnerTask = 'RONSAS GitHub Windows Runner'
 
 function Get-DesktopCommanderProcess {
     $entry = [regex]::Escape([string]$Config.remote.desktopCommanderEntry)
@@ -127,6 +132,63 @@ function Ensure-GitHubRunner {
     }
 }
 
+function Ensure-WindowsGitHubRunner {
+    if ((Get-Date) -lt $script:nextWindowsRunnerAttempt) { return }
+
+    $overallConfigured = ($Config.autonomy.PSObject.Properties.Name -contains 'ensureGitHubRunner')
+    if ($overallConfigured -and -not [bool]$Config.autonomy.ensureGitHubRunner) { return }
+
+    $windowsConfigured = ($Config.autonomy.PSObject.Properties.Name -contains 'ensureWindowsGitHubRunner')
+    if ($windowsConfigured -and -not [bool]$Config.autonomy.ensureWindowsGitHubRunner) { return }
+
+    # Do not introduce a Windows runner onto a host that never had one.
+    $existingTask = Get-ScheduledTask -TaskName $DefaultWindowsRunnerTask -ErrorAction SilentlyContinue
+    $existingRoot = Test-Path -LiteralPath $DefaultWindowsRunnerRoot -PathType Container
+    if (-not $existingTask -and -not $existingRoot) { return }
+
+    $installer = $DefaultWindowsRunnerInstaller
+    if (($Config.PSObject.Properties.Name -contains 'githubWindowsRunner') -and $Config.githubWindowsRunner) {
+        $configuredInstaller = [string]$Config.githubWindowsRunner.installerScript
+        if (-not [string]::IsNullOrWhiteSpace($configuredInstaller)) {
+            $installer = $configuredInstaller
+        }
+    }
+
+    if (-not (Test-Path -LiteralPath $installer -PathType Leaf)) {
+        if ($windowsConfigured -and [bool]$Config.autonomy.ensureWindowsGitHubRunner) {
+            Log ('Windows GitHub runner installer is missing: ' + $installer)
+        }
+        return
+    }
+
+    try {
+        $output = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer 2>&1)
+        $exitCode = [int]$LASTEXITCODE
+        if ($exitCode -eq 0) {
+            $script:windowsRunnerFailures = 0
+            $script:nextWindowsRunnerAttempt = [datetime]::MinValue
+            return
+        }
+
+        $script:windowsRunnerFailures++
+        $delay = [math]::Min(
+            [int]$Config.autonomy.maxRestartBackoffSeconds,
+            [int](60 * [math]::Pow(2, [math]::Min($script:windowsRunnerFailures - 1, 5)))
+        )
+        $script:nextWindowsRunnerAttempt = (Get-Date).AddSeconds($delay)
+        $tail = @($output | Select-Object -Last 5) -join ' | '
+        Log ("Windows GitHub runner recovery failed (exit=$exitCode); retry in $delay seconds: $tail")
+    } catch {
+        $script:windowsRunnerFailures++
+        $delay = [math]::Min(
+            [int]$Config.autonomy.maxRestartBackoffSeconds,
+            [int](60 * [math]::Pow(2, [math]::Min($script:windowsRunnerFailures - 1, 5)))
+        )
+        $script:nextWindowsRunnerAttempt = (Get-Date).AddSeconds($delay)
+        Log ('Windows GitHub runner recovery failed: ' + $_.Exception.Message + "; retry in $delay seconds.")
+    }
+}
+
 function Ensure-Dropbox {
     if (-not [bool]$Config.autonomy.ensureDropbox) { return }
     if (@(Get-Process -Name Dropbox -ErrorAction SilentlyContinue).Count) { return }
@@ -192,6 +254,7 @@ try {
     Log 'Supervisor started.'
     do {
         Ensure-GitHubRunner
+        Ensure-WindowsGitHubRunner
         Ensure-Dropbox
         Ensure-ChromeRemoteDesktop
         Ensure-DesktopCommander
