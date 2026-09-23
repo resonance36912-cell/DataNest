@@ -15,6 +15,28 @@ $desktopControl=Join-Path $launcherRoot 'Start-RonsasDesktop.ps1'
 Copy-Item -LiteralPath $sourceGuard -Destination $guard -Force
 Copy-Item -LiteralPath $sourceWatcher -Destination $watcher -Force
 Copy-Item -LiteralPath $sourceDesktop -Destination $desktopControl -Force
+
+# Install a topology-preserving copy of the canonical machine controls so the
+# desktop shortcut does not depend on a stale Git checkout or a partial live
+# integrations directory. The repository remains the source authority.
+$sourceCluster=Join-Path $repoRoot 'ops\ealiophin\cluster'
+$sourceRuntime=Join-Path $repoRoot 'ops\ealiophin\runtime'
+$installedOpsRoot=Join-Path $launcherRoot 'Control\ops\ealiophin'
+$installedCluster=Join-Path $installedOpsRoot 'cluster'
+$installedRuntime=Join-Path $installedOpsRoot 'runtime'
+New-Item -ItemType Directory -Force -Path $installedCluster,$installedRuntime|Out-Null
+
+foreach($name in @('START-RONSAS-ECOSYSTEM.ps1','STATUS-RONSAS-ECOSYSTEM.ps1','STOP-RONSAS-ECOSYSTEM.ps1','RONSAS-MODULES.json')){
+  $source=Join-Path $sourceCluster $name
+  if(-not(Test-Path -LiteralPath $source -PathType Leaf)){throw "Required RONSAS control file is missing: $source"}
+  Copy-Item -LiteralPath $source -Destination (Join-Path $installedCluster $name) -Force
+}
+foreach($name in @('syncvision-local-stt.py','rons-local-llm-service.py','epublisher-premium-image-service.py')){
+  $source=Join-Path $sourceRuntime $name
+  if(-not(Test-Path -LiteralPath $source -PathType Leaf)){throw "Required RONSAS runtime source is missing: $source"}
+  Copy-Item -LiteralPath $source -Destination (Join-Path $installedRuntime $name) -Force
+}
+
 $desktop=[Environment]::GetFolderPath('Desktop')
 $startup=[Environment]::GetFolderPath('Startup')
 $powershell=Join-Path $PSHOME 'powershell.exe'
@@ -43,5 +65,6 @@ Write-Host "Installed RONSAS sovereign shortcuts on $env:COMPUTERNAME"
 Write-Host "Operational guard: $guard"
 Write-Host "Browser watcher: $watcher"
 Write-Host "Desktop control: $desktopControl"
+Write-Host "Installed control bundle: $installedCluster"
 Write-Host "Desktop: $desktop"
 Write-Host "Startup: $startup"
