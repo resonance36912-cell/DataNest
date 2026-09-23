@@ -109,6 +109,8 @@ function Ensure-GitHubRunner {
         $requiredMarkers = @(
             'Runner.Worker',
             'Get-ActiveRunnerAssignments',
+            'Ensure-PodmanVmEgress',
+            'Test-CiHttpsEgress',
             'for ($settleAttempt = 1; $settleAttempt -le 18; $settleAttempt++)',
             'ForceRecycle deferred because online runner registration deletion was not proven safe.'
         )
