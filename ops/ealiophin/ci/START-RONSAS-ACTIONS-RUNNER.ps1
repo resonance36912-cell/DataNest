@@ -8,6 +8,7 @@ param(
     [string]$Network = 'ronsas-ci',
     [string]$Proxy = 'ronsas-podman-api',
     [string]$Volume = 'ronsas-actions-work',
+    [string]$PodmanMachine = 'podman-machine-default',
     [switch]$ForceRecycle
 )
 $ErrorActionPreference = 'Stop'
@@ -15,6 +16,175 @@ Set-StrictMode -Version Latest
 
 $podman = (Get-Command podman.exe -ErrorAction Stop).Source
 $gh = (Get-Command gh.exe -ErrorAction Stop).Source
+
+function Ensure-PodmanMachineReady {
+    $priorErrorActionPreference = $ErrorActionPreference
+    $machineRaw = @()
+    $machineExit = 1
+    try {
+        $ErrorActionPreference = 'Continue'
+        $machineRaw = @(& $podman machine list --format json 2>&1)
+        $machineExit = [int]$LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $priorErrorActionPreference
+    }
+    if ($machineExit -ne 0) {
+        throw 'Unable to inspect Podman machine state before governed runner recovery.'
+    }
+
+    try {
+        $machines = @(($machineRaw -join [Environment]::NewLine) | ConvertFrom-Json)
+    } catch {
+        throw "Unable to parse Podman machine state before governed runner recovery: $($_.Exception.Message)"
+    }
+    $machine = @($machines | Where-Object { [string]$_.Name -eq $PodmanMachine }) | Select-Object -First 1
+    if (-not $machine) {
+        throw "Required existing Podman machine is missing: $PodmanMachine"
+    }
+
+    if (-not [bool]$machine.Running) {
+        Write-Host "Podman machine is stopped; starting the existing machine once: $PodmanMachine" -ForegroundColor Yellow
+        $trackingWasPresent = Test-Path Env:RUNNER_TRACKING_ID
+        $trackingValue = if ($trackingWasPresent) { [string]$env:RUNNER_TRACKING_ID } else { $null }
+        try {
+            Remove-Item Env:RUNNER_TRACKING_ID -ErrorAction SilentlyContinue
+            & $podman machine start $PodmanMachine
+            if ($LASTEXITCODE -ne 0) { throw "Failed to start existing Podman machine: $PodmanMachine" }
+        } finally {
+            if ($trackingWasPresent) {
+                $env:RUNNER_TRACKING_ID = $trackingValue
+            } else {
+                Remove-Item Env:RUNNER_TRACKING_ID -ErrorAction SilentlyContinue
+            }
+        }
+    }
+
+    for ($attempt = 1; $attempt -le 30; $attempt++) {
+        $infoExit = 1
+        try {
+            $ErrorActionPreference = 'Continue'
+            & $podman info *> $null
+            $infoExit = [int]$LASTEXITCODE
+        } finally {
+            $ErrorActionPreference = $priorErrorActionPreference
+        }
+        if ($infoExit -eq 0) {
+            Write-Host "Podman machine ready for governed runner recovery after attempt $attempt/30." -ForegroundColor Green
+            return
+        }
+        Start-Sleep -Seconds 2
+    }
+
+    throw "Existing Podman machine did not become ready within the bounded wait: $PodmanMachine"
+}
+
+
+function Test-PodmanVmHttps {
+    $priorErrorActionPreference = $ErrorActionPreference
+    $exitCode = 1
+    try {
+        $ErrorActionPreference = 'Continue'
+        & wsl.exe -d $PodmanMachine -u root -- sh -lc 'curl -4 -fsSIL --connect-timeout 5 --max-time 15 https://github.com >/dev/null && curl -4 -fsSIL --connect-timeout 5 --max-time 15 https://api.github.com >/dev/null' 2>$null
+        $exitCode = [int]$LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $priorErrorActionPreference
+    }
+    return ($exitCode -eq 0)
+}
+
+function Test-PodmanVmInterfaceHttps([string]$Interface) {
+    if ($Interface -notmatch '^eth[0-9]+$') { return $false }
+
+    $priorErrorActionPreference = $ErrorActionPreference
+    $exitCode = 1
+    try {
+        $ErrorActionPreference = 'Continue'
+        $probe = "curl -4 -fsSIL --interface '$Interface' --connect-timeout 5 --max-time 15 https://github.com >/dev/null && curl -4 -fsSIL --interface '$Interface' --connect-timeout 5 --max-time 15 https://api.github.com >/dev/null"
+        & wsl.exe -d $PodmanMachine -u root -- sh -lc $probe 2>$null
+        $exitCode = [int]$LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $priorErrorActionPreference
+    }
+    return ($exitCode -eq 0)
+}
+
+function Ensure-PodmanVmEgress {
+    if (Test-PodmanVmHttps) {
+        Write-Host 'Podman VM HTTPS egress is already healthy.' -ForegroundColor Green
+        return
+    }
+
+    try {
+        $hostProbe = Invoke-WebRequest -UseBasicParsing -Method Head -Uri 'https://github.com' -TimeoutSec 10
+        if ($hostProbe.StatusCode -lt 200 -or $hostProbe.StatusCode -ge 400) {
+            throw "Unexpected host HTTPS status: $($hostProbe.StatusCode)"
+        }
+    } catch {
+        throw "Windows host HTTPS is unavailable; refusing Podman VM route mutation: $($_.Exception.Message)"
+    }
+
+    $routes = @(Get-NetRoute -AddressFamily IPv4 -DestinationPrefix '0.0.0.0/0' -ErrorAction Stop |
+        Where-Object { [string]$_.State -ne 'Dead' } |
+        Sort-Object RouteMetric, InterfaceMetric)
+
+    foreach ($route in $routes) {
+        $gateway = [string]$route.NextHop
+        $alias = [string]$route.InterfaceAlias
+        if ([string]::IsNullOrWhiteSpace($gateway) -or $gateway -eq '0.0.0.0') { continue }
+
+        $hostAddress = @(Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias $alias -ErrorAction SilentlyContinue |
+            Where-Object { $_.IPAddress -and $_.IPAddress -notlike '169.254.*' } |
+            Select-Object -First 1).IPAddress
+        if ([string]::IsNullOrWhiteSpace([string]$hostAddress)) { continue }
+
+        $iface = (& wsl.exe -d $PodmanMachine -u root -- sh -lc "ip -o -4 addr show | grep -F ' $hostAddress/' | head -n 1 | cut -d' ' -f2").Trim()
+        if ($iface -notmatch '^eth[0-9]+$') { continue }
+
+        $healthy = Test-PodmanVmInterfaceHttps $iface
+        Write-Host "Podman mirrored route probe: host=$alias address=$hostAddress gateway=$gateway guest=$iface healthy=$healthy"
+        if (-not $healthy) { continue }
+
+        $existingPreferred = @(& wsl.exe -d $PodmanMachine -u root -- sh -lc "ip -4 route show default | grep -F 'via $gateway dev $iface metric 5'" 2>$null)
+        $addedPreferredRoute = ($LASTEXITCODE -ne 0 -or $existingPreferred.Count -eq 0)
+        if ($addedPreferredRoute) {
+            & wsl.exe -d $PodmanMachine -u root -- sh -lc "ip route replace default via $gateway dev $iface metric 5"
+            if ($LASTEXITCODE -ne 0) {
+                throw "Failed to prefer proven healthy mirrored Podman VM route via $iface."
+            }
+        }
+
+        Start-Sleep -Seconds 2
+        if (Test-PodmanVmHttps) {
+            Write-Host "Podman VM HTTPS egress restored through mirrored route $iface metric 5." -ForegroundColor Green
+            return
+        }
+
+        if ($addedPreferredRoute) {
+            $priorErrorActionPreference = $ErrorActionPreference
+            try {
+                $ErrorActionPreference = 'Continue'
+                & wsl.exe -d $PodmanMachine -u root -- sh -lc "ip route del default via $gateway dev $iface metric 5" 2>$null
+            } finally {
+                $ErrorActionPreference = $priorErrorActionPreference
+            }
+        }
+    }
+
+    throw 'Podman VM HTTPS egress remains unavailable after testing existing non-dead mirrored host routes; refusing broader adapter, firewall, VPN, or WSL mutation.'
+}
+
+function Test-CiHttpsEgress {
+    $priorErrorActionPreference = $ErrorActionPreference
+    $exitCode = 1
+    try {
+        $ErrorActionPreference = 'Continue'
+        & $podman run --rm --network $Network --entrypoint sh $Image -lc 'curl -4 -fsSIL --connect-timeout 5 --max-time 15 https://github.com >/dev/null && curl -4 -fsSIL --connect-timeout 5 --max-time 15 https://api.github.com >/dev/null' 2>$null
+        $exitCode = [int]$LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $priorErrorActionPreference
+    }
+    return ($exitCode -eq 0)
+}
 
 function Get-RegisteredRunner {
     $runnerRaw = @(& $gh api "repos/$Repository/actions/runners")
@@ -202,10 +372,16 @@ function Ensure-RunnerLabels($Runner) {
     if ($LASTEXITCODE -ne 0) { throw 'Failed to restore required GitHub runner labels.' }
 }
 
+Ensure-PodmanMachineReady
+Ensure-PodmanVmEgress
+
 & $podman network inspect $Network *> $null
 if ($LASTEXITCODE -ne 0) { throw "Required CI network is missing: $Network" }
 & $podman image inspect $Image *> $null
 if ($LASTEXITCODE -ne 0) { throw "Required runner image is missing: $Image" }
+if (-not (Test-CiHttpsEgress)) {
+    throw 'Governed ronsas-ci HTTPS egress is unavailable before runner mutation.'
+}
 if (-not (Test-ContainerExists $Proxy)) { throw "Governed Podman API proxy is missing: $Proxy" }
 
 $proxyInfo = (& $podman inspect $Proxy | ConvertFrom-Json)[0]
@@ -480,6 +656,33 @@ if ($registered -and ($registered.status -ne 'online' -or $forceRecycleDeleteRea
     $registered = $null
 }
 
+# Registration absence/offline state does not by itself prove the local container is idle.
+# Before replacing any existing container, re-check GitHub assignment ownership and
+# the local Runner.Worker state so stale credentials can never justify killing
+# an in-flight job.
+if (Test-ContainerExists $Container) {
+    $replacementAssignments = @(Get-ActiveRunnerAssignments)
+    if ($replacementAssignments.Count -gt 0) {
+        $summary = ($replacementAssignments | Select-Object -First 10 | ForEach-Object {
+            "$($_.run_id):$($_.run_name):$($_.job_id):$($_.job_name):$($_.job_status)"
+        }) -join ', '
+        Write-Host "Fresh registration deferred because GitHub still reports active assignment(s) on ${RunnerName}: $summary" -ForegroundColor Yellow
+        exit 0
+    }
+
+    $replacementInfo = (& $podman inspect $Container | ConvertFrom-Json)[0]
+    if ($replacementInfo.State.Running) {
+        $replacementState = Get-RunnerProcessState $Container
+        if (-not $replacementState.observed) {
+            Write-Host 'Fresh registration deferred because the running local runner process state could not be observed safely.' -ForegroundColor Yellow
+            exit 0
+        }
+        if ($replacementState.worker) {
+            Write-Host 'Fresh registration deferred because local Runner.Worker is active even though the GitHub registration is missing or replaceable.' -ForegroundColor Yellow
+            exit 0
+        }
+    }
+}
 $token = (& $gh api -X POST "repos/$Repository/actions/runners/registration-token" --jq .token).Trim()
 if ([string]::IsNullOrWhiteSpace($token)) { throw 'Unable to obtain an ephemeral GitHub runner registration token.' }
 
@@ -517,6 +720,12 @@ if (-not (Wait-RunnerContainerReady $Container 30 2)) {
 }
 if (-not (Wait-GovernedPodmanProxyConnectivity $Container 30 2)) {
     throw 'Runner cannot reach governed Podman API proxy after the bounded readiness window.'
+}
+if (-not (Test-PodmanVmHttps)) {
+    throw 'Podman VM HTTPS egress was lost after runner startup.'
+}
+if (-not (Test-CiHttpsEgress)) {
+    throw 'Governed ronsas-ci HTTPS egress was lost after runner startup.'
 }
 
 Write-Host "RONSAS Actions runner online: $RunnerName on $Network" -ForegroundColor Green

@@ -41,7 +41,15 @@ if (-not $created) { Log 'A supervisor instance is already running.'; exit 0 }
 
 $commanderFailures = 0
 $nextCommanderAttempt = [datetime]::MinValue
+$runnerFailures = 0
+$nextRunnerAttempt = [datetime]::MinValue
+$windowsRunnerFailures = 0
+$nextWindowsRunnerAttempt = [datetime]::MinValue
 $chromeEnrollmentWarned = $false
+$DefaultGitHubRunnerStartup = Join-Path $env:USERPROFILE 'Documents\GitHub\rons-sovereign-codebase\ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
+$DefaultWindowsRunnerInstaller = Join-Path $env:USERPROFILE 'Documents\GitHub\rons-sovereign-codebase\ops\ealiophin\ci\INSTALL-RONSAS-WINDOWS-RUNNER.ps1'
+$DefaultWindowsRunnerRoot = Join-Path $env:LOCALAPPDATA 'Resonance\RONS-GitHubRunner-Windows'
+$DefaultWindowsRunnerTask = 'RONSAS GitHub Windows Runner'
 
 function Get-DesktopCommanderProcess {
     $entry = [regex]::Escape([string]$Config.remote.desktopCommanderEntry)
@@ -71,25 +79,164 @@ function Ensure-RonsSuite {
     Start-Process -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File','C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Recover-Suite.ps1') -WindowStyle Hidden | Out-Null
 }
 function Ensure-GitHubRunner {
-    if (-not ($Config.autonomy.PSObject.Properties.Name -contains 'ensureGitHubRunner')) { return }
-    if (-not [bool]$Config.autonomy.ensureGitHubRunner) { return }
-    if (-not ($Config.PSObject.Properties.Name -contains 'githubRunner')) {
-        Log 'GitHub runner configuration is missing; recovery skipped.'
-        return
+    if ((Get-Date) -lt $script:nextRunnerAttempt) { return }
+
+    $configured = ($Config.autonomy.PSObject.Properties.Name -contains 'ensureGitHubRunner')
+    if ($configured -and -not [bool]$Config.autonomy.ensureGitHubRunner) { return }
+
+    $startup = $null
+    if (($Config.PSObject.Properties.Name -contains 'githubRunner') -and $Config.githubRunner) {
+        $startup = [string]$Config.githubRunner.startupScript
     }
-    $startup = [string]$Config.githubRunner.startupScript
-    if (-not $startup -or -not (Test-Path -LiteralPath $startup -PathType Leaf)) {
-        Log 'GitHub runner startup script is missing; recovery skipped.'
-        return
+
+    # Older RONS control configs predate the runner supervisor hook. Reuse the
+    # same governed launcher provisioned for the non-parameterized TRIGGERcmd
+    # recovery command, but only when the operator has not explicitly disabled
+    # ensureGitHubRunner.
+    if ([string]::IsNullOrWhiteSpace($startup)) {
+        $startup = $DefaultGitHubRunnerStartup
     }
-    try {
-        $output = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $startup 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            $tail = @($output | Select-Object -Last 3) -join ' | '
-            Log ('GitHub runner recovery failed: ' + $tail)
+
+    if (-not (Test-Path -LiteralPath $startup -PathType Leaf)) {
+        if ($configured -and [bool]$Config.autonomy.ensureGitHubRunner) {
+            Log ('GitHub runner startup script is missing: ' + $startup)
         }
+        return
+    }
+
+    try {
+        $source = Get-Content -Raw -LiteralPath $startup -ErrorAction Stop
+        $requiredMarkers = @(
+            'Runner.Worker',
+            'Get-ActiveRunnerAssignments',
+            'Ensure-PodmanVmEgress',
+            'Test-CiHttpsEgress',
+            'for ($settleAttempt = 1; $settleAttempt -le 18; $settleAttempt++)',
+            'ForceRecycle deferred because online runner registration deletion was not proven safe.'
+        )
+        foreach ($marker in $requiredMarkers) {
+            if (-not $source.Contains($marker)) {
+                $script:runnerFailures++
+                $delay = [math]::Min(
+                    [int]$Config.autonomy.maxRestartBackoffSeconds,
+                    [int](60 * [math]::Pow(2, [math]::Min($script:runnerFailures - 1, 5)))
+                )
+                $script:nextRunnerAttempt = (Get-Date).AddSeconds($delay)
+                Log ("GitHub runner recovery authority is stale; missing safeguard marker '$marker'. Retry in $delay seconds.")
+                return
+            }
+        }
+
+        $output = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $startup 2>&1)
+        $exitCode = [int]$LASTEXITCODE
+        if ($exitCode -eq 0) {
+            $script:runnerFailures = 0
+            $script:nextRunnerAttempt = [datetime]::MinValue
+            return
+        }
+
+        $script:runnerFailures++
+        $delay = [math]::Min(
+            [int]$Config.autonomy.maxRestartBackoffSeconds,
+            [int](60 * [math]::Pow(2, [math]::Min($script:runnerFailures - 1, 5)))
+        )
+        $script:nextRunnerAttempt = (Get-Date).AddSeconds($delay)
+        $tail = @($output | Select-Object -Last 5) -join ' | '
+        Log ("GitHub runner recovery failed (exit=$exitCode); retry in $delay seconds: $tail")
     } catch {
-        Log ('GitHub runner recovery failed: ' + $_.Exception.Message)
+        $script:runnerFailures++
+        $delay = [math]::Min(
+            [int]$Config.autonomy.maxRestartBackoffSeconds,
+            [int](60 * [math]::Pow(2, [math]::Min($script:runnerFailures - 1, 5)))
+        )
+        $script:nextRunnerAttempt = (Get-Date).AddSeconds($delay)
+        Log ('GitHub runner recovery failed: ' + $_.Exception.Message + "; retry in $delay seconds.")
+    }
+}
+
+function Ensure-WindowsGitHubRunner {
+    if ((Get-Date) -lt $script:nextWindowsRunnerAttempt) { return }
+
+    $overallConfigured = ($Config.autonomy.PSObject.Properties.Name -contains 'ensureGitHubRunner')
+    if ($overallConfigured -and -not [bool]$Config.autonomy.ensureGitHubRunner) { return }
+
+    $windowsConfigured = ($Config.autonomy.PSObject.Properties.Name -contains 'ensureWindowsGitHubRunner')
+    if ($windowsConfigured -and -not [bool]$Config.autonomy.ensureWindowsGitHubRunner) { return }
+
+    # Do not introduce a Windows runner onto a host that never had one.
+    $existingTask = Get-ScheduledTask -TaskName $DefaultWindowsRunnerTask -ErrorAction SilentlyContinue
+    $existingRoot = Test-Path -LiteralPath $DefaultWindowsRunnerRoot -PathType Container
+    if (-not $existingTask -and -not $existingRoot) { return }
+
+    $installer = $DefaultWindowsRunnerInstaller
+    if (($Config.PSObject.Properties.Name -contains 'githubWindowsRunner') -and $Config.githubWindowsRunner) {
+        $configuredInstaller = [string]$Config.githubWindowsRunner.installerScript
+        if (-not [string]::IsNullOrWhiteSpace($configuredInstaller)) {
+            $installer = $configuredInstaller
+        }
+    }
+
+    if (-not (Test-Path -LiteralPath $installer -PathType Leaf)) {
+        if ($windowsConfigured -and [bool]$Config.autonomy.ensureWindowsGitHubRunner) {
+            Log ('Windows GitHub runner installer is missing: ' + $installer)
+        }
+        return
+    }
+
+    try {
+        $installerSource = Get-Content -Raw -LiteralPath $installer -ErrorAction Stop
+        $requiredWindowsMarkers = @(
+            'function Get-LocalRunnerWorker',
+            'function Get-ActiveRunnerAssignments',
+            'Multiple GitHub runner registrations found for $RunnerName; refusing automatic recovery.',
+            'GitHub reports the Windows runner online while the expected local Runner.Listener is absent',
+            'Runner.Listener exists while GitHub reports the Windows runner busy=true',
+            'Runner.Listener exists while GitHub reports active assignment(s) for the Windows runner; refusing automatic restart',
+            'GitHub runner registration is missing while Runner.Worker PID',
+            'Cleared stale local primary/migrated runner configuration after GitHub registration was proven missing.',
+            'Stale local Windows runner configuration remained after cleanup',
+            'Windows runner remained offline after the bounded restart with no Worker, busy flag, or active assignment.',
+            'Windows runner state changed before guarded deletion',
+            'Waiting for stale offline Windows runner registration deletion to become visible;',
+            'RONSAS Windows runner still did not become online after one guarded stale-offline registration recycle.'
+        )
+        foreach ($marker in $requiredWindowsMarkers) {
+            if (-not $installerSource.Contains($marker)) {
+                $script:windowsRunnerFailures++
+                $delay = [math]::Min(
+                    [int]$Config.autonomy.maxRestartBackoffSeconds,
+                    [int](60 * [math]::Pow(2, [math]::Min($script:windowsRunnerFailures - 1, 5)))
+                )
+                $script:nextWindowsRunnerAttempt = (Get-Date).AddSeconds($delay)
+                Log ("Windows GitHub runner recovery authority is stale; missing safeguard marker '$marker'. Retry in $delay seconds.")
+                return
+            }
+        }
+
+        $output = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer 2>&1)
+        $exitCode = [int]$LASTEXITCODE
+        if ($exitCode -eq 0) {
+            $script:windowsRunnerFailures = 0
+            $script:nextWindowsRunnerAttempt = [datetime]::MinValue
+            return
+        }
+
+        $script:windowsRunnerFailures++
+        $delay = [math]::Min(
+            [int]$Config.autonomy.maxRestartBackoffSeconds,
+            [int](60 * [math]::Pow(2, [math]::Min($script:windowsRunnerFailures - 1, 5)))
+        )
+        $script:nextWindowsRunnerAttempt = (Get-Date).AddSeconds($delay)
+        $tail = @($output | Select-Object -Last 5) -join ' | '
+        Log ("Windows GitHub runner recovery failed (exit=$exitCode); retry in $delay seconds: $tail")
+    } catch {
+        $script:windowsRunnerFailures++
+        $delay = [math]::Min(
+            [int]$Config.autonomy.maxRestartBackoffSeconds,
+            [int](60 * [math]::Pow(2, [math]::Min($script:windowsRunnerFailures - 1, 5)))
+        )
+        $script:nextWindowsRunnerAttempt = (Get-Date).AddSeconds($delay)
+        Log ('Windows GitHub runner recovery failed: ' + $_.Exception.Message + "; retry in $delay seconds.")
     }
 }
 
@@ -158,6 +305,7 @@ try {
     Log 'Supervisor started.'
     do {
         Ensure-GitHubRunner
+        Ensure-WindowsGitHubRunner
         Ensure-Dropbox
         Ensure-ChromeRemoteDesktop
         Ensure-DesktopCommander
