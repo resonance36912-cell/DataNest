@@ -5,6 +5,10 @@ const supervisor = readFileSync(
   new URL("../../ops/ealiophin/control-center/RONS-Supervisor.ps1", import.meta.url),
   "utf8",
 );
+const windowsInstaller = readFileSync(
+  new URL("../../ops/ealiophin/ci/INSTALL-RONSAS-WINDOWS-RUNNER.ps1", import.meta.url),
+  "utf8",
+);
 
 test("legacy control configs fall back to the exact governed runner launcher", () => {
   expect(supervisor).toContain(
@@ -107,4 +111,21 @@ test("supervisor refuses stale Linux recovery authority before execution", () =>
   );
   expect(markerIndex).toBeGreaterThan(-1);
   expect(launchIndex).toBeGreaterThan(markerIndex);
+});
+
+
+test("Windows runner scheduled task has logon and periodic restart triggers", () => {
+  expect(windowsInstaller).toContain(
+    "$logonTrigger = New-ScheduledTaskTrigger -AtLogOn -User $userId",
+  );
+  expect(windowsInstaller).toContain(
+    "$watchdogTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(2)",
+  );
+  expect(windowsInstaller).toContain(
+    "-RepetitionInterval (New-TimeSpan -Minutes 5)",
+  );
+  expect(windowsInstaller).toContain(
+    "Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger @($logonTrigger,$watchdogTrigger)",
+  );
+  expect(windowsInstaller).toContain("-MultipleInstances IgnoreNew");
 });
