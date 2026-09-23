@@ -22,8 +22,30 @@ if ($LASTEXITCODE -ne 0) { throw 'GitHub CLI is not authenticated.' }
 
 New-Item -ItemType Directory -Force -Path $RunnerRoot | Out-Null
 $runnerExe = Join-Path $RunnerRoot 'bin\Runner.Listener.exe'
+$workerExe = Join-Path $RunnerRoot 'bin\Runner.Worker.exe'
 $runCmd = Join-Path $RunnerRoot 'run.cmd'
 $configCmd = Join-Path $RunnerRoot 'config.cmd'
+
+function Get-LocalRunnerListener {
+    return Get-CimInstance Win32_Process -Filter "Name='Runner.Listener.exe'" -ErrorAction SilentlyContinue |
+        Where-Object { [string]$_.ExecutablePath -eq $runnerExe } |
+        Select-Object -First 1
+}
+
+function Get-LocalRunnerWorker {
+    return Get-CimInstance Win32_Process -Filter "Name='Runner.Worker.exe'" -ErrorAction SilentlyContinue |
+        Where-Object { [string]$_.ExecutablePath -eq $workerExe } |
+        Select-Object -First 1
+}
+
+function Get-GitHubRunnerRegistration {
+    $raw = @(& $gh api "repos/$Repository/actions/runners?per_page=100" 2>&1)
+    if ($LASTEXITCODE -ne 0) { throw 'Unable to query GitHub runner registrations.' }
+    $payload = ($raw -join [Environment]::NewLine) | ConvertFrom-Json
+    $matches = @($payload.runners | Where-Object { [string]$_.name -eq $RunnerName })
+    if ($matches.Count -gt 1) { throw "Multiple GitHub runner registrations found for $RunnerName; refusing automatic recovery." }
+    return ($matches | Select-Object -First 1)
+}
 
 function Get-RunnerReleaseAsset {
     $tag = "v$RunnerVersion"
@@ -56,12 +78,30 @@ if (-not (Test-Path -LiteralPath $runnerExe -PathType Leaf)) {
 if (-not (Test-Path -LiteralPath $configCmd -PathType Leaf)) { throw 'Runner config.cmd is missing.' }
 if (-not (Test-Path -LiteralPath $runCmd -PathType Leaf)) { throw 'Runner run.cmd is missing.' }
 
-$running = Get-CimInstance Win32_Process -Filter "Name='Runner.Listener.exe'" -ErrorAction SilentlyContinue |
-    Where-Object { [string]$_.ExecutablePath -eq $runnerExe } |
-    Select-Object -First 1
-if ($running) {
-    Write-Host "RONSAS Windows runner already running: PID $($running.ProcessId)" -ForegroundColor Green
+$running = Get-LocalRunnerListener
+$registered = Get-GitHubRunnerRegistration
+if ($running -and $registered -and [string]$registered.status -eq 'online') {
+    Write-Host "RONSAS Windows runner healthy: PID $($running.ProcessId), GitHub status=online busy=$($registered.busy)" -ForegroundColor Green
     exit 0
+}
+
+if ($running) {
+    $worker = Get-LocalRunnerWorker
+    if ($worker) {
+        throw "Runner.Listener exists but GitHub is not online while Runner.Worker PID $($worker.ProcessId) is active; refusing automatic restart."
+    }
+    $state = if ($registered) { "status=$($registered.status) busy=$($registered.busy) id=$($registered.id)" } else { 'registration=missing' }
+    Write-Warning "Runner.Listener PID $($running.ProcessId) is locally alive but GitHub is not online ($state); restarting the idle listener."
+    $task = Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+    if ($task) {
+        Stop-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 2
+    }
+    $running = Get-LocalRunnerListener
+    if ($running) {
+        Stop-Process -Id $running.ProcessId -Force -ErrorAction Stop
+        Start-Sleep -Seconds 2
+    }
 }
 
 $runnerConfig = Join-Path $RunnerRoot '.runner'
@@ -88,11 +128,28 @@ Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger @($logonTrig
 Start-ScheduledTask -TaskName $TaskName
 Start-Sleep -Seconds 5
 
-$running = Get-CimInstance Win32_Process -Filter "Name='Runner.Listener.exe'" -ErrorAction SilentlyContinue |
-    Where-Object { [string]$_.ExecutablePath -eq $runnerExe } |
-    Select-Object -First 1
+$running = Get-LocalRunnerListener
 if (-not $running) { throw 'RONSAS Windows runner did not stay running.' }
 
-Write-Host "RONSAS Windows runner online locally: $RunnerName (PID $($running.ProcessId))" -ForegroundColor Green
+$online = $false
+$registered = $null
+for ($attempt = 1; $attempt -le 12; $attempt++) {
+    $registered = Get-GitHubRunnerRegistration
+    if ($registered -and [string]$registered.status -eq 'online') {
+        $online = $true
+        break
+    }
+    Write-Host "Waiting for GitHub runner registration to become online; attempt $attempt/12."
+    Start-Sleep -Seconds 5
+}
+if (-not $online) {
+    $worker = Get-LocalRunnerWorker
+    if ($worker) {
+        throw "Windows runner stayed offline in GitHub while Runner.Worker PID $($worker.ProcessId) became active; refusing further recovery."
+    }
+    throw 'RONSAS Windows runner process is running locally but GitHub did not report it online within the bounded verification window.'
+}
+
+Write-Host "RONSAS Windows runner online: $RunnerName (PID $($running.ProcessId), GitHub busy=$($registered.busy))" -ForegroundColor Green
 Write-Host 'Repository scope: private resonance36912-cell/RONSAS only.'
 Write-Host 'Labels: ronsas,ealiophin,production-host'
