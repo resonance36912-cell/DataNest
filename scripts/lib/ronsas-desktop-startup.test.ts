@@ -23,9 +23,13 @@ describe("RONSAS desktop startup", () => {
     expect(launcher).toContain("last-operation.txt");
   });
 
-  test("requires a complete control bundle and falls back to the governed source checkout", () => {
+  test("prefers an installed complete control bundle before live or source fallbacks", () => {
     expect(launcher).toContain("Test-CompleteControlRoot");
+    expect(launcher).toContain("Control\\ops\\ealiophin\\cluster");
     expect(launcher).toContain("RONSAS-MODULES.json");
+    expect(launcher).toContain("syncvision-local-stt.py");
+    expect(launcher).toContain("rons-local-llm-service.py");
+    expect(launcher).toContain("epublisher-premium-image-service.py");
     expect(launcher).toContain("Documents\\GitHub\\rons-sovereign-codebase\\ops\\ealiophin\\cluster");
     expect(launcher).toContain("No complete RONSAS control root is available.");
   });
@@ -36,6 +40,15 @@ describe("RONSAS desktop startup", () => {
     expect(installer).toContain("-WindowStyle Hidden");
     expect(installer).toContain("-Action Start");
     expect(installer).toContain("-WindowStyle 7");
+  });
+
+  test("installs a topology-preserving canonical control bundle", () => {
+    expect(installer).toContain("Control\\ops\\ealiophin");
+    expect(installer).toContain("START-RONSAS-ECOSYSTEM.ps1");
+    expect(installer).toContain("STATUS-RONSAS-ECOSYSTEM.ps1");
+    expect(installer).toContain("STOP-RONSAS-ECOSYSTEM.ps1");
+    expect(installer).toContain("RONSAS-MODULES.json");
+    expect(installer).toContain("epublisher-premium-image-service.py");
   });
 
   test("uses the compatible Vite config loader for Creative Studio", () => {
