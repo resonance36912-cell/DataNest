@@ -319,3 +319,34 @@ test("supervisor requires hardened Windows deletion visibility guard", () => {
     "Waiting for stale offline Windows runner registration deletion to become visible;",
   );
 });
+
+
+test("Windows installer re-proves exact registration identity and state before delete", () => {
+  expect(windowsInstaller).toContain(
+    "$deleteCandidateId = [long]$registered.id",
+  );
+  expect(windowsInstaller).toContain(
+    "Windows runner registration disappeared before guarded stale-offline deletion; refusing to delete by stale ID.",
+  );
+  expect(windowsInstaller).toContain(
+    "Windows runner registration identity changed before guarded deletion",
+  );
+  expect(windowsInstaller).toContain(
+    "Windows runner state changed before guarded deletion",
+  );
+
+  const stateReproof = windowsInstaller.indexOf(
+    "Windows runner state changed before guarded deletion",
+  );
+  const deleteRegistration = windowsInstaller.indexOf(
+    '& $gh api -X DELETE "repos/$Repository/actions/runners/$($registered.id)"',
+  );
+  expect(stateReproof).toBeGreaterThan(-1);
+  expect(deleteRegistration).toBeGreaterThan(stateReproof);
+});
+
+test("supervisor requires immediate Windows deletion state reproof", () => {
+  expect(supervisor).toContain(
+    "Windows runner state changed before guarded deletion",
+  );
+});
