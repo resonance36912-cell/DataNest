@@ -83,6 +83,14 @@ if ($running -and $registered -and [string]$registered.status -eq 'online') {
     exit 0
 }
 
+if (-not $running -and $registered -and [string]$registered.status -eq 'online') {
+    $worker = Get-LocalRunnerWorker
+    if ($worker) {
+        throw "GitHub reports the Windows runner online while local Runner.Listener is absent and Runner.Worker PID $($worker.ProcessId) is active; refusing ambiguous ownership recovery."
+    }
+    throw "GitHub reports the Windows runner online while the expected local Runner.Listener is absent (busy=$($registered.busy), id=$($registered.id)); refusing automatic restart or replacement until ownership is unambiguous."
+}
+
 if ($running) {
     $worker = Get-LocalRunnerWorker
     if ($worker) {
