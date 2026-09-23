@@ -8,6 +8,7 @@ param(
     [string]$Network = 'ronsas-ci',
     [string]$Proxy = 'ronsas-podman-api',
     [string]$Volume = 'ronsas-actions-work',
+    [string]$PodmanMachine = 'podman-machine-default',
     [switch]$ForceRecycle
 )
 $ErrorActionPreference = 'Stop'
@@ -15,6 +16,67 @@ Set-StrictMode -Version Latest
 
 $podman = (Get-Command podman.exe -ErrorAction Stop).Source
 $gh = (Get-Command gh.exe -ErrorAction Stop).Source
+
+function Ensure-PodmanMachineReady {
+    $priorErrorActionPreference = $ErrorActionPreference
+    $machineRaw = @()
+    $machineExit = 1
+    try {
+        $ErrorActionPreference = 'Continue'
+        $machineRaw = @(& $podman machine list --format json 2>&1)
+        $machineExit = [int]$LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $priorErrorActionPreference
+    }
+    if ($machineExit -ne 0) {
+        throw 'Unable to inspect Podman machine state before governed runner recovery.'
+    }
+
+    try {
+        $machines = @(($machineRaw -join [Environment]::NewLine) | ConvertFrom-Json)
+    } catch {
+        throw "Unable to parse Podman machine state before governed runner recovery: $($_.Exception.Message)"
+    }
+    $machine = @($machines | Where-Object { [string]$_.Name -eq $PodmanMachine }) | Select-Object -First 1
+    if (-not $machine) {
+        throw "Required existing Podman machine is missing: $PodmanMachine"
+    }
+
+    if (-not [bool]$machine.Running) {
+        Write-Host "Podman machine is stopped; starting the existing machine once: $PodmanMachine" -ForegroundColor Yellow
+        $trackingWasPresent = Test-Path Env:RUNNER_TRACKING_ID
+        $trackingValue = if ($trackingWasPresent) { [string]$env:RUNNER_TRACKING_ID } else { $null }
+        try {
+            Remove-Item Env:RUNNER_TRACKING_ID -ErrorAction SilentlyContinue
+            & $podman machine start $PodmanMachine
+            if ($LASTEXITCODE -ne 0) { throw "Failed to start existing Podman machine: $PodmanMachine" }
+        } finally {
+            if ($trackingWasPresent) {
+                $env:RUNNER_TRACKING_ID = $trackingValue
+            } else {
+                Remove-Item Env:RUNNER_TRACKING_ID -ErrorAction SilentlyContinue
+            }
+        }
+    }
+
+    for ($attempt = 1; $attempt -le 30; $attempt++) {
+        $infoExit = 1
+        try {
+            $ErrorActionPreference = 'Continue'
+            & $podman info *> $null
+            $infoExit = [int]$LASTEXITCODE
+        } finally {
+            $ErrorActionPreference = $priorErrorActionPreference
+        }
+        if ($infoExit -eq 0) {
+            Write-Host "Podman machine ready for governed runner recovery after attempt $attempt/30." -ForegroundColor Green
+            return
+        }
+        Start-Sleep -Seconds 2
+    }
+
+    throw "Existing Podman machine did not become ready within the bounded wait: $PodmanMachine"
+}
 
 function Get-RegisteredRunner {
     $runnerRaw = @(& $gh api "repos/$Repository/actions/runners")
@@ -201,6 +263,8 @@ function Ensure-RunnerLabels($Runner) {
     & $gh @args | Out-Null
     if ($LASTEXITCODE -ne 0) { throw 'Failed to restore required GitHub runner labels.' }
 }
+
+Ensure-PodmanMachineReady
 
 & $podman network inspect $Network *> $null
 if ($LASTEXITCODE -ne 0) { throw "Required CI network is missing: $Network" }
