@@ -47,3 +47,42 @@ test("successful recovery resets supervisor runner backoff state", () => {
   expect(supervisor).toContain("$script:nextRunnerAttempt = [datetime]::MinValue");
   expect(supervisor).toContain("if ($exitCode -eq 0)");
 });
+
+
+test("Windows runner watchdog only restores an existing installation", () => {
+  expect(supervisor).toContain(
+    "Documents\\GitHub\\rons-sovereign-codebase\\ops\\ealiophin\\ci\\INSTALL-RONSAS-WINDOWS-RUNNER.ps1",
+  );
+  expect(supervisor).toContain(
+    "Resonance\\RONS-GitHubRunner-Windows",
+  );
+  expect(supervisor).toContain(
+    "$DefaultWindowsRunnerTask = 'RONSAS GitHub Windows Runner'",
+  );
+  expect(supervisor).toContain(
+    "if (-not $existingTask -and -not $existingRoot) { return }",
+  );
+  expect(supervisor).toContain("Ensure-WindowsGitHubRunner");
+});
+
+test("Windows runner watchdog respects explicit disables and uses no forced recycle", () => {
+  expect(supervisor).toContain(
+    "if ($overallConfigured -and -not [bool]$Config.autonomy.ensureGitHubRunner) { return }",
+  );
+  expect(supervisor).toContain(
+    "if ($windowsConfigured -and -not [bool]$Config.autonomy.ensureWindowsGitHubRunner) { return }",
+  );
+  expect(supervisor).not.toContain("-ForceRecycle");
+});
+
+test("Windows runner recovery has independent bounded backoff", () => {
+  expect(supervisor).toContain("$windowsRunnerFailures = 0");
+  expect(supervisor).toContain("$nextWindowsRunnerAttempt = [datetime]::MinValue");
+  expect(supervisor).toContain(
+    "if ((Get-Date) -lt $script:nextWindowsRunnerAttempt) { return }",
+  );
+  expect(supervisor).toContain("$script:windowsRunnerFailures++");
+  expect(supervisor).toContain(
+    "$script:nextWindowsRunnerAttempt = (Get-Date).AddSeconds($delay)",
+  );
+});
