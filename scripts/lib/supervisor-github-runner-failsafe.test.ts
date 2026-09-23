@@ -129,3 +129,44 @@ test("Windows runner scheduled task has logon and periodic restart triggers", ()
   );
   expect(windowsInstaller).toContain("-MultipleInstances IgnoreNew");
 });
+
+
+test("Windows installer verifies GitHub online state instead of trusting a local listener", () => {
+  expect(windowsInstaller).toContain("function Get-GitHubRunnerRegistration");
+  expect(windowsInstaller).toContain(
+    "if ($running -and $registered -and [string]$registered.status -eq 'online')",
+  );
+  expect(windowsInstaller).toContain(
+    "Runner.Listener exists but GitHub is not online while Runner.Worker PID",
+  );
+  expect(windowsInstaller).toContain(
+    "Stop-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue",
+  );
+  expect(windowsInstaller).toContain(
+    "Stop-Process -Id $running.ProcessId -Force -ErrorAction Stop",
+  );
+
+  const workerGuard = windowsInstaller.indexOf(
+    "Runner.Listener exists but GitHub is not online while Runner.Worker PID",
+  );
+  const stopListener = windowsInstaller.indexOf(
+    "Stop-Process -Id $running.ProcessId -Force -ErrorAction Stop",
+  );
+  expect(workerGuard).toBeGreaterThan(-1);
+  expect(stopListener).toBeGreaterThan(workerGuard);
+});
+
+test("Windows installer requires bounded GitHub re-registration visibility after restart", () => {
+  expect(windowsInstaller).toContain(
+    "for ($attempt = 1; $attempt -le 12; $attempt++)",
+  );
+  expect(windowsInstaller).toContain(
+    "Waiting for GitHub runner registration to become online; attempt $attempt/12.",
+  );
+  expect(windowsInstaller).toContain(
+    "RONSAS Windows runner process is running locally but GitHub did not report it online within the bounded verification window.",
+  );
+  expect(windowsInstaller).toContain(
+    "Windows runner stayed offline in GitHub while Runner.Worker PID",
+  );
+});
