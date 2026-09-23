@@ -130,8 +130,18 @@ if ($running) {
     if ($worker) {
         throw "Runner.Listener exists but GitHub is not online while Runner.Worker PID $($worker.ProcessId) is active; refusing automatic restart."
     }
+    if ($registered -and [bool]$registered.busy) {
+        throw "Runner.Listener exists while GitHub reports the Windows runner busy=true (status=$($registered.status) id=$($registered.id)); refusing automatic restart."
+    }
+    $assignments = @(Get-ActiveRunnerAssignments)
+    if ($assignments.Count -gt 0) {
+        $summary = ($assignments | Select-Object -First 10 | ForEach-Object {
+            "$($_.run_id):$($_.run_name):$($_.job_id):$($_.job_name):$($_.job_status)"
+        }) -join ', '
+        throw "Runner.Listener exists while GitHub reports active assignment(s) for the Windows runner; refusing automatic restart: $summary"
+    }
     $state = if ($registered) { "status=$($registered.status) busy=$($registered.busy) id=$($registered.id)" } else { 'registration=missing' }
-    Write-Warning "Runner.Listener PID $($running.ProcessId) is locally alive but GitHub is not online ($state); restarting the idle listener."
+    Write-Warning "Runner.Listener PID $($running.ProcessId) is locally alive but GitHub is not online ($state); restarting only after Worker, busy, and assignment checks proved idle."
     $task = Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
     if ($task) {
         Stop-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
