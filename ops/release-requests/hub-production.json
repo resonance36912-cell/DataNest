@@ -2,25 +2,15 @@
   "schema": "ronsas-hub-release-request/v1",
   "sourceRepo": "resonance36912-cell/resonance-hub",
   "sourceBranch": "ronsas/ealiophin-production",
-  "commit": "791c5b7e74dab20c1e48fb0d7bb34a8f6d426d57",
+  "commit": "a9ecf4873548aaba0fe2286f7a2ccd18e607e311",
   "confirmation": "PROMOTE RONSAS HUB",
   "validation": {
-    "workflowRun": 35483409056,
-    "artifactId": 10596204376,
-    "artifactName": "ronsas-hub-candidate-174cf6f",
-    "artifactArchiveDigest": "sha256:fe13f1dde0e5ad1fb0d41d1c10f5d24303fb1c0bc0989a74086017867994d2b6",
-    "candidateBundleSha256": "6b607b9f42de1859137d5e58af61fb3b4dd859667dc79f931e2bce80f0ba3bfc",
-    "candidateFiles": 340,
-    "routeSmoke": "passed",
-    "priorValidatedCommit": "174cf6f64edbf9eafb7301008c1be7dcfbdbdf3f",
-    "currentHead": "791c5b7e74dab20c1e48fb0d7bb34a8f6d426d57",
-    "runtimeDelta": "test-only; application/runtime code unchanged",
-    "testIsolationPr": 48,
-    "commercialModeRun": 35483989207,
-    "candidatePort": 4195,
-    "publicFallbackPortPreserved": 4175
+    "commercialModeRun": 35914270318,
+    "commercialMode": "passed",
+    "sourceHead": "a9ecf4873548aaba0fe2286f7a2ccd18e607e311",
+    "releaseValidation": "performed by governed windows-hub-promotion workflow before atomic promotion"
   },
-  "purpose": "Publish the validated free-promotion Hub bundle so /pricing and /changelog match governed production source.",
-  "retryAttempt": 10,
-  "retryReason": "Re-trigger governed Hub production promotion after PR #110 merged and exact-head CI passed. Canonical Hub production head remains 791c5b7e74dab20c1e48fb0d7bb34a8f6d426d57; public /pricing is still serving the prior paid-pack surface, so republish the already validated free-promotion bundle."
+  "purpose": "Promote current governed Hub production source including the Admin/R&D Control Center and Ops Agent integration while preserving free-promotion/no-billing invariants.",
+  "priorReleaseCommit": "791c5b7e74dab20c1e48fb0d7bb34a8f6d426d57",
+  "requestedAt": "2026-09-23T20:20:00Z"
 }
