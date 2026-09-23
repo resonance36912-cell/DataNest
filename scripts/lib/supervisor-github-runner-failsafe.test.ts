@@ -248,3 +248,49 @@ test("supervisor requires the ambiguous-ownership Windows guard", () => {
     "GitHub reports the Windows runner online while the expected local Runner.Listener is absent",
   );
 });
+
+
+test("Windows installer recycles only a proven-idle offline registration", () => {
+  expect(windowsInstaller).toContain("function Get-ActiveRunnerAssignments");
+  expect(windowsInstaller).toContain(
+    "Windows runner remained offline after the bounded restart with no Worker, busy flag, or active assignment.",
+  );
+  expect(windowsInstaller).toContain(
+    "if ([string]$registered.status -ne 'offline')",
+  );
+  expect(windowsInstaller).toContain(
+    "if ([bool]$registered.busy)",
+  );
+  expect(windowsInstaller).toContain(
+    "$assignments = @(Get-ActiveRunnerAssignments)",
+  );
+  expect(windowsInstaller).toContain(
+    "Failed to remove proven-idle stale offline Windows runner registration",
+  );
+  expect(windowsInstaller).toContain(
+    "RONSAS Windows runner still did not become online after one guarded stale-offline registration recycle.",
+  );
+
+  const firstVerify = windowsInstaller.indexOf(
+    "for ($attempt = 1; $attempt -le 12; $attempt++)",
+  );
+  const deleteRegistration = windowsInstaller.indexOf(
+    '& $gh api -X DELETE "repos/$Repository/actions/runners/$($registered.id)"',
+  );
+  const secondVerify = windowsInstaller.indexOf(
+    "for ($retryAttempt = 1; $retryAttempt -le 12; $retryAttempt++)",
+  );
+  expect(firstVerify).toBeGreaterThan(-1);
+  expect(deleteRegistration).toBeGreaterThan(firstVerify);
+  expect(secondVerify).toBeGreaterThan(deleteRegistration);
+});
+
+test("supervisor requires guarded offline Windows recycle markers", () => {
+  expect(supervisor).toContain("function Get-ActiveRunnerAssignments");
+  expect(supervisor).toContain(
+    "Windows runner remained offline after the bounded restart with no Worker, busy flag, or active assignment.",
+  );
+  expect(supervisor).toContain(
+    "RONSAS Windows runner still did not become online after one guarded stale-offline registration recycle.",
+  );
+});
