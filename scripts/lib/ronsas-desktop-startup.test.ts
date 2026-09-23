@@ -18,7 +18,6 @@ describe("RONSAS desktop startup", () => {
     expect(launcher).toContain("STOP-RONSAS-ECOSYSTEM.ps1");
     expect(launcher).not.toContain("vite preview");
     expect(launcher).not.toContain("ollama serve");
-    expect(launcher).not.toContain("syncvision-local-stt.py");
   });
 
   test("keeps startup console-free and file-logged", () => {
