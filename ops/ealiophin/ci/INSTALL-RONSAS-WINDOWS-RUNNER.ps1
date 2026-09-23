@@ -241,6 +241,18 @@ if (-not $online) {
         throw 'GitHub assigned work to the Windows runner before stale offline registration recycle; refusing deletion.'
     }
 
+    $deleteCandidateId = [long]$registered.id
+    $registered = Get-GitHubRunnerRegistration
+    if (-not $registered) {
+        throw 'Windows runner registration disappeared before guarded stale-offline deletion; refusing to delete by stale ID.'
+    }
+    if ([long]$registered.id -ne $deleteCandidateId) {
+        throw "Windows runner registration identity changed before guarded deletion (expected=$deleteCandidateId actual=$($registered.id)); refusing recovery."
+    }
+    if ([string]$registered.status -ne 'offline' -or [bool]$registered.busy) {
+        throw "Windows runner state changed before guarded deletion (status=$($registered.status) busy=$($registered.busy)); refusing recovery."
+    }
+
     $priorErrorActionPreference = $ErrorActionPreference
     $deleteOutput = @()
     $deleteExit = 1
