@@ -9,6 +9,10 @@ const windowsInstaller = readFileSync(
   new URL("../../ops/ealiophin/ci/INSTALL-RONSAS-WINDOWS-RUNNER.ps1", import.meta.url),
   "utf8",
 );
+const linuxLauncher = readFileSync(
+  new URL("../../ops/ealiophin/ci/START-RONSAS-ACTIONS-RUNNER.ps1", import.meta.url),
+  "utf8",
+);
 
 test("legacy control configs fall back to the exact governed runner launcher", () => {
   expect(supervisor).toContain(
@@ -421,4 +425,21 @@ test("supervisor requires Windows busy and assignment restart guards", () => {
   expect(supervisor).toContain(
     "Runner.Listener exists while GitHub reports active assignment(s) for the Windows runner; refusing automatic restart",
   );
+});
+
+test("Linux runner recovery starts only an existing stopped Podman machine and protects it from Actions cleanup", () => {
+  expect(linuxLauncher).toContain("function Ensure-PodmanMachineReady");
+  expect(linuxLauncher).toContain("machine list --format json");
+  expect(linuxLauncher).toContain("if (-not [bool]$machine.Running)");
+  expect(linuxLauncher).toContain("Remove-Item Env:RUNNER_TRACKING_ID -ErrorAction SilentlyContinue");
+  expect(linuxLauncher).toContain("& $podman machine start $PodmanMachine");
+  expect(linuxLauncher).toContain("for ($attempt = 1; $attempt -le 30; $attempt++)");
+  expect(linuxLauncher).not.toContain("podman machine stop");
+  expect(linuxLauncher).not.toContain("podman machine rm");
+  expect(linuxLauncher).not.toContain("wsl --shutdown");
+
+  const ensureIndex = linuxLauncher.indexOf("Ensure-PodmanMachineReady");
+  const networkIndex = linuxLauncher.indexOf("& $podman network inspect $Network");
+  expect(ensureIndex).toBeGreaterThan(-1);
+  expect(networkIndex).toBeGreaterThan(ensureIndex);
 });
