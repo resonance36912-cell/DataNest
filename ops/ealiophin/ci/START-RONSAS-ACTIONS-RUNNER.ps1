@@ -656,6 +656,33 @@ if ($registered -and ($registered.status -ne 'online' -or $forceRecycleDeleteRea
     $registered = $null
 }
 
+# Registration absence/offline state does not by itself prove the local container is idle.
+# Before replacing any existing container, re-check GitHub assignment ownership and
+# the local Runner.Worker state so stale credentials can never justify killing
+# an in-flight job.
+if (Test-ContainerExists $Container) {
+    $replacementAssignments = @(Get-ActiveRunnerAssignments)
+    if ($replacementAssignments.Count -gt 0) {
+        $summary = ($replacementAssignments | Select-Object -First 10 | ForEach-Object {
+            "$($_.run_id):$($_.run_name):$($_.job_id):$($_.job_name):$($_.job_status)"
+        }) -join ', '
+        Write-Host "Fresh registration deferred because GitHub still reports active assignment(s) on ${RunnerName}: $summary" -ForegroundColor Yellow
+        exit 0
+    }
+
+    $replacementInfo = (& $podman inspect $Container | ConvertFrom-Json)[0]
+    if ($replacementInfo.State.Running) {
+        $replacementState = Get-RunnerProcessState $Container
+        if (-not $replacementState.observed) {
+            Write-Host 'Fresh registration deferred because the running local runner process state could not be observed safely.' -ForegroundColor Yellow
+            exit 0
+        }
+        if ($replacementState.worker) {
+            Write-Host 'Fresh registration deferred because local Runner.Worker is active even though the GitHub registration is missing or replaceable.' -ForegroundColor Yellow
+            exit 0
+        }
+    }
+}
 $token = (& $gh api -X POST "repos/$Repository/actions/runners/registration-token" --jq .token).Trim()
 if ([string]::IsNullOrWhiteSpace($token)) { throw 'Unable to obtain an ephemeral GitHub runner registration token.' }
 
