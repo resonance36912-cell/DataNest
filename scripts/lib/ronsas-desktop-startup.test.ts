@@ -32,7 +32,7 @@ describe("RONSAS desktop startup", () => {
   });
 
   test("uses the compatible Vite config loader for Creative Studio", () => {
-    expect(cluster).toContain("[string]$ConfigLoader = '');");
+    expect(cluster).toContain("[string]$ConfigLoader = '') {");
     expect(cluster).toContain("@('--configLoader', $ConfigLoader)");
     expect(cluster).toContain("creative-studio-sovereign-local-v0.1') 3201 'preview' '127.0.0.1' 'runner'");
   });
