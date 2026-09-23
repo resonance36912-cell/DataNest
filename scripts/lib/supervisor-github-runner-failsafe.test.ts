@@ -56,9 +56,7 @@ test("Windows runner watchdog only restores an existing installation", () => {
   expect(supervisor).toContain(
     "Documents\\GitHub\\rons-sovereign-codebase\\ops\\ealiophin\\ci\\INSTALL-RONSAS-WINDOWS-RUNNER.ps1",
   );
-  expect(supervisor).toContain(
-    "Resonance\\RONS-GitHubRunner-Windows",
-  );
+  expect(supervisor).toContain("Resonance\\RONS-GitHubRunner-Windows");
   expect(supervisor).toContain("$DefaultWindowsRunnerTask = 'RONSAS GitHub Windows Runner'");
   expect(supervisor).toContain("if (-not $existingTask -and -not $existingRoot) { return }");
   expect(supervisor).toContain("Ensure-WindowsGitHubRunner");
