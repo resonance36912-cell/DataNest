@@ -2,8 +2,14 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 
 const launcher = readFileSync(new URL("../Start-RonsasDesktop.ps1", import.meta.url), "utf8");
-const installer = readFileSync(new URL("../Install-RonsasSovereignShortcuts.ps1", import.meta.url), "utf8");
-const cluster = readFileSync(new URL("../../ops/ealiophin/cluster/START-RONSAS-ECOSYSTEM.ps1", import.meta.url), "utf8");
+const installer = readFileSync(
+  new URL("../Install-RonsasSovereignShortcuts.ps1", import.meta.url),
+  "utf8",
+);
+const cluster = readFileSync(
+  new URL("../../ops/ealiophin/cluster/START-RONSAS-ECOSYSTEM.ps1", import.meta.url),
+  "utf8",
+);
 
 describe("RONSAS desktop startup", () => {
   test("delegates only to the canonical cluster controls", () => {
@@ -30,7 +36,9 @@ describe("RONSAS desktop startup", () => {
     expect(launcher).toContain("syncvision-local-stt.py");
     expect(launcher).toContain("rons-local-llm-service.py");
     expect(launcher).toContain("epublisher-premium-image-service.py");
-    expect(launcher).toContain("Documents\\GitHub\\rons-sovereign-codebase\\ops\\ealiophin\\cluster");
+    expect(launcher).toContain(
+      "Documents\\GitHub\\rons-sovereign-codebase\\ops\\ealiophin\\cluster",
+    );
     expect(launcher).toContain("No complete RONSAS control root is available.");
   });
 
@@ -54,6 +62,8 @@ describe("RONSAS desktop startup", () => {
   test("uses the compatible Vite config loader for Creative Studio", () => {
     expect(cluster).toContain("[string]$ConfigLoader = '') {");
     expect(cluster).toContain("@('--configLoader', $ConfigLoader)");
-    expect(cluster).toContain("creative-studio-sovereign-local-v0.1') 3201 'preview' '127.0.0.1' 'runner'");
+    expect(cluster).toContain(
+      "creative-studio-sovereign-local-v0.1') 3201 'preview' '127.0.0.1' 'runner'",
+    );
   });
 });
