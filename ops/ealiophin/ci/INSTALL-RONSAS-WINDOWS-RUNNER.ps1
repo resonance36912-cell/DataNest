@@ -241,12 +241,30 @@ if (-not $online) {
         throw 'GitHub assigned work to the Windows runner before stale offline registration recycle; refusing deletion.'
     }
 
-    $deleteOutput = @(& $gh api -X DELETE "repos/$Repository/actions/runners/$($registered.id)" 2>&1)
-    if ($LASTEXITCODE -ne 0) {
+    $priorErrorActionPreference = $ErrorActionPreference
+    $deleteOutput = @()
+    $deleteExit = 1
+    try {
+        # Windows PowerShell can promote native stderr into a terminating
+        # NativeCommandError. Capture it as data so deletion remains fail-closed
+        # and the exact GitHub response is preserved in the diagnostic.
+        $ErrorActionPreference = 'Continue'
+        $deleteOutput = @(& $gh api -X DELETE "repos/$Repository/actions/runners/$($registered.id)" 2>&1)
+        $deleteExit = [int]$LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $priorErrorActionPreference
+    }
+    if ($deleteExit -ne 0) {
         throw "Failed to remove proven-idle stale offline Windows runner registration: $($deleteOutput -join [Environment]::NewLine)"
     }
 
-    $registered = Get-GitHubRunnerRegistration
+    $registered = $null
+    for ($disappearAttempt = 1; $disappearAttempt -le 6; $disappearAttempt++) {
+        $registered = Get-GitHubRunnerRegistration
+        if (-not $registered) { break }
+        Write-Host "Waiting for stale offline Windows runner registration deletion to become visible; attempt $disappearAttempt/6."
+        Start-Sleep -Seconds 2
+    }
     if ($registered) {
         throw 'Windows runner registration still exists after stale offline deletion; refusing local re-registration.'
     }
