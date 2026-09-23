@@ -402,17 +402,13 @@ test("Linux runner recovery self-heals proven mirrored VM egress and rechecks it
     "Get-NetRoute -AddressFamily IPv4 -DestinationPrefix '0.0.0.0/0'",
   );
   expect(linuxLauncher).toContain("Where-Object { [string]$_.State -ne 'Dead' }");
-  expect(linuxLauncher).toContain(
-    'ip route replace default via $gateway dev $iface metric 5',
-  );
+  expect(linuxLauncher).toContain("ip route replace default via $gateway dev $iface metric 5");
   expect(linuxLauncher).toContain("Ensure-PodmanMachineReady\nEnsure-PodmanVmEgress");
   expect(linuxLauncher).toContain(
     "Governed ronsas-ci HTTPS egress is unavailable before runner mutation.",
   );
   expect(linuxLauncher).toContain("Podman VM HTTPS egress was lost after runner startup.");
-  expect(linuxLauncher).toContain(
-    "Governed ronsas-ci HTTPS egress was lost after runner startup.",
-  );
+  expect(linuxLauncher).toContain("Governed ronsas-ci HTTPS egress was lost after runner startup.");
   expect(linuxLauncher).not.toContain("Set-NetIPInterface");
   expect(linuxLauncher).not.toContain("Disable-NetAdapter");
 });
