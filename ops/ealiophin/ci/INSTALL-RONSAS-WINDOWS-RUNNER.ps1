@@ -155,23 +155,52 @@ if ($running) {
 }
 
 $runnerConfig = Join-Path $RunnerRoot '.runner'
-if (-not $registered -and (Test-Path -LiteralPath $runnerConfig -PathType Leaf)) {
+$migratedRunnerConfig = Join-Path $RunnerRoot '.runner_migrated'
+$credentialConfig = Join-Path $RunnerRoot '.credentials'
+$migratedCredentialConfig = Join-Path $RunnerRoot '.credentials_migrated'
+$rsaCredentialConfig = Join-Path $RunnerRoot '.credentials_rsaparams'
+$localRunnerConfigFiles = @(
+    $runnerConfig,
+    $migratedRunnerConfig,
+    $credentialConfig,
+    $migratedCredentialConfig,
+    $rsaCredentialConfig
+)
+
+function Remove-StaleLocalRunnerConfiguration {
+    foreach ($path in $localRunnerConfigFiles) {
+        if (Test-Path -LiteralPath $path -PathType Leaf) {
+            Remove-Item -LiteralPath $path -Force -ErrorAction Stop
+        }
+    }
+
+    $remaining = @($localRunnerConfigFiles | Where-Object {
+        Test-Path -LiteralPath $_ -PathType Leaf
+    })
+    if ($remaining.Count -gt 0) {
+        throw "Stale local Windows runner configuration remained after cleanup: $($remaining -join ', ')"
+    }
+}
+$hasLocalRunnerConfig = @($localRunnerConfigFiles | Where-Object {
+    Test-Path -LiteralPath $_ -PathType Leaf
+}).Count -gt 0
+if (-not $registered -and $hasLocalRunnerConfig) {
     $worker = Get-LocalRunnerWorker
     if ($worker) {
         throw "GitHub runner registration is missing while Runner.Worker PID $($worker.ProcessId) is active; refusing local re-registration."
     }
 
-    # GitHub documents removal of the local .runner marker as the recovery path
-    # for reusing an existing runner installation when no server-side
-    # registration is available. Server absence was already proven above.
-    Remove-Item -LiteralPath $runnerConfig -Force -ErrorAction Stop
-    if (Test-Path -LiteralPath $runnerConfig -PathType Leaf) {
-        throw 'Stale local Windows runner .runner marker remained after documented cleanup.'
-    }
-    Write-Host 'Cleared stale local .runner marker after GitHub registration was proven missing.' -ForegroundColor Yellow
+    # actions/runner treats either .runner or .runner_migrated as configured,
+    # while normal settings loading reads .runner. Clear the complete local
+    # settings/credential set only after server absence and idle state are proven.
+    Remove-StaleLocalRunnerConfiguration
+    Write-Host 'Cleared stale local primary/migrated runner configuration after GitHub registration was proven missing.' -ForegroundColor Yellow
 }
 
-if (-not (Test-Path -LiteralPath $runnerConfig -PathType Leaf)) {
+if (
+    -not (Test-Path -LiteralPath $runnerConfig -PathType Leaf) -and
+    -not (Test-Path -LiteralPath $migratedRunnerConfig -PathType Leaf)
+) {
     $token = (& $gh api -X POST "repos/$Repository/actions/runners/registration-token" --jq .token).Trim()
     if ([string]::IsNullOrWhiteSpace($token)) { throw 'Unable to obtain GitHub runner registration token.' }
     try {
@@ -291,12 +320,11 @@ if (-not $online) {
         throw 'Windows runner registration still exists after stale offline deletion; refusing local re-registration.'
     }
 
-    if (Test-Path -LiteralPath $runnerConfig -PathType Leaf) {
-        Remove-Item -LiteralPath $runnerConfig -Force -ErrorAction Stop
-    }
-    if (Test-Path -LiteralPath $runnerConfig -PathType Leaf) {
-        throw 'Stale local Windows runner .runner marker remained after offline registration deletion.'
-    }
+    # The server-side registration is now proven absent. Remove the complete
+    # local runner settings/credential set, including migrated settings, before
+    # attempting exactly one clean re-registration.
+    Remove-StaleLocalRunnerConfiguration
+    Write-Host 'Cleared stale local primary/migrated runner configuration after guarded GitHub registration deletion.' -ForegroundColor Yellow
 
     $token = (& $gh api -X POST "repos/$Repository/actions/runners/registration-token" --jq .token).Trim()
     if ([string]::IsNullOrWhiteSpace($token)) { throw 'Unable to obtain GitHub runner registration token after stale offline recycle.' }

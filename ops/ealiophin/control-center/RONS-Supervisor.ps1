@@ -191,6 +191,8 @@ function Ensure-WindowsGitHubRunner {
             'Runner.Listener exists while GitHub reports the Windows runner busy=true',
             'Runner.Listener exists while GitHub reports active assignment(s) for the Windows runner; refusing automatic restart',
             'GitHub runner registration is missing while Runner.Worker PID',
+            'Cleared stale local primary/migrated runner configuration after GitHub registration was proven missing.',
+            'Stale local Windows runner configuration remained after cleanup',
             'Windows runner remained offline after the bounded restart with no Worker, busy flag, or active assignment.',
             'Windows runner state changed before guarded deletion',
             'Waiting for stale offline Windows runner registration deletion to become visible;',

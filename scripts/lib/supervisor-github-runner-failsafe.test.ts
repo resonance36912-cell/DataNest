@@ -173,29 +173,60 @@ test("Windows installer requires bounded GitHub re-registration visibility after
 
 
 test("Windows installer can re-register when GitHub registration is missing", () => {
+  expect(windowsInstaller).toContain("$migratedRunnerConfig = Join-Path $RunnerRoot '.runner_migrated'");
+  expect(windowsInstaller).toContain("$migratedCredentialConfig = Join-Path $RunnerRoot '.credentials_migrated'");
+  expect(windowsInstaller).toContain("$rsaCredentialConfig = Join-Path $RunnerRoot '.credentials_rsaparams'");
+  expect(windowsInstaller).toContain("function Remove-StaleLocalRunnerConfiguration");
   expect(windowsInstaller).toContain(
-    "if (-not $registered -and (Test-Path -LiteralPath $runnerConfig -PathType Leaf))",
+    "if (-not $registered -and $hasLocalRunnerConfig)",
   );
   expect(windowsInstaller).toContain(
     "GitHub runner registration is missing while Runner.Worker PID",
   );
   expect(windowsInstaller).toContain(
-    "Remove-Item -LiteralPath $runnerConfig -Force -ErrorAction Stop",
-  );
-  expect(windowsInstaller).toContain(
-    "Cleared stale local .runner marker after GitHub registration was proven missing.",
+    "Cleared stale local primary/migrated runner configuration after GitHub registration was proven missing.",
   );
 
   const workerGuard = windowsInstaller.indexOf(
     "GitHub runner registration is missing while Runner.Worker PID",
   );
-  const removeMarker = windowsInstaller.indexOf(
-    "Remove-Item -LiteralPath $runnerConfig -Force -ErrorAction Stop",
+  const cleanup = windowsInstaller.indexOf(
+    "Remove-StaleLocalRunnerConfiguration",
+    windowsInstaller.indexOf("if (-not $registered -and $hasLocalRunnerConfig)"),
+  );
+  const configReplace = windowsInstaller.indexOf(
+    "& $configCmd --unattended --url",
   );
   expect(workerGuard).toBeGreaterThan(-1);
-  expect(removeMarker).toBeGreaterThan(workerGuard);
+  expect(cleanup).toBeGreaterThan(workerGuard);
+  expect(configReplace).toBeGreaterThan(cleanup);
 });
 
+
+test("Windows installer clears migrated settings and credentials before guarded re-registration", () => {
+  expect(windowsInstaller).toContain("'.runner_migrated'");
+  expect(windowsInstaller).toContain("'.credentials_migrated'");
+  expect(windowsInstaller).toContain("'.credentials_rsaparams'");
+  expect(windowsInstaller).toContain(
+    "Stale local Windows runner configuration remained after cleanup",
+  );
+  expect(windowsInstaller).toContain(
+    "Cleared stale local primary/migrated runner configuration after guarded GitHub registration deletion.",
+  );
+
+  const guardedDelete = windowsInstaller.indexOf(
+    '& $gh api -X DELETE "repos/$Repository/actions/runners/$($registered.id)"',
+  );
+  const guardedCleanupMessage = windowsInstaller.indexOf(
+    "Cleared stale local primary/migrated runner configuration after guarded GitHub registration deletion.",
+  );
+  const secondRegistration = windowsInstaller.indexOf(
+    "GitHub Actions Windows runner re-registration failed after stale offline recycle.",
+  );
+  expect(guardedDelete).toBeGreaterThan(-1);
+  expect(guardedCleanupMessage).toBeGreaterThan(guardedDelete);
+  expect(secondRegistration).toBeGreaterThan(guardedCleanupMessage);
+});
 
 test("supervisor refuses stale Windows recovery authority before execution", () => {
   expect(supervisor).toContain("function Get-LocalRunnerWorker");
@@ -204,6 +235,12 @@ test("supervisor refuses stale Windows recovery authority before execution", () 
   );
   expect(supervisor).toContain(
     "GitHub runner registration is missing while Runner.Worker PID",
+  );
+  expect(supervisor).toContain(
+    "Cleared stale local primary/migrated runner configuration after GitHub registration was proven missing.",
+  );
+  expect(supervisor).toContain(
+    "Stale local Windows runner configuration remained after cleanup",
   );
   expect(supervisor).toContain(
     "RONSAS Windows runner process is running locally but GitHub did not report it online within the bounded verification window.",
