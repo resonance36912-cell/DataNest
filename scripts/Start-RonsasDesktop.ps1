@@ -8,9 +8,10 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+$InstalledClusterRoot = Join-Path $PSScriptRoot 'Control\ops\ealiophin\cluster'
 $LiveClusterRoot = Join-Path $Root 'integrations\rons-cluster'
 $SourceClusterRoot = Join-Path $env:USERPROFILE 'Documents\GitHub\rons-sovereign-codebase\ops\ealiophin\cluster'
-$ControlCandidates = @($LiveClusterRoot, $SourceClusterRoot)
+$ControlCandidates = @($InstalledClusterRoot, $LiveClusterRoot, $SourceClusterRoot)
 
 function Test-CompleteControlRoot {
   param([string]$Path)
@@ -22,6 +23,16 @@ function Test-CompleteControlRoot {
     'RONSAS-MODULES.json'
   )) {
     if (-not (Test-Path -LiteralPath (Join-Path $Path $name) -PathType Leaf)) { return $false }
+  }
+
+  $opsRoot = Split-Path $Path -Parent
+  $runtimeRoot = Join-Path $opsRoot 'runtime'
+  foreach ($name in @(
+    'syncvision-local-stt.py',
+    'rons-local-llm-service.py',
+    'epublisher-premium-image-service.py'
+  )) {
+    if (-not (Test-Path -LiteralPath (Join-Path $runtimeRoot $name) -PathType Leaf)) { return $false }
   }
   return $true
 }
