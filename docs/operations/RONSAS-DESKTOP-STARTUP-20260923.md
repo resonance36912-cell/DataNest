@@ -16,6 +16,8 @@ The desktop entry point must start RONSAS without leaving a stack of Vite, Pytho
 
 The helper does not start individual modules itself. Separate processes and ports remain fault-isolation boundaries behind the single RONSAS control plane.
 
+The desktop helper prefers the live machine control bundle at `%USERPROFILE%\Resonance\OpenNova\integrations\rons-cluster` only when that directory contains all three canonical controls plus `RONSAS-MODULES.json`. If the live bundle is incomplete, it falls back to the governed source checkout at `%USERPROFILE%\Documents\GitHub\rons-sovereign-codebase\ops\ealiophin\cluster`. It never mixes controls across directories. This protects startup from the partial live-control drift found on Ealiophin on 2026-09-23.
+
 ## Window and log behavior
 
 The desktop helper starts its child PowerShell control process with `-WindowStyle Hidden` and redirects standard output and standard error to:
