@@ -146,7 +146,13 @@ test("Windows installer requires bounded GitHub re-registration visibility after
     "Waiting for GitHub runner registration to become online; attempt $attempt/12.",
   );
   expect(windowsInstaller).toContain(
-    "RONSAS Windows runner process is running locally but GitHub did not report it online within the bounded verification window.",
+    "Windows runner remained offline after the bounded restart with no Worker, busy flag, or active assignment.",
+  );
+  expect(windowsInstaller).toContain(
+    "for ($retryAttempt = 1; $retryAttempt -le 12; $retryAttempt++)",
+  );
+  expect(windowsInstaller).toContain(
+    "Waiting for re-registered Windows runner to become online; attempt $retryAttempt/12.",
   );
   expect(windowsInstaller).toContain(
     "Windows runner stayed offline in GitHub while Runner.Worker PID",
@@ -221,7 +227,10 @@ test("supervisor refuses stale Windows recovery authority before execution", () 
   );
   expect(supervisor).toContain("Stale local Windows runner configuration remained after cleanup");
   expect(supervisor).toContain(
-    "RONSAS Windows runner process is running locally but GitHub did not report it online within the bounded verification window.",
+    "Windows runner remained offline after the bounded restart with no Worker, busy flag, or active assignment.",
+  );
+  expect(supervisor).toContain(
+    "RONSAS Windows runner still did not become online after one guarded stale-offline registration recycle.",
   );
   expect(supervisor).toContain(
     "Windows GitHub runner recovery authority is stale; missing safeguard marker",
