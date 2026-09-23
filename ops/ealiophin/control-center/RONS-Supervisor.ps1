@@ -186,6 +186,7 @@ function Ensure-WindowsGitHubRunner {
         $requiredWindowsMarkers = @(
             'function Get-LocalRunnerWorker',
             'Multiple GitHub runner registrations found for $RunnerName; refusing automatic recovery.',
+            'GitHub reports the Windows runner online while the expected local Runner.Listener is absent',
             'GitHub runner registration is missing while Runner.Worker PID',
             'RONSAS Windows runner process is running locally but GitHub did not report it online within the bounded verification window.'
         )
