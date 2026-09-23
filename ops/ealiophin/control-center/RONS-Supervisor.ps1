@@ -105,6 +105,26 @@ function Ensure-GitHubRunner {
     }
 
     try {
+        $source = Get-Content -Raw -LiteralPath $startup -ErrorAction Stop
+        $requiredMarkers = @(
+            'Runner.Worker',
+            'Get-ActiveRunnerAssignments',
+            'for ($settleAttempt = 1; $settleAttempt -le 18; $settleAttempt++)',
+            'ForceRecycle deferred because online runner registration deletion was not proven safe.'
+        )
+        foreach ($marker in $requiredMarkers) {
+            if (-not $source.Contains($marker)) {
+                $script:runnerFailures++
+                $delay = [math]::Min(
+                    [int]$Config.autonomy.maxRestartBackoffSeconds,
+                    [int](60 * [math]::Pow(2, [math]::Min($script:runnerFailures - 1, 5)))
+                )
+                $script:nextRunnerAttempt = (Get-Date).AddSeconds($delay)
+                Log ("GitHub runner recovery authority is stale; missing safeguard marker '$marker'. Retry in $delay seconds.")
+                return
+            }
+        }
+
         $output = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $startup 2>&1)
         $exitCode = [int]$LASTEXITCODE
         if ($exitCode -eq 0) {
