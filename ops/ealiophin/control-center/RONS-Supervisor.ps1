@@ -190,6 +190,7 @@ function Ensure-WindowsGitHubRunner {
             'GitHub reports the Windows runner online while the expected local Runner.Listener is absent',
             'GitHub runner registration is missing while Runner.Worker PID',
             'Windows runner remained offline after the bounded restart with no Worker, busy flag, or active assignment.',
+            'Waiting for stale offline Windows runner registration deletion to become visible;',
             'RONSAS Windows runner still did not become online after one guarded stale-offline registration recycle.'
         )
         foreach ($marker in $requiredWindowsMarkers) {
