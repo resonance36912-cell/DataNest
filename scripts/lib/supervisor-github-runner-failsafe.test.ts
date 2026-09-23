@@ -170,3 +170,31 @@ test("Windows installer requires bounded GitHub re-registration visibility after
     "Windows runner stayed offline in GitHub while Runner.Worker PID",
   );
 });
+
+
+test("Windows installer can re-register when GitHub registration is missing", () => {
+  expect(windowsInstaller).toContain(
+    "if (-not $registered -and (Test-Path -LiteralPath $runnerConfig -PathType Leaf))",
+  );
+  expect(windowsInstaller).toContain(
+    "GitHub runner registration is missing while Runner.Worker PID",
+  );
+  expect(windowsInstaller).toContain(
+    'repos/$Repository/actions/runners/remove-token',
+  );
+  expect(windowsInstaller).toContain(
+    "& $configCmd remove --token $removeToken",
+  );
+  expect(windowsInstaller).toContain(
+    "Cleared stale local Windows runner configuration after GitHub registration was proven missing.",
+  );
+
+  const workerGuard = windowsInstaller.indexOf(
+    "GitHub runner registration is missing while Runner.Worker PID",
+  );
+  const removeCommand = windowsInstaller.indexOf(
+    "& $configCmd remove --token $removeToken",
+  );
+  expect(workerGuard).toBeGreaterThan(-1);
+  expect(removeCommand).toBeGreaterThan(workerGuard);
+});

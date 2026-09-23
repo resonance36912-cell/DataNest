@@ -105,6 +105,32 @@ if ($running) {
 }
 
 $runnerConfig = Join-Path $RunnerRoot '.runner'
+if (-not $registered -and (Test-Path -LiteralPath $runnerConfig -PathType Leaf)) {
+    $worker = Get-LocalRunnerWorker
+    if ($worker) {
+        throw "GitHub runner registration is missing while Runner.Worker PID $($worker.ProcessId) is active; refusing local re-registration."
+    }
+
+    $removeToken = (& $gh api -X POST "repos/$Repository/actions/runners/remove-token" --jq .token).Trim()
+    if ([string]::IsNullOrWhiteSpace($removeToken)) {
+        throw 'Unable to obtain a GitHub runner removal token for stale local configuration cleanup.'
+    }
+    try {
+        Push-Location $RunnerRoot
+        & $configCmd remove --token $removeToken
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Failed to clear stale local Windows runner configuration.'
+        }
+    } finally {
+        $removeToken = $null
+        Pop-Location
+    }
+    if (Test-Path -LiteralPath $runnerConfig -PathType Leaf) {
+        throw 'Stale local Windows runner configuration remained after governed removal.'
+    }
+    Write-Host 'Cleared stale local Windows runner configuration after GitHub registration was proven missing.' -ForegroundColor Yellow
+}
+
 if (-not (Test-Path -LiteralPath $runnerConfig -PathType Leaf)) {
     $token = (& $gh api -X POST "repos/$Repository/actions/runners/registration-token" --jq .token).Trim()
     if ([string]::IsNullOrWhiteSpace($token)) { throw 'Unable to obtain GitHub runner registration token.' }
