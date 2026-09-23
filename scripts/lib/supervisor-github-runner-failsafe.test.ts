@@ -180,21 +180,18 @@ test("Windows installer can re-register when GitHub registration is missing", ()
     "GitHub runner registration is missing while Runner.Worker PID",
   );
   expect(windowsInstaller).toContain(
-    'repos/$Repository/actions/runners/remove-token',
+    "Remove-Item -LiteralPath $runnerConfig -Force -ErrorAction Stop",
   );
   expect(windowsInstaller).toContain(
-    "& $configCmd remove --token $removeToken",
-  );
-  expect(windowsInstaller).toContain(
-    "Cleared stale local Windows runner configuration after GitHub registration was proven missing.",
+    "Cleared stale local .runner marker after GitHub registration was proven missing.",
   );
 
   const workerGuard = windowsInstaller.indexOf(
     "GitHub runner registration is missing while Runner.Worker PID",
   );
-  const removeCommand = windowsInstaller.indexOf(
-    "& $configCmd remove --token $removeToken",
+  const removeMarker = windowsInstaller.indexOf(
+    "Remove-Item -LiteralPath $runnerConfig -Force -ErrorAction Stop",
   );
   expect(workerGuard).toBeGreaterThan(-1);
-  expect(removeCommand).toBeGreaterThan(workerGuard);
+  expect(removeMarker).toBeGreaterThan(workerGuard);
 });

@@ -111,24 +111,14 @@ if (-not $registered -and (Test-Path -LiteralPath $runnerConfig -PathType Leaf))
         throw "GitHub runner registration is missing while Runner.Worker PID $($worker.ProcessId) is active; refusing local re-registration."
     }
 
-    $removeToken = (& $gh api -X POST "repos/$Repository/actions/runners/remove-token" --jq .token).Trim()
-    if ([string]::IsNullOrWhiteSpace($removeToken)) {
-        throw 'Unable to obtain a GitHub runner removal token for stale local configuration cleanup.'
-    }
-    try {
-        Push-Location $RunnerRoot
-        & $configCmd remove --token $removeToken
-        if ($LASTEXITCODE -ne 0) {
-            throw 'Failed to clear stale local Windows runner configuration.'
-        }
-    } finally {
-        $removeToken = $null
-        Pop-Location
-    }
+    # GitHub documents removal of the local .runner marker as the recovery path
+    # for reusing an existing runner installation when no server-side
+    # registration is available. Server absence was already proven above.
+    Remove-Item -LiteralPath $runnerConfig -Force -ErrorAction Stop
     if (Test-Path -LiteralPath $runnerConfig -PathType Leaf) {
-        throw 'Stale local Windows runner configuration remained after governed removal.'
+        throw 'Stale local Windows runner .runner marker remained after documented cleanup.'
     }
-    Write-Host 'Cleared stale local Windows runner configuration after GitHub registration was proven missing.' -ForegroundColor Yellow
+    Write-Host 'Cleared stale local .runner marker after GitHub registration was proven missing.' -ForegroundColor Yellow
 }
 
 if (-not (Test-Path -LiteralPath $runnerConfig -PathType Leaf)) {
