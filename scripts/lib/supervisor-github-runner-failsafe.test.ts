@@ -39,15 +39,11 @@ test("runner recovery failures use bounded exponential backoff", () => {
   expect(supervisor).toContain("$nextRunnerAttempt = [datetime]::MinValue");
   expect(supervisor).toContain("if ((Get-Date) -lt $script:nextRunnerAttempt) { return }");
   expect(supervisor).toContain("$script:runnerFailures++");
-  expect(supervisor).toContain(
-    "[int]$Config.autonomy.maxRestartBackoffSeconds",
-  );
+  expect(supervisor).toContain("[int]$Config.autonomy.maxRestartBackoffSeconds");
   expect(supervisor).toContain(
     "[int](60 * [math]::Pow(2, [math]::Min($script:runnerFailures - 1, 5)))",
   );
-  expect(supervisor).toContain(
-    "$script:nextRunnerAttempt = (Get-Date).AddSeconds($delay)",
-  );
+  expect(supervisor).toContain("$script:nextRunnerAttempt = (Get-Date).AddSeconds($delay)");
 });
 
 test("successful recovery resets supervisor runner backoff state", () => {
@@ -56,7 +52,6 @@ test("successful recovery resets supervisor runner backoff state", () => {
   expect(supervisor).toContain("if ($exitCode -eq 0)");
 });
 
-
 test("Windows runner watchdog only restores an existing installation", () => {
   expect(supervisor).toContain(
     "Documents\\GitHub\\rons-sovereign-codebase\\ops\\ealiophin\\ci\\INSTALL-RONSAS-WINDOWS-RUNNER.ps1",
@@ -64,12 +59,8 @@ test("Windows runner watchdog only restores an existing installation", () => {
   expect(supervisor).toContain(
     "Resonance\\RONS-GitHubRunner-Windows",
   );
-  expect(supervisor).toContain(
-    "$DefaultWindowsRunnerTask = 'RONSAS GitHub Windows Runner'",
-  );
-  expect(supervisor).toContain(
-    "if (-not $existingTask -and -not $existingRoot) { return }",
-  );
+  expect(supervisor).toContain("$DefaultWindowsRunnerTask = 'RONSAS GitHub Windows Runner'");
+  expect(supervisor).toContain("if (-not $existingTask -and -not $existingRoot) { return }");
   expect(supervisor).toContain("Ensure-WindowsGitHubRunner");
 });
 
@@ -86,22 +77,15 @@ test("Windows runner watchdog respects explicit disables and uses no forced recy
 test("Windows runner recovery has independent bounded backoff", () => {
   expect(supervisor).toContain("$windowsRunnerFailures = 0");
   expect(supervisor).toContain("$nextWindowsRunnerAttempt = [datetime]::MinValue");
-  expect(supervisor).toContain(
-    "if ((Get-Date) -lt $script:nextWindowsRunnerAttempt) { return }",
-  );
+  expect(supervisor).toContain("if ((Get-Date) -lt $script:nextWindowsRunnerAttempt) { return }");
   expect(supervisor).toContain("$script:windowsRunnerFailures++");
-  expect(supervisor).toContain(
-    "$script:nextWindowsRunnerAttempt = (Get-Date).AddSeconds($delay)",
-  );
+  expect(supervisor).toContain("$script:nextWindowsRunnerAttempt = (Get-Date).AddSeconds($delay)");
 });
-
 
 test("supervisor refuses stale Linux recovery authority before execution", () => {
   expect(supervisor).toContain("Runner.Worker");
   expect(supervisor).toContain("Get-ActiveRunnerAssignments");
-  expect(supervisor).toContain(
-    "for ($settleAttempt = 1; $settleAttempt -le 18; $settleAttempt++)",
-  );
+  expect(supervisor).toContain("for ($settleAttempt = 1; $settleAttempt -le 18; $settleAttempt++)");
   expect(supervisor).toContain(
     "ForceRecycle deferred because online runner registration deletion was not proven safe.",
   );
@@ -117,7 +101,6 @@ test("supervisor refuses stale Linux recovery authority before execution", () =>
   expect(launchIndex).toBeGreaterThan(markerIndex);
 });
 
-
 test("Windows runner scheduled task has logon and periodic restart triggers", () => {
   expect(windowsInstaller).toContain(
     "$logonTrigger = New-ScheduledTaskTrigger -AtLogOn -User $userId",
@@ -125,15 +108,12 @@ test("Windows runner scheduled task has logon and periodic restart triggers", ()
   expect(windowsInstaller).toContain(
     "$watchdogTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(2)",
   );
-  expect(windowsInstaller).toContain(
-    "-RepetitionInterval (New-TimeSpan -Minutes 5)",
-  );
+  expect(windowsInstaller).toContain("-RepetitionInterval (New-TimeSpan -Minutes 5)");
   expect(windowsInstaller).toContain(
     "Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger @($logonTrigger,$watchdogTrigger)",
   );
   expect(windowsInstaller).toContain("-MultipleInstances IgnoreNew");
 });
-
 
 test("Windows installer verifies GitHub online state instead of trusting a local listener", () => {
   expect(windowsInstaller).toContain("function Get-GitHubRunnerRegistration");
@@ -161,9 +141,7 @@ test("Windows installer verifies GitHub online state instead of trusting a local
 });
 
 test("Windows installer requires bounded GitHub re-registration visibility after restart", () => {
-  expect(windowsInstaller).toContain(
-    "for ($attempt = 1; $attempt -le 12; $attempt++)",
-  );
+  expect(windowsInstaller).toContain("for ($attempt = 1; $attempt -le 12; $attempt++)");
   expect(windowsInstaller).toContain(
     "Waiting for GitHub runner registration to become online; attempt $attempt/12.",
   );
@@ -175,18 +153,19 @@ test("Windows installer requires bounded GitHub re-registration visibility after
   );
 });
 
-
 test("Windows installer can re-register when GitHub registration is missing", () => {
-  expect(windowsInstaller).toContain("$migratedRunnerConfig = Join-Path $RunnerRoot '.runner_migrated'");
-  expect(windowsInstaller).toContain("$migratedCredentialConfig = Join-Path $RunnerRoot '.credentials_migrated'");
-  expect(windowsInstaller).toContain("$rsaCredentialConfig = Join-Path $RunnerRoot '.credentials_rsaparams'");
+  expect(windowsInstaller).toContain(
+    "$migratedRunnerConfig = Join-Path $RunnerRoot '.runner_migrated'",
+  );
+  expect(windowsInstaller).toContain(
+    "$migratedCredentialConfig = Join-Path $RunnerRoot '.credentials_migrated'",
+  );
+  expect(windowsInstaller).toContain(
+    "$rsaCredentialConfig = Join-Path $RunnerRoot '.credentials_rsaparams'",
+  );
   expect(windowsInstaller).toContain("function Remove-StaleLocalRunnerConfiguration");
-  expect(windowsInstaller).toContain(
-    "if (-not $registered -and $hasLocalRunnerConfig)",
-  );
-  expect(windowsInstaller).toContain(
-    "GitHub runner registration is missing while Runner.Worker PID",
-  );
+  expect(windowsInstaller).toContain("if (-not $registered -and $hasLocalRunnerConfig)");
+  expect(windowsInstaller).toContain("GitHub runner registration is missing while Runner.Worker PID");
   expect(windowsInstaller).toContain(
     "Cleared stale local primary/migrated runner configuration after GitHub registration was proven missing.",
   );
@@ -198,22 +177,17 @@ test("Windows installer can re-register when GitHub registration is missing", ()
     "Remove-StaleLocalRunnerConfiguration",
     windowsInstaller.indexOf("if (-not $registered -and $hasLocalRunnerConfig)"),
   );
-  const configReplace = windowsInstaller.indexOf(
-    "& $configCmd --unattended --url",
-  );
+  const configReplace = windowsInstaller.indexOf("& $configCmd --unattended --url");
   expect(workerGuard).toBeGreaterThan(-1);
   expect(cleanup).toBeGreaterThan(workerGuard);
   expect(configReplace).toBeGreaterThan(cleanup);
 });
 
-
 test("Windows installer clears migrated settings and credentials before guarded re-registration", () => {
   expect(windowsInstaller).toContain("'.runner_migrated'");
   expect(windowsInstaller).toContain("'.credentials_migrated'");
   expect(windowsInstaller).toContain("'.credentials_rsaparams'");
-  expect(windowsInstaller).toContain(
-    "Stale local Windows runner configuration remained after cleanup",
-  );
+  expect(windowsInstaller).toContain("Stale local Windows runner configuration remained after cleanup");
   expect(windowsInstaller).toContain(
     "Cleared stale local primary/migrated runner configuration after guarded GitHub registration deletion.",
   );
@@ -237,15 +211,11 @@ test("supervisor refuses stale Windows recovery authority before execution", () 
   expect(supervisor).toContain(
     "Multiple GitHub runner registrations found for $RunnerName; refusing automatic recovery.",
   );
-  expect(supervisor).toContain(
-    "GitHub runner registration is missing while Runner.Worker PID",
-  );
+  expect(supervisor).toContain("GitHub runner registration is missing while Runner.Worker PID");
   expect(supervisor).toContain(
     "Cleared stale local primary/migrated runner configuration after GitHub registration was proven missing.",
   );
-  expect(supervisor).toContain(
-    "Stale local Windows runner configuration remained after cleanup",
-  );
+  expect(supervisor).toContain("Stale local Windows runner configuration remained after cleanup");
   expect(supervisor).toContain(
     "RONSAS Windows runner process is running locally but GitHub did not report it online within the bounded verification window.",
   );
@@ -265,7 +235,6 @@ test("Windows runner installer has no unrelated Git CLI dependency", () => {
   expect(windowsInstaller).not.toContain("Get-Command git.exe");
 });
 
-
 test("Windows installer refuses ambiguous online ownership without local listener", () => {
   expect(windowsInstaller).toContain(
     "GitHub reports the Windows runner online while the expected local Runner.Listener is absent",
@@ -277,9 +246,7 @@ test("Windows installer refuses ambiguous online ownership without local listene
   const ambiguousGuard = windowsInstaller.indexOf(
     "GitHub reports the Windows runner online while the expected local Runner.Listener is absent",
   );
-  const configReplace = windowsInstaller.indexOf(
-    "& $configCmd --unattended --url",
-  );
+  const configReplace = windowsInstaller.indexOf("& $configCmd --unattended --url");
   expect(ambiguousGuard).toBeGreaterThan(-1);
   expect(configReplace).toBeGreaterThan(ambiguousGuard);
 });
@@ -290,21 +257,14 @@ test("supervisor requires the ambiguous-ownership Windows guard", () => {
   );
 });
 
-
 test("Windows installer recycles only a proven-idle offline registration", () => {
   expect(windowsInstaller).toContain("function Get-ActiveRunnerAssignments");
   expect(windowsInstaller).toContain(
     "Windows runner remained offline after the bounded restart with no Worker, busy flag, or active assignment.",
   );
-  expect(windowsInstaller).toContain(
-    "if ([string]$registered.status -ne 'offline')",
-  );
-  expect(windowsInstaller).toContain(
-    "if ([bool]$registered.busy)",
-  );
-  expect(windowsInstaller).toContain(
-    "$assignments = @(Get-ActiveRunnerAssignments)",
-  );
+  expect(windowsInstaller).toContain("if ([string]$registered.status -ne 'offline')");
+  expect(windowsInstaller).toContain("if ([bool]$registered.busy)");
+  expect(windowsInstaller).toContain("$assignments = @(Get-ActiveRunnerAssignments)");
   expect(windowsInstaller).toContain(
     "Failed to remove proven-idle stale offline Windows runner registration",
   );
@@ -336,17 +296,10 @@ test("supervisor requires guarded offline Windows recycle markers", () => {
   );
 });
 
-
 test("Windows stale-registration delete captures native stderr and waits for visibility", () => {
-  expect(windowsInstaller).toContain(
-    "$priorErrorActionPreference = $ErrorActionPreference",
-  );
-  expect(windowsInstaller).toContain(
-    "$ErrorActionPreference = 'Continue'",
-  );
-  expect(windowsInstaller).toContain(
-    "$deleteExit = [int]$LASTEXITCODE",
-  );
+  expect(windowsInstaller).toContain("$priorErrorActionPreference = $ErrorActionPreference");
+  expect(windowsInstaller).toContain("$ErrorActionPreference = 'Continue'");
+  expect(windowsInstaller).toContain("$deleteExit = [int]$LASTEXITCODE");
   expect(windowsInstaller).toContain(
     "for ($disappearAttempt = 1; $disappearAttempt -le 6; $disappearAttempt++)",
   );
@@ -361,20 +314,15 @@ test("supervisor requires hardened Windows deletion visibility guard", () => {
   );
 });
 
-
 test("Windows installer re-proves exact registration identity and state before delete", () => {
-  expect(windowsInstaller).toContain(
-    "$deleteCandidateId = [long]$registered.id",
-  );
+  expect(windowsInstaller).toContain("$deleteCandidateId = [long]$registered.id");
   expect(windowsInstaller).toContain(
     "Windows runner registration disappeared before guarded stale-offline deletion; refusing to delete by stale ID.",
   );
   expect(windowsInstaller).toContain(
     "Windows runner registration identity changed before guarded deletion",
   );
-  expect(windowsInstaller).toContain(
-    "Windows runner state changed before guarded deletion",
-  );
+  expect(windowsInstaller).toContain("Windows runner state changed before guarded deletion");
 
   const stateReproof = windowsInstaller.indexOf(
     "Windows runner state changed before guarded deletion",
@@ -387,11 +335,8 @@ test("Windows installer re-proves exact registration identity and state before d
 });
 
 test("supervisor requires immediate Windows deletion state reproof", () => {
-  expect(supervisor).toContain(
-    "Windows runner state changed before guarded deletion",
-  );
+  expect(supervisor).toContain("Windows runner state changed before guarded deletion");
 });
-
 
 test("Windows installer proves no busy flag or active assignment before listener restart", () => {
   expect(windowsInstaller).toContain(
@@ -431,7 +376,9 @@ test("Linux runner recovery starts only an existing stopped Podman machine and p
   expect(linuxLauncher).toContain("function Ensure-PodmanMachineReady");
   expect(linuxLauncher).toContain("machine list --format json");
   expect(linuxLauncher).toContain("if (-not [bool]$machine.Running)");
-  expect(linuxLauncher).toContain("Remove-Item Env:RUNNER_TRACKING_ID -ErrorAction SilentlyContinue");
+  expect(linuxLauncher).toContain(
+    "Remove-Item Env:RUNNER_TRACKING_ID -ErrorAction SilentlyContinue",
+  );
   expect(linuxLauncher).toContain("& $podman machine start $PodmanMachine");
   expect(linuxLauncher).toContain("for ($attempt = 1; $attempt -le 30; $attempt++)");
   expect(linuxLauncher).not.toContain("podman machine stop");
