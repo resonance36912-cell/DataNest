@@ -182,6 +182,26 @@ function Ensure-WindowsGitHubRunner {
     }
 
     try {
+        $installerSource = Get-Content -Raw -LiteralPath $installer -ErrorAction Stop
+        $requiredWindowsMarkers = @(
+            'function Get-LocalRunnerWorker',
+            'Multiple GitHub runner registrations found for $RunnerName; refusing automatic recovery.',
+            'GitHub runner registration is missing while Runner.Worker PID',
+            'RONSAS Windows runner process is running locally but GitHub did not report it online within the bounded verification window.'
+        )
+        foreach ($marker in $requiredWindowsMarkers) {
+            if (-not $installerSource.Contains($marker)) {
+                $script:windowsRunnerFailures++
+                $delay = [math]::Min(
+                    [int]$Config.autonomy.maxRestartBackoffSeconds,
+                    [int](60 * [math]::Pow(2, [math]::Min($script:windowsRunnerFailures - 1, 5)))
+                )
+                $script:nextWindowsRunnerAttempt = (Get-Date).AddSeconds($delay)
+                Log ("Windows GitHub runner recovery authority is stale; missing safeguard marker '$marker'. Retry in $delay seconds.")
+                return
+            }
+        }
+
         $output = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer 2>&1)
         $exitCode = [int]$LASTEXITCODE
         if ($exitCode -eq 0) {
