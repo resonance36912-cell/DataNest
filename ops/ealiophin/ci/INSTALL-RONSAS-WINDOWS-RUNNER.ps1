@@ -15,8 +15,6 @@ if ($Repository -ne 'resonance36912-cell/RONSAS') {
 }
 
 $gh = (Get-Command gh.exe -ErrorAction Stop).Source
-$null = (Get-Command git.exe -ErrorAction Stop).Source
-
 & $gh auth status *> $null
 if ($LASTEXITCODE -ne 0) { throw 'GitHub CLI is not authenticated.' }
 
