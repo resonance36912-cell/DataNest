@@ -223,3 +223,28 @@ test("supervisor refuses stale Windows recovery authority before execution", () 
 test("Windows runner installer has no unrelated Git CLI dependency", () => {
   expect(windowsInstaller).not.toContain("Get-Command git.exe");
 });
+
+
+test("Windows installer refuses ambiguous online ownership without local listener", () => {
+  expect(windowsInstaller).toContain(
+    "GitHub reports the Windows runner online while the expected local Runner.Listener is absent",
+  );
+  expect(windowsInstaller).toContain(
+    "refusing automatic restart or replacement until ownership is unambiguous.",
+  );
+
+  const ambiguousGuard = windowsInstaller.indexOf(
+    "GitHub reports the Windows runner online while the expected local Runner.Listener is absent",
+  );
+  const configReplace = windowsInstaller.indexOf(
+    "& $configCmd --unattended --url",
+  );
+  expect(ambiguousGuard).toBeGreaterThan(-1);
+  expect(configReplace).toBeGreaterThan(ambiguousGuard);
+});
+
+test("supervisor requires the ambiguous-ownership Windows guard", () => {
+  expect(supervisor).toContain(
+    "GitHub reports the Windows runner online while the expected local Runner.Listener is absent",
+  );
+});
