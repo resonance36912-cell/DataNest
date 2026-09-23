@@ -45,6 +45,40 @@ function Get-GitHubRunnerRegistration {
     return ($matches | Select-Object -First 1)
 }
 
+function Get-ActiveRunnerAssignments {
+    $runsRaw = @(& $gh api "repos/$Repository/actions/runs?per_page=100" 2>&1)
+    if ($LASTEXITCODE -ne 0) { throw 'Unable to query GitHub workflow runs for Windows runner assignment proof.' }
+    $runsPayload = ($runsRaw -join [Environment]::NewLine) | ConvertFrom-Json
+    $activeRunStates = @('queued','pending','waiting','requested','in_progress')
+    $activeJobStates = @('queued','in_progress')
+    $assignments = @()
+
+    foreach ($run in @($runsPayload.workflow_runs | Where-Object {
+        $activeRunStates -contains [string]$_.status
+    })) {
+        $jobsRaw = @(& $gh api "repos/$Repository/actions/runs/$($run.id)/jobs?filter=latest&per_page=100" 2>&1)
+        if ($LASTEXITCODE -ne 0) { throw "Unable to query jobs for workflow run $($run.id)." }
+        $jobsPayload = ($jobsRaw -join [Environment]::NewLine) | ConvertFrom-Json
+        foreach ($job in @($jobsPayload.jobs)) {
+            if (
+                [string]$job.runner_name -eq $RunnerName -and
+                $activeJobStates -contains [string]$job.status
+            ) {
+                $assignments += [pscustomobject]@{
+                    run_id = [long]$run.id
+                    run_name = [string]$run.name
+                    branch = [string]$run.head_branch
+                    job_id = [long]$job.id
+                    job_name = [string]$job.name
+                    job_status = [string]$job.status
+                }
+            }
+        }
+    }
+
+    return @($assignments)
+}
+
 function Get-RunnerReleaseAsset {
     $tag = "v$RunnerVersion"
     $release = & $gh api "repos/actions/runner/releases/tags/$tag" | ConvertFrom-Json
@@ -169,7 +203,97 @@ if (-not $online) {
     if ($worker) {
         throw "Windows runner stayed offline in GitHub while Runner.Worker PID $($worker.ProcessId) became active; refusing further recovery."
     }
-    throw 'RONSAS Windows runner process is running locally but GitHub did not report it online within the bounded verification window.'
+
+    $registered = Get-GitHubRunnerRegistration
+    if (-not $registered) {
+        throw 'Windows runner failed to come online and its GitHub registration disappeared during verification; refusing automatic recycle without a fresh local pass.'
+    }
+    if ([string]$registered.status -ne 'offline') {
+        throw "Windows runner failed to come online but GitHub registration status is '$($registered.status)'; refusing automatic recycle."
+    }
+    if ([bool]$registered.busy) {
+        throw 'Windows runner failed to come online but GitHub still reports busy=true; refusing automatic recycle.'
+    }
+
+    $assignments = @(Get-ActiveRunnerAssignments)
+    if ($assignments.Count -gt 0) {
+        $summary = ($assignments | Select-Object -First 10 | ForEach-Object {
+            "$($_.run_id):$($_.run_name):$($_.job_id):$($_.job_name):$($_.job_status)"
+        }) -join ', '
+        throw "Windows runner failed to come online but GitHub still reports active assignment(s): $summary"
+    }
+
+    Write-Warning "Windows runner remained offline after the bounded restart with no Worker, busy flag, or active assignment. Recycling only the stale offline registration id=$($registered.id)."
+    Stop-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+    Start-Sleep -Seconds 2
+
+    $running = Get-LocalRunnerListener
+    if ($running) {
+        Stop-Process -Id $running.ProcessId -Force -ErrorAction Stop
+        Start-Sleep -Seconds 2
+    }
+    $worker = Get-LocalRunnerWorker
+    if ($worker) {
+        throw "Runner.Worker PID $($worker.ProcessId) appeared before stale offline registration recycle; refusing deletion."
+    }
+    $assignments = @(Get-ActiveRunnerAssignments)
+    if ($assignments.Count -gt 0) {
+        throw 'GitHub assigned work to the Windows runner before stale offline registration recycle; refusing deletion.'
+    }
+
+    $deleteOutput = @(& $gh api -X DELETE "repos/$Repository/actions/runners/$($registered.id)" 2>&1)
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to remove proven-idle stale offline Windows runner registration: $($deleteOutput -join [Environment]::NewLine)"
+    }
+
+    $registered = Get-GitHubRunnerRegistration
+    if ($registered) {
+        throw 'Windows runner registration still exists after stale offline deletion; refusing local re-registration.'
+    }
+
+    if (Test-Path -LiteralPath $runnerConfig -PathType Leaf) {
+        Remove-Item -LiteralPath $runnerConfig -Force -ErrorAction Stop
+    }
+    if (Test-Path -LiteralPath $runnerConfig -PathType Leaf) {
+        throw 'Stale local Windows runner .runner marker remained after offline registration deletion.'
+    }
+
+    $token = (& $gh api -X POST "repos/$Repository/actions/runners/registration-token" --jq .token).Trim()
+    if ([string]::IsNullOrWhiteSpace($token)) { throw 'Unable to obtain GitHub runner registration token after stale offline recycle.' }
+    try {
+        Push-Location $RunnerRoot
+        & $configCmd --unattended --url "https://github.com/$Repository" --token $token --name $RunnerName --labels 'ronsas,ealiophin,production-host' --work '_work' --replace
+        if ($LASTEXITCODE -ne 0) { throw 'GitHub Actions Windows runner re-registration failed after stale offline recycle.' }
+    } finally {
+        $token = $null
+        Pop-Location
+    }
+
+    Start-ScheduledTask -TaskName $TaskName
+    Start-Sleep -Seconds 5
+    $running = Get-LocalRunnerListener
+    if (-not $running) {
+        throw 'RONSAS Windows runner did not stay running after stale offline re-registration.'
+    }
+
+    $online = $false
+    $registered = $null
+    for ($retryAttempt = 1; $retryAttempt -le 12; $retryAttempt++) {
+        $registered = Get-GitHubRunnerRegistration
+        if ($registered -and [string]$registered.status -eq 'online') {
+            $online = $true
+            break
+        }
+        Write-Host "Waiting for re-registered Windows runner to become online; attempt $retryAttempt/12."
+        Start-Sleep -Seconds 5
+    }
+    if (-not $online) {
+        $worker = Get-LocalRunnerWorker
+        if ($worker) {
+            throw "Re-registered Windows runner stayed offline while Runner.Worker PID $($worker.ProcessId) became active; refusing further recovery."
+        }
+        throw 'RONSAS Windows runner still did not become online after one guarded stale-offline registration recycle.'
+    }
 }
 
 Write-Host "RONSAS Windows runner online: $RunnerName (PID $($running.ProcessId), GitHub busy=$($registered.busy))" -ForegroundColor Green
