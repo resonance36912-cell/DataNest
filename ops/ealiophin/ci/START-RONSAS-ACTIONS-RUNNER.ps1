@@ -78,7 +78,6 @@ function Ensure-PodmanMachineReady {
     throw "Existing Podman machine did not become ready within the bounded wait: $PodmanMachine"
 }
 
-
 function Test-PodmanVmHttps {
     $priorErrorActionPreference = $ErrorActionPreference
     $exitCode = 1
@@ -1164,25 +1163,37 @@ Write-Host "RONSAS Actions runner online: $RunnerName on $Network" -ForegroundCo
 Write-Host "Container: $Container | Image: $Image | Proxy: $Proxy"
 ) { continue }
 
-        $forcedHealthy = Test-PodmanVmInterfaceHttps $iface
-        Write-Host "Podman mirrored-route candidate alias=$alias iface=$iface state=$($route.State) forcedHttps=$forcedHealthy"
-        if (-not $forcedHealthy) { continue }
+        $healthy = Test-PodmanVmInterfaceHttps $iface
+        Write-Host "Podman mirrored route probe: host=$alias address=$hostAddress gateway=$gateway guest=$iface healthy=$healthy"
+        if (-not $healthy) { continue }
 
-        & wsl.exe -d $PodmanMachine -u root -- sh -lc "ip route replace default via $gateway dev $iface metric 5"
-        if ($LASTEXITCODE -ne 0) {
-            throw "Failed to prefer proven healthy mirrored Podman VM route: alias=$alias iface=$iface"
+        $existingPreferred = @(& wsl.exe -d $PodmanMachine -u root -- sh -lc "ip -4 route show default | grep -F 'via $gateway dev $iface metric 5'" 2>$null)
+        $addedPreferredRoute = ($LASTEXITCODE -ne 0 -or $existingPreferred.Count -eq 0)
+        if ($addedPreferredRoute) {
+            & wsl.exe -d $PodmanMachine -u root -- sh -lc "ip route replace default via $gateway dev $iface metric 5"
+            if ($LASTEXITCODE -ne 0) {
+                throw "Failed to prefer proven healthy mirrored Podman VM route via $iface."
+            }
         }
 
         Start-Sleep -Seconds 2
         if (Test-PodmanVmHttps) {
-            Write-Host "Podman VM HTTPS egress restored through proven healthy mirrored route: alias=$alias iface=$iface metric=5" -ForegroundColor Green
+            Write-Host "Podman VM HTTPS egress restored through mirrored route $iface metric 5." -ForegroundColor Green
             return
         }
 
-        throw "Podman VM HTTPS remained unavailable after preferring proven healthy mirrored route: alias=$alias iface=$iface"
+        if ($addedPreferredRoute) {
+            $priorErrorActionPreference = $ErrorActionPreference
+            try {
+                $ErrorActionPreference = 'Continue'
+                & wsl.exe -d $PodmanMachine -u root -- sh -lc "ip route del default via $gateway dev $iface metric 5" 2>$null
+            } finally {
+                $ErrorActionPreference = $priorErrorActionPreference
+            }
+        }
     }
 
-    throw 'Podman VM HTTPS is unavailable and no existing non-dead mirrored host route passed the forced-interface HTTPS proof.'
+    throw 'Podman VM HTTPS egress remains unavailable after testing existing non-dead mirrored host routes; refusing broader adapter, firewall, VPN, or WSL mutation.'
 }
 
 function Test-CiHttpsEgress {
