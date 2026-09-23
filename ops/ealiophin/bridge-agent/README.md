@@ -20,13 +20,18 @@ This connector is the Windows-side execution boundary for the shared ChatGPT/RON
 4. Set process/user environment variables:
    - `SUPABASE_URL`
    - `SUPABASE_PUBLISHABLE_KEY`
-   - `RONSAS_BRIDGE_ACCESS_TOKEN`
+   - Bootstrap one connector credential:
+     - recommended: `RONSAS_BRIDGE_REFRESH_TOKEN` for the dedicated non-admin connector user; or
+     - compatibility: `RONSAS_BRIDGE_ACCESS_TOKEN`.
+   - Optional: `RONSAS_BRIDGE_REFRESH_TOKEN_FILE` to override the encrypted refresh-token store path.
 5. Run:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\bridge-agent.ps1
 ```
 
-The v1 connector uses an authenticated Supabase bearer token. For unattended service operation, the next hardening step is a connector-specific refresh flow or device credential exchange so an expiring human session token is not the long-term credential.
+When a refresh token is available, the connector refreshes an expired access token and retries the failed RPC once. Rotated refresh tokens are persisted with Windows DPAPI using `Export-Clixml`; the default store is `%LOCALAPPDATA%\Resonance\RONSAS\bridge-agent-refresh-token.xml`. The bootstrap refresh-token environment variable is used only when that protected store does not yet exist.
+
+Use a dedicated Supabase Auth user whose ID matches `bridge_devices.connector_user_id`. Do not use a personal admin session or service-role credential for the Windows connector.
 
 Do not run this process elevated. Use a dedicated non-admin Windows account with NTFS access only to the configured workspaces.
