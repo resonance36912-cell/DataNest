@@ -350,3 +350,38 @@ test("supervisor requires immediate Windows deletion state reproof", () => {
     "Windows runner state changed before guarded deletion",
   );
 });
+
+
+test("Windows installer proves no busy flag or active assignment before listener restart", () => {
+  expect(windowsInstaller).toContain(
+    "Runner.Listener exists while GitHub reports the Windows runner busy=true",
+  );
+  expect(windowsInstaller).toContain(
+    "Runner.Listener exists while GitHub reports active assignment(s) for the Windows runner; refusing automatic restart",
+  );
+  expect(windowsInstaller).toContain(
+    "restarting only after Worker, busy, and assignment checks proved idle.",
+  );
+
+  const busyGuard = windowsInstaller.indexOf(
+    "Runner.Listener exists while GitHub reports the Windows runner busy=true",
+  );
+  const assignmentGuard = windowsInstaller.indexOf(
+    "Runner.Listener exists while GitHub reports active assignment(s) for the Windows runner; refusing automatic restart",
+  );
+  const stopTask = windowsInstaller.indexOf(
+    "Stop-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue",
+  );
+  expect(busyGuard).toBeGreaterThan(-1);
+  expect(assignmentGuard).toBeGreaterThan(busyGuard);
+  expect(stopTask).toBeGreaterThan(assignmentGuard);
+});
+
+test("supervisor requires Windows busy and assignment restart guards", () => {
+  expect(supervisor).toContain(
+    "Runner.Listener exists while GitHub reports the Windows runner busy=true",
+  );
+  expect(supervisor).toContain(
+    "Runner.Listener exists while GitHub reports active assignment(s) for the Windows runner; refusing automatic restart",
+  );
+});
