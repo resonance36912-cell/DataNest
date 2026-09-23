@@ -163,7 +163,9 @@ test("Windows installer can re-register when GitHub registration is missing", ()
   );
   expect(windowsInstaller).toContain("function Remove-StaleLocalRunnerConfiguration");
   expect(windowsInstaller).toContain("if (-not $registered -and $hasLocalRunnerConfig)");
-  expect(windowsInstaller).toContain("GitHub runner registration is missing while Runner.Worker PID");
+  expect(windowsInstaller).toContain(
+    "GitHub runner registration is missing while Runner.Worker PID",
+  );
   expect(windowsInstaller).toContain(
     "Cleared stale local primary/migrated runner configuration after GitHub registration was proven missing.",
   );
@@ -185,7 +187,9 @@ test("Windows installer clears migrated settings and credentials before guarded 
   expect(windowsInstaller).toContain("'.runner_migrated'");
   expect(windowsInstaller).toContain("'.credentials_migrated'");
   expect(windowsInstaller).toContain("'.credentials_rsaparams'");
-  expect(windowsInstaller).toContain("Stale local Windows runner configuration remained after cleanup");
+  expect(windowsInstaller).toContain(
+    "Stale local Windows runner configuration remained after cleanup",
+  );
   expect(windowsInstaller).toContain(
     "Cleared stale local primary/migrated runner configuration after guarded GitHub registration deletion.",
   );
@@ -270,9 +274,7 @@ test("Windows installer recycles only a proven-idle offline registration", () =>
     "RONSAS Windows runner still did not become online after one guarded stale-offline registration recycle.",
   );
 
-  const firstVerify = windowsInstaller.indexOf(
-    "for ($attempt = 1; $attempt -le 12; $attempt++)",
-  );
+  const firstVerify = windowsInstaller.indexOf("for ($attempt = 1; $attempt -le 12; $attempt++)");
   const deleteRegistration = windowsInstaller.indexOf(
     '& $gh api -X DELETE "repos/$Repository/actions/runners/$($registered.id)"',
   );
