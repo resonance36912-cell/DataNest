@@ -201,7 +201,11 @@ def main() -> int:
                             "AttachStdout": True,
                             "AttachStderr": True,
                             "Tty": True,
-                            "Cmd": ["pg_isready", "-U", "postgres", "-d", "postgres"],
+                            "Cmd": [
+                                "sh",
+                                "-ec",
+                                'test "$(cat /proc/1/comm)" = "postgres" && exec pg_isready -U postgres -d postgres',
+                            ],
                         },
                     ).decode("utf-8")
                 )

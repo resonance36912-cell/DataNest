@@ -243,7 +243,7 @@ AS $$
 DECLARE
   job_row public.bridge_jobs;
 BEGIN
-  IF auth.uid() IS NULL OR NOT public.has_role('admin'::public.app_role, auth.uid()) THEN
+  IF auth.uid() IS NULL OR NOT public.has_role(auth.uid(), 'admin'::public.app_role) THEN
     RAISE EXCEPTION 'bridge_admin_required';
   END IF;
 

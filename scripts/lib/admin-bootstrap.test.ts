@@ -175,14 +175,23 @@ describe("first-admin bootstrap security regressions", () => {
     expect(functionsSource).not.toMatch(/context\.claims|user_metadata/);
   });
 
-  test("keeps ADMIN_BOOTSTRAP_EMAILS in the server-function module only", () => {
+  test("keeps ADMIN_BOOTSTRAP_EMAILS in server-function modules only", () => {
     const references = sourceFiles(resolve(ROOT, "src"))
       .filter((file) => readFileSync(file, "utf8").includes("ADMIN_BOOTSTRAP_EMAILS"))
-      .map((file) => relative(ROOT, file).replaceAll("\\", "/"));
+      .map((file) => relative(ROOT, file).replaceAll("\\", "/"))
+      .sort();
 
-    expect(references).toEqual(["src/lib/admin-bootstrap.functions.ts"]);
+    expect(references).toEqual([
+      "src/lib/admin-bootstrap.functions.ts",
+      "src/lib/rnd-control.functions.ts",
+    ]);
+    expect(references.every((file) => file.endsWith(".functions.ts"))).toBe(true);
     expect(functionsSource).toContain("process.env.ADMIN_BOOTSTRAP_EMAILS");
     expect(functionsSource).not.toContain("VITE_ADMIN_BOOTSTRAP_EMAILS");
+    expect(read("src/lib/rnd-control.functions.ts")).toContain(
+      "process.env.RONSAS_RND_ALLOWED_EMAILS ?? process.env.ADMIN_BOOTSTRAP_EMAILS",
+    );
+    expect(read("src/lib/rnd-control.functions.ts")).not.toContain("VITE_ADMIN_BOOTSTRAP_EMAILS");
   });
 
   test("rechecks eligibility inside POST before invoking the atomic RPC", () => {

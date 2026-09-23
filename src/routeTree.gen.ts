@@ -35,6 +35,7 @@ import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
 import { Route as AdminWebhooksRouteImport } from './routes/admin.webhooks'
 import { Route as AdminSecurityScanRouteImport } from './routes/admin.security-scan'
 import { Route as AdminRopRouteImport } from './routes/admin.rop'
+import { Route as AdminRndRouteImport } from './routes/admin.rnd'
 import { Route as AdminRevenueRouteImport } from './routes/admin.revenue'
 import { Route as AdminRepoHealthRouteImport } from './routes/admin.repo-health'
 import { Route as AdminPayfastAuditRouteImport } from './routes/admin.payfast-audit'
@@ -205,6 +206,11 @@ const AdminSecurityScanRoute = AdminSecurityScanRouteImport.update({
 const AdminRopRoute = AdminRopRouteImport.update({
   id: '/admin/rop',
   path: '/admin/rop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRndRoute = AdminRndRouteImport.update({
+  id: '/admin/rnd',
+  path: '/admin/rnd',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRevenueRoute = AdminRevenueRouteImport.update({
@@ -460,6 +466,7 @@ export interface FileRoutesByFullPath {
   '/admin/repo-health': typeof AdminRepoHealthRoute
   '/admin/revenue': typeof AdminRevenueRoute
   '/admin/rop': typeof AdminRopRoute
+  '/admin/rnd': typeof AdminRndRoute
   '/admin/security-scan': typeof AdminSecurityScanRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
@@ -529,6 +536,7 @@ export interface FileRoutesByTo {
   '/admin/repo-health': typeof AdminRepoHealthRoute
   '/admin/revenue': typeof AdminRevenueRoute
   '/admin/rop': typeof AdminRopRoute
+  '/admin/rnd': typeof AdminRndRoute
   '/admin/security-scan': typeof AdminSecurityScanRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
@@ -599,6 +607,7 @@ export interface FileRoutesById {
   '/admin/repo-health': typeof AdminRepoHealthRoute
   '/admin/revenue': typeof AdminRevenueRoute
   '/admin/rop': typeof AdminRopRoute
+  '/admin/rnd': typeof AdminRndRoute
   '/admin/security-scan': typeof AdminSecurityScanRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
@@ -878,6 +887,7 @@ export interface RootRouteChildren {
   AdminRepoHealthRoute: typeof AdminRepoHealthRoute
   AdminRevenueRoute: typeof AdminRevenueRoute
   AdminRopRoute: typeof AdminRopRoute
+  AdminRndRoute: typeof AdminRndRoute
   AdminSecurityScanRoute: typeof AdminSecurityScanRoute
   AdminWebhooksRoute: typeof AdminWebhooksRoute
   CreativeStudioPricingRoute: typeof CreativeStudioPricingRoute
@@ -1097,6 +1107,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/rop'
       fullPath: '/admin/rop'
       preLoaderRoute: typeof AdminRopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/rnd': {
+      id: '/admin/rnd'
+      path: '/admin/rnd'
+      fullPath: '/admin/rnd'
+      preLoaderRoute: typeof AdminRndRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/revenue': {
@@ -1447,6 +1464,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRepoHealthRoute: AdminRepoHealthRoute,
   AdminRevenueRoute: AdminRevenueRoute,
   AdminRopRoute: AdminRopRoute,
+  AdminRndRoute: AdminRndRoute,
   AdminSecurityScanRoute: AdminSecurityScanRoute,
   AdminWebhooksRoute: AdminWebhooksRoute,
   CreativeStudioPricingRoute: CreativeStudioPricingRoute,

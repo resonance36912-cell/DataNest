@@ -1,0 +1,94 @@
+name: Probe R&D production control readiness
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/probe-rnd-production-control.yml"
+      - "src/lib/rnd-control.functions.ts"
+      - "src/routes/admin.rnd.tsx"
+      - "supabase/migrations/20260922071500_bridge_execution_core.sql"
+      - "supabase/migrations/20260923203500_rnd_control_center_hardening.sql"
+      - "ops/ealiophin/control-center/RONS-RnD-Agent.ps1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: probe-rnd-production-control-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    name: R&D production control readiness
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 5
+    steps:
+      - name: Inspect production Hub environment without exposing secrets
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $envFile='C:\Resonance\Sources\ronsas-hub-canonical\.env.local'
+          if(-not (Test-Path -LiteralPath $envFile -PathType Leaf)){
+            throw "Production Hub environment file is missing: $envFile"
+          }
+
+          $pairs=@{}
+          foreach($line in Get-Content -LiteralPath $envFile){
+            $trim=[string]$line
+            if([string]::IsNullOrWhiteSpace($trim) -or $trim.TrimStart().StartsWith('#')){continue}
+            $i=$trim.IndexOf('=')
+            if($i -lt 1){continue}
+            $key=$trim.Substring(0,$i).Trim()
+            $value=$trim.Substring($i+1).Trim().Trim('"').Trim("'")
+            $pairs[$key]=$value
+          }
+
+          $supabaseUrl=[string]$pairs['SUPABASE_URL']
+          if([string]::IsNullOrWhiteSpace($supabaseUrl)){
+            throw 'SUPABASE_URL is absent from the production Hub environment.'
+          }
+          $uri=[Uri]$supabaseUrl
+          $projectRef=($uri.Host -split '\.')[0]
+          if($projectRef -notmatch '^[a-z0-9]{20}$'){
+            throw "Unexpected production Supabase hostname: $($uri.Host)"
+          }
+
+          $viteSupabaseUrl=[string]$pairs['VITE_SUPABASE_URL']
+          $viteProjectRef=''
+          if(-not [string]::IsNullOrWhiteSpace($viteSupabaseUrl)){
+            $viteUri=[Uri]$viteSupabaseUrl
+            $viteProjectRef=($viteUri.Host -split '\.')[0]
+          }
+
+          $serviceRolePresent=-not [string]::IsNullOrWhiteSpace([string]$pairs['SUPABASE_SERVICE_ROLE_KEY'])
+          $serverPublishablePresent=-not [string]::IsNullOrWhiteSpace([string]$pairs['SUPABASE_PUBLISHABLE_KEY'])
+          $vitePublishablePresent=-not [string]::IsNullOrWhiteSpace([string]$pairs['VITE_SUPABASE_PUBLISHABLE_KEY'])
+          $rndAllowlistPresent=-not [string]::IsNullOrWhiteSpace([string]$pairs['RONSAS_RND_ALLOWED_EMAILS'])
+          $adminBootstrapAllowlistPresent=-not [string]::IsNullOrWhiteSpace([string]$pairs['ADMIN_BOOTSTRAP_EMAILS'])
+          $backendProvider=[string]$pairs['RESONANCE_BACKEND_PROVIDER']
+          $clientServerRefMatch=(
+            -not [string]::IsNullOrWhiteSpace($viteProjectRef) -and
+            [string]::Equals($projectRef,$viteProjectRef,[StringComparison]::Ordinal)
+          )
+
+          Write-Host "RND_PRODUCTION_SUPABASE_REF=$projectRef"
+          Write-Host "RND_PRODUCTION_VITE_SUPABASE_REF=$viteProjectRef"
+          Write-Host "RND_PRODUCTION_CLIENT_SERVER_REF_MATCH=$clientServerRefMatch"
+          Write-Host "RND_PRODUCTION_SERVER_PUBLISHABLE_PRESENT=$serverPublishablePresent"
+          Write-Host "RND_PRODUCTION_VITE_PUBLISHABLE_PRESENT=$vitePublishablePresent"
+          Write-Host "RND_PRODUCTION_SERVICE_ROLE_PRESENT=$serviceRolePresent"
+          Write-Host "RND_PRODUCTION_ALLOWLIST_PRESENT=$rndAllowlistPresent"
+          Write-Host "RND_PRODUCTION_ADMIN_BOOTSTRAP_ALLOWLIST_PRESENT=$adminBootstrapAllowlistPresent"
+          Write-Host "RND_PRODUCTION_BACKEND_PROVIDER=$backendProvider"
+
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value "### R&D production control readiness"
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value ("- Server Supabase project ref: {0}" -f $projectRef)
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value ("- Browser Supabase project ref: {0}" -f $viteProjectRef)
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value ("- Browser/server project match: {0}" -f $clientServerRefMatch)
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value ("- Server publishable key configured: {0}" -f $serverPublishablePresent)
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value ("- Browser publishable key configured: {0}" -f $vitePublishablePresent)
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value ("- Service role configured: {0}" -f $serviceRolePresent)
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value ("- Explicit R&D email allowlist configured: {0}" -f $rndAllowlistPresent)
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value ("- Existing admin bootstrap allowlist configured: {0}" -f $adminBootstrapAllowlistPresent)
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value ("- Backend provider: {0}" -f $backendProvider)

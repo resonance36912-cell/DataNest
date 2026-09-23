@@ -1341,6 +1341,229 @@ export type Database = {
         };
         Relationships: [];
       };
+      bridge_audit_events: {
+        Row: {
+          actor_user_id: string | null;
+          client_id: string | null;
+          created_at: string;
+          device_id: string | null;
+          event_type: string;
+          id: number;
+          job_id: string | null;
+          payload: Json;
+        };
+        Insert: {
+          actor_user_id?: string | null;
+          client_id?: string | null;
+          created_at?: string;
+          device_id?: string | null;
+          event_type: string;
+          id?: number;
+          job_id?: string | null;
+          payload?: Json;
+        };
+        Update: {
+          actor_user_id?: string | null;
+          client_id?: string | null;
+          created_at?: string;
+          device_id?: string | null;
+          event_type?: string;
+          id?: number;
+          job_id?: string | null;
+          payload?: Json;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "bridge_audit_events_device_id_fkey";
+            columns: ["device_id"];
+            isOneToOne: false;
+            referencedRelation: "bridge_devices";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "bridge_audit_events_job_id_fkey";
+            columns: ["job_id"];
+            isOneToOne: false;
+            referencedRelation: "bridge_jobs";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      bridge_devices: {
+        Row: {
+          connector_user_id: string;
+          created_at: string;
+          display_name: string;
+          enabled: boolean;
+          id: string;
+          last_seen_at: string | null;
+          metadata: Json;
+          platform: string;
+          slug: string;
+          updated_at: string;
+        };
+        Insert: {
+          connector_user_id: string;
+          created_at?: string;
+          display_name: string;
+          enabled?: boolean;
+          id?: string;
+          last_seen_at?: string | null;
+          metadata?: Json;
+          platform: string;
+          slug: string;
+          updated_at?: string;
+        };
+        Update: {
+          connector_user_id?: string;
+          created_at?: string;
+          display_name?: string;
+          enabled?: boolean;
+          id?: string;
+          last_seen_at?: string | null;
+          metadata?: Json;
+          platform?: string;
+          slug?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      bridge_jobs: {
+        Row: {
+          approval_required: boolean;
+          cancel_requested: boolean;
+          client_id: string | null;
+          completed_at: string | null;
+          created_at: string;
+          device_id: string;
+          error: string | null;
+          id: string;
+          payload: Json;
+          result: Json | null;
+          started_at: string | null;
+          status: Database["public"]["Enums"]["bridge_job_status"];
+          tool_name: string;
+          user_id: string;
+          workspace: string | null;
+        };
+        Insert: {
+          approval_required?: boolean;
+          cancel_requested?: boolean;
+          client_id?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          device_id: string;
+          error?: string | null;
+          id?: string;
+          payload?: Json;
+          result?: Json | null;
+          started_at?: string | null;
+          status: Database["public"]["Enums"]["bridge_job_status"];
+          tool_name: string;
+          user_id: string;
+          workspace?: string | null;
+        };
+        Update: {
+          approval_required?: boolean;
+          cancel_requested?: boolean;
+          client_id?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          device_id?: string;
+          error?: string | null;
+          id?: string;
+          payload?: Json;
+          result?: Json | null;
+          started_at?: string | null;
+          status?: Database["public"]["Enums"]["bridge_job_status"];
+          tool_name?: string;
+          user_id?: string;
+          workspace?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "bridge_jobs_device_id_fkey";
+            columns: ["device_id"];
+            isOneToOne: false;
+            referencedRelation: "bridge_devices";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      bridge_tool_grants: {
+        Row: {
+          approval_required: boolean;
+          client_id: string | null;
+          created_at: string;
+          device_id: string;
+          enabled: boolean;
+          id: string;
+          tool_name: string;
+          user_id: string;
+          workspace_patterns: string[];
+        };
+        Insert: {
+          approval_required?: boolean;
+          client_id?: string | null;
+          created_at?: string;
+          device_id: string;
+          enabled?: boolean;
+          id?: string;
+          tool_name: string;
+          user_id: string;
+          workspace_patterns?: string[];
+        };
+        Update: {
+          approval_required?: boolean;
+          client_id?: string | null;
+          created_at?: string;
+          device_id?: string;
+          enabled?: boolean;
+          id?: string;
+          tool_name?: string;
+          user_id?: string;
+          workspace_patterns?: string[];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "bridge_tool_grants_device_id_fkey";
+            columns: ["device_id"];
+            isOneToOne: false;
+            referencedRelation: "bridge_devices";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      rnd_control_settings: {
+        Row: {
+          emergency_lock: boolean;
+          mutations_enabled_until: string | null;
+          operator_user_id: string | null;
+          recovery_hold: boolean;
+          singleton: boolean;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          emergency_lock?: boolean;
+          mutations_enabled_until?: string | null;
+          operator_user_id?: string | null;
+          recovery_hold?: boolean;
+          singleton?: boolean;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          emergency_lock?: boolean;
+          mutations_enabled_until?: string | null;
+          operator_user_id?: string | null;
+          recovery_hold?: boolean;
+          singleton?: boolean;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -1410,8 +1633,88 @@ export type Database = {
           read_ct: number;
         }[];
       };
+      bridge_approve_job: {
+        Args: { _approved: boolean; _job_id: string };
+        Returns: Json;
+      };
+      bridge_cancel_job: {
+        Args: { _client_id: string; _job_id: string };
+        Returns: Json;
+      };
+      bridge_connector_claim_job: {
+        Args: { _device_id: string };
+        Returns: Json;
+      };
+      bridge_connector_complete_job: {
+        Args: {
+          _device_id: string;
+          _error?: string;
+          _job_id: string;
+          _ok: boolean;
+          _result?: Json;
+        };
+        Returns: undefined;
+      };
+      bridge_connector_heartbeat: {
+        Args: { _device_id: string };
+        Returns: undefined;
+      };
+      bridge_devices_for_caller: {
+        Args: { _client_id?: string };
+        Returns: {
+          display_name: string;
+          id: string;
+          last_seen_at: string;
+          online: boolean;
+          platform: string;
+          slug: string;
+        }[];
+      };
+      bridge_enqueue_job: {
+        Args: {
+          _client_id: string;
+          _device_id: string;
+          _payload?: Json;
+          _tool_name: string;
+          _workspace?: string;
+        };
+        Returns: string;
+      };
+      bridge_job_status: {
+        Args: { _client_id: string; _job_id: string };
+        Returns: Json;
+      };
+      bridge_rnd_admin_approve_job: {
+        Args: { _actor_user_id: string; _job_id: string };
+        Returns: Json;
+      };
+      bridge_rnd_agent_claim_job: {
+        Args: { _device_id: string };
+        Returns: Json;
+      };
+      bridge_rnd_agent_complete_job: {
+        Args: {
+          _device_id: string;
+          _error?: string;
+          _job_id: string;
+          _ok: boolean;
+          _result?: Json;
+        };
+        Returns: undefined;
+      };
+      bridge_rnd_agent_heartbeat: {
+        Args: { _device_id: string; _metadata?: Json };
+        Returns: Json;
+      };
     };
     Enums: {
+      bridge_job_status:
+        | "approval_required"
+        | "queued"
+        | "running"
+        | "succeeded"
+        | "failed"
+        | "cancelled";
       app_role: "admin" | "user";
       hub_app_role: "hub_admin" | "app_owner";
       hub_outcome_verdict: "improved" | "neutral" | "regressed" | "inconclusive";
@@ -1565,6 +1868,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      bridge_job_status: [
+        "approval_required",
+        "queued",
+        "running",
+        "succeeded",
+        "failed",
+        "cancelled",
+      ],
       app_role: ["admin", "user"],
       hub_app_role: ["hub_admin", "app_owner"],
       hub_outcome_verdict: ["improved", "neutral", "regressed", "inconclusive"],
