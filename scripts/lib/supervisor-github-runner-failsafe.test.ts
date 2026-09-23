@@ -86,3 +86,25 @@ test("Windows runner recovery has independent bounded backoff", () => {
     "$script:nextWindowsRunnerAttempt = (Get-Date).AddSeconds($delay)",
   );
 });
+
+
+test("supervisor refuses stale Linux recovery authority before execution", () => {
+  expect(supervisor).toContain("Runner.Worker");
+  expect(supervisor).toContain("Get-ActiveRunnerAssignments");
+  expect(supervisor).toContain(
+    "for ($settleAttempt = 1; $settleAttempt -le 18; $settleAttempt++)",
+  );
+  expect(supervisor).toContain(
+    "ForceRecycle deferred because online runner registration deletion was not proven safe.",
+  );
+  expect(supervisor).toContain(
+    "GitHub runner recovery authority is stale; missing safeguard marker",
+  );
+
+  const markerIndex = supervisor.indexOf("$requiredMarkers = @(");
+  const launchIndex = supervisor.indexOf(
+    "$output = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $startup 2>&1)",
+  );
+  expect(markerIndex).toBeGreaterThan(-1);
+  expect(launchIndex).toBeGreaterThan(markerIndex);
+});
