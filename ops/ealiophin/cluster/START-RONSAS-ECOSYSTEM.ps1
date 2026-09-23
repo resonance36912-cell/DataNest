@@ -104,7 +104,7 @@ function Assert-KnownPort([string]$Name, [int]$Port, [string]$Expected) {
     Write-Host "[SAFE REUSE] $Name PID $listenerPid verified by loopback endpoint fingerprint (command line unavailable)." -ForegroundColor Yellow
     return [pscustomobject]@{ pid=$listenerPid; owned=$false; command=''; identity='loopback-endpoint-fingerprint' }
 }
-function Start-ViteApp([string]$Name, [string]$Dir, [int]$Port, [string]$Mode, [string]$BindAddress) {
+function Start-ViteApp([string]$Name, [string]$Dir, [int]$Port, [string]$Mode, [string]$BindAddress, [string]$ConfigLoader = '') {
     $url = if ($BindAddress -eq '0.0.0.0') { "http://127.0.0.1:$Port/" } else { "http://$BindAddress`:$Port/" }
     $existing = Assert-KnownPort $Name $Port $Dir
     if ($existing) {
@@ -114,6 +114,7 @@ function Start-ViteApp([string]$Name, [string]$Dir, [int]$Port, [string]$Mode, [
     $vite = Join-Path $Dir 'node_modules\vite\bin\vite.js'
     if (-not (Test-Path -LiteralPath $vite -PathType Leaf)) { throw "$Name Vite runtime missing: $vite" }
     $args = @($vite, $Mode, '--host', $BindAddress, '--port', [string]$Port, '--strictPort')
+    if (-not [string]::IsNullOrWhiteSpace($ConfigLoader)) { $args += @('--configLoader', $ConfigLoader) }
     $outLog = Join-Path $LogRoot ($Name + '.out.log')
     $errLog = Join-Path $LogRoot ($Name + '.err.log')
     $proc = Start-Process -FilePath $Node -ArgumentList $args -WorkingDirectory $Dir `
@@ -411,7 +412,7 @@ if ($hubExisting) {
     $services += [pscustomobject]@{name='hub';port=4173;url='http://127.0.0.1:4173/';pid=$hubPid;owned=$true;root=$hub;launcherPid=$hubProc.Id}
 }
 $services += Start-ViteApp 'epublisher' (Join-Path $Root 'apps\epublisher-sovereign-local-v0.1') 3101 'preview' '127.0.0.1'
-$services += Start-ViteApp 'creative-studio' (Join-Path $Root 'apps\creative-studio-sovereign-local-v0.1') 3201 'preview' '127.0.0.1'
+$services += Start-ViteApp 'creative-studio' (Join-Path $Root 'apps\creative-studio-sovereign-local-v0.1') 3201 'preview' '127.0.0.1' 'runner'
 $services += Start-ViteApp 'sync-vision' (Join-Path $Root 'apps\sync-vision-sovereign-local-v0.1') 3301 'preview' '127.0.0.1'
 $youtubeDir = Join-Path $Runtime 'youtube-optimizer-stage'
 $youtubeEntry = Join-Path $youtubeDir '.output\server\index.mjs'
