@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 
 const launcher = readFileSync(new URL("../Start-RonsasDesktop.ps1", import.meta.url), "utf8");
 const installer = readFileSync(new URL("../Install-RonsasSovereignShortcuts.ps1", import.meta.url), "utf8");
+const cluster = readFileSync(new URL("../../ops/ealiophin/cluster/START-RONSAS-ECOSYSTEM.ps1", import.meta.url), "utf8");
 
 describe("RONSAS desktop startup", () => {
   test("delegates only to the canonical cluster controls", () => {
@@ -28,5 +29,11 @@ describe("RONSAS desktop startup", () => {
     expect(installer).toContain("-WindowStyle Hidden");
     expect(installer).toContain("-Action Start");
     expect(installer).toContain("-WindowStyle 7");
+  });
+
+  test("uses the compatible Vite config loader for Creative Studio", () => {
+    expect(cluster).toContain("[string]$ConfigLoader = '');");
+    expect(cluster).toContain("@('--configLoader', $ConfigLoader)");
+    expect(cluster).toContain("creative-studio-sovereign-local-v0.1') 3201 'preview' '127.0.0.1' 'runner'");
   });
 });
