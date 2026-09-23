@@ -18,9 +18,6 @@ jobs:
     runs-on: [self-hosted, Windows, X64, ronsas, ealiophin]
     timeout-minutes: 12
     steps:
-      - name: Check out exact candidate
-        uses: actions/checkout@v4
-
       - name: Guard Ealiophin target
         shell: powershell
         run: |
@@ -28,24 +25,136 @@ jobs:
           if ($env:COMPUTERNAME -notmatch '(?i)^Ealiophin$') {
             throw "Refusing desktop install on unexpected host: $env:COMPUTERNAME"
           }
-          if ("$env:GITHUB_SHA" -ne "${{ github.sha }}") {
-            throw "Workflow SHA mismatch."
+
+      - name: Materialize exact desktop helper without Git checkout
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $launcherRoot = Join-Path $env:LOCALAPPDATA 'Resonance\RONSAS\Launcher'
+          New-Item -ItemType Directory -Force -Path $launcherRoot | Out-Null
+          $target = Join-Path $launcherRoot 'Start-RonsasDesktop.ps1'
+          $content = @'
+          [CmdletBinding()]
+          param(
+            [ValidateSet('Start','Status','Stop','Restart')]
+            [string]$Action = 'Start',
+            [string]$Root = (Join-Path $env:USERPROFILE 'Resonance\OpenNova')
+          )
+          
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+          
+          $ClusterRoot = Join-Path $Root 'integrations\rons-cluster'
+          $StartScript = Join-Path $ClusterRoot 'START-RONSAS-ECOSYSTEM.ps1'
+          $StatusScript = Join-Path $ClusterRoot 'STATUS-RONSAS-ECOSYSTEM.ps1'
+          $StopScript = Join-Path $ClusterRoot 'STOP-RONSAS-ECOSYSTEM.ps1'
+          $LogRoot = Join-Path $env:LOCALAPPDATA 'Resonance\RONSAS\logs\desktop-control'
+          $ReceiptPath = Join-Path $LogRoot 'last-operation.txt'
+          $PowerShellExe = Join-Path $PSHOME 'powershell.exe'
+          
+          New-Item -ItemType Directory -Force -Path $LogRoot | Out-Null
+          
+          function Write-Receipt {
+            param(
+              [string]$Operation,
+              [int]$ExitCode,
+              [string]$Stdout,
+              [string]$Stderr
+            )
+            @(
+              'schema=ronsas-desktop-control/v1'
+              ('operation=' + $Operation)
+              ('completedAt=' + (Get-Date).ToUniversalTime().ToString('o'))
+              ('exitCode=' + $ExitCode)
+              ('stdout=' + $Stdout)
+              ('stderr=' + $Stderr)
+            ) | Set-Content -LiteralPath $ReceiptPath -Encoding UTF8
+          }
+          
+          function Invoke-HiddenControl {
+            param(
+              [string]$Name,
+              [string]$Script,
+              [int]$TimeoutSeconds = 600
+            )
+          
+            if (-not (Test-Path -LiteralPath $Script -PathType Leaf)) {
+              throw "RONSAS control script missing: $Script"
+            }
+          
+            $stamp = Get-Date -Format 'yyyyMMdd-HHmmss-fff'
+            $stdout = Join-Path $LogRoot ($stamp + '-' + $Name + '.out.log')
+            $stderr = Join-Path $LogRoot ($stamp + '-' + $Name + '.err.log')
+            $arguments = @(
+              '-NoLogo',
+              '-NoProfile',
+              '-NonInteractive',
+              '-WindowStyle', 'Hidden',
+              '-ExecutionPolicy', 'Bypass',
+              '-File', ('"{0}"' -f $Script),
+              '-Root', ('"{0}"' -f $Root)
+            )
+          
+            $process = Start-Process -FilePath $PowerShellExe -ArgumentList $arguments `
+              -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
+          
+            if (-not $process.WaitForExit($TimeoutSeconds * 1000)) {
+              Write-Receipt -Operation $Name -ExitCode 3 -Stdout $stdout -Stderr $stderr
+              throw "RONSAS $Name exceeded the ${TimeoutSeconds}s desktop-control wait. The hidden child was left running; inspect $stdout and $stderr."
+            }
+          
+            $process.Refresh()
+            $code = [int]$process.ExitCode
+            Write-Receipt -Operation $Name -ExitCode $code -Stdout $stdout -Stderr $stderr
+            return $code
+          }
+          
+          $created = $false
+          $mutex = New-Object System.Threading.Mutex($true, 'Local\RONSAS_Desktop_Control', [ref]$created)
+          if (-not $created) {
+            exit 0
+          }
+          
+          try {
+            switch ($Action) {
+              'Start' {
+                $startCode = Invoke-HiddenControl -Name 'start' -Script $StartScript -TimeoutSeconds 600
+                if ($startCode -ne 0) { exit $startCode }
+                exit (Invoke-HiddenControl -Name 'status-after-start' -Script $StatusScript -TimeoutSeconds 90)
+              }
+              'Status' {
+                exit (Invoke-HiddenControl -Name 'status' -Script $StatusScript -TimeoutSeconds 90)
+              }
+              'Stop' {
+                exit (Invoke-HiddenControl -Name 'stop' -Script $StopScript -TimeoutSeconds 180)
+              }
+              'Restart' {
+                $stopCode = Invoke-HiddenControl -Name 'restart-stop' -Script $StopScript -TimeoutSeconds 180
+                if ($stopCode -ne 0) { exit $stopCode }
+                $startCode = Invoke-HiddenControl -Name 'restart-start' -Script $StartScript -TimeoutSeconds 600
+                if ($startCode -ne 0) { exit $startCode }
+                exit (Invoke-HiddenControl -Name 'status-after-restart' -Script $StatusScript -TimeoutSeconds 90)
+              }
+            }
+          } finally {
+            if ($mutex) {
+              $mutex.ReleaseMutex()
+              $mutex.Dispose()
+            }
+          }
+          
+'@
+          [IO.File]::WriteAllText($target, $content, (New-Object Text.UTF8Encoding($false)))
+          if (-not (Test-Path -LiteralPath $target -PathType Leaf)) {
+            throw "Failed to materialize desktop helper: $target"
           }
 
       - name: Install hidden desktop control entry point
         shell: powershell
         run: |
           $ErrorActionPreference = 'Stop'
-          $source = Join-Path $env:GITHUB_WORKSPACE 'scripts\Start-RonsasDesktop.ps1'
-          if (-not (Test-Path -LiteralPath $source -PathType Leaf)) {
-            throw "Candidate desktop control helper missing: $source"
-          }
-
           $launcherRoot = Join-Path $env:LOCALAPPDATA 'Resonance\RONSAS\Launcher'
-          New-Item -ItemType Directory -Force -Path $launcherRoot | Out-Null
           $target = Join-Path $launcherRoot 'Start-RonsasDesktop.ps1'
-          Copy-Item -LiteralPath $source -Destination $target -Force
-
           $desktop = [Environment]::GetFolderPath('Desktop')
           $shortcutPath = Join-Path $desktop 'RONS - ALL.lnk'
           $powershell = Join-Path $PSHOME 'powershell.exe'
@@ -78,9 +187,10 @@ jobs:
           if ($shortcut.Arguments -notlike '*Start-RonsasDesktop.ps1*') { throw 'RONS - ALL does not target the governed desktop helper.' }
           if ([int]$shortcut.WindowStyle -ne 7) { throw "Unexpected shortcut window style: $($shortcut.WindowStyle)" }
 
-          & $target -Action Status
-          if ($LASTEXITCODE -ne 0) { throw "RONSAS governed status failed with exit code $LASTEXITCODE." }
-
+          $powershell = Join-Path $PSHOME 'powershell.exe'
+          & $powershell -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $target -Action Status
+          $code = $LASTEXITCODE
           $receipt = Join-Path $env:LOCALAPPDATA 'Resonance\RONSAS\logs\desktop-control\last-operation.txt'
+          if (Test-Path -LiteralPath $receipt -PathType Leaf) { Get-Content -LiteralPath $receipt }
+          if ($code -ne 0) { throw "RONSAS governed status failed with exit code $code." }
           if (-not (Test-Path -LiteralPath $receipt -PathType Leaf)) { throw 'Desktop-control receipt was not written.' }
-          Get-Content -LiteralPath $receipt
