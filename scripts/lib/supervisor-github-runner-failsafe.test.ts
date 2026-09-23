@@ -294,3 +294,28 @@ test("supervisor requires guarded offline Windows recycle markers", () => {
     "RONSAS Windows runner still did not become online after one guarded stale-offline registration recycle.",
   );
 });
+
+
+test("Windows stale-registration delete captures native stderr and waits for visibility", () => {
+  expect(windowsInstaller).toContain(
+    "$priorErrorActionPreference = $ErrorActionPreference",
+  );
+  expect(windowsInstaller).toContain(
+    "$ErrorActionPreference = 'Continue'",
+  );
+  expect(windowsInstaller).toContain(
+    "$deleteExit = [int]$LASTEXITCODE",
+  );
+  expect(windowsInstaller).toContain(
+    "for ($disappearAttempt = 1; $disappearAttempt -le 6; $disappearAttempt++)",
+  );
+  expect(windowsInstaller).toContain(
+    "Waiting for stale offline Windows runner registration deletion to become visible; attempt $disappearAttempt/6.",
+  );
+});
+
+test("supervisor requires hardened Windows deletion visibility guard", () => {
+  expect(supervisor).toContain(
+    "Waiting for stale offline Windows runner registration deletion to become visible;",
+  );
+});
