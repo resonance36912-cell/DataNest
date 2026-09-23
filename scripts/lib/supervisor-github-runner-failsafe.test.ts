@@ -83,6 +83,8 @@ test("Windows runner recovery has independent bounded backoff", () => {
 test("supervisor refuses stale Linux recovery authority before execution", () => {
   expect(supervisor).toContain("Runner.Worker");
   expect(supervisor).toContain("Get-ActiveRunnerAssignments");
+  expect(supervisor).toContain("Ensure-PodmanVmEgress");
+  expect(supervisor).toContain("Test-CiHttpsEgress");
   expect(supervisor).toContain("for ($settleAttempt = 1; $settleAttempt -le 18; $settleAttempt++)");
   expect(supervisor).toContain(
     "ForceRecycle deferred because online runner registration deletion was not proven safe.",
@@ -389,4 +391,28 @@ test("Linux runner recovery starts only an existing stopped Podman machine and p
   const networkIndex = linuxLauncher.indexOf("& $podman network inspect $Network");
   expect(ensureIndex).toBeGreaterThan(-1);
   expect(networkIndex).toBeGreaterThan(ensureIndex);
+});
+
+test("Linux runner recovery self-heals proven mirrored VM egress and rechecks it after startup", () => {
+  expect(linuxLauncher).toContain("function Test-PodmanVmHttps");
+  expect(linuxLauncher).toContain("function Test-PodmanVmInterfaceHttps");
+  expect(linuxLauncher).toContain("function Ensure-PodmanVmEgress");
+  expect(linuxLauncher).toContain("function Test-CiHttpsEgress");
+  expect(linuxLauncher).toContain(
+    "Get-NetRoute -AddressFamily IPv4 -DestinationPrefix '0.0.0.0/0'",
+  );
+  expect(linuxLauncher).toContain("Where-Object { [string]$_.State -ne 'Dead' }");
+  expect(linuxLauncher).toContain(
+    'ip route replace default via $gateway dev $iface metric 5',
+  );
+  expect(linuxLauncher).toContain("Ensure-PodmanMachineReady\nEnsure-PodmanVmEgress");
+  expect(linuxLauncher).toContain(
+    "Governed ronsas-ci HTTPS egress is unavailable before runner mutation.",
+  );
+  expect(linuxLauncher).toContain("Podman VM HTTPS egress was lost after runner startup.");
+  expect(linuxLauncher).toContain(
+    "Governed ronsas-ci HTTPS egress was lost after runner startup.",
+  );
+  expect(linuxLauncher).not.toContain("Set-NetIPInterface");
+  expect(linuxLauncher).not.toContain("Disable-NetAdapter");
 });
