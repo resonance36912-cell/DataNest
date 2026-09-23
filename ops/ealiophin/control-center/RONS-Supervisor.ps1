@@ -41,7 +41,10 @@ if (-not $created) { Log 'A supervisor instance is already running.'; exit 0 }
 
 $commanderFailures = 0
 $nextCommanderAttempt = [datetime]::MinValue
+$runnerFailures = 0
+$nextRunnerAttempt = [datetime]::MinValue
 $chromeEnrollmentWarned = $false
+$DefaultGitHubRunnerStartup = Join-Path $env:USERPROFILE 'Documents\GitHub\rons-sovereign-codebase\ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
 
 function Get-DesktopCommanderProcess {
     $entry = [regex]::Escape([string]$Config.remote.desktopCommanderEntry)
@@ -71,25 +74,56 @@ function Ensure-RonsSuite {
     Start-Process -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File','C:\\Users\\Ashley\\AppData\\Local\\Resonance\\RONS-ControlCenter\\RONS-Recover-Suite.ps1') -WindowStyle Hidden | Out-Null
 }
 function Ensure-GitHubRunner {
-    if (-not ($Config.autonomy.PSObject.Properties.Name -contains 'ensureGitHubRunner')) { return }
-    if (-not [bool]$Config.autonomy.ensureGitHubRunner) { return }
-    if (-not ($Config.PSObject.Properties.Name -contains 'githubRunner')) {
-        Log 'GitHub runner configuration is missing; recovery skipped.'
-        return
+    if ((Get-Date) -lt $script:nextRunnerAttempt) { return }
+
+    $configured = ($Config.autonomy.PSObject.Properties.Name -contains 'ensureGitHubRunner')
+    if ($configured -and -not [bool]$Config.autonomy.ensureGitHubRunner) { return }
+
+    $startup = $null
+    if (($Config.PSObject.Properties.Name -contains 'githubRunner') -and $Config.githubRunner) {
+        $startup = [string]$Config.githubRunner.startupScript
     }
-    $startup = [string]$Config.githubRunner.startupScript
-    if (-not $startup -or -not (Test-Path -LiteralPath $startup -PathType Leaf)) {
-        Log 'GitHub runner startup script is missing; recovery skipped.'
-        return
+
+    # Older RONS control configs predate the runner supervisor hook. Reuse the
+    # same governed launcher provisioned for the non-parameterized TRIGGERcmd
+    # recovery command, but only when the operator has not explicitly disabled
+    # ensureGitHubRunner.
+    if ([string]::IsNullOrWhiteSpace($startup)) {
+        $startup = $DefaultGitHubRunnerStartup
     }
-    try {
-        $output = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $startup 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            $tail = @($output | Select-Object -Last 3) -join ' | '
-            Log ('GitHub runner recovery failed: ' + $tail)
+
+    if (-not (Test-Path -LiteralPath $startup -PathType Leaf)) {
+        if ($configured -and [bool]$Config.autonomy.ensureGitHubRunner) {
+            Log ('GitHub runner startup script is missing: ' + $startup)
         }
+        return
+    }
+
+    try {
+        $output = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $startup 2>&1)
+        $exitCode = [int]$LASTEXITCODE
+        if ($exitCode -eq 0) {
+            $script:runnerFailures = 0
+            $script:nextRunnerAttempt = [datetime]::MinValue
+            return
+        }
+
+        $script:runnerFailures++
+        $delay = [math]::Min(
+            [int]$Config.autonomy.maxRestartBackoffSeconds,
+            [int](60 * [math]::Pow(2, [math]::Min($script:runnerFailures - 1, 5)))
+        )
+        $script:nextRunnerAttempt = (Get-Date).AddSeconds($delay)
+        $tail = @($output | Select-Object -Last 5) -join ' | '
+        Log ("GitHub runner recovery failed (exit=$exitCode); retry in $delay seconds: $tail")
     } catch {
-        Log ('GitHub runner recovery failed: ' + $_.Exception.Message)
+        $script:runnerFailures++
+        $delay = [math]::Min(
+            [int]$Config.autonomy.maxRestartBackoffSeconds,
+            [int](60 * [math]::Pow(2, [math]::Min($script:runnerFailures - 1, 5)))
+        )
+        $script:nextRunnerAttempt = (Get-Date).AddSeconds($delay)
+        Log ('GitHub runner recovery failed: ' + $_.Exception.Message + "; retry in $delay seconds.")
     }
 }
 
