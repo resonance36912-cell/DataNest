@@ -195,3 +195,31 @@ test("Windows installer can re-register when GitHub registration is missing", ()
   expect(workerGuard).toBeGreaterThan(-1);
   expect(removeMarker).toBeGreaterThan(workerGuard);
 });
+
+
+test("supervisor refuses stale Windows recovery authority before execution", () => {
+  expect(supervisor).toContain("function Get-LocalRunnerWorker");
+  expect(supervisor).toContain(
+    "Multiple GitHub runner registrations found for $RunnerName; refusing automatic recovery.",
+  );
+  expect(supervisor).toContain(
+    "GitHub runner registration is missing while Runner.Worker PID",
+  );
+  expect(supervisor).toContain(
+    "RONSAS Windows runner process is running locally but GitHub did not report it online within the bounded verification window.",
+  );
+  expect(supervisor).toContain(
+    "Windows GitHub runner recovery authority is stale; missing safeguard marker",
+  );
+
+  const markerIndex = supervisor.indexOf("$requiredWindowsMarkers = @(");
+  const launchIndex = supervisor.indexOf(
+    "$output = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer 2>&1)",
+  );
+  expect(markerIndex).toBeGreaterThan(-1);
+  expect(launchIndex).toBeGreaterThan(markerIndex);
+});
+
+test("Windows runner installer has no unrelated Git CLI dependency", () => {
+  expect(windowsInstaller).not.toContain("Get-Command git.exe");
+});
