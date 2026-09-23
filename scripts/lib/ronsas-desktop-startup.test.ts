@@ -23,6 +23,13 @@ describe("RONSAS desktop startup", () => {
     expect(launcher).toContain("last-operation.txt");
   });
 
+  test("requires a complete control bundle and falls back to the governed source checkout", () => {
+    expect(launcher).toContain("Test-CompleteControlRoot");
+    expect(launcher).toContain("RONSAS-MODULES.json");
+    expect(launcher).toContain("Documents\\GitHub\\rons-sovereign-codebase\\ops\\ealiophin\\cluster");
+    expect(launcher).toContain("No complete RONSAS control root is available.");
+  });
+
   test("owns the RONS - ALL shortcut as a hidden canonical entry point", () => {
     expect(installer).toContain("Start-RonsasDesktop.ps1");
     expect(installer).toContain("RONS - ALL.lnk");
