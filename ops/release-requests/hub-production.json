@@ -2,21 +2,21 @@
   "schema": "ronsas-hub-release-request/v1",
   "sourceRepo": "resonance36912-cell/resonance-hub",
   "sourceBranch": "ronsas/ealiophin-production",
-  "commit": "ef38d0d888fbe4be67f625f5b24b9c537653aba3",
+  "commit": "0329aeb42c3f10b26febb638482207468a050332",
   "confirmation": "PROMOTE RONSAS HUB",
   "validation": {
-    "commercialModeRun": 35953529433,
+    "commercialModeRun": 35964562475,
     "commercialMode": "passed",
     "rndControlRun": 35923242562,
     "rndControl": "passed",
     "rndControlSourceHead": "67917fa07101761a71b10421b2798d70b634a0a5",
     "privilegedAcceptance": "skipped_until_explicitly_enabled",
-    "sourceHead": "ef38d0d888fbe4be67f625f5b24b9c537653aba3",
-    "releaseValidation": "Current production head passed commercial-mode validation. Admin/R&D privileged-control files are unchanged from the validated parent 67917fa; the governed Windows promotion performs build, tests, typecheck, candidate validation, rollback protection, and public-edge verification before atomic promotion."
+    "sourceHead": "0329aeb42c3f10b26febb638482207468a050332",
+    "releaseValidation": "Current production head passed commercial-mode validation. The only change since ef38d0d is test-environment isolation for sovereign auth proxy tests; runtime auth code and R&D privileged-control files are unchanged. The governed Windows promotion performs install, prebuild, full tests, typecheck, build, candidate validation, rollback protection, and public-edge verification before atomic promotion."
   },
-  "purpose": "Promote the hardened Admin/R&D browser/MCP bridge plus read-only Remote Evidence catalog to Ealiophin production while preserving Recovery HOLD, explicit privileged-mode gating, exact-head validation, and free-promotion/no-billing invariants.",
+  "purpose": "Promote the hardened Admin/R&D browser/MCP bridge plus read-only Remote Evidence catalog to Ealiophin production after isolating sovereign auth tests from production-only environment flags, while preserving Recovery HOLD, explicit privileged-mode gating, exact-head validation, and free-promotion/no-billing invariants.",
   "priorReleaseCommit": "a9ecf4873548aaba0fe2286f7a2ccd18e607e311",
-  "requestedAt": "2026-09-24T06:18:00Z",
-  "retryAttempt": 5,
-  "retryReason": "Retry after transport hardening succeeded but the exact-head guard correctly detected that ronsas/ealiophin-production had advanced from 67917fa to validated merge ef38d0d via PR #130. Update only the governed release request to the current verified production head; retain OpenSSL plus HTTP/1.1 transport, certificate verification, Recovery HOLD, privileged-mode gates, rollback, and public verification."
+  "requestedAt": "2026-09-24T06:28:00Z",
+  "retryAttempt": 6,
+  "retryReason": "Retry after the exact-head production candidate exposed three test-isolation failures caused by production cookie/origin environment flags leaking into local-mode sovereign-auth proxy tests. Hub PR #131 fixes test setup only; runtime auth behavior and all production safety gates are unchanged."
 }
