@@ -18,6 +18,13 @@ jobs:
     runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
     timeout-minutes: 45
     environment: production
+    # Ealiophin's Git for Windows intermittently fails GitHub HTTPS via
+    # Schannel with SEC_E_MESSAGE_ALTERED. Use Git's bundled OpenSSL backend
+    # for this job only; this affects transport, not certificate verification.
+    env:
+      GIT_CONFIG_COUNT: "1"
+      GIT_CONFIG_KEY_0: http.sslBackend
+      GIT_CONFIG_VALUE_0: openssl
     steps:
       - name: Check out RONSAS control authority
         uses: actions/checkout@v4
