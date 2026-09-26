@@ -28,7 +28,7 @@ export const Route = createFileRoute("/")({
     const origin = loaderData?.origin ?? "https://resonance-hub-life.lovable.app";
     return {
       meta: [
-        { title: "The Resonance — One ecosystem for the aligned mind" },
+        { title: "RONSAS — The Resonance Sovereign Application Suite" },
         {
           name: "description",
           content:
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/")({
         },
         {
           property: "og:title",
-          content: "The Resonance — One ecosystem for the aligned mind",
+          content: "RONSAS — The Resonance Sovereign Application Suite",
         },
         {
           property: "og:description",
@@ -640,7 +640,7 @@ function Index() {
               onClick={() => setMobileMenuOpen(false)}
               className="px-2 py-3 rounded-md hover:bg-white/5 text-white/80 hover:text-white"
             >
-              Pricing
+              Free access
             </Link>
           </div>
         )}
@@ -652,14 +652,14 @@ function Index() {
           <div>
             <div className="inline-flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.25em] text-white/65 border border-white/10 rounded-full px-4 py-1.5 mb-5">
               <span className="size-1.5 rounded-full bg-[hsl(295_90%_60%)] shadow-[0_0_10px_hsl(295_90%_60%)]" />
-              Reson8.life · Source of truth
+              RONSAS · Sovereign application suite
             </div>
             <h1 className="font-display text-[2.5rem] sm:text-5xl md:text-6xl lg:text-[4.5rem] font-bold tracking-[-0.035em] leading-[0.96] text-balance mb-8">
               The Resonance <span className="text-gradient-brand">Hub</span>
             </h1>
             <p className="text-base md:text-lg text-white/75 leading-[1.65] text-pretty max-w-[58ch] mb-6">
-              The source of truth for every Resonance app, update, promotion, governance control,
-              and ecosystem capability.
+              One governed Resonance operating system for applications, AI collaboration, promotion state,
+              evidence, governance controls, and ecosystem capability.
             </p>
             <p className="text-sm text-white/65 leading-relaxed max-w-[58ch] mb-4">
               Discover new tools, follow product updates, and use the Resonance ecosystem free
