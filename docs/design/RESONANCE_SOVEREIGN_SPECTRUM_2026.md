@@ -220,3 +220,46 @@ Applications should **not** share:
 6. Responsive density.
 7. Browser regression tests and visual smoke tests.
 8. Iterate from usage data without breaking governance semantics.
+
+
+## 13. Public surfaces outside the connected source authority
+
+The following public products are part of the Resonance ecosystem but are not exposed as writable repositories through the current GitHub connection. They still follow this design authority.
+
+### The Resonance Podcast
+
+**Current public role:** media, interviews, clips, community storytelling, studio content and ecosystem thought leadership.  
+**Accent:** cyan with violet depth.  
+**UX posture:** cinematic media surface, not a SaaS dashboard.
+
+Alignment target:
+- preserve immersive editorial/media presentation;
+- use Resonance sovereign-dark canvas and cyan/violet identity;
+- identify it as **Resonance ecosystem media**, not as a paid software product;
+- prioritize episodes, clips, transcripts, guests, and community pathways;
+- connect clearly back to Reson8/RONSAS without adding operational controls that belong in Hub/DataNest;
+- use glass only for media navigation/player controls, with opaque reading surfaces for transcripts/blogs;
+- avoid product-pricing language unless an actual media/product sale is explicitly active.
+
+Public surface: https://www.resonance-podcast.com/
+
+### Career Compass
+
+**Current public role:** evidence-based South African learner guidance using personality, skills and aptitude assessments, reports, careers, bursaries and jobs.  
+**Accent:** emerald with gold secondary.  
+**UX posture:** calm evidence-first guidance, privacy and uncertainty made explicit.
+
+Alignment target:
+- retain the Resonance sovereign foundation while using a lighter emotional load than operational RONSAS tools;
+- emphasize **Direction & Purpose** rather than AI spectacle;
+- surface assessment progress, evidence/source quality, privacy state and report confidence clearly;
+- keep probabilistic-result disclaimers visible near recommendations;
+- distinguish pilot/reward mechanics from career evidence so incentives never appear to affect guidance;
+- use emerald for progress/positive direction, gold for opportunities, cyan for verified system/source state;
+- link back to the Resonance ecosystem while keeping learner guidance task-first.
+
+Public surface: https://www.career-compass.org/
+
+## 14. Source-authority boundary
+
+The canonical theme may define alignment targets for products whose public surfaces are visible, but implementation claims must remain scoped to repositories or systems available through an authorized write connection. A public-site assessment is not evidence that its source has been changed.
