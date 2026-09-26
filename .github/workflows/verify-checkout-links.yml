@@ -13,7 +13,7 @@ concurrency:
 jobs:
   verify:
     name: Pricing pages → /checkout SKU links
-    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Check out repository
