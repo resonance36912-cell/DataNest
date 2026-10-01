@@ -369,7 +369,7 @@ begin
       'Evidence-led readiness assessment, certification, standards alignment, surveillance and governed evidence packs.',
       'DataNest-managed certification service using the existing external audit, standards, evidence and review control plane with human certification decisions.',
       'DataNest governance and evidence control plane',
-      'free promotion / no billing until pricing is established',
+      'published introductory pricing / paid checkout not yet connected',
       false,
       current_date,
       jsonb_build_object(
@@ -386,7 +386,7 @@ begin
         'execution_authority','DataNest',
         'promotion_authority','DataNest',
         'hosting_model','replaceable_delivery_infrastructure',
-        'commercial_state','free_promotion'
+        'commercial_state','introductory_pricing_published'
       )
     ) returning id into certification_product;
   else
