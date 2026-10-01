@@ -141,7 +141,7 @@ test("Pages workflow stays within GitHub workflow_dispatch input limit",()=>{
 
 test("Pages release wiring requires live database and Edge Function attestation",()=>{
   assert.match(pagesWorkflow,/database_migration_reference:/);
-  assert.match(pagesWorkflow,/default: '\{"head":"20260930130500","name":"index_external_ai_companion_intake"\}'/);
+  assert.match(pagesWorkflow,/default: '\{"head":"20261001142117","name":"certification_business_bank_settlement_launch"\}'/);
   assert.doesNotMatch(pagesWorkflow,/database_migration_head:/);
   assert.doesNotMatch(pagesWorkflow,/database_migration_name:/);
   assert.match(pagesWorkflow,/verify-production-release-attestation\.mjs/);

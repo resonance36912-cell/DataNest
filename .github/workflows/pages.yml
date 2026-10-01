@@ -11,9 +11,9 @@ on:
         required: true
         type: string
       database_migration_reference:
-        description: Expected production database migration identity as JSON, for example {"head":"20260930130500","name":"index_external_ai_companion_intake"}
+        description: Expected production database migration identity as JSON, for example {"head":"20261001142117","name":"certification_business_bank_settlement_launch"}
         required: true
-        default: '{"head":"20260930130500","name":"index_external_ai_companion_intake"}'
+        default: '{"head":"20261001142117","name":"certification_business_bank_settlement_launch"}'
         type: string
       release_mode:
         description: Fully authorized production or temporary Owner live test mode
