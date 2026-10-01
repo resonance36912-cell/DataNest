@@ -86,7 +86,7 @@ export default function CertificationServicesPanel({projectId}:Props){
 
     <div className="certificationBoundaryNote">
       <b>Certification boundary</b>
-      <span>RCS is Resonance's internal certification standard. It is not ISO certification, accreditation, regulatory approval, legal advice, or third-party conformity certification.</span>
+      <span>RCS is Resonance's internal certification standard. It is not ISO certification, external accreditation, regulatory approval, legal advice, or third-party conformity certification.</span>
     </div>
 
     <form id="certification-service-request" className="certificationServiceRequest" onSubmit={submit}>
