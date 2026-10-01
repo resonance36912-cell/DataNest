@@ -168,12 +168,12 @@ const certificationPanel=fs.readFileSync(path.join(root,"src/components/Certific
 
 test("Certification services are customer-facing with pricing and governed intake",()=>{
   assert.match(certificationPanel,/Resonance Certification & Assurance/);
-  assert.match(certificationPanel,/USD 750/);
-  assert.match(certificationPanel,/From USD 3,500/);
-  assert.match(certificationPanel,/From USD 1,500/);
-  assert.match(certificationPanel,/From USD 1,250/);
+  assert.match(certificationPanel,/ZAR 12,500/);
+  assert.match(certificationPanel,/From ZAR 58,500/);
+  assert.match(certificationPanel,/From ZAR 25,000/);
+  assert.match(certificationPanel,/From ZAR 21,000/);
   assert.match(certificationPanel,/Submit service request/);
-  assert.match(certificationPanel,/create_certification_service_request_v1/);
+  assert.match(certificationPanel,/create_certification_service_request_v2/);
   assert.match(certificationPanel,/external accreditation/i);
   assert.match(products,/CertificationServicesPanel/);
 });
