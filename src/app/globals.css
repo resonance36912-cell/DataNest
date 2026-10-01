@@ -5332,3 +5332,32 @@ html[data-motion-paused="true"] .workspaceArrival,html[data-motion-paused="true"
 .datanestAiContributionEmpty{padding:18px}
 @container datanest-main (max-width:920px){.datanestAiContributionSections{grid-template-columns:repeat(2,minmax(0,1fr))}.datanestAiContributionQueue article{grid-template-columns:1fr}.datanestAiContributionImpact{justify-content:flex-start}}
 @container datanest-main (max-width:620px){.datanestAiContributionDashboard>summary,.datanestAiContributionHead{display:grid}.datanestAiContributionPulse{justify-content:flex-start}.datanestAiContributionSections{grid-template-columns:1fr}}
+
+/* Resonance Certification business services */
+.certificationServiceGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:18px}
+.certificationServiceCard{display:flex;flex-direction:column;gap:9px;min-width:0;padding:17px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.012))}
+.certificationServiceCard h3{margin:0;font-size:17px;line-height:1.15}
+.certificationServiceCard p{margin:0;color:var(--muted);font-size:12px;line-height:1.5;min-height:54px}
+.certificationServiceCard strong{font-size:17px;letter-spacing:-.02em}
+.certificationServiceCard small,.certificationServiceCard span{color:var(--muted);font-size:10px;line-height:1.45}
+.certificationServiceCard button{margin-top:auto}
+.certificationClassStrip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.certificationClassStrip span{display:flex;flex-direction:column;gap:3px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.018);font-size:10px}
+.certificationClassStrip b{font-size:9px;letter-spacing:.05em}
+.certificationBoundaryNote{display:grid;gap:5px;margin-top:14px;padding:13px 15px;border:1px solid rgba(242,199,120,.22);border-radius:13px;background:rgba(242,199,120,.045)}
+.certificationBoundaryNote span{color:var(--muted);font-size:11px;line-height:1.55}
+.certificationServiceRequest{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px;padding:18px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.018)}
+.certificationServiceRequest>div:first-child{grid-column:1/-1}
+.certificationServiceRequest h3{margin:3px 0 6px}
+.certificationServiceRequest p{margin:0;color:var(--muted);font-size:12px;line-height:1.5}
+.certificationServiceRequest label{display:grid;gap:6px;font-size:11px;font-weight:800}
+.certificationServiceRequest .wide{grid-column:1/-1}
+.certificationServiceRequest input,.certificationServiceRequest select,.certificationServiceRequest textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 11px;background:rgba(255,255,255,.03);color:inherit;font:inherit}
+.certificationServiceRequest textarea{min-height:120px;resize:vertical}
+@media(max-width:1100px){
+  .certificationServiceGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px){
+  .certificationServiceGrid,.certificationClassStrip,.certificationServiceRequest{grid-template-columns:1fr}
+  .certificationServiceRequest>div:first-child,.certificationServiceRequest .wide{grid-column:auto}
+}
