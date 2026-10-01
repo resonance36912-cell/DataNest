@@ -20,7 +20,7 @@ export type ResonanceCertificationService={
   description:string;
   output:string;
   billingEnabled:boolean;
-  commercialState:"free_promotion";
+  commercialState:"introductory_pricing_published";
 };
 
 export const RESONANCE_CERTIFICATION_PRICING=[
@@ -47,7 +47,7 @@ export const RESONANCE_CERTIFICATION_STANDARD={
     {code:"RCS-MKT-01",name:"Transparency & Market Integrity Assurance",domain:"market_integrity",description:"Truthful market claims, certification disclosure, evidence references and commercial-state transparency."}
   ] satisfies readonly ResonanceCertificationClass[],
   services:[
-    {code:"RCS-SVC-01",name:"Certification Readiness Assessment",description:"Scoped readiness and evidence-gap assessment before certification.",output:"Readiness report, applicability profile, evidence plan and remediation register.",billingEnabled:false,commercialState:"free_promotion"},
+    {code:"RCS-SVC-01",name:"Certification Readiness Assessment",description:"Scoped readiness and evidence-gap assessment before certification.",output:"Readiness report, applicability profile, evidence plan and remediation register.",billingEnabled:false,commercialState:"introductory_pricing_published"},
     {code:"RCS-SVC-02",name:"Resonance Certification Assessment",description:"Formal evidence-led assessment against one or more RCS certification classes.",output:"Assessment record, findings/actions, review record and certification decision.",billingEnabled:false,commercialState:"free_promotion"},
     {code:"RCS-SVC-03",name:"Certification & Evidence Pack",description:"Governed certificate plus scope, criteria, validity and evidence references.",output:"Certificate record plus human/machine-readable evidence pack.",billingEnabled:false,commercialState:"free_promotion"},
     {code:"RCS-SVC-04",name:"Surveillance & Renewal",description:"Periodic re-assessment of certification basis, material changes and evidence.",output:"Surveillance record and renewal, suspension, revocation or expiry decision.",billingEnabled:false,commercialState:"free_promotion"},
