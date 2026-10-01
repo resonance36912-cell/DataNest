@@ -16,9 +16,9 @@ test("RCS defines internal certification boundaries and market claim controls",(
     "RCS-MKT-01",
     "published introductory pricing is active",
     "automated card checkout is disabled",
-    "does not by itself represent ISO certification",
     "third-party / accredited certification"
   ]) assert.equal(standard.includes(token),true,token);
+  assert.match(standard,/does \*\*not\*\* by itself represent ISO certification/);
 });
 
 test("certification source declares classes, services and no external accreditation claim",()=>{
