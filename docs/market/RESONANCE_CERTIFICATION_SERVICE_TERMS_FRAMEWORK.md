@@ -30,7 +30,7 @@ Published introductory prices are:
 
 Starting prices are not fixed quotations. Final pricing may vary with scope, number of certification classes, evidence volume, systems assessed, integrations, jurisdiction, complexity and required review effort.
 
-Payment processing is currently not connected in DataNest. No payment is treated as collected merely because a price is displayed.
+Payment processing is currently not connected in DataNest. No payment is treated as collected merely because a price is displayed; early engagements may remain promotional at governed discretion.
 
 ## 4. Deliverables
 
