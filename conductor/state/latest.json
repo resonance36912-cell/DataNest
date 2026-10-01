@@ -1,0 +1,591 @@
+{
+  "schemaVersion": "datanest-conductor-state-v1",
+  "generatedAt": "2026-10-01T20:36:36.063Z",
+  "authority": "process-synchronization",
+  "productionAuthorization": false,
+  "repository": "DataNest-Supository/DataNest",
+  "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c",
+  "allProcessesFresh": false,
+  "processCount": 10,
+  "processes": [
+    {
+      "id": "knowledge",
+      "workflow": "knowledge-tree.yml",
+      "workflowName": "Knowledge Tree",
+      "maxAgeMinutes": 360,
+      "dependencies": [],
+      "dispatch": {
+        "enabled": true
+      },
+      "state": {
+        "available": true,
+        "active": false,
+        "latest": {
+          "id": 36922077357,
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DataNest-Supository/DataNest/actions/runs/36922077357",
+          "createdAt": "2026-10-01T20:30:29Z",
+          "updatedAt": "2026-10-01T20:30:48Z",
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestSuccessful": {
+          "id": 36922077357,
+          "completedAt": "2026-10-01T20:30:48Z",
+          "startedAt": "2026-10-01T20:30:29Z",
+          "ageMinutes": 5.8,
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestCompletedAt": "2026-10-01T20:30:48Z"
+      },
+      "successFresh": true,
+      "operationalFresh": true,
+      "due": false,
+      "active": false,
+      "retryCooldown": false,
+      "latestFailure": null,
+      "inputsNewer": false,
+      "dependenciesReady": true,
+      "blockedBy": []
+    },
+    {
+      "id": "environment",
+      "workflow": "environment-tree.yml",
+      "workflowName": "ENVIRONMENT Tree",
+      "maxAgeMinutes": 360,
+      "dependencies": [],
+      "dispatch": {
+        "enabled": true
+      },
+      "state": {
+        "available": true,
+        "active": false,
+        "latest": {
+          "id": 36922077514,
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DataNest-Supository/DataNest/actions/runs/36922077514",
+          "createdAt": "2026-10-01T20:30:29Z",
+          "updatedAt": "2026-10-01T20:30:50Z",
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestSuccessful": {
+          "id": 36922077514,
+          "completedAt": "2026-10-01T20:30:50Z",
+          "startedAt": "2026-10-01T20:30:29Z",
+          "ageMinutes": 5.8,
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestCompletedAt": "2026-10-01T20:30:50Z"
+      },
+      "successFresh": true,
+      "operationalFresh": true,
+      "due": false,
+      "active": false,
+      "retryCooldown": false,
+      "latestFailure": null,
+      "inputsNewer": false,
+      "dependenciesReady": true,
+      "blockedBy": []
+    },
+    {
+      "id": "boundaries",
+      "workflow": "boundaries-assessment.yml",
+      "workflowName": "DataNest Boundaries",
+      "maxAgeMinutes": 1440,
+      "dependencies": [],
+      "dispatch": {
+        "enabled": true
+      },
+      "state": {
+        "available": true,
+        "active": false,
+        "latest": {
+          "id": 36922199958,
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DataNest-Supository/DataNest/actions/runs/36922199958",
+          "createdAt": "2026-10-01T20:31:28Z",
+          "updatedAt": "2026-10-01T20:32:01Z",
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestSuccessful": {
+          "id": 36922199958,
+          "completedAt": "2026-10-01T20:32:01Z",
+          "startedAt": "2026-10-01T20:31:28Z",
+          "ageMinutes": 4.6,
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestCompletedAt": "2026-10-01T20:32:01Z"
+      },
+      "successFresh": true,
+      "operationalFresh": true,
+      "due": false,
+      "active": false,
+      "retryCooldown": false,
+      "latestFailure": null,
+      "inputsNewer": false,
+      "dependenciesReady": true,
+      "blockedBy": []
+    },
+    {
+      "id": "security",
+      "workflow": "security-scan.yml",
+      "workflowName": "Security scan",
+      "maxAgeMinutes": 1440,
+      "dependencies": [],
+      "dispatch": {
+        "enabled": true
+      },
+      "state": {
+        "available": true,
+        "active": false,
+        "latest": {
+          "id": 36922077147,
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DataNest-Supository/DataNest/actions/runs/36922077147",
+          "createdAt": "2026-10-01T20:30:29Z",
+          "updatedAt": "2026-10-01T20:36:25Z",
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestSuccessful": {
+          "id": 36922077147,
+          "completedAt": "2026-10-01T20:36:25Z",
+          "startedAt": "2026-10-01T20:30:29Z",
+          "ageMinutes": 0.2,
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestCompletedAt": "2026-10-01T20:36:25Z"
+      },
+      "successFresh": true,
+      "operationalFresh": true,
+      "due": false,
+      "active": false,
+      "retryCooldown": false,
+      "latestFailure": null,
+      "inputsNewer": false,
+      "dependenciesReady": true,
+      "blockedBy": []
+    },
+    {
+      "id": "enforcer",
+      "workflow": "enforcer.yml",
+      "workflowName": "ENFORCER Defence Tree",
+      "maxAgeMinutes": 180,
+      "dependencies": [
+        "knowledge",
+        "environment",
+        "security",
+        "boundaries"
+      ],
+      "dispatch": {
+        "enabled": true
+      },
+      "state": {
+        "available": true,
+        "active": true,
+        "latest": {
+          "id": 36922812254,
+          "status": "in_progress",
+          "conclusion": null,
+          "url": "https://github.com/DataNest-Supository/DataNest/actions/runs/36922812254",
+          "createdAt": "2026-10-01T20:36:28Z",
+          "updatedAt": "2026-10-01T20:36:39Z",
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestSuccessful": {
+          "id": 36922126827,
+          "completedAt": "2026-10-01T20:31:09Z",
+          "startedAt": "2026-10-01T20:30:53Z",
+          "ageMinutes": 5.5,
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestCompletedAt": "2026-10-01T20:36:39Z"
+      },
+      "successFresh": false,
+      "operationalFresh": false,
+      "due": false,
+      "active": true,
+      "retryCooldown": false,
+      "latestFailure": null,
+      "inputsNewer": true,
+      "dependenciesReady": true,
+      "blockedBy": []
+    },
+    {
+      "id": "botsquad",
+      "workflow": "botsquad.yml",
+      "workflowName": "BOTSQUAD AI Tree",
+      "maxAgeMinutes": 60,
+      "dependencies": [
+        "knowledge",
+        "environment"
+      ],
+      "dispatch": {
+        "enabled": true
+      },
+      "state": {
+        "available": true,
+        "active": false,
+        "latest": {
+          "id": 36922126777,
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DataNest-Supository/DataNest/actions/runs/36922126777",
+          "createdAt": "2026-10-01T20:30:53Z",
+          "updatedAt": "2026-10-01T20:32:21Z",
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestSuccessful": {
+          "id": 36922126777,
+          "completedAt": "2026-10-01T20:32:21Z",
+          "startedAt": "2026-10-01T20:30:53Z",
+          "ageMinutes": 4.3,
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestCompletedAt": "2026-10-01T20:32:21Z"
+      },
+      "successFresh": true,
+      "operationalFresh": true,
+      "due": false,
+      "active": false,
+      "retryCooldown": false,
+      "latestFailure": null,
+      "inputsNewer": false,
+      "dependenciesReady": true,
+      "blockedBy": []
+    },
+    {
+      "id": "guardian",
+      "workflow": "guardian.yml",
+      "workflowName": "GUARDIAN Health & Healing Tree",
+      "maxAgeMinutes": 30,
+      "dependencies": [
+        "knowledge",
+        "environment",
+        "enforcer",
+        "botsquad",
+        "boundaries"
+      ],
+      "dispatch": {
+        "enabled": true
+      },
+      "state": {
+        "available": true,
+        "active": false,
+        "latest": {
+          "id": 36922812232,
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/DataNest-Supository/DataNest/actions/runs/36922812232",
+          "createdAt": "2026-10-01T20:36:28Z",
+          "updatedAt": "2026-10-01T20:36:48Z",
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestSuccessful": {
+          "id": 36922364521,
+          "completedAt": "2026-10-01T20:33:01Z",
+          "startedAt": "2026-10-01T20:32:49Z",
+          "ageMinutes": 3.6,
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestCompletedAt": "2026-10-01T20:36:48Z"
+      },
+      "successFresh": false,
+      "operationalFresh": false,
+      "due": false,
+      "active": false,
+      "retryCooldown": true,
+      "latestFailure": "failure",
+      "inputsNewer": false,
+      "dependenciesReady": false,
+      "blockedBy": [
+        "enforcer"
+      ]
+    },
+    {
+      "id": "calmer",
+      "workflow": "calmer.yml",
+      "workflowName": "CALMER Governance Softening Tree",
+      "maxAgeMinutes": 30,
+      "dependencies": [
+        "guardian",
+        "enforcer",
+        "boundaries"
+      ],
+      "dispatch": {
+        "enabled": true
+      },
+      "state": {
+        "available": true,
+        "active": false,
+        "latest": {
+          "id": 36922527983,
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DataNest-Supository/DataNest/actions/runs/36922527983",
+          "createdAt": "2026-10-01T20:34:08Z",
+          "updatedAt": "2026-10-01T20:34:25Z",
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestSuccessful": {
+          "id": 36922527983,
+          "completedAt": "2026-10-01T20:34:25Z",
+          "startedAt": "2026-10-01T20:34:08Z",
+          "ageMinutes": 2.2,
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestCompletedAt": "2026-10-01T20:34:25Z"
+      },
+      "successFresh": false,
+      "operationalFresh": false,
+      "due": true,
+      "active": false,
+      "retryCooldown": false,
+      "latestFailure": null,
+      "inputsNewer": false,
+      "dependenciesReady": false,
+      "blockedBy": [
+        "guardian",
+        "enforcer"
+      ]
+    },
+    {
+      "id": "regulator",
+      "workflow": "regulator.yml",
+      "workflowName": "REGULATOR Harmony Tree",
+      "maxAgeMinutes": 30,
+      "dependencies": [
+        "calmer",
+        "guardian",
+        "enforcer",
+        "botsquad",
+        "boundaries"
+      ],
+      "dispatch": {
+        "enabled": true
+      },
+      "state": {
+        "available": true,
+        "active": true,
+        "latest": {
+          "id": 36922856396,
+          "status": "queued",
+          "conclusion": null,
+          "url": "https://github.com/DataNest-Supository/DataNest/actions/runs/36922856396",
+          "createdAt": "2026-10-01T20:36:50Z",
+          "updatedAt": "2026-10-01T20:36:50Z",
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestSuccessful": {
+          "id": 36922563856,
+          "completedAt": "2026-10-01T20:34:40Z",
+          "startedAt": "2026-10-01T20:34:27Z",
+          "ageMinutes": 1.9,
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestCompletedAt": "2026-10-01T20:36:50Z"
+      },
+      "successFresh": false,
+      "operationalFresh": false,
+      "due": false,
+      "active": true,
+      "retryCooldown": false,
+      "latestFailure": null,
+      "inputsNewer": false,
+      "dependenciesReady": false,
+      "blockedBy": [
+        "calmer",
+        "guardian",
+        "enforcer"
+      ]
+    },
+    {
+      "id": "visibility-utility",
+      "workflow": "visibility-utility.yml",
+      "workflowName": "VISIBILITY-UTILITY Market Presence Tree",
+      "maxAgeMinutes": 240,
+      "dependencies": [
+        "knowledge",
+        "botsquad",
+        "regulator"
+      ],
+      "dispatch": {
+        "enabled": true
+      },
+      "state": {
+        "available": true,
+        "active": false,
+        "latest": {
+          "id": 36922593670,
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DataNest-Supository/DataNest/actions/runs/36922593670",
+          "createdAt": "2026-10-01T20:34:43Z",
+          "updatedAt": "2026-10-01T20:34:55Z",
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestSuccessful": {
+          "id": 36922593670,
+          "completedAt": "2026-10-01T20:34:55Z",
+          "startedAt": "2026-10-01T20:34:43Z",
+          "ageMinutes": 1.7,
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        },
+        "latestCompletedAt": "2026-10-01T20:34:55Z"
+      },
+      "successFresh": false,
+      "operationalFresh": false,
+      "due": true,
+      "active": false,
+      "retryCooldown": false,
+      "latestFailure": null,
+      "inputsNewer": false,
+      "dependenciesReady": false,
+      "blockedBy": [
+        "regulator"
+      ]
+    }
+  ],
+  "dataFlows": [
+    {
+      "from": "main",
+      "to": "Knowledge",
+      "mode": "pull-source-evidence"
+    },
+    {
+      "from": "main",
+      "to": "ENVIRONMENT",
+      "mode": "pull-blueprint-and-runtime-contracts"
+    },
+    {
+      "from": "Knowledge+ENVIRONMENT+Security",
+      "to": "ENFORCER",
+      "mode": "pull-assess-push-defence-evidence"
+    },
+    {
+      "from": "Knowledge+ENVIRONMENT",
+      "to": "BOTSQUAD",
+      "mode": "pull-analyze-push-optimization-feeds"
+    },
+    {
+      "from": "all-specialized-tree-feeds",
+      "to": "GUARDIAN",
+      "mode": "pull-measure-heal-push-health"
+    },
+    {
+      "from": "GUARDIAN+Knowledge+BOTSQUAD+ENFORCER+ENVIRONMENT",
+      "to": "SUGGESTER",
+      "mode": "pull-suggest-push-optimization-queue"
+    },
+    {
+      "from": "SUGGESTER",
+      "to": "CONDUCTOR",
+      "mode": "pull-safe-automation-commands"
+    },
+    {
+      "from": "CONDUCTOR",
+      "to": "specialized-workflows",
+      "mode": "push-dispatch"
+    },
+    {
+      "from": "canonical-feeds",
+      "to": "Mirror-DataNest",
+      "mode": "push-public-feed-pull-by-mirror-consumers"
+    },
+    {
+      "from": "GUARDIAN+ENFORCER+CONDUCTOR",
+      "to": "CALMER",
+      "mode": "pull-minimize-governance-friction"
+    },
+    {
+      "from": "CALMER+GUARDIAN+ENFORCER+BOTSQUAD+SUGGESTER",
+      "to": "REGULATOR",
+      "mode": "pull-audit-stress-acquire-supply-action-requirements"
+    },
+    {
+      "from": "REGULATOR",
+      "to": "BOTSQUAD",
+      "mode": "push-requirement-packet"
+    },
+    {
+      "from": "Knowledge+BOTSQUAD+REGULATOR+public-platform-state",
+      "to": "VISIBILITY-UTILITY",
+      "mode": "pull-assess-project-market-routes"
+    },
+    {
+      "from": "VISIBILITY-UTILITY",
+      "to": "SUGGESTER",
+      "mode": "push-seo-market-and-route-to-market-evidence"
+    }
+  ],
+  "nextCommand": {
+    "type": "wait",
+    "source": "conductor",
+    "workflow": null,
+    "workflowName": null,
+    "inputs": {},
+    "reason": "processes-pending",
+    "pending": [
+      {
+        "id": "enforcer",
+        "due": false,
+        "active": true,
+        "retryCooldown": false,
+        "blockedBy": []
+      },
+      {
+        "id": "guardian",
+        "due": false,
+        "active": false,
+        "retryCooldown": true,
+        "blockedBy": [
+          "enforcer"
+        ]
+      },
+      {
+        "id": "calmer",
+        "due": true,
+        "active": false,
+        "retryCooldown": false,
+        "blockedBy": [
+          "guardian",
+          "enforcer"
+        ]
+      },
+      {
+        "id": "regulator",
+        "due": false,
+        "active": true,
+        "retryCooldown": false,
+        "blockedBy": [
+          "calmer",
+          "guardian",
+          "enforcer"
+        ]
+      },
+      {
+        "id": "visibility-utility",
+        "due": true,
+        "active": false,
+        "retryCooldown": false,
+        "blockedBy": [
+          "regulator"
+        ]
+      }
+    ],
+    "fingerprint": "sha256:cadd27f2d0bff80b2ddbe0a076d702475512c776493767e2d9c4f27ce32fd24f"
+  },
+  "attemptedSuggestions": [],
+  "dispatchState": "idle",
+  "reservation": {
+    "createdAt": "2026-10-01T20:30:53.749Z",
+    "workflow": "boundaries-assessment.yml"
+  },
+  "previousState": {
+    "available": true,
+    "generatedAt": "2026-10-01T20:34:37.571Z",
+    "nextCommandFingerprint": "sha256:cadd27f2d0bff80b2ddbe0a076d702475512c776493767e2d9c4f27ce32fd24f"
+  }
+}

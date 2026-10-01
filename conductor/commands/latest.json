@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "datanest-conductor-command-v1",
+  "generatedAt": "2026-10-01T20:36:36.063Z",
+  "productionAuthorization": false,
+  "nextCommand": {
+    "type": "wait",
+    "source": "conductor",
+    "workflow": null,
+    "workflowName": null,
+    "inputs": {},
+    "reason": "processes-pending",
+    "pending": [
+      {
+        "id": "enforcer",
+        "due": false,
+        "active": true,
+        "retryCooldown": false,
+        "blockedBy": []
+      },
+      {
+        "id": "guardian",
+        "due": false,
+        "active": false,
+        "retryCooldown": true,
+        "blockedBy": [
+          "enforcer"
+        ]
+      },
+      {
+        "id": "calmer",
+        "due": true,
+        "active": false,
+        "retryCooldown": false,
+        "blockedBy": [
+          "guardian",
+          "enforcer"
+        ]
+      },
+      {
+        "id": "regulator",
+        "due": false,
+        "active": true,
+        "retryCooldown": false,
+        "blockedBy": [
+          "calmer",
+          "guardian",
+          "enforcer"
+        ]
+      },
+      {
+        "id": "visibility-utility",
+        "due": true,
+        "active": false,
+        "retryCooldown": false,
+        "blockedBy": [
+          "regulator"
+        ]
+      }
+    ],
+    "fingerprint": "sha256:cadd27f2d0bff80b2ddbe0a076d702475512c776493767e2d9c4f27ce32fd24f"
+  }
+}
