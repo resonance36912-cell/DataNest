@@ -1,0 +1,73 @@
+name: Trade & Implementation Interest
+description: Discuss procurement, partnership, implementation, reseller, integration or enterprise assessment opportunities.
+title: "[TRADE] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your interest in DataNest independent regulatory-readiness, technical-audit and digital-oversight services.
+
+        **Do not include passwords, private keys, confidential datasets, personal information, security vulnerabilities, or other sensitive material in this public issue.** We will establish an appropriate private channel before exchanging restricted information.
+  - type: dropdown
+    id: interest
+    attributes:
+      label: Interest type
+      options:
+        - Assessment / audit support
+        - Continuous digital oversight
+        - Compliance readiness
+        - Implementation / remediation
+        - Integration / technology partnership
+        - Reseller / channel partnership
+        - Procurement / enterprise services
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: organisation
+    attributes:
+      label: Organisation
+      description: Public organisation or trading name only.
+      placeholder: Example Organisation
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Non-confidential scope
+      description: What outcome are you looking for?
+      placeholder: We need an independent review of...
+    validations:
+      required: true
+  - type: dropdown
+    id: timing
+    attributes:
+      label: Intended timing
+      options:
+        - As soon as practical
+        - Within 30 days
+        - Within 90 days
+        - This quarter
+        - Exploratory / no fixed date
+    validations:
+      required: true
+  - type: dropdown
+    id: budget
+    attributes:
+      label: Indicative budget band
+      options:
+        - Under R10,000
+        - R10,000–R25,000
+        - R25,000–R75,000
+        - R75,000+
+        - Prefer to discuss
+    validations:
+      required: true
+  - type: checkboxes
+    id: authorization
+    attributes:
+      label: Authorization
+      options:
+        - label: I understand DataNest only monitors or tests assets that the client owns or is explicitly authorized to assess.
+          required: true

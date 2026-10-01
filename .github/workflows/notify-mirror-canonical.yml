@@ -22,7 +22,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ -z "${MIRROR_SYNC_TOKEN:-}" ]; then
-            echo "DATANEST_MIRROR_SYNC_TOKEN is not configured; Mirror daily reconciliation remains the fallback."
+            echo "DATANEST_MIRROR_SYNC_TOKEN is not configured; Mirror hourly reconciliation remains the fallback."
             exit 0
           fi
 

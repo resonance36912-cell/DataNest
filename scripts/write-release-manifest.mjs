@@ -34,6 +34,31 @@ const manifest={
     externalAudit:process.env.DATANEST_EDGE_EXTERNAL_AUDIT || "external-audit@1"
   },
   supabaseProject:process.env.DATANEST_SUPABASE_PROJECT || "sgqdmfgjbprsoqsmgigi",
+  productionInclusion:{
+    schemaVersion:"production-inclusion-v1",
+    inclusive:true,
+    canonicalAuthority:"DataNest-Supository/DataNest:main",
+    publicSurfaces:[
+      "datanest",
+      "datanest-assurance",
+      "ronsas-career-compass",
+      "ronsas-creative-studio",
+      "ronsas-epublisher",
+      "ronsas-lyricsync-studio",
+      "ronsas-scene-song-spark",
+      "ronsas-sovereign-forge",
+      "ronsas-syncvision"
+    ],
+    externalProductionSurfaces:["ronsas-youtube-optimizer"],
+    productionSupportComponents:["ronsas-sovereign-backend","ronsas-shared"],
+    excludedFromProductionAuthority:[
+      "DataNest-Supository/Mirror-DataNest",
+      "DataNest AI Staging",
+      "DataNest-Supository/FREETREE",
+      "automation/*",
+      "mirror-promotion/*"
+    ]
+  },
   ...(uiGovernance ? {uiGovernance} : {}),
   releaseAttestation:{
     database:databaseAttestation

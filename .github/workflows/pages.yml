@@ -295,7 +295,7 @@ jobs:
 
       - name: Verify deployed Next.js shell and public governance routes
         run: |
-          for route in "" legal governance accessibility terms privacy disclaimers acceptable-use intellectual-property transparency system-charter architecture stress-test; do
+          for route in "" legal governance accessibility terms privacy disclaimers acceptable-use intellectual-property transparency system-charter architecture stress-test assurance; do
             suffix=""
             if [ -n "$route" ]; then suffix="$route/"; fi
             curl --fail --silent --show-error --location --retry 8 --retry-delay 3 --retry-all-errors               "https://datanest-supository.github.io/DataNest/$suffix"               -o "/tmp/datanest-${route:-home}.html"
@@ -328,6 +328,17 @@ jobs:
             -o /tmp/datanest-sitemap.xml
           grep -q '<urlset' /tmp/datanest-sitemap.xml
           grep -Fq '<loc>https://datanest-supository.github.io/DataNest/</loc>' /tmp/datanest-sitemap.xml
+          grep -Fq '<loc>https://datanest-supository.github.io/DataNest/assurance/</loc>' /tmp/datanest-sitemap.xml
+
+      - name: Verify production-inclusive Assurance surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --retry 8 --retry-delay 3 --retry-all-errors \
+            https://datanest-supository.github.io/DataNest/assurance/ \
+            -o /tmp/datanest-assurance.html
+          grep -Fq 'Regulatory readiness, technical audit' /tmp/datanest-assurance.html
+          grep -Fq 'trade-implementation-interest.yml' /tmp/datanest-assurance.html
       - name: Verify runtime configuration
         run: |
           curl --fail --silent --show-error --location --retry 8 --retry-delay 3 --retry-all-errors             https://datanest-supository.github.io/DataNest/runtime-config.js             -o /tmp/runtime-config.js
@@ -388,6 +399,22 @@ jobs:
           node <<'NODE'
           const fs=require("fs");
           const manifest=JSON.parse(fs.readFileSync("/tmp/release-manifest.json","utf8"));
+          if(manifest.productionInclusion?.inclusive!==true) throw new Error("Live release must declare production-inclusive mode");
+          const requiredPublic=[
+            "datanest",
+            "datanest-assurance",
+            "ronsas-career-compass",
+            "ronsas-creative-studio",
+            "ronsas-epublisher",
+            "ronsas-lyricsync-studio",
+            "ronsas-scene-song-spark",
+            "ronsas-sovereign-forge",
+            "ronsas-syncvision"
+          ];
+          for(const id of requiredPublic){
+            if(!manifest.productionInclusion.publicSurfaces?.includes(id)) throw new Error(`Missing production-inclusive public surface: ${id}`);
+          }
+          if(!manifest.productionInclusion.externalProductionSurfaces?.includes("ronsas-youtube-optimizer")) throw new Error("YouTube Optimizer must remain in the external production set");
           if(manifest.releaseAttestation?.database?.status!=="verified") throw new Error("Live release must carry a verified production database attestation");
           if(!/^[0-9a-f]{64}$/i.test(String(manifest.releaseAttestation.database.fingerprint||""))) throw new Error("Production database attestation fingerprint is missing");
           if(manifest.releaseAttestation.edgeFunctions?.status!=="verified") throw new Error("Live release must carry a verified Edge Function attestation");

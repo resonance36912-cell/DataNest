@@ -23,7 +23,17 @@
       "type": "product-platform",
       "sourcePath": ".",
       "deliveryPath": "/DataNest/",
-      "lifecycle": "production"
+      "lifecycle": "production",
+      "productionInclusion": "public"
+    },
+    {
+      "id": "datanest-assurance",
+      "name": "DataNest Independent Regulatory Assurance & Audit Services",
+      "type": "service-surface",
+      "sourcePath": "src/app/assurance",
+      "deliveryPath": "/DataNest/assurance/",
+      "lifecycle": "production",
+      "productionInclusion": "public"
     },
     {
       "id": "ronsas-career-compass",
@@ -32,7 +42,8 @@
       "portfolio": "RONSAS",
       "sourcePath": "apps/ronsas/career-compass",
       "deliveryPath": "/DataNest/apps/career-compass/",
-      "lifecycle": "governed"
+      "lifecycle": "production",
+      "productionInclusion": "public"
     },
     {
       "id": "ronsas-creative-studio",
@@ -41,7 +52,8 @@
       "portfolio": "RONSAS",
       "sourcePath": "apps/ronsas/creative-studio",
       "deliveryPath": "/DataNest/apps/creative-studio/",
-      "lifecycle": "governed"
+      "lifecycle": "production",
+      "productionInclusion": "public"
     },
     {
       "id": "ronsas-epublisher",
@@ -50,7 +62,8 @@
       "portfolio": "RONSAS",
       "sourcePath": "apps/ronsas/epublisher",
       "deliveryPath": "/DataNest/apps/epublisher/",
-      "lifecycle": "governed"
+      "lifecycle": "production",
+      "productionInclusion": "public"
     },
     {
       "id": "ronsas-lyricsync-studio",
@@ -59,7 +72,8 @@
       "portfolio": "RONSAS",
       "sourcePath": "apps/ronsas/lyricsync-studio",
       "deliveryPath": "/DataNest/apps/lyricsync-studio/",
-      "lifecycle": "governed"
+      "lifecycle": "production",
+      "productionInclusion": "public"
     },
     {
       "id": "ronsas-scene-song-spark",
@@ -68,7 +82,8 @@
       "portfolio": "RONSAS",
       "sourcePath": "apps/ronsas/scene-song-spark",
       "deliveryPath": "/DataNest/apps/scene-song-spark/",
-      "lifecycle": "governed"
+      "lifecycle": "production",
+      "productionInclusion": "public"
     },
     {
       "id": "ronsas-sovereign-forge",
@@ -77,7 +92,8 @@
       "portfolio": "RONSAS",
       "sourcePath": "apps/ronsas/sovereign-forge",
       "deliveryPath": "/DataNest/apps/sovereign-forge/",
-      "lifecycle": "governed"
+      "lifecycle": "production",
+      "productionInclusion": "public"
     },
     {
       "id": "ronsas-syncvision",
@@ -86,7 +102,8 @@
       "portfolio": "RONSAS",
       "sourcePath": "apps/ronsas/syncvision",
       "deliveryPath": "/DataNest/apps/syncvision/",
-      "lifecycle": "governed"
+      "lifecycle": "production",
+      "productionInclusion": "public"
     },
     {
       "id": "ronsas-youtube-optimizer",
@@ -95,7 +112,8 @@
       "portfolio": "RONSAS",
       "sourcePath": "apps/ronsas/youtube-optimizer",
       "deliveryUrl": "https://youtubeoptimizer.life/",
-      "lifecycle": "governed"
+      "lifecycle": "production",
+      "productionInclusion": "external-production"
     },
     {
       "id": "ronsas-sovereign-backend",
@@ -103,7 +121,8 @@
       "type": "service",
       "portfolio": "RONSAS",
       "sourcePath": "apps/ronsas/sovereign-backend",
-      "lifecycle": "governed"
+      "lifecycle": "governed",
+      "productionInclusion": "production-support"
     },
     {
       "id": "ronsas-shared",
@@ -111,7 +130,8 @@
       "type": "package-set",
       "portfolio": "RONSAS",
       "sourcePath": "apps/ronsas/shared",
-      "lifecycle": "governed"
+      "lifecycle": "governed",
+      "productionInclusion": "production-support"
     }
   ],
   "rdMirror": {
@@ -286,5 +306,37 @@
     "path": "docs/DATANEST_SYSTEM_CHARTER.md",
     "publicUrl": "https://datanest-supository.github.io/DataNest/system-charter/",
     "standardsAlignment": "mapped-not-certified"
+  },
+  "productionInclusion": {
+    "schemaVersion": "production-inclusion-v1",
+    "inclusive": true,
+    "authority": "DataNest-Supository/DataNest:main",
+    "delivery": "GitHub Pages + Supabase",
+    "publicSurfaces": [
+      "datanest",
+      "datanest-assurance",
+      "ronsas-career-compass",
+      "ronsas-creative-studio",
+      "ronsas-epublisher",
+      "ronsas-lyricsync-studio",
+      "ronsas-scene-song-spark",
+      "ronsas-sovereign-forge",
+      "ronsas-syncvision"
+    ],
+    "externalProductionSurfaces": [
+      "ronsas-youtube-optimizer"
+    ],
+    "productionSupportComponents": [
+      "ronsas-sovereign-backend",
+      "ronsas-shared"
+    ],
+    "excludedFromProductionAuthority": [
+      "DataNest-Supository/Mirror-DataNest",
+      "DataNest AI Staging",
+      "DataNest-Supository/FREETREE",
+      "automation/*",
+      "mirror-promotion/*"
+    ],
+    "rule": "Every approved production-capable surface must be represented in the release manifest and verified by the canonical production release. Staging/R&D surfaces never gain canonical production authority by inclusion."
   }
 }

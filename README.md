@@ -2,10 +2,27 @@
 
 **DataNest** is the canonical Resonance AppDev web control plane. It governs product execution intent, promotion, evidence and lifecycle state while preserving separate source, backend and delivery authorities.
 
+
+## Independent assurance services
+
+DataNest offers **private independent regulatory-readiness, technical-audit support, evidence, remediation and authorized digital-oversight services**.
+
+- Public service page: **https://datanest-supository.github.io/DataNest/assurance/**
+- Commercial charter: [`docs/INDEPENDENT_REGULATORY_ASSURANCE_SERVICES.md`](docs/INDEPENDENT_REGULATORY_ASSURANCE_SERVICES.md)
+- Trade & implementation intake: GitHub issue template `Trade & Implementation Interest`
+
+This service does **not** claim statutory government-regulator status, IRBA audit-firm status, accredited ISO certification-body status, or authority to perform private-security surveillance without the registrations required for those reserved activities.
+
 It combines two first-class tools:
 
 - **UNIFI** — project orchestration, planning, Job Manifests, context, checkpoints, artifacts and audit.
 - **TranScheduler** — capability-aware scheduling, dependencies, reservations, retry/backoff, execution history and human controls.
+
+## Production-inclusive baseline
+
+DataNest uses an **inclusive production contract**: every approved production-capable public surface, governed external production target, and production-support component is included in the canonical release manifest and release verification. Mirror-DataNest, staging backends, FREETREE, automation branches, and candidate branches remain explicitly non-production-authoritative.
+
+Contract: [`docs/PRODUCTION_INCLUSION_CONTRACT.md`](docs/PRODUCTION_INCLUSION_CONTRACT.md)
 
 ## Canonical public identity
 

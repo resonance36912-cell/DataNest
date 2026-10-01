@@ -130,7 +130,8 @@ test("Pages post-deployment verification covers all public legal routes and gove
     "privacy",
     "disclaimers",
     "acceptable-use",
-    "intellectual-property"
+    "intellectual-property",
+    "assurance"
   ]) {
     assert.match(pagesWorkflow,new RegExp(`for route in [^\\n]*\\b${route}\\b`));
   }
@@ -148,6 +149,8 @@ test("Pages post-deployment verification covers all public legal routes and gove
   }
 
   assert.match(pagesWorkflow,/https:\/\/youtubeoptimizer\.life\//);
+  assert.match(pagesWorkflow,/production-inclusive Assurance surface/);
+  assert.match(pagesWorkflow,/trade-implementation-interest\.yml/);
   assert.match(pagesWorkflow,/ui-governance-release\.json/);
   assert.match(pagesWorkflow,/release_mode:/);
   assert.match(pagesWorkflow,/owner_test_mode/);

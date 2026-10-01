@@ -198,3 +198,27 @@ test("release manifest records verified database and Edge Function attestations"
   assert.equal(json.releaseAttestation.edgeFunctions.sourceTreeSha256,"b".repeat(64));
   rmSync(dir,{recursive:true,force:true});
 });
+
+
+test("release manifest declares the production-inclusive surface contract",()=>{
+  assert.match(manifestScript,/productionInclusion:\{/);
+  assert.match(manifestScript,/inclusive:true/);
+  for(const id of [
+    "datanest",
+    "datanest-assurance",
+    "ronsas-career-compass",
+    "ronsas-creative-studio",
+    "ronsas-epublisher",
+    "ronsas-lyricsync-studio",
+    "ronsas-scene-song-spark",
+    "ronsas-sovereign-forge",
+    "ronsas-syncvision",
+    "ronsas-youtube-optimizer",
+    "ronsas-sovereign-backend",
+    "ronsas-shared"
+  ]){
+    assert.match(manifestScript,new RegExp(id));
+  }
+  assert.match(pagesWorkflow,/production-inclusive Assurance surface/);
+  assert.match(pagesWorkflow,/DataNest\/assurance\//);
+});
