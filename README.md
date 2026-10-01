@@ -20,7 +20,7 @@ It combines two first-class tools:
 
 ## Production-inclusive baseline
 
-DataNest uses an **inclusive production contract**: every approved production-capable public surface, governed external production target, and production-support component is included in the canonical release manifest and release verification. Mirror-DataNest, staging backends, FREETREE, automation branches, and candidate branches remain explicitly non-production-authoritative.
+DataNest uses an **inclusive production contract**: every approved production-capable public surface, governed external production target, and production-support component is represented in its release contract. `/DataNest/` and `/Mirror-DataNest/` are peer production surfaces with separate release authority; staging backends, FREETREE, automation branches, and candidate branches remain non-production-authoritative unless explicitly assigned to one of those peer surfaces.
 
 Contract: [`docs/PRODUCTION_INCLUSION_CONTRACT.md`](docs/PRODUCTION_INCLUSION_CONTRACT.md)
 
@@ -95,7 +95,7 @@ GitHub and Supabase remain the required source/CI and backend authorities. Dropb
 
 `DataNest-Supository/DataNest` is the canonical Resonance AppDev **Supository**: the governed parent index for Resonance application-development projects, products and services.
 
-The Supository scope includes source/provenance, lifecycle state, delivery routes, release evidence, service relationships and future sovereign Git/registry replication. The current production authority model remains GitHub + GitHub Pages + Supabase; deploying Reson8 Forge does not silently replace it.
+The Supository scope includes source/provenance, lifecycle state, delivery routes, release evidence, service relationships and future sovereign Git/registry replication. The current peer production authority model is GitHub + GitHub Pages + separate Supabase services: DataNest governs `/DataNest/`, while Mirror governs `/Mirror-DataNest/`. Deploying Reson8 Forge does not silently replace either surface.
 
 - Architecture contract: [`docs/DATANEST_SUPOSITORY_ARCHITECTURE.md`](docs/DATANEST_SUPOSITORY_ARCHITECTURE.md)
 - Machine-readable catalog: [`config/supository.catalog.json`](config/supository.catalog.json)

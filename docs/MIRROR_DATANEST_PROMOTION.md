@@ -1,14 +1,14 @@
-# Mirror-DataNest production promotion contract
+# Mirror-DataNest production promotion and peer-authority contract
 
 Canonical repository: `DataNest-Supository/DataNest`
 
-R&D / production-parity candidate repository: `DataNest-Supository/Mirror-DataNest`
+R&D + peer-production repository: `DataNest-Supository/Mirror-DataNest`
 
 ## Production rule
 
-All production-bound changes are developed and exercised in Mirror-DataNest, then return to the canonical DataNest Supository for audit, certification, governance approval and canonical live deployment.
+Mirror owns an independent production surface at `/Mirror-DataNest/`. Changes intended for that surface may be released directly from Mirror `main`. Changes intended for the separate canonical `/DataNest/` surface still return to the canonical DataNest Supository for its audit, certification, governance approval and live deployment.
 
-Mirror-DataNest may publish **its own production-parity candidate site** for visual and functional testing:
+Mirror-DataNest may publish and operate **its own production site**:
 
 `https://datanest-supository.github.io/Mirror-DataNest/`
 
@@ -16,7 +16,22 @@ It may never publish or replace the canonical production endpoint:
 
 `https://datanest-supository.github.io/DataNest/`
 
-The mandatory path is:
+The peer-production path is:
+
+```text
+Mirror/main
+   -> Mirror production release
+   -> /Mirror-DataNest/
+   -> independent Mirror Supabase project
+
+DataNest/main
+   -> canonical production release
+   -> /DataNest/
+   -> canonical production Supabase project
+```
+
+For changes intended to move between the two surfaces, the existing candidate handoff remains mandatory:
+
 
 ```text
 Mirror-DataNest R&D
@@ -55,8 +70,8 @@ Runtime:
 
 - public URL: `https://datanest-supository.github.io/Mirror-DataNest/`
 - source: `Mirror-DataNest/main`
-- backend: **DataNest AI Staging** (`qchttpcyqlqnhvahprhz`)
-- backend mode: isolated staging
+- backend: **Mirror DataNest isolated production** (`qchttpcyqlqnhvahprhz`)
+- backend mode: isolated production
 - canonical production backend is not used for Mirror write testing
 
 Each live build writes `mirror-release.json` with:
@@ -67,7 +82,7 @@ Each live build writes `mirror-release.json` with:
 - public Mirror URL;
 - backend identity;
 - unit/type/dependency observations;
-- explicit non-authority flags.
+- explicit peer-production authority flags.
 
 After deployment, the workflow verifies routes and runs browser tests against the live Mirror pages. The resulting `mirror-live-verification.json`, Playwright evidence and workflow run are retained as governance evidence.
 

@@ -16,12 +16,13 @@ The Supository is broader than a source-code repository. It is the governed inde
 
 ## Authority model
 
-The current production authority model remains unchanged until a separately governed cutover is approved:
+The production authority model is a peer-surface model: each production repository is authoritative for its own public surface and isolated backend. Neither peer may silently overwrite the other.
 
 1. **DataNest** — parent AppDev governance, execution and promotion authority.
-2. **DataNest-Supository/DataNest** — canonical GitHub source, history, CI and evidence authority.
-3. **GitHub Pages** — current public DataNest delivery target.
-4. **Supabase** — governed auth, database, storage and backend-function authority.
+2. **DataNest-Supository/DataNest** — production source, history, CI and evidence authority for `/DataNest/`.
+3. **DataNest-Supository/Mirror-DataNest** — independent production source, history, CI and evidence authority for `/Mirror-DataNest/`.
+4. **GitHub Pages** — public delivery target for both peer surfaces.
+5. **Supabase** — separate backend authority for each production surface.
 5. **Dropbox** — governed backup/recovery artifact host.
 6. **Reson8 Forge** — sovereign Git/registry/automation extension and replica of the Supository; it does not silently replace the current canonical GitHub or Pages authority.
 
@@ -140,12 +141,13 @@ Operators and viewers do not receive the admin toggle.
 
 `DataNest-Supository/Mirror-DataNest` is the designated ungated R&D repository and production-parity candidate deployment environment.
 
-Its two authorities are deliberately separated:
+Its production scope is explicit:
 
-- **Mirror candidate deployment authority: YES** — it may deploy its own `/Mirror-DataNest/` site for testing.
-- **Canonical DataNest deployment authority: NO** — it may not deploy or replace `/DataNest/`.
+- **Mirror production authority: YES** — it may deploy and operate `/Mirror-DataNest/` and its isolated Supabase backend.
+- **Canonical DataNest production authority: NO** — it may not deploy or replace `/DataNest/`.
+- **Canonical DataNest peer authority: YES** — DataNest independently governs `/DataNest/` and its canonical Supabase backend.
 
-The Mirror candidate uses the **DataNest AI Staging** Supabase project (`qchttpcyqlqnhvahprhz`) so reviewers can exercise real functional paths without defaulting writes to the canonical production backend.
+The Mirror production surface uses its isolated Supabase project (`qchttpcyqlqnhvahprhz`) so Mirror production writes never default to the canonical production backend (`sgqdmfgjbprsoqsmgigi`).
 
 Each Mirror live release has an immutable commit and release ID. The Pages workflow verifies the public routes and runs browser-level visual/functional checks against the deployed site.
 
@@ -178,9 +180,9 @@ DataNest/main baseline
     -> exact-SHA governed canonical production deployment
 ```
 
-The canonical release payload requires a Mirror promotion reference, successful live Mirror evidence, DataNest AI Certification evidence for the governed staging backend, and an Audit Optimizer reference before production authorization can resolve.
+The canonical `/DataNest/` release payload continues to require its existing Mirror promotion, live evidence, DataNest AI Certification, and Audit Optimizer references. Those requirements govern the canonical surface only; they do not revoke or gate Mirror's independent `/Mirror-DataNest/` production authority.
 
-A Mirror deployment is therefore **live evidence**, not canonical production authority.
+A Mirror deployment is production-authoritative for `/Mirror-DataNest/` and live evidence for the separate canonical `/DataNest/` surface.
 
 
 ## Specialized tree topology

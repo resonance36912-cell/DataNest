@@ -3,16 +3,18 @@
 **Contract:** production-inclusion-v1  
 **Authority:** `DataNest-Supository/DataNest:main`  
 **Delivery:** GitHub Pages + production Supabase services
+**Authority model:** peer production surfaces
 
 ## Intent
 
 DataNest production is inclusive by default: every approved production-capable public surface, governed external production target, and production-support component is represented in the canonical release contract. A surface cannot be silently omitted from production verification after it has been approved as production-capable.
 
-Production inclusion does **not** grant production authority to staging, R&D, automation, or candidate branches.
+Production inclusion does **not** grant production authority to staging, automation, or candidate branches. Mirror-DataNest is an explicit exception: its `/Mirror-DataNest/` surface is production-authoritative within its own isolated runtime and does not gain authority over `/DataNest/`.
 
 ## Inclusive public production set
 
 - DataNest control plane — `/DataNest/`
+- Mirror-DataNest production surface — `/Mirror-DataNest/` (independent peer production authority)
 - Independent Regulatory Assurance & Audit Services — `/DataNest/assurance/`
 - Career Compass — `/DataNest/apps/career-compass/`
 - Creative Studio — `/DataNest/apps/creative-studio/`
@@ -33,14 +35,13 @@ Production inclusion does **not** grant production authority to staging, R&D, au
 
 ## Explicitly non-production-authoritative
 
-- Mirror-DataNest
-- DataNest AI Staging
+- DataNest AI Staging when used outside the Mirror production contract
 - FREETREE
 - `automation/*` branches
 - `mirror-promotion/*` branches
 - local workstations and local controlled-test runtimes
 
-These environments can generate evidence or candidates, but canonical production authority remains DataNest `main` plus the authorized production release workflow.
+The canonical `/DataNest/` surface remains DataNest `main` plus its authorized production release workflow. The Mirror `/Mirror-DataNest/` surface is independently production-authoritative through Mirror `main` plus its own production release workflow. Neither surface may silently deploy or overwrite the other.
 
 ## Release enforcement
 

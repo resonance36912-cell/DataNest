@@ -136,16 +136,19 @@
   ],
   "rdMirror": {
     "repository": "DataNest-Supository/Mirror-DataNest",
-    "mode": "production-parity-rd-test",
+    "mode": "peer-production-rd",
     "sourceOfTruth": false,
+    "productionAuthority": true,
+    "mirrorProductionDeploymentAuthority": true,
+    "mirrorProductionBackendAuthority": true,
     "canonicalProductionAuthority": false,
     "mirrorCandidateDeploymentAuthority": true,
     "canonicalLiveDeploymentAuthority": false,
     "previewUrl": "https://datanest-supository.github.io/Mirror-DataNest/",
     "backend": {
       "project": "Supabase:qchttpcyqlqnhvahprhz",
-      "name": "DataNest AI Staging",
-      "mode": "isolated-staging"
+      "name": "Mirror DataNest isolated production",
+      "mode": "isolated-production"
     },
     "adminAccess": {
       "canonicalUiToggle": true,
@@ -174,14 +177,15 @@
         "artifacts",
         "events"
       ],
-      "surfaceName": "Mirror-DataNest Production Candidate",
+      "surfaceName": "Mirror-DataNest Production Surface",
       "releaseManifest": "/Mirror-DataNest/mirror-release.json",
       "liveVerificationArtifact": "mirror-live-evidence-<run>-<sha>",
       "certificationWorkflow": ".github/workflows/datanest-ai-certification.yml",
       "stagingSchemaPolicy": "Certification workflow validates governed staging schema and backend acceptance before canonical release."
     },
     "productionPromotion": {
-      "allProductionCandidatesMustReturnToCanonical": true,
+      "allProductionCandidatesMustReturnToCanonical": false,
+      "canonicalHandoffRequiredOnlyFor": "/DataNest/",
       "mirrorLiveWorkflow": "Mirror-DataNest/.github/workflows/pages.yml",
       "candidateWorkflow": "Mirror-DataNest/.github/workflows/production-candidate.yml",
       "canonicalImportWorkflow": ".github/workflows/mirror-production-import.yml",
@@ -198,7 +202,10 @@
         "human reviewer approval",
         "production authorization"
       ],
-      "liveDeploymentAuthority": "DataNest-Supository/DataNest"
+      "liveDeploymentAuthority": {
+        "mirrorSurface": "DataNest-Supository/Mirror-DataNest",
+        "canonicalSurface": "DataNest-Supository/DataNest"
+      }
     }
   },
   "specializedTrees": {
