@@ -177,3 +177,18 @@ test("Certification services are customer-facing with pricing and governed intak
   assert.match(certificationPanel,/external accreditation/i);
   assert.match(products,/CertificationServicesPanel/);
 });
+
+
+const certificationLaunchMigration=fs.readFileSync(path.join(root,"supabase/migrations/20261001170000_certification_business_bank_settlement_launch.sql"),"utf8");
+const bankPaymentMigration=fs.readFileSync(path.join(root,"supabase/migrations/20261001162000_certification_bank_transfer_business_payments.sql"),"utf8");
+const bankPanel=fs.readFileSync(path.join(root,"src/components/CertificationServicesPanel.tsx"),"utf8");
+
+test("bank-transfer payment intake is a governed commercial path",()=>{
+  assert.equal(bankPaymentMigration.includes("settlement_currency text not null default 'ZAR'"),true);
+  assert.equal(bankPaymentMigration.includes("payment_method text not null default 'bank_transfer'"),true);
+  assert.equal(bankPaymentMigration.includes("issued invoices are denominated in ZAR"),true);
+  assert.equal(certificationLaunchMigration.includes("published_pricing_bank_transfer"),true);
+  assert.equal(bankPanel.includes("Bank transfer / EFT"),true);
+  assert.equal(bankPanel.includes("target_requested_currency:requestedCurrency"),true);
+  assert.equal(bankPanel.includes("create_certification_service_request_v2"),true);
+});
