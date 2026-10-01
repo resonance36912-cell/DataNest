@@ -17,6 +17,7 @@ export default function CertificationServicesPanel({projectId}:Props){
   const [reference,setReference]=useState("");
   const [scope,setScope]=useState("");
   const [jurisdiction,setJurisdiction]=useState("");
+  const [requestedCurrency,setRequestedCurrency]=useState("ZAR");
   const [busy,setBusy]=useState(false);
   const [notice,setNotice]=useState("");
   const [error,setError]=useState("");
@@ -33,7 +34,7 @@ export default function CertificationServicesPanel({projectId}:Props){
     try{
       const supabase=getSupabase();
       if(!supabase)throw new Error("DataNest backend is not configured.");
-      const {data,error:rpcError}=await supabase.rpc("create_certification_service_request_v1",{
+      const {data,error:rpcError}=await supabase.rpc("create_certification_service_request_v2",{
         target_project:projectId,
         target_request_key:crypto.randomUUID(),
         target_service_code:serviceCode,
@@ -42,7 +43,8 @@ export default function CertificationServicesPanel({projectId}:Props){
         target_target_kind:targetKind,
         target_target_reference:reference||null,
         target_scope_summary:scope,
-        target_jurisdiction:jurisdiction||null
+        target_jurisdiction:jurisdiction||null,
+        target_requested_currency:requestedCurrency
       });
       if(rpcError)throw rpcError;
       const row=Array.isArray(data)?data[0]:data;
@@ -92,6 +94,7 @@ export default function CertificationServicesPanel({projectId}:Props){
         <p className="eyebrow">REQUEST INTAKE</p>
         <h3>Start a certification engagement</h3>
         <p>Submit the scope and target. DataNest records the request before assessment work begins.</p>
+        <div className="certificationPaymentNotice"><b>Payment method: Bank transfer / EFT</b><span>Issued invoices are settled in ZAR. Foreign-currency preferences are used for quotation only; bank settlement follows the issued ZAR invoice and your bank's applicable conversion process.</span></div>
       </div>
       <label>Service
         <select value={serviceCode} onChange={e=>setServiceCode(e.target.value)}>
@@ -110,11 +113,16 @@ export default function CertificationServicesPanel({projectId}:Props){
         </select>
       </label>
       <label>Reference<input value={reference} onChange={e=>setReference(e.target.value)} placeholder="Public URL or governed reference"/></label>
+      <label>Quote currency preference
+        <select value={requestedCurrency} onChange={e=>setRequestedCurrency(e.target.value)}>
+          {["ZAR","USD","EUR","GBP"].map(item=><option key={item} value={item}>{item}</option>)}
+        </select>
+      </label>
       <label>Jurisdiction<input value={jurisdiction} onChange={e=>setJurisdiction(e.target.value)} placeholder="Optional"/></label>
       <label className="wide">Scope summary<textarea required value={scope} onChange={e=>setScope(e.target.value)} placeholder="What is being assessed, and what should the engagement determine?"/></label>
       {error&&<div className="errorBanner">{error}</div>}
       {notice&&<div className="noticeBanner">{notice}</div>}
-      <div className="externalAuditActions"><button disabled={busy||!targetName.trim()||!scope.trim()} type="submit">{busy?"Submitting…":"Submit service request"}</button><span className="muted">{selectedService.name} · {RESONANCE_CERTIFICATION_PRICING.find(item=>item.serviceCode===serviceCode)?.displayPrice||"Quote required"}</span></div>
+      <div className="externalAuditActions"><button disabled={busy||!targetName.trim()||!scope.trim()} type="submit">{busy?"Submitting…":"Submit service request"}</button><span className="muted">{selectedService.name} · ZAR settlement · {RESONANCE_CERTIFICATION_PRICING.find(item=>item.serviceCode===serviceCode)?.displayPrice||"Quote required"}</span></div>
     </form>
   </section>;
 }
