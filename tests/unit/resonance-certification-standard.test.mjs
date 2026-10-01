@@ -15,7 +15,7 @@ test("RCS defines internal certification boundaries and market claim controls",(
     "RCS-OPS-01",
     "RCS-MKT-01",
     "published introductory pricing is active",
-    "paid checkout is currently disabled",
+    "automated card checkout is disabled",
     "does not by itself represent ISO certification",
     "third-party / accredited certification"
   ]) assert.equal(standard.includes(token),true,token);
