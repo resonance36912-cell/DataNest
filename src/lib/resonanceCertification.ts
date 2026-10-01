@@ -5,6 +5,15 @@ export type ResonanceCertificationClass={
   description:string;
 };
 
+export type ResonanceCertificationPricing={
+  serviceCode:string;
+  currency:"USD";
+  priceModel:"fixed_introductory"|"starting_at";
+  amount:number;
+  displayPrice:string;
+  scopeNote:string;
+};
+
 export type ResonanceCertificationService={
   code:string;
   name:string;
@@ -13,6 +22,14 @@ export type ResonanceCertificationService={
   billingEnabled:boolean;
   commercialState:"free_promotion";
 };
+
+export const RESONANCE_CERTIFICATION_PRICING=[
+  {serviceCode:"RCS-SVC-01",currency:"USD",priceModel:"fixed_introductory",amount:750,displayPrice:"USD 750",scopeNote:"Fixed introductory scope."},
+  {serviceCode:"RCS-SVC-02",currency:"USD",priceModel:"starting_at",amount:3500,displayPrice:"From USD 3,500",scopeNote:"Final quote depends on scope and evidence complexity."},
+  {serviceCode:"RCS-SVC-03",currency:"USD",priceModel:"fixed_introductory",amount:750,displayPrice:"USD 750",scopeNote:"Standalone; may be included in a full certification engagement."},
+  {serviceCode:"RCS-SVC-04",currency:"USD",priceModel:"starting_at",amount:1500,displayPrice:"From USD 1,500",scopeNote:"Based on prior scope and evidence refresh."},
+  {serviceCode:"RCS-SVC-05",currency:"USD",priceModel:"starting_at",amount:1250,displayPrice:"From USD 1,250",scopeNote:"Alignment review; not external accreditation."}
+] satisfies readonly ResonanceCertificationPricing[];
 
 export const RESONANCE_CERTIFICATION_STANDARD={
   id:"RCS",
