@@ -10,6 +10,7 @@ const products=fs.readFileSync(path.join(root,"src/components/ProductsWorkspace.
 const gateway=fs.readFileSync(path.join(root,"supabase/functions/datanest-ai-chat/index.ts"),"utf8");
 const learningGateway=fs.readFileSync(path.join(root,"supabase/functions/_shared/datanestAiLearning.ts"),"utf8");
 const productMigration=fs.readFileSync(path.join(root,"supabase/migrations/20260926055810_add_governed_product_catalog.sql"),"utf8");
+const certificationMigration=fs.readFileSync(path.join(root,"supabase/migrations/20261001140000_resonance_certification_service_offering.sql"),"utf8");
 const ronsasSnapshot=fs.readFileSync(path.join(root,"data/imports/ronsas-product-20260926.jsonl"),"utf8");
 
 test("Products is a first-class DataNest workspace",()=>{
@@ -157,7 +158,8 @@ test("Portfolio Pulse receives governed products with Portfolio Registry lifecyc
 test("Resonance Certification & Assurance is a governed market service offering",()=>{
   assert.match(products,/Resonance Certification & Assurance/);
   assert.match(products,/certification|assurance/i);
-  assert.match(productMigration,/resonance-certification-service-offering|RCS-SVC-01/);
-  assert.match(productMigration,/billing_enabled,false/);
-  assert.match(productMigration,/external_accreditation_claim',false/);
+  assert.match(certificationMigration,/RCS-SVC-01/);
+  assert.match(certificationMigration,/billing_enabled,false/);
+  assert.match(certificationMigration,/external_accreditation_claim/);
+  assert.match(certificationMigration,/external_accreditation_claim',false/);
 });
