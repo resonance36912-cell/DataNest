@@ -21,7 +21,7 @@ export type ResonanceCertificationService={
   description:string;
   output:string;
   billingEnabled:boolean;
-  commercialState:"introductory_pricing_published";
+  commercialState:"introductory_pricing_published"|"published_pricing_bank_transfer";
 };
 
 export const RESONANCE_CERTIFICATION_PRICING=[
