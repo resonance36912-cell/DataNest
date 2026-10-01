@@ -1,0 +1,2393 @@
+{
+  "schemaVersion": "datanest-regulator-state-v1",
+  "generatedAt": "2026-10-01T20:34:36.057Z",
+  "authority": "transparent-system-regulation",
+  "productionAuthorization": false,
+  "status": "blocked",
+  "harmony": {
+    "boundariesLoaded": true,
+    "boundaryScopeCount": 18,
+    "hardRuleCount": 10,
+    "guardianStatus": "degraded",
+    "enforcerStatus": "block",
+    "calmerStatus": "softening-suspended",
+    "environmentCompatible": true,
+    "conductorFresh": false
+  },
+  "requirements": [
+    {
+      "id": "sha256:e448b4bcb47276806168c9741bcc35d51127ce0c673a9f114cbe2829c44ea8ac",
+      "source": "enforcer",
+      "requirementClass": "security",
+      "severity": "critical",
+      "title": "Resolve ENFORCER blocker",
+      "detail": "security-workflow-cancelled",
+      "evidence": [
+        "enforcer.blockers"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:ea60c424234ee8894b737456069d908215c70e4163adab9232af23e7aac45d87",
+      "source": "calmer",
+      "requirementClass": "governance",
+      "severity": "high",
+      "title": "Restore conditions required for governance softening",
+      "detail": "CALMER suspended softening because a non-negotiable health/security condition is not satisfied.",
+      "evidence": [
+        "calmer.status"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:227720d8f88614738887d7499f957de673d886f198a2c25ff52a88b1c87c8ca3",
+      "source": "guardian",
+      "requirementClass": "health",
+      "severity": "high",
+      "title": "Restore GUARDIAN blueprint alignment",
+      "detail": "{\"control\":\"branch-health\",\"available\":false,\"failed\":[]}",
+      "evidence": [
+        "guardian.drift.optimalConditionDrift"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:f6e1a73ec8f40b16a1b8b76014b0d54f878b59d9f018f284fd734a53f0a5bc3a",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Consider route to market: Community + educational content",
+      "detail": "{\"opportunityScore\":64,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":109,\"activationIndexRange\":[93,122],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:26930a9362e2246da1d4915005bba19ea3d652a17a47b07868b3360a3a84d7ba"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:4ca06c4e693e677d8f4762e21dddcd5c5725d068892ecad836730e50e7308839",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Consider route to market: Owned search + public evidence",
+      "detail": "{\"opportunityScore\":68,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":111,\"activationIndexRange\":[94,124],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:5d2942829efb455c47316d5653f9d0e2c2fad472b37a414302a755da11bd55f4"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:76bd5c7a19667627e365142682ef044b6aa9f357741b6018dc5af7e12874ac91",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Consider route to market: Partnership + referral channels",
+      "detail": "{\"opportunityScore\":65,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":109,\"activationIndexRange\":[93,122],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:40aae1398bffe241a2c04c7c12b231a8de956c0d821801447ca375d6d332b297"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:be17b6293d41a018b3104cb58356aa31176d2657808f782f69ad72afc2005585",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Consider route to market: Product-led public proof + demos",
+      "detail": "{\"opportunityScore\":69,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":111,\"activationIndexRange\":[94,125],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:a7a81c4573a41e443883800463f35b7aa7138c0100c0e015cf93d82fcb7c61ed"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:5c5e429527c4a2157e1cd82ae6372b84b316667b3f92d81847c9a0fcc6b2cf22",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Consider route to market: Reson8/RONSAS ecosystem cross-promotion",
+      "detail": "{\"opportunityScore\":70,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":112,\"activationIndexRange\":[95,125],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:22a1f18960f4b7ab298336e701c00746d510c5b9bebdcd952dc8e9f020526374"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:1030e9ba5a0fffe769889ead1188aaad12b0fd3507ac08be101e07b0a5c2c39f",
+      "source": "visibility-utility",
+      "requirementClass": "market-visibility",
+      "severity": "medium",
+      "title": "Resolve market-evidence gap: analytics",
+      "detail": "Market projection confidence is limited until this input is configured or explicitly waived.",
+      "evidence": [
+        "visibility.missingInputs",
+        "analytics"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:bb065129d00b1427c8d6d22c0044c681f4ce95c33da52099e6a3e09fd9a9187a",
+      "source": "visibility-utility",
+      "requirementClass": "market-visibility",
+      "severity": "medium",
+      "title": "Resolve market-evidence gap: commercial-baseline",
+      "detail": "Market projection confidence is limited until this input is configured or explicitly waived.",
+      "evidence": [
+        "visibility.missingInputs",
+        "commercial-baseline"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:dff2c23990776b662a66efbd494b416ab81755bf2fbbef6332b7f6fa4cc6f7f1",
+      "source": "visibility-utility",
+      "requirementClass": "market-visibility",
+      "severity": "medium",
+      "title": "Resolve market-evidence gap: global-trends",
+      "detail": "Market projection confidence is limited until this input is configured or explicitly waived.",
+      "evidence": [
+        "visibility.missingInputs",
+        "global-trends"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:18c4546e7c84ba118788f806e0d498082a426aac33933e3a96ef14e1d7e5e8db",
+      "source": "visibility-utility",
+      "requirementClass": "market-visibility",
+      "severity": "medium",
+      "title": "Resolve market-evidence gap: local-trends",
+      "detail": "Market projection confidence is limited until this input is configured or explicitly waived.",
+      "evidence": [
+        "visibility.missingInputs",
+        "local-trends"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:8f30a088d7af98a3c61f9308b1d9b783529bda3e8fb4fd799424f8fd423e0c27",
+      "source": "conductor",
+      "requirementClass": "timing",
+      "severity": "medium",
+      "title": "Restore synchronized process timing",
+      "detail": "CONDUCTOR reports one or more specialized processes are stale, active, blocked or awaiting refresh.",
+      "evidence": [
+        "conductor.processes",
+        "conductor.nextCommand"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:5a18b368f77a70c3fe34dcb88524fe0f7eddb084c983c52448763edc45ddf7fb",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"scripts/enforcer-monitor.mjs\",\"line\":46,\"detail\":\"164-line function: export function buildEnforcerAssessment({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:f3bf4e9b4d5c8faf1451dfd6a26b92805f95fd78391b0ae964b8962f35dca2c0"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:baaaff14bab74d439ea20c05508d896a2837c2928046b0413d6ab7ac5542f03d",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"scripts/guardian-health.mjs\",\"line\":202,\"detail\":\"374-line function: export function buildGuardianSnapshot({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:84fda8515e7e7bab6b937f0c66bf45815c609dca8ec6d0ce4730e78ac39a4362"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:4d575404c35ff6e6a8893fe14bd1662529f5cd94de5510d8f85c0640f50238a4",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"scripts/regulator-engine.mjs\",\"line\":23,\"detail\":\"174-line function: export function buildRegulatorState({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:61c05f677ff749c695a914a0551cca9ceb5bb3b4c5ab69a6f4856c14f1736550"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:ba82a03bf88818e6cfc475debf519d635fa8943ee690dbee880e47504c493a00",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"scripts/suggester-engine.mjs\",\"line\":22,\"detail\":\"290-line function: export function buildSuggesterFeed({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:7417eaa80f4d71a606d6efc22196028f5466c72dfb641a141202fbdc9ab377a7"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:2d764c43549ccecd2a20a29e7e5c3b5689b4eafc1cd734f0d738505c1d309b86",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AdminRndModeToggle.tsx\",\"line\":34,\"detail\":\"243-line function: export default function AdminRndModeToggle({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:02b6af860d9d98d04072928974c0b091c619bcade32486ef3ad3f35fa2470256"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:f2d5942362a41f409ad47e423abc5e55d45af73654d21fac8b6de3791dcf8485",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AdminRndModeToggle.tsx\",\"line\":55,\"detail\":\"166-line function: async function loadAndSynchronizeMirror(){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:0be75b60af175f42f628ae692b865fad2b08f01ae960a2169408c3d9c99854fc"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:b759937a8e7523d31fbf1d5c19e7f158388ad39464329aeb9c062f41818cedba",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AiOperationsDashboard.tsx\",\"line\":79,\"detail\":\"419-line function: export default function AiOperationsDashboard({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:e4c390862aa8f8c3cd29b9e63619f98b3cb2a7b808e90cb11b9457fa5361bdd8"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:f143753157d4a92e4d29e4131edecd1cfd4a25e21abf734d47aad479a94b092f",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AiReconciliationPanel.tsx\",\"line\":32,\"detail\":\"148-line function: export default function AiReconciliationPanel({projectId}:{projectId:string}){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:3a02540dadc5adf057a1b57f3776205b73540422f4d8617c0e8c36c16e52f9a0"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:c716eeba1142c56bfda7e8c0dfe81593c8d71a98170e8bdb7126843512bf057b",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AuthGate.tsx\",\"line\":36,\"detail\":\"315-line function: export default function AuthGate() {\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:d994104d422dff34f2600c13d730074428e13e15959119a1082001844e46e58e"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:440c35c5c461ce900e4d350545142fad54381b6d565c7475f9de642d44d40374",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/CollaborationVisual.tsx\",\"line\":45,\"detail\":\"207-line function: export default function CollaborationVisual({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:437f025cb0f3ca2a342f2e5935e4b19669d3424e4c49bbb78d5c39a776197fb2"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:5a560df9522906aecc075371cd3587bbd09573d751f369fa659638382b41d2f1",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/DataNestAiCertificationPanel.tsx\",\"detail\":\"984 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:6763fee46157656e466849f33e6f33c84382abc09f918c6429546843766aba47"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:17ba0fa40a03c46527173125a4a8542c6c5c7f015718d126e5ef52274b3ba5c9",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestAiCertificationPanel.tsx\",\"line\":203,\"detail\":\"781-line function: export default function DataNestAiCertificationPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:6951612ff14a2bf9f556943ce51899923b680f3f1aeb26cc7668f71285d33c45"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:b2e778365c3d32e45973e232bb175806f7047b0741ca13c40d1cabb1f8524ffb",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestAiChatPanel.tsx\",\"line\":121,\"detail\":\"415-line function: export default function DataNestAiChatPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:f3b43fa2c19746f56d3ff8822a74c3ca0b7366802f082f3a74881a934562e0a9"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:8544a3ffdb3b217585e7e54ebd66d01c913cdf04e00a466495f6a3b0f0cffcb6",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestAiChatPanel.tsx\",\"line\":209,\"detail\":\"117-line function: async function send(event:FormEvent){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:3e097b53f9f86df2648bc0356a6e186981739f7708ef4dfb63d0b9eef042b226"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:692d917f9a18699c9018a94a057846d7bba70f153eec1a6d2780a3b4eb0b9c3f",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestAiWorkspace.tsx\",\"line\":63,\"detail\":\"437-line function: export default function DataNestAiWorkspace({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:860517e1e5e8d9a5afbce4e7e800e9ecd3c58de77434c95e60b9d6daf2778ced"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:dbe810562d3e2905a17d840f709050ab06d6d1a09f3af36d40ffd1e74cdb7990",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/DataNestApp.tsx\",\"detail\":\"2587 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:892b05f8f19a220ceee3cb1aacd4f2b58d129b70328a30afed659645579244c8"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:46c53e013aa4653bccd0296909dbd3c4abe43105eee858d7fbae30656bdb7ae2",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestApp.tsx\",\"line\":435,\"detail\":\"1361-line function: export default function DataNestApp({session}:{session:Session}) {\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:06ca401c13cd1ffe65759ab66826aedc84662ea107feb95867162b592b162454"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:0c6f15c71f099225ab1281f6cd870221e009b5dc436a0cba2dffef2338b20159",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestApp.tsx\",\"line\":1872,\"detail\":\"211-line function: function UnifiPlanner({project,currentUserId,jobs,capabilities,reload,setNotice,setError,canOperate,page,total,onPage,activeJobId}:{project:\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:ae03d6d48586c6093d1210c5d055c3f4b48b5e71d479b525871b9f6695353c8d"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:988c0a84072f69ee8a197cb9652a1392e4bfa1e7bcfc17edf9b2fbb14f26783e",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestApp.tsx\",\"line\":2113,\"detail\":\"236-line function: function Scheduler({projectId,projectName,projectSlug,currentUserId,role,jobs,capabilities,onStatus,canOperate,page,total,onPage,onNavigate,\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:81e172c413c39a558ac2f24416612c872397fb6de0401997507c403b11c2572b"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:1ee95740b1073718c7b7ea04688298f6ae6d0f8d99731bb945ce674347252d04",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestApp.tsx\",\"line\":2411,\"detail\":\"95-line function: function SchedulerGantt({projectName,projectSlug,jobs,onStatus,canOperate,activeJobId,userInterests}:{projectName:string;projectSlug:string;\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:19b901fc1565c70336f91d43baf971505e024cab4b30fbff720b54407200be4e"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:9c9a81c143ceff717434695bca53141f6360633bb8b4c2978162d43168cfcee5",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestDashboard.tsx\",\"line\":84,\"detail\":\"236-line function: export default function DataNestDashboard({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:e4a713bc29cd0de6fe011c7f90b1e9b8d6210c2e2518ef52d60e7ac58e62504a"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:18db7be4f7d673228777d4e9de70c74e186de8d5d6571689de06a863a0f9740f",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DevelopmentWorkContributionDashboard.tsx\",\"line\":88,\"detail\":\"120-line function: export default function DevelopmentWorkContributionDashboard({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:9b70a30e9430a38aff6bb8b8aa88db385545ab6128b62ee8863da636f599ea10"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:043242f26fe3dcaa0fb9786d0de5fcef5fbf54ce08d84b6d941b93e145d08428",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ExecutionAuthorityPanel.tsx\",\"line\":85,\"detail\":\"442-line function: export default function ExecutionAuthorityPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:2143175be5460ded3f122af6087213abd1f9e87909462bb68b9bd3735c96f7dd"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:3e041082988896383c91aac1f7e2f141adfae4e72313c36752adc774eddacbbb",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/ExternalAiSidebar.tsx\",\"detail\":\"1072 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:c22c6467c616a0739d1729043f97299001746a1a3c44a22e676381d709f6042c"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:040dfcf21fd52fb315a43de7fa43b28cd791e54f244e5b22c673ea367c48f9bf",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ExternalAiSidebar.tsx\",\"line\":61,\"detail\":\"1011-line function: export default function ExternalAiSidebar({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:5185ddbe200de379527c4bc7520639b96ee62fbe38865aabc1abcb5661a2bd85"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:7effb9cf78933615cf308bb52cd7094d1c8d396aa8edd4c0968d23f09b4343df",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ExternalAiSidebar.tsx\",\"line\":601,\"detail\":\"103-line function: async function startSession(mode:\\\"sidebar\\\"|\\\"companion\\\"|\\\"popout\\\"){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:53749c6dffd74bb9c31cefc1f9a809ba39658e7d7611758df600addd3b300b65"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:e92276f54be24972ed58d9fcd129ecb487c80a8452df922cd5e65a23f49a205f",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ExternalAuditor.tsx\",\"line\":11,\"detail\":\"116-line function: export default function ExternalAuditor({projectId,role}:ExternalAuditorProps){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:e016af990f160dad88ae464357971c48457b9797d94cb16a674cd34ceebeed00"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:20cacd88c52d1c3fb07e033ba98f903842fafba2eafe7ff4f421f20c9440e468",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/GovernanceControlMonitor.tsx\",\"line\":66,\"detail\":\"201-line function: export default function GovernanceControlMonitor({projectId}:{projectId:string}){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:7d1cc7fc03650243e5c51b7c5879efb423eeb93b82f44c81cdf8165054b0209b"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:5daf66f7374b4a5e8084b39992865f6733ef68fd09a539b5dabf63e324d7bd0e",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/GovernanceImprovementPanel.tsx\",\"detail\":\"991 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:107e4f9a1219810431728c1c13a39a1fe7733e952c4c3673f0fc65c60e7d2858"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:07e0397ccde9ced2fcbc1de5d0089ad14667ebe898da4df976bf11abe8fd5f9e",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/GovernanceWorkspace.tsx\",\"line\":90,\"detail\":\"479-line function: export default function GovernanceWorkspace({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:4e74f0bf9fbc36b186abe6c5da96ffcd2b921dda885bc3decf73c3d18df6dc14"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:cbbadbb5e289f7f48d2baf9d2deeb1b3e1dcee30a6e9f565a0c3ea06ea49c521",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/IntelligenceFabricPanel.tsx\",\"line\":51,\"detail\":\"219-line function: export default function IntelligenceFabricPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:7d8318059e4f9a5f840d3fb84a29c77c58ff6ebea7cca455a9b6d78c4ff22b55"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:f582e7062673d1dc62af4145ed830821d5545d6bf11a3b497b0631c980d6750c",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/OwnerOptimizerDashboard.tsx\",\"line\":90,\"detail\":\"283-line function: export default function OwnerOptimizerDashboard({projectId}:{projectId:string}){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:f5765b461acbaca3c6d0b2311210b7b4cca7deb0a25de452ab3a393edb9da28b"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:32f1eaffb2197714a3cc770709f7a09ce9364c9c3d9cc85c06f6090fdd446bb5",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/PortfolioRegistryPanel.tsx\",\"line\":55,\"detail\":\"408-line function: export default function PortfolioRegistryPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:e42880a552722fc1a1881280dd1fc780785ade19d6160b985ceafc478941d622"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:cb53f07250d4be75a30785b4c000ff83c78ac00297072ef63d3b712d02b971eb",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ProductLab.tsx\",\"line\":48,\"detail\":\"446-line function: export default function ProductLab({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:7b9b453fce766393ed79a71bd5837b0beb333cdc5bb25ff4d70887a8a3f19a54"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:2e854e7948660fc789b468c242484fb28e275918eb074c4b1e26b451cba0face",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/ProductsWorkspace.tsx\",\"detail\":\"1076 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:113d1904c5cb55f5443b2c6391ac147eb77f1af2ae0ffbd3b5b1badf0dfd2526"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:475b796a602e8c91e517f7f6c3283c6250bc3846ef1417f1f171dbf0ee3f400e",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ProductsWorkspace.tsx\",\"line\":204,\"detail\":\"872-line function: export default function ProductsWorkspace({projectId,currentUserId,role}:Props){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:d592eb7faea85802e1a063045bfac47128617dfa41d293950223cac6199c79e2"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:f492b84777fa58a32b0d7d00d354a5685f03a72e1684262a7b18ab4164b67d55",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ProjectMembersPanel.tsx\",\"line\":64,\"detail\":\"388-line function: export default function ProjectMembersPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:9a80472a4c329323d039df2da9e63f56eaceef5a78b360e0e815eebc170c14b2"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:8ef2b71a776a8310d7c88a315b836baed541cfa141d82ced910c916dcf84d67e",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/RecoveryDiagnosticsPanel.tsx\",\"line\":30,\"detail\":\"105-line function: export default function RecoveryDiagnosticsPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:0b3c5b7125ce9ff94573cfab60e40bb1c01f4796e135755fe1a3d2150f5def8e"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:66f162a3756eafadda91636f2834b6d89aa0c31cce141b6bcf170e0bddc6ffa7",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ResonanceHome.tsx\",\"line\":25,\"detail\":\"197-line function: export default function ResonanceHome({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:dd08603a2129d2f0696e24ebd107026160c409834adfccb5cddc6315239d4493"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:255ed86bb7d340039657cece682f6b050fb05753d4bcc95e3561141217f99537",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ResonancePortfolioPulse.tsx\",\"line\":62,\"detail\":\"113-line function: export default function ResonancePortfolioPulse({products,records,loading}:Props){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:a29221ce6db8aaec9249da6f7789abf4737840fa6c59e589d018b7ca6de77e22"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:2784476c3daa6c2ef4079909a8ade3efc92b7420493f6662f2a1a6965836c85e",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ResourceFabricPanel.tsx\",\"line\":53,\"detail\":\"266-line function: export default function ResourceFabricPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:362da512156080ac1e105dca82324a970225cbc2955181f534ca4b69ebbe9fe2"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:0f5fbad38034a3bf08d3ef2ccadb476bdb5aaf2a9c7d80cc19b8e503301011a7",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/RndDeviceAdministration.tsx\",\"line\":83,\"detail\":\"244-line function: export default function RndDeviceAdministration({projectId,role}:{projectId:string;role:AdminRole}){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:da3443d6d21e1e52ac52af155571565079f2037fd795f01c1e874468cc2ae0e8"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:d2171a818042e94d9df79c5ac2e2bbba2adb174826a80b8cdab1d031e205cf61",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/SparksWorkspace.tsx\",\"line\":54,\"detail\":\"413-line function: export default function SparksWorkspace({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:6867c7045fda3637678068c054e6737cf6e68b504a37b1bd413146564a33374b"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:5312b0984e6ae3dc0c18818a230dc38ff772830316d7dc1a9efab3b8ee219860",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/StakeholderWorkspace.tsx\",\"line\":114,\"detail\":\"367-line function: export default function StakeholderWorkspace({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:2d08856228135e90f8d1c58ff1623303d99802444fca8fb7d62699c576a014a5"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    },
+    {
+      "id": "sha256:40c191c1f2e8cfe499f06349966fb8130486f700ca9189fa502fa884b2994fc1",
+      "source": "suggester",
+      "requirementClass": "optimization",
+      "severity": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ThinkTankWorkspace.tsx\",\"line\":57,\"detail\":\"574-line function: export default function ThinkTankWorkspace({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "evidence": [
+        "suggester.suggestions",
+        "sha256:b9d3bc86e9f5f9de0695f0862bc9767cceec5797d1e0d3c5a536197f3b1209ac"
+      ],
+      "botsquadTasks": [
+        "audit",
+        "stress-test",
+        "acquisition-scout",
+        "supply-readiness",
+        "action-plan"
+      ],
+      "productionAuthorization": false
+    }
+  ],
+  "botsquadPacket": {
+    "schemaVersion": "datanest-regulator-botsquad-requirements-v1",
+    "generatedAt": "2026-10-01T20:34:36.057Z",
+    "authority": "requirement-request",
+    "productionAuthorization": false,
+    "status": "blocked",
+    "requirements": [
+      {
+        "id": "sha256:e448b4bcb47276806168c9741bcc35d51127ce0c673a9f114cbe2829c44ea8ac",
+        "source": "enforcer",
+        "requirementClass": "security",
+        "severity": "critical",
+        "title": "Resolve ENFORCER blocker",
+        "detail": "security-workflow-cancelled",
+        "evidence": [
+          "enforcer.blockers"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:ea60c424234ee8894b737456069d908215c70e4163adab9232af23e7aac45d87",
+        "source": "calmer",
+        "requirementClass": "governance",
+        "severity": "high",
+        "title": "Restore conditions required for governance softening",
+        "detail": "CALMER suspended softening because a non-negotiable health/security condition is not satisfied.",
+        "evidence": [
+          "calmer.status"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:227720d8f88614738887d7499f957de673d886f198a2c25ff52a88b1c87c8ca3",
+        "source": "guardian",
+        "requirementClass": "health",
+        "severity": "high",
+        "title": "Restore GUARDIAN blueprint alignment",
+        "detail": "{\"control\":\"branch-health\",\"available\":false,\"failed\":[]}",
+        "evidence": [
+          "guardian.drift.optimalConditionDrift"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:f6e1a73ec8f40b16a1b8b76014b0d54f878b59d9f018f284fd734a53f0a5bc3a",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Consider route to market: Community + educational content",
+        "detail": "{\"opportunityScore\":64,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":109,\"activationIndexRange\":[93,122],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:26930a9362e2246da1d4915005bba19ea3d652a17a47b07868b3360a3a84d7ba"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:4ca06c4e693e677d8f4762e21dddcd5c5725d068892ecad836730e50e7308839",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Consider route to market: Owned search + public evidence",
+        "detail": "{\"opportunityScore\":68,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":111,\"activationIndexRange\":[94,124],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:5d2942829efb455c47316d5653f9d0e2c2fad472b37a414302a755da11bd55f4"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:76bd5c7a19667627e365142682ef044b6aa9f357741b6018dc5af7e12874ac91",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Consider route to market: Partnership + referral channels",
+        "detail": "{\"opportunityScore\":65,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":109,\"activationIndexRange\":[93,122],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:40aae1398bffe241a2c04c7c12b231a8de956c0d821801447ca375d6d332b297"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:be17b6293d41a018b3104cb58356aa31176d2657808f782f69ad72afc2005585",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Consider route to market: Product-led public proof + demos",
+        "detail": "{\"opportunityScore\":69,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":111,\"activationIndexRange\":[94,125],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:a7a81c4573a41e443883800463f35b7aa7138c0100c0e015cf93d82fcb7c61ed"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:5c5e429527c4a2157e1cd82ae6372b84b316667b3f92d81847c9a0fcc6b2cf22",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Consider route to market: Reson8/RONSAS ecosystem cross-promotion",
+        "detail": "{\"opportunityScore\":70,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":112,\"activationIndexRange\":[95,125],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:22a1f18960f4b7ab298336e701c00746d510c5b9bebdcd952dc8e9f020526374"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:1030e9ba5a0fffe769889ead1188aaad12b0fd3507ac08be101e07b0a5c2c39f",
+        "source": "visibility-utility",
+        "requirementClass": "market-visibility",
+        "severity": "medium",
+        "title": "Resolve market-evidence gap: analytics",
+        "detail": "Market projection confidence is limited until this input is configured or explicitly waived.",
+        "evidence": [
+          "visibility.missingInputs",
+          "analytics"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:bb065129d00b1427c8d6d22c0044c681f4ce95c33da52099e6a3e09fd9a9187a",
+        "source": "visibility-utility",
+        "requirementClass": "market-visibility",
+        "severity": "medium",
+        "title": "Resolve market-evidence gap: commercial-baseline",
+        "detail": "Market projection confidence is limited until this input is configured or explicitly waived.",
+        "evidence": [
+          "visibility.missingInputs",
+          "commercial-baseline"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:dff2c23990776b662a66efbd494b416ab81755bf2fbbef6332b7f6fa4cc6f7f1",
+        "source": "visibility-utility",
+        "requirementClass": "market-visibility",
+        "severity": "medium",
+        "title": "Resolve market-evidence gap: global-trends",
+        "detail": "Market projection confidence is limited until this input is configured or explicitly waived.",
+        "evidence": [
+          "visibility.missingInputs",
+          "global-trends"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:18c4546e7c84ba118788f806e0d498082a426aac33933e3a96ef14e1d7e5e8db",
+        "source": "visibility-utility",
+        "requirementClass": "market-visibility",
+        "severity": "medium",
+        "title": "Resolve market-evidence gap: local-trends",
+        "detail": "Market projection confidence is limited until this input is configured or explicitly waived.",
+        "evidence": [
+          "visibility.missingInputs",
+          "local-trends"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:8f30a088d7af98a3c61f9308b1d9b783529bda3e8fb4fd799424f8fd423e0c27",
+        "source": "conductor",
+        "requirementClass": "timing",
+        "severity": "medium",
+        "title": "Restore synchronized process timing",
+        "detail": "CONDUCTOR reports one or more specialized processes are stale, active, blocked or awaiting refresh.",
+        "evidence": [
+          "conductor.processes",
+          "conductor.nextCommand"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:5a18b368f77a70c3fe34dcb88524fe0f7eddb084c983c52448763edc45ddf7fb",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"scripts/enforcer-monitor.mjs\",\"line\":46,\"detail\":\"164-line function: export function buildEnforcerAssessment({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:f3bf4e9b4d5c8faf1451dfd6a26b92805f95fd78391b0ae964b8962f35dca2c0"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:baaaff14bab74d439ea20c05508d896a2837c2928046b0413d6ab7ac5542f03d",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"scripts/guardian-health.mjs\",\"line\":202,\"detail\":\"374-line function: export function buildGuardianSnapshot({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:84fda8515e7e7bab6b937f0c66bf45815c609dca8ec6d0ce4730e78ac39a4362"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:4d575404c35ff6e6a8893fe14bd1662529f5cd94de5510d8f85c0640f50238a4",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"scripts/regulator-engine.mjs\",\"line\":23,\"detail\":\"174-line function: export function buildRegulatorState({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:61c05f677ff749c695a914a0551cca9ceb5bb3b4c5ab69a6f4856c14f1736550"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:ba82a03bf88818e6cfc475debf519d635fa8943ee690dbee880e47504c493a00",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"scripts/suggester-engine.mjs\",\"line\":22,\"detail\":\"290-line function: export function buildSuggesterFeed({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:7417eaa80f4d71a606d6efc22196028f5466c72dfb641a141202fbdc9ab377a7"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:2d764c43549ccecd2a20a29e7e5c3b5689b4eafc1cd734f0d738505c1d309b86",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AdminRndModeToggle.tsx\",\"line\":34,\"detail\":\"243-line function: export default function AdminRndModeToggle({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:02b6af860d9d98d04072928974c0b091c619bcade32486ef3ad3f35fa2470256"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:f2d5942362a41f409ad47e423abc5e55d45af73654d21fac8b6de3791dcf8485",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AdminRndModeToggle.tsx\",\"line\":55,\"detail\":\"166-line function: async function loadAndSynchronizeMirror(){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:0be75b60af175f42f628ae692b865fad2b08f01ae960a2169408c3d9c99854fc"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:b759937a8e7523d31fbf1d5c19e7f158388ad39464329aeb9c062f41818cedba",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AiOperationsDashboard.tsx\",\"line\":79,\"detail\":\"419-line function: export default function AiOperationsDashboard({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:e4c390862aa8f8c3cd29b9e63619f98b3cb2a7b808e90cb11b9457fa5361bdd8"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:f143753157d4a92e4d29e4131edecd1cfd4a25e21abf734d47aad479a94b092f",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AiReconciliationPanel.tsx\",\"line\":32,\"detail\":\"148-line function: export default function AiReconciliationPanel({projectId}:{projectId:string}){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:3a02540dadc5adf057a1b57f3776205b73540422f4d8617c0e8c36c16e52f9a0"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:c716eeba1142c56bfda7e8c0dfe81593c8d71a98170e8bdb7126843512bf057b",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AuthGate.tsx\",\"line\":36,\"detail\":\"315-line function: export default function AuthGate() {\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:d994104d422dff34f2600c13d730074428e13e15959119a1082001844e46e58e"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:440c35c5c461ce900e4d350545142fad54381b6d565c7475f9de642d44d40374",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/CollaborationVisual.tsx\",\"line\":45,\"detail\":\"207-line function: export default function CollaborationVisual({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:437f025cb0f3ca2a342f2e5935e4b19669d3424e4c49bbb78d5c39a776197fb2"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:5a560df9522906aecc075371cd3587bbd09573d751f369fa659638382b41d2f1",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/DataNestAiCertificationPanel.tsx\",\"detail\":\"984 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:6763fee46157656e466849f33e6f33c84382abc09f918c6429546843766aba47"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:17ba0fa40a03c46527173125a4a8542c6c5c7f015718d126e5ef52274b3ba5c9",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestAiCertificationPanel.tsx\",\"line\":203,\"detail\":\"781-line function: export default function DataNestAiCertificationPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:6951612ff14a2bf9f556943ce51899923b680f3f1aeb26cc7668f71285d33c45"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:b2e778365c3d32e45973e232bb175806f7047b0741ca13c40d1cabb1f8524ffb",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestAiChatPanel.tsx\",\"line\":121,\"detail\":\"415-line function: export default function DataNestAiChatPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:f3b43fa2c19746f56d3ff8822a74c3ca0b7366802f082f3a74881a934562e0a9"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:8544a3ffdb3b217585e7e54ebd66d01c913cdf04e00a466495f6a3b0f0cffcb6",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestAiChatPanel.tsx\",\"line\":209,\"detail\":\"117-line function: async function send(event:FormEvent){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:3e097b53f9f86df2648bc0356a6e186981739f7708ef4dfb63d0b9eef042b226"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:692d917f9a18699c9018a94a057846d7bba70f153eec1a6d2780a3b4eb0b9c3f",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestAiWorkspace.tsx\",\"line\":63,\"detail\":\"437-line function: export default function DataNestAiWorkspace({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:860517e1e5e8d9a5afbce4e7e800e9ecd3c58de77434c95e60b9d6daf2778ced"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:dbe810562d3e2905a17d840f709050ab06d6d1a09f3af36d40ffd1e74cdb7990",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/DataNestApp.tsx\",\"detail\":\"2587 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:892b05f8f19a220ceee3cb1aacd4f2b58d129b70328a30afed659645579244c8"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:46c53e013aa4653bccd0296909dbd3c4abe43105eee858d7fbae30656bdb7ae2",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestApp.tsx\",\"line\":435,\"detail\":\"1361-line function: export default function DataNestApp({session}:{session:Session}) {\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:06ca401c13cd1ffe65759ab66826aedc84662ea107feb95867162b592b162454"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:0c6f15c71f099225ab1281f6cd870221e009b5dc436a0cba2dffef2338b20159",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestApp.tsx\",\"line\":1872,\"detail\":\"211-line function: function UnifiPlanner({project,currentUserId,jobs,capabilities,reload,setNotice,setError,canOperate,page,total,onPage,activeJobId}:{project:\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:ae03d6d48586c6093d1210c5d055c3f4b48b5e71d479b525871b9f6695353c8d"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:988c0a84072f69ee8a197cb9652a1392e4bfa1e7bcfc17edf9b2fbb14f26783e",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestApp.tsx\",\"line\":2113,\"detail\":\"236-line function: function Scheduler({projectId,projectName,projectSlug,currentUserId,role,jobs,capabilities,onStatus,canOperate,page,total,onPage,onNavigate,\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:81e172c413c39a558ac2f24416612c872397fb6de0401997507c403b11c2572b"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:1ee95740b1073718c7b7ea04688298f6ae6d0f8d99731bb945ce674347252d04",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestApp.tsx\",\"line\":2411,\"detail\":\"95-line function: function SchedulerGantt({projectName,projectSlug,jobs,onStatus,canOperate,activeJobId,userInterests}:{projectName:string;projectSlug:string;\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:19b901fc1565c70336f91d43baf971505e024cab4b30fbff720b54407200be4e"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:9c9a81c143ceff717434695bca53141f6360633bb8b4c2978162d43168cfcee5",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestDashboard.tsx\",\"line\":84,\"detail\":\"236-line function: export default function DataNestDashboard({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:e4a713bc29cd0de6fe011c7f90b1e9b8d6210c2e2518ef52d60e7ac58e62504a"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:18db7be4f7d673228777d4e9de70c74e186de8d5d6571689de06a863a0f9740f",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DevelopmentWorkContributionDashboard.tsx\",\"line\":88,\"detail\":\"120-line function: export default function DevelopmentWorkContributionDashboard({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:9b70a30e9430a38aff6bb8b8aa88db385545ab6128b62ee8863da636f599ea10"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:043242f26fe3dcaa0fb9786d0de5fcef5fbf54ce08d84b6d941b93e145d08428",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ExecutionAuthorityPanel.tsx\",\"line\":85,\"detail\":\"442-line function: export default function ExecutionAuthorityPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:2143175be5460ded3f122af6087213abd1f9e87909462bb68b9bd3735c96f7dd"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:3e041082988896383c91aac1f7e2f141adfae4e72313c36752adc774eddacbbb",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/ExternalAiSidebar.tsx\",\"detail\":\"1072 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:c22c6467c616a0739d1729043f97299001746a1a3c44a22e676381d709f6042c"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:040dfcf21fd52fb315a43de7fa43b28cd791e54f244e5b22c673ea367c48f9bf",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ExternalAiSidebar.tsx\",\"line\":61,\"detail\":\"1011-line function: export default function ExternalAiSidebar({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:5185ddbe200de379527c4bc7520639b96ee62fbe38865aabc1abcb5661a2bd85"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:7effb9cf78933615cf308bb52cd7094d1c8d396aa8edd4c0968d23f09b4343df",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ExternalAiSidebar.tsx\",\"line\":601,\"detail\":\"103-line function: async function startSession(mode:\\\"sidebar\\\"|\\\"companion\\\"|\\\"popout\\\"){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:53749c6dffd74bb9c31cefc1f9a809ba39658e7d7611758df600addd3b300b65"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:e92276f54be24972ed58d9fcd129ecb487c80a8452df922cd5e65a23f49a205f",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ExternalAuditor.tsx\",\"line\":11,\"detail\":\"116-line function: export default function ExternalAuditor({projectId,role}:ExternalAuditorProps){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:e016af990f160dad88ae464357971c48457b9797d94cb16a674cd34ceebeed00"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:20cacd88c52d1c3fb07e033ba98f903842fafba2eafe7ff4f421f20c9440e468",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/GovernanceControlMonitor.tsx\",\"line\":66,\"detail\":\"201-line function: export default function GovernanceControlMonitor({projectId}:{projectId:string}){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:7d1cc7fc03650243e5c51b7c5879efb423eeb93b82f44c81cdf8165054b0209b"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:5daf66f7374b4a5e8084b39992865f6733ef68fd09a539b5dabf63e324d7bd0e",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/GovernanceImprovementPanel.tsx\",\"detail\":\"991 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:107e4f9a1219810431728c1c13a39a1fe7733e952c4c3673f0fc65c60e7d2858"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:07e0397ccde9ced2fcbc1de5d0089ad14667ebe898da4df976bf11abe8fd5f9e",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/GovernanceWorkspace.tsx\",\"line\":90,\"detail\":\"479-line function: export default function GovernanceWorkspace({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:4e74f0bf9fbc36b186abe6c5da96ffcd2b921dda885bc3decf73c3d18df6dc14"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:cbbadbb5e289f7f48d2baf9d2deeb1b3e1dcee30a6e9f565a0c3ea06ea49c521",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/IntelligenceFabricPanel.tsx\",\"line\":51,\"detail\":\"219-line function: export default function IntelligenceFabricPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:7d8318059e4f9a5f840d3fb84a29c77c58ff6ebea7cca455a9b6d78c4ff22b55"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:f582e7062673d1dc62af4145ed830821d5545d6bf11a3b497b0631c980d6750c",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/OwnerOptimizerDashboard.tsx\",\"line\":90,\"detail\":\"283-line function: export default function OwnerOptimizerDashboard({projectId}:{projectId:string}){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:f5765b461acbaca3c6d0b2311210b7b4cca7deb0a25de452ab3a393edb9da28b"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:32f1eaffb2197714a3cc770709f7a09ce9364c9c3d9cc85c06f6090fdd446bb5",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/PortfolioRegistryPanel.tsx\",\"line\":55,\"detail\":\"408-line function: export default function PortfolioRegistryPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:e42880a552722fc1a1881280dd1fc780785ade19d6160b985ceafc478941d622"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:cb53f07250d4be75a30785b4c000ff83c78ac00297072ef63d3b712d02b971eb",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ProductLab.tsx\",\"line\":48,\"detail\":\"446-line function: export default function ProductLab({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:7b9b453fce766393ed79a71bd5837b0beb333cdc5bb25ff4d70887a8a3f19a54"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:2e854e7948660fc789b468c242484fb28e275918eb074c4b1e26b451cba0face",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/ProductsWorkspace.tsx\",\"detail\":\"1076 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:113d1904c5cb55f5443b2c6391ac147eb77f1af2ae0ffbd3b5b1badf0dfd2526"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:475b796a602e8c91e517f7f6c3283c6250bc3846ef1417f1f171dbf0ee3f400e",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ProductsWorkspace.tsx\",\"line\":204,\"detail\":\"872-line function: export default function ProductsWorkspace({projectId,currentUserId,role}:Props){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:d592eb7faea85802e1a063045bfac47128617dfa41d293950223cac6199c79e2"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:f492b84777fa58a32b0d7d00d354a5685f03a72e1684262a7b18ab4164b67d55",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ProjectMembersPanel.tsx\",\"line\":64,\"detail\":\"388-line function: export default function ProjectMembersPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:9a80472a4c329323d039df2da9e63f56eaceef5a78b360e0e815eebc170c14b2"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:8ef2b71a776a8310d7c88a315b836baed541cfa141d82ced910c916dcf84d67e",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/RecoveryDiagnosticsPanel.tsx\",\"line\":30,\"detail\":\"105-line function: export default function RecoveryDiagnosticsPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:0b3c5b7125ce9ff94573cfab60e40bb1c01f4796e135755fe1a3d2150f5def8e"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:66f162a3756eafadda91636f2834b6d89aa0c31cce141b6bcf170e0bddc6ffa7",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ResonanceHome.tsx\",\"line\":25,\"detail\":\"197-line function: export default function ResonanceHome({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:dd08603a2129d2f0696e24ebd107026160c409834adfccb5cddc6315239d4493"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:255ed86bb7d340039657cece682f6b050fb05753d4bcc95e3561141217f99537",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ResonancePortfolioPulse.tsx\",\"line\":62,\"detail\":\"113-line function: export default function ResonancePortfolioPulse({products,records,loading}:Props){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:a29221ce6db8aaec9249da6f7789abf4737840fa6c59e589d018b7ca6de77e22"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:2784476c3daa6c2ef4079909a8ade3efc92b7420493f6662f2a1a6965836c85e",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ResourceFabricPanel.tsx\",\"line\":53,\"detail\":\"266-line function: export default function ResourceFabricPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:362da512156080ac1e105dca82324a970225cbc2955181f534ca4b69ebbe9fe2"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:0f5fbad38034a3bf08d3ef2ccadb476bdb5aaf2a9c7d80cc19b8e503301011a7",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/RndDeviceAdministration.tsx\",\"line\":83,\"detail\":\"244-line function: export default function RndDeviceAdministration({projectId,role}:{projectId:string;role:AdminRole}){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:da3443d6d21e1e52ac52af155571565079f2037fd795f01c1e874468cc2ae0e8"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:d2171a818042e94d9df79c5ac2e2bbba2adb174826a80b8cdab1d031e205cf61",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/SparksWorkspace.tsx\",\"line\":54,\"detail\":\"413-line function: export default function SparksWorkspace({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:6867c7045fda3637678068c054e6737cf6e68b504a37b1bd413146564a33374b"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:5312b0984e6ae3dc0c18818a230dc38ff772830316d7dc1a9efab3b8ee219860",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/StakeholderWorkspace.tsx\",\"line\":114,\"detail\":\"367-line function: export default function StakeholderWorkspace({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:2d08856228135e90f8d1c58ff1623303d99802444fca8fb7d62699c576a014a5"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      },
+      {
+        "id": "sha256:40c191c1f2e8cfe499f06349966fb8130486f700ca9189fa502fa884b2994fc1",
+        "source": "suggester",
+        "requirementClass": "optimization",
+        "severity": "medium",
+        "title": "Review code/workflow streamlining candidate",
+        "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ThinkTankWorkspace.tsx\",\"line\":57,\"detail\":\"574-line function: export default function ThinkTankWorkspace({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+        "evidence": [
+          "suggester.suggestions",
+          "sha256:b9d3bc86e9f5f9de0695f0862bc9767cceec5797d1e0d3c5a536197f3b1209ac"
+        ],
+        "botsquadTasks": [
+          "audit",
+          "stress-test",
+          "acquisition-scout",
+          "supply-readiness",
+          "action-plan"
+        ],
+        "productionAuthorization": false
+      }
+    ],
+    "roles": [
+      {
+        "id": "regulator-auditor",
+        "purpose": "Audit requirements, evidence completeness, control consistency, transparency and unresolved obligations."
+      },
+      {
+        "id": "regulator-stress-tester",
+        "purpose": "Stress-test requirements, failure modes, limits, recovery paths and operational assumptions."
+      },
+      {
+        "id": "regulator-acquisition-scout",
+        "purpose": "Identify free/open or already-authorized resources, dependencies, tools and evidence needed to satisfy requirements; never purchase or commit funds."
+      },
+      {
+        "id": "regulator-supply-coordinator",
+        "purpose": "Assess availability and supply readiness of approved internal/free/open resources, evidence, capabilities and dependencies."
+      },
+      {
+        "id": "regulator-action-planner",
+        "purpose": "Translate validated requirements into bounded action plans for SUGGESTER/CONDUCTOR or human review."
+      }
+    ],
+    "instructions": [
+      "Audit every requirement against evidence and Boundaries.",
+      "Stress-test assumptions, failure modes and recovery paths.",
+      "Identify only free/open/already-authorized acquisition options; do not purchase or acquire credentials.",
+      "Assess supply readiness of approved resources/capabilities/evidence.",
+      "Return bounded action plans for SUGGESTER/CONDUCTOR or human review."
+    ]
+  },
+  "transparency": {
+    "requirementCount": 58,
+    "critical": 1,
+    "high": 2,
+    "medium": 55,
+    "secretValuesPublished": false,
+    "privateAuthenticationMaterialPublished": false,
+    "financialCommitmentsAuthorized": false
+  },
+  "controls": {
+    "mayRequestBotsquadWork": true,
+    "mayPublishTransparentRequirementState": true,
+    "mayQueueAllowlistedInternalActions": true,
+    "mayPurchase": false,
+    "mayCommitFunds": false,
+    "mayAcquireCredentials": false,
+    "mayBypassSecurity": false,
+    "mayChangeBoundaries": false,
+    "mayMerge": false,
+    "mayDeployProduction": false,
+    "freetreeMode": "observe-contract-only"
+  }
+}
