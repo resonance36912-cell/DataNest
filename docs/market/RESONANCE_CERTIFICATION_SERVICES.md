@@ -47,7 +47,7 @@ Automation may prepare evidence and records but cannot self-issue certification.
 
 ## Commercial boundary
 
-The current offering is intentionally free during the active promotion period. Billing remains disabled. Future pricing requires a separate governed commercial decision and does not alter certification criteria.
+The current offering is intentionally priced as a published introductory business offering. Billing remains disabled. Future pricing requires a separate governed commercial decision and does not alter certification criteria.
 
 ## Transparency
 
