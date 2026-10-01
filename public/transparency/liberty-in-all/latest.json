@@ -1,0 +1,1020 @@
+{
+  "schemaVersion": "datanest-liberty-in-all-public-index-v1",
+  "generatedAt": "2026-10-01T20:32:04.158Z",
+  "authority": "traceability-assurance-non-authorizing",
+  "productionAuthorization": false,
+  "status": "ready",
+  "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c",
+  "canonicalPublicUrl": "https://datanest-supository.github.io/DataNest/",
+  "coverage": {
+    "indexedRecords": 150,
+    "publicRecords": 108,
+    "controlledRecords": 42,
+    "restrictedRecords": 0,
+    "configuredEvidenceSources": 10,
+    "missingEvidenceSources": 0
+  },
+  "missingEvidenceSources": [],
+  "standardsAlignment": [
+    {
+      "id": "ISO-15489-1:2016",
+      "role": "records creation, capture and management principles",
+      "certificationClaim": false
+    },
+    {
+      "id": "ISO-23081-1:2017",
+      "role": "metadata-for-records principles",
+      "certificationClaim": false
+    },
+    {
+      "id": "W3C-PROV",
+      "role": "provenance entities, activities, agents and derivation concepts",
+      "certificationClaim": false
+    },
+    {
+      "id": "ISO/IEC-27001:2022",
+      "role": "information-security control context",
+      "certificationClaim": false
+    },
+    {
+      "id": "ISO/IEC-27701:2025",
+      "role": "privacy information management context",
+      "certificationClaim": false
+    },
+    {
+      "id": "NIST-CSF-2.0",
+      "role": "cybersecurity governance and assurance context",
+      "certificationClaim": false
+    }
+  ],
+  "audienceViews": [
+    "public",
+    "stakeholders",
+    "auditors",
+    "regulators"
+  ],
+  "records": [
+    {
+      "path": "config/boundaries.policy.json",
+      "digest": "sha256:5f125bcd56a6558191b5b1d7bce9d93870f30f6a73671fa333e9cb3516a94caf",
+      "bytes": 17357,
+      "extension": ".json",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "config/enforcer.tree.json",
+      "digest": "sha256:445717d620e091300cbb924e42f3ce0c475265c1a2b22e866f21deff71071a42",
+      "bytes": 2169,
+      "extension": ".json",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "config/environment.tree.json",
+      "digest": "sha256:79c29c38cecc4d8cc190332f86e7b2a104f5c07d2b7f4d8db0177b0f1afef551",
+      "bytes": 4797,
+      "extension": ".json",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "config/guardian.blueprint.json",
+      "digest": "sha256:290a38bd3c91dc1334576acb2580955bfad138471a0cd7accc4fe8c8ff59c8e2",
+      "bytes": 4183,
+      "extension": ".json",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "config/liberty-in-all.standard.json",
+      "digest": "sha256:a5b74cdb85439186fa2833858daf8721f1cb2249ad694fb76e3a0575e8245dc2",
+      "bytes": 5100,
+      "extension": ".json",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "config/regulator.tree.json",
+      "digest": "sha256:f2e71da162951da8fe221492c600203ea67c576bf8729926f1c95c15cd48046f",
+      "bytes": 2357,
+      "extension": ".json",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "config/repository-boundary.json",
+      "digest": "sha256:cd3d6bd36db5463af91014bde84c416ba9e52006d80d3b812322d70b4b02b4b3",
+      "bytes": 10670,
+      "extension": ".json",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "config/visibility-utility.tree.json",
+      "digest": "sha256:7deb63abadf81b0e13436eb480fea8cc2e34acc397ddeb8eb4c3269289e68abc",
+      "bytes": 5071,
+      "extension": ".json",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/ADVERSARIAL_STRESS_TEST_2026-09-28.md",
+      "digest": "sha256:4081995566932bdcfc29942ac1f38ed1a7007f951301056f842576db4575a156",
+      "bytes": 5910,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "digest": "sha256:54743de99429842c13bfee95bf4679ab461b8d4e03fd114ef53e58f65bdffca0",
+      "bytes": 25243,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/BRANCH_CLEANER.md",
+      "digest": "sha256:96252d210d9591c3ec749673a6baf507e21f1459dd0be3fa318c309c76cee79f",
+      "bytes": 6205,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/CONTINUOUS_GOVERNANCE_OPTIMIZATION.md",
+      "digest": "sha256:1bd219e03a87bb968aa667d210890105e355944063df2821bbe44b164af43ed4",
+      "bytes": 16961,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/DATANEST_AI_ARCHITECTURE.md",
+      "digest": "sha256:8f64a83c4c83b34576968e74f9d630ee4b793d6fc4d4ffe4ea6de3055af69d58",
+      "bytes": 8635,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/DATANEST_AI_CLOUDFLARE_BOOTSTRAP.md",
+      "digest": "sha256:8b0d1e8bb36c935a707db2e90d6d8b138a8dbae0ed26ee61e570d300f050f80f",
+      "bytes": 1765,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/DATANEST_SUPOSITORY_ARCHITECTURE.md",
+      "digest": "sha256:7a6b383bdfe8103da5470db9e60c92023f77a1e9556f0a5ed14a1a1466cd3e6c",
+      "bytes": 16576,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/DATANEST_SYSTEM_CHARTER.md",
+      "digest": "sha256:c71cffbc52a866b586ee8d63c51b398d007d4074d6aecff5f9b1583170cf169d",
+      "bytes": 32504,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/DATA_SOVEREIGNTY_MODEL.md",
+      "digest": "sha256:a4f16dd1d78239ec618a9c5203d9a114383ccc37fe8a4e6a1a2c15e1e60e9598",
+      "bytes": 5137,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/DEPLOYMENT.md",
+      "digest": "sha256:ab5ed83a3191dd3a02110c0a6b9f1aaa88ac304cf797eef3dedee4cd5a6c780f",
+      "bytes": 4014,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/GOVERNANCE_CONTROL_EFFECTIVENESS_MONITORING.md",
+      "digest": "sha256:d931d101377a118888ffaf4a5421a3b0b765bb818b6c0e06c4b139f1cc628d36",
+      "bytes": 3166,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/INDEPENDENT_REGULATORY_ASSURANCE_SERVICES.md",
+      "digest": "sha256:84b50466cb228135815589f125d3fd1e0f2b76eea639177360f7696a9ead1e1f",
+      "bytes": 5629,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/LIBERTY_IN_ALL_STANDARD.md",
+      "digest": "sha256:f9248529ead7a68251bebb075370272c5e1319caf3b764b6c8c925de58533e13",
+      "bytes": 5519,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/MAINTENANCE_PROTOCOL.md",
+      "digest": "sha256:937ffef81a678e0092852b2dcfe047f3eb42ecff4ca16f175bd740f4d43013bc",
+      "bytes": 2414,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/MEMORY_LEARNING_LANGUAGE_STANDARDS.md",
+      "digest": "sha256:2fb5f2160638f329be4f890c7abe4a120e2c66651eb8e5aaae32243438bde342",
+      "bytes": 23718,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/MIRROR_DATANEST_PROMOTION.md",
+      "digest": "sha256:094647d7f358de8ace8b5df82b05c1972757939a4e653abc7dc35a4349329360",
+      "bytes": 6413,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/OWNER_AUDIT_OPTIMIZER.md",
+      "digest": "sha256:c31016845ca51c203fd31a6fd63c994e1cf9c2b25ee48654f6ddd7519093e5bd",
+      "bytes": 4893,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/OWNER_TEST_MODE_AUTHORITY_RESILIENCE.md",
+      "digest": "sha256:a06f03343508995e8e03c52827390c27f8fa52d5b512011b930ab7031d3e7172",
+      "bytes": 726,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/PRODUCTION_INCLUSION_CONTRACT.md",
+      "digest": "sha256:0fa2aaa978be15f961be1f8c84c83fa4c7070cba0e8c92fb0c4633b938e11192",
+      "bytes": 3134,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/RESON8_ADT_IMPLEMENTATION.md",
+      "digest": "sha256:e0c2da43d7f47ff60998db0a26b531b01faed6bb8364976970ff8b1d11b1962c",
+      "bytes": 5021,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/RESON8_DATANEST_INGRESS.md",
+      "digest": "sha256:8aa4cc18f6083150401ba4447fadc1414d0b4dd4eba6ac70976d0013bd7c1594",
+      "bytes": 1612,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/RESONANCE_FORGE_PHASE_A.md",
+      "digest": "sha256:95cfe2d48a5c70a528a5b201e6b758ab7bc25a2eed07396c2dbb4863c945a7c5",
+      "bytes": 1474,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/RESONANCE_FORGE_PHASE_B.md",
+      "digest": "sha256:170ea53f851cc697fd95b5022b14f2296cdbb769237ef5d8d4027200ddc983f6",
+      "bytes": 4585,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/RESONANCE_FORGE_PHASE_B_RECOVERY.md",
+      "digest": "sha256:3aaeabccf29e5c264a311be7d125de34acd3763341a0fb5889ee3a8ac5d4d74b",
+      "bytes": 2051,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/RESONANCE_FORGE_V1_ARCHITECTURE.md",
+      "digest": "sha256:1f25ef30acfa75cdd0fa3ce8e41bb909ea88db71da79f1bcd9b6f28d7cb3ad63",
+      "bytes": 6576,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/RESONANCE_VALUE_CONSOLIDATION_20260926.md",
+      "digest": "sha256:8cc545948cc1837edb80abc8ca3494c622ef60d112764e2fb868def01705dfb1",
+      "bytes": 5828,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/RONSAS_DATANEST_CONSOLIDATION.md",
+      "digest": "sha256:33b346c271df9a22eb99b34b383f979460a6956d150b7e52f84507e97ba12633",
+      "bytes": 9420,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/UX_WORKFLOW_ARCHITECTURE.md",
+      "digest": "sha256:294db56f23a09499509a14a2356354d8078bc967e225aa245464735491fd542b",
+      "bytes": 35675,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/WORKFLOW_REVIEWER.md",
+      "digest": "sha256:1a9dd3e19c94fc30328ea0d01dca8636eda22a7d514f42a122d0075490d55ac1",
+      "bytes": 2228,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/certification/datanest-ai-retention-recovery-20260924.json",
+      "digest": "sha256:18599b598131cf44679b00a277eff04b9685967af3fe67cae7256db8b0a7d2f9",
+      "bytes": 2554,
+      "extension": ".json",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/datanest-ai-learning-validation-v2.md",
+      "digest": "sha256:9ae993d5edbcddc606066037b07b4b28ccd16644a53b4a51eb94fe76d78ed824",
+      "bytes": 1282,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/development-command-working-memory.md",
+      "digest": "sha256:e5533475d2a4baa5093683940fc53100e0282c5b3d53e27cafe0f16d2e321951",
+      "bytes": 2020,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/governance/AUTOMATION_X_ANNOTATION.md",
+      "digest": "sha256:17ea3ccfe171aecb5b43d496db253cacf053890bbb6dc4f50ad34f39f21f30e6",
+      "bytes": 1595,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/governance/BRANCH_X_PROTECTION.md",
+      "digest": "sha256:d7b3694fa70276da838e755c829a0c79a5cbcab0ea3f90335dd3d9f472c13741",
+      "bytes": 2229,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/governance/CONTROL_MATRIX.md",
+      "digest": "sha256:a80c1636554fd5f157f59da5e4841160a7a303205fef0c5841450aa0f0ebf4fa",
+      "bytes": 2512,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/governance/OWNERSHIP.md",
+      "digest": "sha256:9abf9c341453db22a28811092cc5439f813d1416b8101604a4dc93e2c4a29839",
+      "bytes": 981,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/governance/RESONANCE_SECURITY_EXECUTION.md",
+      "digest": "sha256:c6b833a35d65c73a5de58f92c7cdc73e71bc20ada4b94919cdd243902ee816af",
+      "bytes": 2351,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/governance/legal-review/RESONANCE_DATANEST_LEGAL_REVIEW_CHECKLIST.md",
+      "digest": "sha256:4face140ea5862281305fe2b781356496494c9ca682721a0ccc0d3aa0e1c290a",
+      "bytes": 2705,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/governance/platform-dossier/ADMIN_SYSTEM_OPTIMIZER_PRODUCTION_RELEASE.md",
+      "digest": "sha256:21bf21bbf4d1cc2846aa718a1f52ecc2ef506ea7b8512061f2ae4f13f2a946a0",
+      "bytes": 4152,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/governance/platform-dossier/OWNER_LIVE_TEST_MODE_TIMEFRAMES.md",
+      "digest": "sha256:1f29a39f88dc22d6e3d1037116ccf29035ba778cb88e6dbe9af08b54ffdb0a1d",
+      "bytes": 4234,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/governance/platform-dossier/README.md",
+      "digest": "sha256:c4683311fd5d3125721ebab8cdbe67b0baf3ea49f049e2c3c97cc5ac3c35c644",
+      "bytes": 1217,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/governance/platform-dossier/UI_GOVERNANCE_CANDIDATE_88945f1.md",
+      "digest": "sha256:cd2fab750d7d2896595093f22a998db0d52e563519c5070b932098acd283bca1",
+      "bytes": 5104,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/governance/platform-dossier/UI_GOVERNANCE_EVIDENCE_SCHEMA.md",
+      "digest": "sha256:dc6893842086ebaa55a4443c9df4c192ce4d1df28f28251f0cfe97ae7750d14b",
+      "bytes": 1369,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/governance/platform-dossier/UI_GOVERNANCE_RELEASE_REVIEW.md",
+      "digest": "sha256:ec9a3e3ff2af9b88e5461b002f71e32fd5c7aab6da470f72c21a7ee32f11a8c3",
+      "bytes": 1067,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/governance/platform-dossier/UI_TEST_MODE.md",
+      "digest": "sha256:ebffed15ddc8d029ebbe73b2d74ec8531875e4e95d4f358d91def3a8851ee471",
+      "bytes": 2587,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/governance/platform-dossier/WORKTREE_GATE_TIMEFRAMES.md",
+      "digest": "sha256:68af8e8509ca62531827db87b11e1ad2609634686d50aac3d1dcb4bc12ae6e97",
+      "bytes": 3082,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/releases/companion-handoff-prefill-v1.md",
+      "digest": "sha256:4db2448417e2debe66e259a6c7208bbe4e517f818117609c80a9e77805416db1",
+      "bytes": 1487,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/releases/datanest-ai-founder-baseline-20260928.md",
+      "digest": "sha256:a08f0763d522ad7aeffd4158abc69b81d21f3cb8a0be5cacdec1f9af28baa768",
+      "bytes": 1562,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/releases/external-ai-companion-v1.md",
+      "digest": "sha256:03203c4a1750e9ae4ca389a670f16954da9ffea2897d88d93069960c2c55a9c8",
+      "bytes": 1497,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/releases/external-ai-sidebar-v1.md",
+      "digest": "sha256:12c72e669379cc8d42e663e8033f50031dcf238a4bcf6eeca76182671411a0f8",
+      "bytes": 1063,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/releases/reload-latest-v1.md",
+      "digest": "sha256:2b5a2984053b71ba9ead07c6f3583a6678486a34e319a22f87de35d898a5ea06",
+      "bytes": 683,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/reviews/2026-09-25-live-review.md",
+      "digest": "sha256:a497db0d2476376d59839af3e03950b01c23413ee9ce4171174bf61d4ed520c1",
+      "bytes": 5350,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/reviews/2026-09-27-migration-history-reconciliation.md",
+      "digest": "sha256:4573bf31ce5cd7b0ac9fbba3caa6d08da2d4c94e65dd2d62b33ffa63602fe571",
+      "bytes": 1965,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/reviews/2026-09-30-sec01-runtime-acceptance.md",
+      "digest": "sha256:fa610d2cc55dc698a4e3bf2a69b82557b6fe88efd109cc1c364689296103865c",
+      "bytes": 6232,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/runbooks/datanest-ai-staging-retention.md",
+      "digest": "sha256:e6e8067459ba670846018f12ead0e6183608f8aaad28ac1788309b851aac5663",
+      "bytes": 5283,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-24-datanest-ai-governed-memory.md",
+      "digest": "sha256:6910e88759e0c5172bf901dd4c2d9099d5251256ef24b05b982278d514752b89",
+      "bytes": 89571,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-26-datanest-product-hierarchy-managed-execution.md",
+      "digest": "sha256:52c3b64518ac479d9c597f86b3085b90887ec8a07de46e1651481da060345271",
+      "bytes": 17668,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-27-datanest-phase-a-authority-terminology-hardening.md",
+      "digest": "sha256:0500b08b7aad12e8ba6eb054692f5bac54b2c600d30459631c3dd32a2e2dc03c",
+      "bytes": 17590,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-27-datanest-phase-b-portfolio-registry-lifecycle.md",
+      "digest": "sha256:4431e74e1d2d7f143baa93a9044264cc13e7d728757768a965c4f8e0a830e755",
+      "bytes": 32314,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-27-datanest-phase-c-trust-data-policy-foundations.md",
+      "digest": "sha256:3b9b04edf01e651ca68f91c37c36560bd593156eb0b7fa6b4031bb494cad6fec",
+      "bytes": 48566,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-27-datanest-phase-c-trust-data-policy-implementation-plan.md",
+      "digest": "sha256:7bb0e3ca9d3588afacfcd49b2f5c0ddd8984a0637962219dbd3796a07fd42e6a",
+      "bytes": 18190,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-27-datanest-phase-d-approved-spec-conformance.md",
+      "digest": "sha256:160715dd4da20d65d9f5edd5426f82a0f7d9f7929d09d94cabed52e45d7ef61e",
+      "bytes": 34152,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-27-datanest-phase-d-authority-execution-controls.md",
+      "digest": "sha256:443259828564b65af114dea79f15b336b0ddfb28bcaac7c231b134340d871169",
+      "bytes": 14749,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-27-datanest-phase-e-resource-capability-fabric.md",
+      "digest": "sha256:3c4412f7602513fc4629468af01f0657f66b16e3ebdbd616e69676ac79d07696",
+      "bytes": 7773,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-27-datanest-phase-f-intelligence-fabric.md",
+      "digest": "sha256:4dca7af48db9b1b43feed24829332a5f0081926fef13b2bcb61d8fbef9a461ff",
+      "bytes": 6524,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-29-datanest-external-audit-optimizer.md",
+      "digest": "sha256:cb490ef47858369c98ab36be68ffc3fd58e6dd668a1325ba6b6158fb40518846",
+      "bytes": 16234,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-29-resonance-datanest-certification-production-gates.md",
+      "digest": "sha256:f768e6362c8d5f98cd94b07143775bcc6466c53fc99b6ddb547e22a0d85239dd",
+      "bytes": 22145,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-29-resonance-datanest-governance-legal-centre.md",
+      "digest": "sha256:9a8b4ea793fdaad0ffd25d535a1844c304e8256122c644a47c4f3331fca030ac",
+      "bytes": 19077,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-29-resonance-datanest-ronsas-ui-migration.md",
+      "digest": "sha256:5fa3b0b8d7ac4d1b8820a0c2af9fe1e307caccd96e365315756c01d35d437657",
+      "bytes": 24340,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-29-resonance-datanest-ui-foundation-shell.md",
+      "digest": "sha256:3760763264b7f4ea4e9fd4ee306d6fdba8b0e988a4c4f7cc7bab68bb84cf6bdf",
+      "bytes": 23087,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-09-24-datanest-ai-governed-memory-design.md",
+      "digest": "sha256:99716d750e77d379835435c95421ba7846d8e8703aa81365c75bd50f5a21de8c",
+      "bytes": 26749,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-09-26-datanest-product-hierarchy-managed-execution-design.md",
+      "digest": "sha256:a727e185643ada9e42e751f11578f6ab35902bdfbf9bde274caa197d5f3a7507",
+      "bytes": 7973,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-09-27-datanest-ecosystem-business-operating-architecture-design.md",
+      "digest": "sha256:111db9c80e9fb4fafc23677ea3ea03a96d189017d41e52bd97e35864c5a48ad6",
+      "bytes": 42722,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-09-27-datanest-phase-b-portfolio-registry-lifecycle-design.md",
+      "digest": "sha256:18e10057b717e3daf1ad13a1017a90b6a2d71ec625c6ecff657eb6ca562e2134",
+      "bytes": 26986,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-09-27-datanest-phase-c-trust-data-policy-foundations-design.md",
+      "digest": "sha256:f30d62ee0774ea2274eac0220e0e33092acca8e471f1c3fdfecdc4e75161c38b",
+      "bytes": 31741,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-09-27-datanest-phase-d-authority-execution-controls-design.md",
+      "digest": "sha256:94bf6e1f319de69c90a029b064b5ed23220dc80028c0fa5a14ad3dcb64d4e986",
+      "bytes": 42235,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-09-27-datanest-phase-e-resource-capability-fabric-design.md",
+      "digest": "sha256:9881e70558d7e6fc3686d3e229592056347210dfa399336845b5862ec3ca8447",
+      "bytes": 17277,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-09-27-datanest-phase-f-intelligence-fabric-design.md",
+      "digest": "sha256:6d000b81a1d136e4751ace6c5ddcf339a83f7059db0cd84c853b1ea285e0cf9a",
+      "bytes": 15725,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-09-29-datanest-external-audit-optimizer-design.md",
+      "digest": "sha256:7968ba8335a9aaf68effb428fd8743563491c84e24c792644523ee157d599321",
+      "bytes": 16774,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-09-29-resonance-datanest-ui-governance-system-design.md",
+      "digest": "sha256:49f5add305e5c838baccaabf1f10a5dbec8b884d332fe010ee06f8378d80b682",
+      "bytes": 25014,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/verification/datanest-product-hierarchy-2026-09-26.md",
+      "digest": "sha256:01cce860d140754b9abc67fb0c46fd5229ab4e7774b699c86287ddd83146a0ef",
+      "bytes": 3555,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "docs/verification/ui-optimization-2026-09-26.md",
+      "digest": "sha256:314833a89c6b97d0ba9e69c58f117a5e4f08c8622dd047b00e39a50d049b9044",
+      "bytes": 1179,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "liberty-in-all/README.md",
+      "digest": "sha256:5fe2e1452a4ac8e2dc6f9ba7a87067f074fee07f4649760295ae1af1572ff4d5",
+      "bytes": 2007,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "public/transparency/audits/external-full-system-audit-brief/part-01.txt",
+      "digest": "sha256:9e495a47cbd15d0d7d555507fb6ae13d8d324193338a1865b3cbe2c40a005644",
+      "bytes": 6018,
+      "extension": ".txt",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "public/transparency/audits/external-full-system-audit-brief/part-02.txt",
+      "digest": "sha256:9f4848a4e6b8d43318cddc8986aec43c621ab83600d1d4f9a3cd645e1b3d0e04",
+      "bytes": 6000,
+      "extension": ".txt",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "public/transparency/audits/external-full-system-audit-brief/part-03.txt",
+      "digest": "sha256:95879785b44606bc1bab31a18dc532d24fa8fbcc1b2054fb18ce7ef8a39ff9f1",
+      "bytes": 6000,
+      "extension": ".txt",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "public/transparency/audits/external-full-system-audit-brief/part-04.txt",
+      "digest": "sha256:62e39ee1da5c19c7fa0ecc2cf61b6eb5455b6616657566604933f9be14554545",
+      "bytes": 6000,
+      "extension": ".txt",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "public/transparency/audits/external-full-system-audit-brief/part-05.txt",
+      "digest": "sha256:a7e1ebc07fe08f5fdecf236f66a62b2813d72bbdb4d4627823cfff509cec2eb1",
+      "bytes": 6004,
+      "extension": ".txt",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "public/transparency/audits/external-full-system-audit-brief/part-06.txt",
+      "digest": "sha256:08e221aaba9385f55e0f34acc8644deab5633e36ee9d8e4b84366d96d7a5b7f7",
+      "bytes": 6004,
+      "extension": ".txt",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "public/transparency/audits/external-full-system-audit-brief/part-07.txt",
+      "digest": "sha256:124611d30025510ffc8ab93e57efabb5ee777d7952632c29b2a101ffbe760961",
+      "bytes": 6000,
+      "extension": ".txt",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "public/transparency/audits/external-full-system-audit-brief/part-08.txt",
+      "digest": "sha256:9d25e2d225e7fabd37e043e17088fbde5bcdba257d7e046883df5b3e6cfd3c90",
+      "bytes": 2355,
+      "extension": ".txt",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "public/transparency/audits/external-full-system-audit-return-2026-09-25/findings.json",
+      "digest": "sha256:e2a4096a6a091ef31b3330703dcd12e30148abf849e88478622b54ee633acdfa",
+      "bytes": 5260,
+      "extension": ".json",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "public/transparency/audits/external-full-system-audit-return-2026-09-25/remediation-backlog.json",
+      "digest": "sha256:396d7b42aa3014e3ae1dee95f6f01c104e5492648268320f47e99ab118cd771d",
+      "bytes": 4378,
+      "extension": ".json",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "public/transparency/audits/external-full-system-audit-return-2026-09-25/report.md",
+      "digest": "sha256:4767b30ce0aed004585a7c6f7b12de4be5ca47a2e65bee6b35174575fd8d2c5c",
+      "bytes": 54703,
+      "extension": ".md",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "public/transparency/audits/index.json",
+      "digest": "sha256:e9900b226b5125f286a74a7fc241aea2ad6a3ee0ae3ac21b0dd115cb082642df",
+      "bytes": 8075,
+      "extension": ".json",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "public/transparency/enforcer/index.json",
+      "digest": "sha256:bade03061cd4edd2d3849602fd6274c0d08bf9c809a9a1c903ff0772a37718c2",
+      "bytes": 840,
+      "extension": ".json",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "public/transparency/liberty-in-all/index.json",
+      "digest": "sha256:7d32d28d228236182de643a0983a3fe4c61894a3db041fb60c76b9181adfbc3d",
+      "bytes": 1036,
+      "extension": ".json",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "public/transparency/regulator/index.json",
+      "digest": "sha256:7fea6c15333967fad3bb6ea7cb3c651a1d01b42a52c4849cf56a2fff3b4fa021",
+      "bytes": 907,
+      "extension": ".json",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "public/transparency/system-charter/index.json",
+      "digest": "sha256:7b595ddc3baead36c127a298d6f01b59b780ddd8ced2a40327818271d0f4ecdf",
+      "bytes": 786,
+      "extension": ".json",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "path": "public/transparency/visibility-utility/index.json",
+      "digest": "sha256:d5c6be7a8d231032ef309cbe4fc9264512a58a63dfbaca051ce4b024f9177528",
+      "bytes": 749,
+      "extension": ".json",
+      "classification": "public-metadata",
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    }
+  ],
+  "evidence": [
+    {
+      "source": "docs/DATANEST_SYSTEM_CHARTER.md",
+      "digest": "sha256:c71cffbc52a866b586ee8d63c51b398d007d4074d6aecff5f9b1583170cf169d",
+      "bytes": 32504,
+      "schemaVersion": null,
+      "generatedAt": null,
+      "productionAuthorization": null,
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "source": "docs/LIBERTY_IN_ALL_STANDARD.md",
+      "digest": "sha256:f9248529ead7a68251bebb075370272c5e1319caf3b764b6c8c925de58533e13",
+      "bytes": 5519,
+      "schemaVersion": null,
+      "generatedAt": null,
+      "productionAuthorization": null,
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "source": "public/transparency/audits/index.json",
+      "digest": "sha256:e9900b226b5125f286a74a7fc241aea2ad6a3ee0ae3ac21b0dd115cb082642df",
+      "bytes": 8075,
+      "schemaVersion": 1,
+      "generatedAt": "2026-10-01",
+      "productionAuthorization": null,
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "source": "config/boundaries.policy.json",
+      "digest": "sha256:5f125bcd56a6558191b5b1d7bce9d93870f30f6a73671fa333e9cb3516a94caf",
+      "bytes": 17357,
+      "schemaVersion": "datanest-boundaries-v1",
+      "generatedAt": null,
+      "productionAuthorization": null,
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "source": "config/environment.tree.json",
+      "digest": "sha256:79c29c38cecc4d8cc190332f86e7b2a104f5c07d2b7f4d8db0177b0f1afef551",
+      "bytes": 4797,
+      "schemaVersion": "datanest-environment-tree-v1",
+      "generatedAt": null,
+      "productionAuthorization": null,
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "source": "config/enforcer.tree.json",
+      "digest": "sha256:445717d620e091300cbb924e42f3ce0c475265c1a2b22e866f21deff71071a42",
+      "bytes": 2169,
+      "schemaVersion": "datanest-enforcer-v1",
+      "generatedAt": null,
+      "productionAuthorization": false,
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "source": "config/guardian.blueprint.json",
+      "digest": "sha256:290a38bd3c91dc1334576acb2580955bfad138471a0cd7accc4fe8c8ff59c8e2",
+      "bytes": 4183,
+      "schemaVersion": "datanest-guardian-blueprint-v1",
+      "generatedAt": null,
+      "productionAuthorization": null,
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "source": "config/regulator.tree.json",
+      "digest": "sha256:f2e71da162951da8fe221492c600203ea67c576bf8729926f1c95c15cd48046f",
+      "bytes": 2357,
+      "schemaVersion": "datanest-regulator-v1",
+      "generatedAt": null,
+      "productionAuthorization": false,
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "source": "config/visibility-utility.tree.json",
+      "digest": "sha256:7deb63abadf81b0e13436eb480fea8cc2e34acc397ddeb8eb4c3269289e68abc",
+      "bytes": 5071,
+      "schemaVersion": "datanest-visibility-utility-v1",
+      "generatedAt": null,
+      "productionAuthorization": false,
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    },
+    {
+      "source": "infra/reson8-forge/specialized-trees.json",
+      "digest": "sha256:a0dfaf6707437bd63760b02562e757a1121f9efc9eea6d6c5d691fc65118b6ca",
+      "bytes": 4827,
+      "schemaVersion": "resonance-forge-specialized-trees-v1",
+      "generatedAt": null,
+      "productionAuthorization": null,
+      "sourceRef": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+    }
+  ],
+  "disclosure": {
+    "recordContentsPublished": false,
+    "secretsPublished": false,
+    "privateAuthenticationMaterialPublished": false,
+    "protectedPersonalDataPublished": false
+  }
+}

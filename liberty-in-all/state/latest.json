@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "datanest-liberty-in-all-state-v1",
+  "generatedAt": "2026-10-01T20:32:04.158Z",
+  "authority": "traceability-assurance-non-authorizing",
+  "productionAuthorization": false,
+  "status": "ready",
+  "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c",
+  "coverage": {
+    "indexedRecords": 150,
+    "publicRecords": 108,
+    "controlledRecords": 42,
+    "restrictedRecords": 0,
+    "configuredEvidenceSources": 10,
+    "missingEvidenceSources": 0
+  },
+  "missingEvidenceSources": [],
+  "audiences": {
+    "public": "sanitized public records, document digests, dates, source refs and assurance status",
+    "stakeholders": "public assurance plus product/governance evidence references",
+    "auditors": "content digests, source commit, evidence-source lineage and gap status",
+    "regulators": "control mappings, provenance, retention posture, evidence lineage and explicit limitations"
+  },
+  "standardsAlignment": [
+    {
+      "id": "ISO-15489-1:2016",
+      "role": "records creation, capture and management principles",
+      "certificationClaim": false
+    },
+    {
+      "id": "ISO-23081-1:2017",
+      "role": "metadata-for-records principles",
+      "certificationClaim": false
+    },
+    {
+      "id": "W3C-PROV",
+      "role": "provenance entities, activities, agents and derivation concepts",
+      "certificationClaim": false
+    },
+    {
+      "id": "ISO/IEC-27001:2022",
+      "role": "information-security control context",
+      "certificationClaim": false
+    },
+    {
+      "id": "ISO/IEC-27701:2025",
+      "role": "privacy information management context",
+      "certificationClaim": false
+    },
+    {
+      "id": "NIST-CSF-2.0",
+      "role": "cybersecurity governance and assurance context",
+      "certificationClaim": false
+    }
+  ],
+  "controls": {
+    "publicByDefaultForSafeMetadata": true,
+    "hashIndexedRecords": true,
+    "preserveSourceCommit": true,
+    "publishEvidenceGaps": true,
+    "publishRecordContents": false,
+    "publishSecrets": false,
+    "publishPrivateAuthenticationMaterial": false,
+    "publishProtectedPersonalData": false,
+    "rewriteHistoricalEvidence": false,
+    "changeProductionAuthority": false,
+    "approvePullRequests": false,
+    "merge": false,
+    "deployProduction": false,
+    "humanReviewRequiredFor": [
+      "disclosure-policy-change",
+      "retention-policy-change",
+      "sensitivity-classification-change",
+      "new-public-data-category",
+      "privacy-or-legal-interpretation",
+      "production-authority-change"
+    ]
+  },
+  "retention": {
+    "workflowArtifactsDays": 90,
+    "gitHistory": "source-controlled-history-retained-by-git",
+    "publicLatest": "current-sanitized-snapshot",
+    "historicalEvidence": "commit-lineage-and-workflow-artifacts"
+  },
+  "evidenceDigest": "sha256:189260b32b8884378d85059d327b63b63b4993c784da29fbd0342dc3360fbee9"
+}
