@@ -186,15 +186,15 @@ select
 from public.products p
 cross join (values
   ('RCS-PRICE-01','Certification Readiness Assessment',1,
-    jsonb_build_object('currency','USD','price_model','fixed_introductory','amount',750,'display_price','USD 750','scope_note','Includes readiness report, applicability profile, evidence plan and remediation register.')),
+    jsonb_build_object('currency','ZAR','price_model','fixed_introductory','amount',12500,'display_price','ZAR 12,500','reference_usd',750,'scope_note','Includes readiness report, applicability profile, evidence plan and remediation register.')),
   ('RCS-PRICE-02','Resonance Certification Assessment',2,
-    jsonb_build_object('currency','USD','price_model','starting_at','amount',3500,'display_price','From USD 3,500','scope_note','Final quote depends on scope, certification class count, evidence volume and assessment complexity.')),
+    jsonb_build_object('currency','ZAR','price_model','starting_at','amount',58500,'display_price','From ZAR 58,500','reference_usd',3500,'scope_note','Final quote depends on scope, certification class count, evidence volume and assessment complexity.')),
   ('RCS-PRICE-03','Certification & Evidence Pack',3,
-    jsonb_build_object('currency','USD','price_model','fixed_introductory','amount',750,'display_price','USD 750','scope_note','Standalone evidence-pack preparation; included in a full certification engagement where explicitly quoted.')),
+    jsonb_build_object('currency','ZAR','price_model','fixed_introductory','amount',12500,'display_price','ZAR 12,500','reference_usd',750,'scope_note','Standalone evidence-pack preparation; included in a full certification engagement where explicitly quoted.')),
   ('RCS-PRICE-04','Surveillance & Renewal',4,
-    jsonb_build_object('currency','USD','price_model','starting_at','amount',1500,'display_price','From USD 1,500','scope_note','Final quote depends on prior certification scope, changes and evidence refresh requirements.')),
+    jsonb_build_object('currency','ZAR','price_model','starting_at','amount',25000,'display_price','From ZAR 25,000','reference_usd',1500,'scope_note','Final quote depends on prior certification scope, changes and evidence refresh requirements.')),
   ('RCS-PRICE-05','Standards Alignment Review',5,
-    jsonb_build_object('currency','USD','price_model','starting_at','amount',1250,'display_price','From USD 1,250','scope_note','Alignment assessment only; does not create an external accreditation claim.'))
+    jsonb_build_object('currency','ZAR','price_model','starting_at','amount',21000,'display_price','From ZAR 21,000','reference_usd',1250,'scope_note','Alignment assessment only; does not create an external accreditation claim.'))
 ) as x(code,name,sort_order,payload)
 where p.project_id='c2aa30c1-fc82-4524-8510-021ac0fef967'
   and p.slug='resonance-certification-assurance'
