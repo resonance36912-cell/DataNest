@@ -1,0 +1,2258 @@
+{
+  "schemaVersion": "datanest-suggester-feed-v1",
+  "generatedAt": "2026-10-01T20:30:59.058Z",
+  "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c",
+  "sourceEvidence": {
+    "guardian": {
+      "valid": true,
+      "reasons": [],
+      "generatedAt": "2026-10-01T20:30:51.827Z",
+      "ageMinutes": 0.12051666666666666,
+      "maxAgeMinutes": 45,
+      "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c",
+      "digest": "sha256:f68aa1ce9f5ac81872832829c97affa65ef232be371b551a300173520cd69a93"
+    },
+    "knowledge": {
+      "valid": true,
+      "reasons": [],
+      "generatedAt": "2026-10-01T20:30:38.507Z",
+      "ageMinutes": 0.3425166666666667,
+      "maxAgeMinutes": 420,
+      "headSha": null,
+      "digest": "sha256:f573eb60267fa84820a1f9b7627ef8f110ad3d438d9103a5dbd8464d4e45fb1c"
+    },
+    "environment": {
+      "valid": true,
+      "reasons": [],
+      "generatedAt": "2026-10-01T20:30:42.228Z",
+      "ageMinutes": 0.2805,
+      "maxAgeMinutes": 420,
+      "headSha": null,
+      "digest": "sha256:8a967127eae93fc5e316db9c0c65faaa9d0b74f62987a6ebf7a0785218a5a6f8"
+    },
+    "enforcer": {
+      "valid": true,
+      "reasons": [],
+      "generatedAt": "2026-10-01T20:30:47.699Z",
+      "ageMinutes": 0.18931666666666666,
+      "maxAgeMinutes": 210,
+      "headSha": null,
+      "digest": "sha256:07164aa5e8d8fa2b9372686d684995462c8b9f75066e857cedef7b9a9fddaff3"
+    },
+    "botsquad": {
+      "valid": true,
+      "reasons": [],
+      "generatedAt": "2026-10-01T19:59:53.555Z",
+      "ageMinutes": 31.091716666666667,
+      "maxAgeMinutes": 420,
+      "headSha": null,
+      "digest": "sha256:d2c4a6c7e03f5865cf90c1d78a37a5f92bb3897d65dd404f4e975e224390f006"
+    },
+    "conductor": {
+      "valid": true,
+      "reasons": [],
+      "generatedAt": "2026-10-01T20:29:14.021Z",
+      "ageMinutes": 1.7506166666666667,
+      "maxAgeMinutes": 30,
+      "headSha": "a020d63fa7e807ffca687482fb373e46cd322d58",
+      "digest": "sha256:e54796790b8faa6255a832c64f4a3a43daf6ae0c9f180d36403bd28d1e07cb3e"
+    },
+    "calmer": {
+      "valid": true,
+      "reasons": [],
+      "generatedAt": "2026-10-01T20:16:31.284Z",
+      "ageMinutes": 14.4629,
+      "maxAgeMinutes": 45,
+      "headSha": null,
+      "digest": "sha256:1eaad1841de231160aac9f889440b9b502b117e9f5053b387832101c6a258923"
+    },
+    "regulator": {
+      "valid": true,
+      "reasons": [],
+      "generatedAt": "2026-10-01T20:24:07.307Z",
+      "ageMinutes": 6.862516666666667,
+      "maxAgeMinutes": 45,
+      "headSha": null,
+      "digest": "sha256:454199a7de76a2b527611b180c72ea70cedb2db940fbd8bdf48f0e81faec604d"
+    },
+    "visibility": {
+      "valid": true,
+      "reasons": [],
+      "generatedAt": "2026-10-01T19:49:57.496Z",
+      "ageMinutes": 41.02603333333333,
+      "maxAgeMinutes": 240,
+      "headSha": null,
+      "digest": "sha256:ec3047f42ae4566b3ef9565f1ec5dd97c5688213e91375daf57157dc1d59ba0d"
+    }
+  },
+  "automationReady": false,
+  "authority": "optimization-advisory",
+  "productionAuthorization": false,
+  "conductor": {
+    "generatedAt": "2026-10-01T20:29:14.021Z",
+    "allProcessesFresh": false,
+    "nextCommand": {
+      "type": "process-dispatch",
+      "source": "conductor",
+      "processId": "visibility-utility",
+      "workflow": "visibility-utility.yml",
+      "workflowName": "VISIBILITY-UTILITY Market Presence Tree",
+      "inputs": {},
+      "fingerprint": "sha256:e3e5ef3596332040738ecaa5939f797658e7ca75c20d7f2dc7f973d6d7339a50"
+    }
+  },
+  "sourceHealth": {
+    "guardianStatus": "degraded",
+    "guardianHealthScore": 90,
+    "enforcerStatus": "review",
+    "environmentCompatible": true,
+    "knowledgeItems": 118,
+    "botsquadAvailable": true,
+    "calmerTier": "STONE",
+    "regulatorStatus": "attention",
+    "visibilitySeoScore": 100,
+    "visibilityScore": 100,
+    "marketEvidenceMissing": 4
+  },
+  "suggestions": [
+    {
+      "fingerprint": "sha256:cdd7aa599add6f2e4f6146195a707e2ccef36b56d778f3b7b540058cb5881c2c",
+      "source": "guardian",
+      "type": "blueprint-drift",
+      "priority": "high",
+      "title": "Resolve blueprint drift: branch-health",
+      "detail": "{\"control\":\"branch-health\",\"available\":false,\"failed\":[]}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.drift.optimalConditionDrift"
+      ]
+    },
+    {
+      "fingerprint": "sha256:e5ea0c1c2ea27e39822b15629a11f087337a0a613dc99acc6f4576d28ee4f56c",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "high",
+      "title": "Restore GUARDIAN blueprint alignment",
+      "detail": "{\"control\":\"enforcer\",\"expected\":\"pass\",\"observed\":\"review\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:7b9d514ce75926d19daf04df1da6e53a8c4899c55d719f3639117f786861e2b6"
+      ]
+    },
+    {
+      "fingerprint": "sha256:7d1ecac0947aa3153494f082a18f8ca566bc35a4e20307db63b774c5a3ab7256",
+      "source": "enforcer",
+      "type": "security-review",
+      "priority": "high",
+      "title": "Review ENFORCER health condition",
+      "detail": "security-workflow-pending",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "enforcer.reviews"
+      ]
+    },
+    {
+      "fingerprint": "sha256:7a2da75cdf9ede734d66f4e85d08fe9d5430af5a075885327d39f4a27fe055d7",
+      "source": "visibility-utility",
+      "type": "market-evidence",
+      "priority": "medium",
+      "title": "Configure visibility evidence source: analytics",
+      "detail": "VISIBILITY-UTILITY cannot raise projection confidence until this configured input is available.",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "visibility.missingInputs",
+        "analytics"
+      ]
+    },
+    {
+      "fingerprint": "sha256:93133571feb617973658e40c7be5e8890671cd68431533b0b5f5db86649da9e9",
+      "source": "visibility-utility",
+      "type": "market-evidence",
+      "priority": "medium",
+      "title": "Configure visibility evidence source: commercial-baseline",
+      "detail": "VISIBILITY-UTILITY cannot raise projection confidence until this configured input is available.",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "visibility.missingInputs",
+        "commercial-baseline"
+      ]
+    },
+    {
+      "fingerprint": "sha256:aed5eda58e3d7cf2924fe959c16e1e9ca6342827bfff7eebdb2654b38fa3996b",
+      "source": "visibility-utility",
+      "type": "market-evidence",
+      "priority": "medium",
+      "title": "Configure visibility evidence source: global-trends",
+      "detail": "VISIBILITY-UTILITY cannot raise projection confidence until this configured input is available.",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "visibility.missingInputs",
+        "global-trends"
+      ]
+    },
+    {
+      "fingerprint": "sha256:75fe2a258d90d701e08ed86dd6f7a415ada6de985e5b3a43f6e08467a341aae2",
+      "source": "visibility-utility",
+      "type": "market-evidence",
+      "priority": "medium",
+      "title": "Configure visibility evidence source: local-trends",
+      "detail": "VISIBILITY-UTILITY cannot raise projection confidence until this configured input is available.",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "visibility.missingInputs",
+        "local-trends"
+      ]
+    },
+    {
+      "fingerprint": "sha256:414ff487b8905d49e3ba8031f3b6c8e53d8b081c4b383e091a06fe5188b713f6",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Consider route to market: Community + educational content",
+      "detail": "{\"opportunityScore\":64,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":109,\"activationIndexRange\":[93,122],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:f6e1a73ec8f40b16a1b8b76014b0d54f878b59d9f018f284fd734a53f0a5bc3a"
+      ]
+    },
+    {
+      "fingerprint": "sha256:26930a9362e2246da1d4915005bba19ea3d652a17a47b07868b3360a3a84d7ba",
+      "source": "visibility-utility",
+      "type": "route-to-market",
+      "priority": "medium",
+      "title": "Consider route to market: Community + educational content",
+      "detail": "{\"opportunityScore\":64,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":109,\"activationIndexRange\":[93,122],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "visibility.routes",
+        "community-education"
+      ]
+    },
+    {
+      "fingerprint": "sha256:592c514afbd66a17637493e422aaac2db8a147c60c4de4e12c41d1b831f7d899",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Consider route to market: Owned search + public evidence",
+      "detail": "{\"opportunityScore\":68,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":111,\"activationIndexRange\":[94,124],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:4ca06c4e693e677d8f4762e21dddcd5c5725d068892ecad836730e50e7308839"
+      ]
+    },
+    {
+      "fingerprint": "sha256:5d2942829efb455c47316d5653f9d0e2c2fad472b37a414302a755da11bd55f4",
+      "source": "visibility-utility",
+      "type": "route-to-market",
+      "priority": "medium",
+      "title": "Consider route to market: Owned search + public evidence",
+      "detail": "{\"opportunityScore\":68,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":111,\"activationIndexRange\":[94,124],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "visibility.routes",
+        "owned-search-content"
+      ]
+    },
+    {
+      "fingerprint": "sha256:46e2940b1babaa6922e3226bb76b18338f3c00634f2df615abfdb83331e9f8c8",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Consider route to market: Partnership + referral channels",
+      "detail": "{\"opportunityScore\":65,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":109,\"activationIndexRange\":[93,122],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:76bd5c7a19667627e365142682ef044b6aa9f357741b6018dc5af7e12874ac91"
+      ]
+    },
+    {
+      "fingerprint": "sha256:40aae1398bffe241a2c04c7c12b231a8de956c0d821801447ca375d6d332b297",
+      "source": "visibility-utility",
+      "type": "route-to-market",
+      "priority": "medium",
+      "title": "Consider route to market: Partnership + referral channels",
+      "detail": "{\"opportunityScore\":65,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":109,\"activationIndexRange\":[93,122],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "visibility.routes",
+        "partnership-referral"
+      ]
+    },
+    {
+      "fingerprint": "sha256:7cb19c0645d8260b0180829bc6a8fb44445823691a1471f4a685fd3a7e9776cd",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Consider route to market: Product-led public proof + demos",
+      "detail": "{\"opportunityScore\":69,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":111,\"activationIndexRange\":[94,125],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:be17b6293d41a018b3104cb58356aa31176d2657808f782f69ad72afc2005585"
+      ]
+    },
+    {
+      "fingerprint": "sha256:a7a81c4573a41e443883800463f35b7aa7138c0100c0e015cf93d82fcb7c61ed",
+      "source": "visibility-utility",
+      "type": "route-to-market",
+      "priority": "medium",
+      "title": "Consider route to market: Product-led public proof + demos",
+      "detail": "{\"opportunityScore\":69,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":111,\"activationIndexRange\":[94,125],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "visibility.routes",
+        "product-led-public-proof"
+      ]
+    },
+    {
+      "fingerprint": "sha256:fd6a0301d413a25c96c88468c6561f98c312d1dddb9222ee7eef43f1203da9c9",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Consider route to market: Reson8/RONSAS ecosystem cross-promotion",
+      "detail": "{\"opportunityScore\":70,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":112,\"activationIndexRange\":[95,125],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:5c5e429527c4a2157e1cd82ae6372b84b316667b3f92d81847c9a0fcc6b2cf22"
+      ]
+    },
+    {
+      "fingerprint": "sha256:22a1f18960f4b7ab298336e701c00746d510c5b9bebdcd952dc8e9f020526374",
+      "source": "visibility-utility",
+      "type": "route-to-market",
+      "priority": "medium",
+      "title": "Consider route to market: Reson8/RONSAS ecosystem cross-promotion",
+      "detail": "{\"opportunityScore\":70,\"confidence\":\"low\",\"projectedOutcome\":{\"basis\":\"scenario-relative-index\",\"currentBaselineIndex\":100,\"reachIndex\":112,\"activationIndexRange\":[95,125],\"revenue\":null},\"implementationClass\":\"review-required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "visibility.routes",
+        "ecosystem-cross-promotion"
+      ]
+    },
+    {
+      "fingerprint": "sha256:15ca85635f18efac41f8d58d17b3e289cf3e8d4afad6300a31c159c056e4668f",
+      "source": "guardian",
+      "type": "source-health",
+      "priority": "medium",
+      "title": "Propose deterministic source streamlining",
+      "detail": "13 normalization refinement(s) are available for a review PR.",
+      "automationClass": "autonomous-safe",
+      "actionId": "heal-byte-safe-source-noise",
+      "evidence": [
+        {
+          "path": "guardian.observed.source.safeRefinements",
+          "value": [
+            {
+              "file": ".github/workflows/notify-mirror-canonical.yml",
+              "refinements": [
+                "normalized_terminal_newline"
+              ]
+            },
+            {
+              "file": "docs/ADVERSARIAL_STRESS_TEST_2026-09-28.md",
+              "refinements": [
+                "normalized_terminal_newline"
+              ]
+            },
+            {
+              "file": "docs/DATANEST_AI_ARCHITECTURE.md",
+              "refinements": [
+                "normalized_terminal_newline"
+              ]
+            },
+            {
+              "file": "docs/governance/AUTOMATION_X_ANNOTATION.md",
+              "refinements": [
+                "normalized_terminal_newline"
+              ]
+            },
+            {
+              "file": "docs/superpowers/plans/2026-09-24-datanest-ai-governed-memory.md",
+              "refinements": [
+                "normalized_terminal_newline"
+              ]
+            },
+            {
+              "file": "scripts/emit-automation-x-annotation.mjs",
+              "refinements": [
+                "normalized_terminal_newline"
+              ]
+            },
+            {
+              "file": "src/app/datanest-ai-zoom.css",
+              "refinements": [
+                "normalized_terminal_newline"
+              ]
+            },
+            {
+              "file": "src/app/external-auditor.css",
+              "refinements": [
+                "normalized_terminal_newline"
+              ]
+            },
+            {
+              "file": "src/components/DataNestApp.tsx",
+              "refinements": [
+                "removed_trailing_whitespace",
+                "normalized_terminal_newline"
+              ]
+            },
+            {
+              "file": "src/components/ExternalAuditor.tsx",
+              "refinements": [
+                "normalized_terminal_newline"
+              ]
+            },
+            {
+              "file": "src/components/ImpactScoringWorkspace.tsx",
+              "refinements": [
+                "normalized_terminal_newline"
+              ]
+            },
+            {
+              "file": "src/lib/externalAuditStandards.ts",
+              "refinements": [
+                "normalized_terminal_newline"
+              ]
+            },
+            {
+              "file": "src/lib/externalAuditTypes.ts",
+              "refinements": [
+                "normalized_terminal_newline"
+              ]
+            }
+          ],
+          "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c"
+        }
+      ]
+    },
+    {
+      "fingerprint": "sha256:840b06bb249983c8f0cfcfa792e3a15c32cbcbfbc696d6c4d70a8b12742ec0af",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Resolve market-evidence gap: analytics",
+      "detail": "Market projection confidence is limited until this input is configured or explicitly waived.",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:1030e9ba5a0fffe769889ead1188aaad12b0fd3507ac08be101e07b0a5c2c39f"
+      ]
+    },
+    {
+      "fingerprint": "sha256:b603dde89502b85cb2629a8f53a704494aa39ff108d067126165c7fa73e75a3f",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Resolve market-evidence gap: commercial-baseline",
+      "detail": "Market projection confidence is limited until this input is configured or explicitly waived.",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:bb065129d00b1427c8d6d22c0044c681f4ce95c33da52099e6a3e09fd9a9187a"
+      ]
+    },
+    {
+      "fingerprint": "sha256:f3c92667167f09e334167644fa7b20ffcb279ab1cd73a11021842e45e000feaa",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Resolve market-evidence gap: global-trends",
+      "detail": "Market projection confidence is limited until this input is configured or explicitly waived.",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:dff2c23990776b662a66efbd494b416ab81755bf2fbbef6332b7f6fa4cc6f7f1"
+      ]
+    },
+    {
+      "fingerprint": "sha256:aa5d2b013d76195b036e23c1f2d7c91d05e195df2000834c72a112d56a119d54",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Resolve market-evidence gap: local-trends",
+      "detail": "Market projection confidence is limited until this input is configured or explicitly waived.",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:18c4546e7c84ba118788f806e0d498082a426aac33933e3a96ef14e1d7e5e8db"
+      ]
+    },
+    {
+      "fingerprint": "sha256:8d1af6e390f151d23a4c09204ef0214dec0bbe759742ce68a09ff5bb75e353de",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Restore synchronized process timing",
+      "detail": "CONDUCTOR reports one or more specialized processes are stale, active, blocked or awaiting refresh.",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:8f30a088d7af98a3c61f9308b1d9b783529bda3e8fb4fd799424f8fd423e0c27"
+      ]
+    },
+    {
+      "fingerprint": "sha256:f3bf4e9b4d5c8faf1451dfd6a26b92805f95fd78391b0ae964b8962f35dca2c0",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"scripts/enforcer-monitor.mjs\",\"line\":46,\"detail\":\"164-line function: export function buildEnforcerAssessment({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:84fda8515e7e7bab6b937f0c66bf45815c609dca8ec6d0ce4730e78ac39a4362",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"scripts/guardian-health.mjs\",\"line\":202,\"detail\":\"374-line function: export function buildGuardianSnapshot({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:61c05f677ff749c695a914a0551cca9ceb5bb3b4c5ab69a6f4856c14f1736550",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"scripts/regulator-engine.mjs\",\"line\":23,\"detail\":\"174-line function: export function buildRegulatorState({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:7417eaa80f4d71a606d6efc22196028f5466c72dfb641a141202fbdc9ab377a7",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"scripts/suggester-engine.mjs\",\"line\":22,\"detail\":\"290-line function: export function buildSuggesterFeed({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:02b6af860d9d98d04072928974c0b091c619bcade32486ef3ad3f35fa2470256",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AdminRndModeToggle.tsx\",\"line\":34,\"detail\":\"243-line function: export default function AdminRndModeToggle({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:0be75b60af175f42f628ae692b865fad2b08f01ae960a2169408c3d9c99854fc",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AdminRndModeToggle.tsx\",\"line\":55,\"detail\":\"166-line function: async function loadAndSynchronizeMirror(){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:e4c390862aa8f8c3cd29b9e63619f98b3cb2a7b808e90cb11b9457fa5361bdd8",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AiOperationsDashboard.tsx\",\"line\":79,\"detail\":\"419-line function: export default function AiOperationsDashboard({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:3a02540dadc5adf057a1b57f3776205b73540422f4d8617c0e8c36c16e52f9a0",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AiReconciliationPanel.tsx\",\"line\":32,\"detail\":\"148-line function: export default function AiReconciliationPanel({projectId}:{projectId:string}){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:d994104d422dff34f2600c13d730074428e13e15959119a1082001844e46e58e",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AuthGate.tsx\",\"line\":36,\"detail\":\"315-line function: export default function AuthGate() {\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:437f025cb0f3ca2a342f2e5935e4b19669d3424e4c49bbb78d5c39a776197fb2",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/CollaborationVisual.tsx\",\"line\":45,\"detail\":\"207-line function: export default function CollaborationVisual({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:6763fee46157656e466849f33e6f33c84382abc09f918c6429546843766aba47",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/DataNestAiCertificationPanel.tsx\",\"detail\":\"984 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:6951612ff14a2bf9f556943ce51899923b680f3f1aeb26cc7668f71285d33c45",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestAiCertificationPanel.tsx\",\"line\":203,\"detail\":\"781-line function: export default function DataNestAiCertificationPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:f3b43fa2c19746f56d3ff8822a74c3ca0b7366802f082f3a74881a934562e0a9",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestAiChatPanel.tsx\",\"line\":121,\"detail\":\"415-line function: export default function DataNestAiChatPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:3e097b53f9f86df2648bc0356a6e186981739f7708ef4dfb63d0b9eef042b226",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestAiChatPanel.tsx\",\"line\":209,\"detail\":\"117-line function: async function send(event:FormEvent){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:860517e1e5e8d9a5afbce4e7e800e9ecd3c58de77434c95e60b9d6daf2778ced",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestAiWorkspace.tsx\",\"line\":63,\"detail\":\"437-line function: export default function DataNestAiWorkspace({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:892b05f8f19a220ceee3cb1aacd4f2b58d129b70328a30afed659645579244c8",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/DataNestApp.tsx\",\"detail\":\"2587 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:06ca401c13cd1ffe65759ab66826aedc84662ea107feb95867162b592b162454",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestApp.tsx\",\"line\":435,\"detail\":\"1361-line function: export default function DataNestApp({session}:{session:Session}) {\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:ae03d6d48586c6093d1210c5d055c3f4b48b5e71d479b525871b9f6695353c8d",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestApp.tsx\",\"line\":1872,\"detail\":\"211-line function: function UnifiPlanner({project,currentUserId,jobs,capabilities,reload,setNotice,setError,canOperate,page,total,onPage,activeJobId}:{project:\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:81e172c413c39a558ac2f24416612c872397fb6de0401997507c403b11c2572b",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestApp.tsx\",\"line\":2113,\"detail\":\"236-line function: function Scheduler({projectId,projectName,projectSlug,currentUserId,role,jobs,capabilities,onStatus,canOperate,page,total,onPage,onNavigate,\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:19b901fc1565c70336f91d43baf971505e024cab4b30fbff720b54407200be4e",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestApp.tsx\",\"line\":2411,\"detail\":\"95-line function: function SchedulerGantt({projectName,projectSlug,jobs,onStatus,canOperate,activeJobId,userInterests}:{projectName:string;projectSlug:string;\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:e4a713bc29cd0de6fe011c7f90b1e9b8d6210c2e2518ef52d60e7ac58e62504a",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestDashboard.tsx\",\"line\":84,\"detail\":\"236-line function: export default function DataNestDashboard({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:9b70a30e9430a38aff6bb8b8aa88db385545ab6128b62ee8863da636f599ea10",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DevelopmentWorkContributionDashboard.tsx\",\"line\":88,\"detail\":\"120-line function: export default function DevelopmentWorkContributionDashboard({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:2143175be5460ded3f122af6087213abd1f9e87909462bb68b9bd3735c96f7dd",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ExecutionAuthorityPanel.tsx\",\"line\":85,\"detail\":\"442-line function: export default function ExecutionAuthorityPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:c22c6467c616a0739d1729043f97299001746a1a3c44a22e676381d709f6042c",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/ExternalAiSidebar.tsx\",\"detail\":\"1072 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:5185ddbe200de379527c4bc7520639b96ee62fbe38865aabc1abcb5661a2bd85",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ExternalAiSidebar.tsx\",\"line\":61,\"detail\":\"1011-line function: export default function ExternalAiSidebar({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:53749c6dffd74bb9c31cefc1f9a809ba39658e7d7611758df600addd3b300b65",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ExternalAiSidebar.tsx\",\"line\":601,\"detail\":\"103-line function: async function startSession(mode:\\\"sidebar\\\"|\\\"companion\\\"|\\\"popout\\\"){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:e016af990f160dad88ae464357971c48457b9797d94cb16a674cd34ceebeed00",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ExternalAuditor.tsx\",\"line\":11,\"detail\":\"116-line function: export default function ExternalAuditor({projectId,role}:ExternalAuditorProps){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:7d1cc7fc03650243e5c51b7c5879efb423eeb93b82f44c81cdf8165054b0209b",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/GovernanceControlMonitor.tsx\",\"line\":66,\"detail\":\"201-line function: export default function GovernanceControlMonitor({projectId}:{projectId:string}){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:107e4f9a1219810431728c1c13a39a1fe7733e952c4c3673f0fc65c60e7d2858",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/GovernanceImprovementPanel.tsx\",\"detail\":\"991 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:4e74f0bf9fbc36b186abe6c5da96ffcd2b921dda885bc3decf73c3d18df6dc14",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/GovernanceWorkspace.tsx\",\"line\":90,\"detail\":\"479-line function: export default function GovernanceWorkspace({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:7d8318059e4f9a5f840d3fb84a29c77c58ff6ebea7cca455a9b6d78c4ff22b55",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/IntelligenceFabricPanel.tsx\",\"line\":51,\"detail\":\"219-line function: export default function IntelligenceFabricPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:f5765b461acbaca3c6d0b2311210b7b4cca7deb0a25de452ab3a393edb9da28b",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/OwnerOptimizerDashboard.tsx\",\"line\":90,\"detail\":\"283-line function: export default function OwnerOptimizerDashboard({projectId}:{projectId:string}){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:e42880a552722fc1a1881280dd1fc780785ade19d6160b985ceafc478941d622",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/PortfolioRegistryPanel.tsx\",\"line\":55,\"detail\":\"408-line function: export default function PortfolioRegistryPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:7b9b453fce766393ed79a71bd5837b0beb333cdc5bb25ff4d70887a8a3f19a54",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ProductLab.tsx\",\"line\":48,\"detail\":\"446-line function: export default function ProductLab({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:113d1904c5cb55f5443b2c6391ac147eb77f1af2ae0ffbd3b5b1badf0dfd2526",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/ProductsWorkspace.tsx\",\"detail\":\"1076 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:d592eb7faea85802e1a063045bfac47128617dfa41d293950223cac6199c79e2",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ProductsWorkspace.tsx\",\"line\":204,\"detail\":\"872-line function: export default function ProductsWorkspace({projectId,currentUserId,role}:Props){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:9a80472a4c329323d039df2da9e63f56eaceef5a78b360e0e815eebc170c14b2",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ProjectMembersPanel.tsx\",\"line\":64,\"detail\":\"388-line function: export default function ProjectMembersPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:0b3c5b7125ce9ff94573cfab60e40bb1c01f4796e135755fe1a3d2150f5def8e",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/RecoveryDiagnosticsPanel.tsx\",\"line\":30,\"detail\":\"105-line function: export default function RecoveryDiagnosticsPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:dd08603a2129d2f0696e24ebd107026160c409834adfccb5cddc6315239d4493",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ResonanceHome.tsx\",\"line\":25,\"detail\":\"197-line function: export default function ResonanceHome({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:a29221ce6db8aaec9249da6f7789abf4737840fa6c59e589d018b7ca6de77e22",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ResonancePortfolioPulse.tsx\",\"line\":62,\"detail\":\"113-line function: export default function ResonancePortfolioPulse({products,records,loading}:Props){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:362da512156080ac1e105dca82324a970225cbc2955181f534ca4b69ebbe9fe2",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ResourceFabricPanel.tsx\",\"line\":53,\"detail\":\"266-line function: export default function ResourceFabricPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:da3443d6d21e1e52ac52af155571565079f2037fd795f01c1e874468cc2ae0e8",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/RndDeviceAdministration.tsx\",\"line\":83,\"detail\":\"244-line function: export default function RndDeviceAdministration({projectId,role}:{projectId:string;role:AdminRole}){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:6867c7045fda3637678068c054e6737cf6e68b504a37b1bd413146564a33374b",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/SparksWorkspace.tsx\",\"line\":54,\"detail\":\"413-line function: export default function SparksWorkspace({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:2d08856228135e90f8d1c58ff1623303d99802444fca8fb7d62699c576a014a5",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/StakeholderWorkspace.tsx\",\"line\":114,\"detail\":\"367-line function: export default function StakeholderWorkspace({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:b9d3bc86e9f5f9de0695f0862bc9767cceec5797d1e0d3c5a536197f3b1209ac",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ThinkTankWorkspace.tsx\",\"line\":57,\"detail\":\"574-line function: export default function ThinkTankWorkspace({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:0e4e75a7768eae0d3d216e31dcb72a472f05a1e38436d972f849e5a91d2f3384",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/TransparencyWorkspace.tsx\",\"line\":100,\"detail\":\"318-line function: export default function TransparencyWorkspace(){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:b8f0357da4db063436ebe8382225d58f4ab308b55ff48d7373590e366e854fdf",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/TrustPolicyPanel.tsx\",\"line\":46,\"detail\":\"451-line function: export default function TrustPolicyPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:39c54b782cd09d76fc79de0c69512cdc33fa4afe8b1228c39dd2b1e18dea70d5",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"low\",\"category\":\"maintenance\",\"code\":\"dense_deferred_work\",\"file\":\"scripts/workflow-reviewer.mjs\",\"detail\":\"6 TODO/FIXME/HACK markers remain in this file.\",\"recommendation\":\"Convert durable work items into tracked issues and remove obsolete inline reminders.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:8b5fe7da0bc9438af2b2946446436f83a000bd94b23e119716f35bf37c1b3251",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"low\",\"category\":\"workflow-deduplication\",\"code\":\"reusable_step_candidate\",\"file\":\".github/workflows/botsquad.yml\",\"detail\":\"uses:actions/checkout@v4 appears across 13 workflows.\",\"recommendation\":\"Consider centralizing this repeated step; affected workflows: .github/workflows/botsquad.yml, .github/workflows/boundaries-assessment.yml, .github/workflows/calmer.yml, .github/workflows/conductor.yml, .github/workflows/enforcer.yml, .github/workflows/environment-tree.yml, .github/workflows/guardian.yml, .github/workflows/knowledge-tree.yml, .github/workflows/liberty-in-all.yml, .github/workflows/maintenance.yml, .github/workflows/regulator.yml, .github/workflows/suggester.yml, .github/workflows/visibility-utility.yml.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:f4fbf2e5d391e39e1243f6215f4d333390b0ad7169c3d7fc19281d11234ac33e",
+      "source": "guardian",
+      "type": "code-streamlining",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"low\",\"category\":\"workflow-deduplication\",\"code\":\"reusable_step_candidate\",\"file\":\".github/workflows/botsquad.yml\",\"detail\":\"uses:actions/upload-artifact@v4 appears across 13 workflows.\",\"recommendation\":\"Consider centralizing this repeated step; affected workflows: .github/workflows/botsquad.yml, .github/workflows/boundaries-assessment.yml, .github/workflows/calmer.yml, .github/workflows/conductor.yml, .github/workflows/enforcer.yml, .github/workflows/environment-tree.yml, .github/workflows/guardian.yml, .github/workflows/knowledge-tree.yml, .github/workflows/liberty-in-all.yml, .github/workflows/maintenance.yml, .github/workflows/regulator.yml, .github/workflows/suggester.yml, .github/workflows/visibility-utility.yml.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "guardian.observed.source.redundancyCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:8b1d62ed3728149aa356303bb819a2d956c1640369ae2c4ece85a6c53efb75bb",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"scripts/enforcer-monitor.mjs\",\"line\":46,\"detail\":\"164-line function: export function buildEnforcerAssessment({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:5a18b368f77a70c3fe34dcb88524fe0f7eddb084c983c52448763edc45ddf7fb"
+      ]
+    },
+    {
+      "fingerprint": "sha256:150b3b0f2a82d08547488153bb4b1ca9dc8581e1bc0a2f1459038acf4c708a42",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"scripts/guardian-health.mjs\",\"line\":202,\"detail\":\"374-line function: export function buildGuardianSnapshot({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:baaaff14bab74d439ea20c05508d896a2837c2928046b0413d6ab7ac5542f03d"
+      ]
+    },
+    {
+      "fingerprint": "sha256:d1f6dcc73d9ae2ccd727f0591c3480e2260d93473754e040403612d90566a744",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"scripts/regulator-engine.mjs\",\"line\":23,\"detail\":\"174-line function: export function buildRegulatorState({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:4d575404c35ff6e6a8893fe14bd1662529f5cd94de5510d8f85c0640f50238a4"
+      ]
+    },
+    {
+      "fingerprint": "sha256:db0222aeeb09de177789f0352e2f6a15abe77e9b2740d468b0d63687464cc8d7",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"scripts/suggester-engine.mjs\",\"line\":22,\"detail\":\"290-line function: export function buildSuggesterFeed({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:ba82a03bf88818e6cfc475debf519d635fa8943ee690dbee880e47504c493a00"
+      ]
+    },
+    {
+      "fingerprint": "sha256:bfed0d5846a8bbbdd597559d6bd3856f7441e751e2be1ea212cd729d696c36ad",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AdminRndModeToggle.tsx\",\"line\":34,\"detail\":\"243-line function: export default function AdminRndModeToggle({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:2d764c43549ccecd2a20a29e7e5c3b5689b4eafc1cd734f0d738505c1d309b86"
+      ]
+    },
+    {
+      "fingerprint": "sha256:c9f59d3ab63ff543427afe8ba04cf864328798584ba0dbf9527b89f2ca8dff7b",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AdminRndModeToggle.tsx\",\"line\":55,\"detail\":\"166-line function: async function loadAndSynchronizeMirror(){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:f2d5942362a41f409ad47e423abc5e55d45af73654d21fac8b6de3791dcf8485"
+      ]
+    },
+    {
+      "fingerprint": "sha256:b66506bae3d70026569e18f9738c08b19fb8ce96880c18b45a4ad29e98d88444",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AiOperationsDashboard.tsx\",\"line\":79,\"detail\":\"419-line function: export default function AiOperationsDashboard({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:b759937a8e7523d31fbf1d5c19e7f158388ad39464329aeb9c062f41818cedba"
+      ]
+    },
+    {
+      "fingerprint": "sha256:e43e7ce9e2e6edab7f4b13ae539c7818f0f8cd963db8ad43d7165994f3f3cab7",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AiReconciliationPanel.tsx\",\"line\":32,\"detail\":\"148-line function: export default function AiReconciliationPanel({projectId}:{projectId:string}){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:f143753157d4a92e4d29e4131edecd1cfd4a25e21abf734d47aad479a94b092f"
+      ]
+    },
+    {
+      "fingerprint": "sha256:fe85c432e6e4dc0aee32f8b7c77c9f97f4b2e1b2dec4f923270b877f4ae07428",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/AuthGate.tsx\",\"line\":36,\"detail\":\"315-line function: export default function AuthGate() {\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:c716eeba1142c56bfda7e8c0dfe81593c8d71a98170e8bdb7126843512bf057b"
+      ]
+    },
+    {
+      "fingerprint": "sha256:0538e15d898fb10bba98284701c4ce44a948f297abc86b32d32bceaebb8c62d6",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/CollaborationVisual.tsx\",\"line\":45,\"detail\":\"207-line function: export default function CollaborationVisual({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:440c35c5c461ce900e4d350545142fad54381b6d565c7475f9de642d44d40374"
+      ]
+    },
+    {
+      "fingerprint": "sha256:53e47548b879c2ab0a9831388c9906ec41964a2a992df026bafbe04741ca47d2",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/DataNestAiCertificationPanel.tsx\",\"detail\":\"984 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:5a560df9522906aecc075371cd3587bbd09573d751f369fa659638382b41d2f1"
+      ]
+    },
+    {
+      "fingerprint": "sha256:7889c714cf5ee6138ac6334ab53ec1abd790090a7c0aa3ba3c721c17616d3796",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestAiCertificationPanel.tsx\",\"line\":203,\"detail\":\"781-line function: export default function DataNestAiCertificationPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:17ba0fa40a03c46527173125a4a8542c6c5c7f015718d126e5ef52274b3ba5c9"
+      ]
+    },
+    {
+      "fingerprint": "sha256:788fde592cc8fef9d130029cfa9ed3e3721e36f2e190847a212a715250891abb",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestAiChatPanel.tsx\",\"line\":121,\"detail\":\"415-line function: export default function DataNestAiChatPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:b2e778365c3d32e45973e232bb175806f7047b0741ca13c40d1cabb1f8524ffb"
+      ]
+    },
+    {
+      "fingerprint": "sha256:ae2e9d2ca23e6cfb2653c098e9b2323b70e74f8250fbbed57e9d41fe053209c8",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestAiChatPanel.tsx\",\"line\":209,\"detail\":\"117-line function: async function send(event:FormEvent){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:8544a3ffdb3b217585e7e54ebd66d01c913cdf04e00a466495f6a3b0f0cffcb6"
+      ]
+    },
+    {
+      "fingerprint": "sha256:24e313aa4f4dabb3d1d4801601cb33a142edf388bbe3f070724b1d48fd00cab3",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestAiWorkspace.tsx\",\"line\":63,\"detail\":\"437-line function: export default function DataNestAiWorkspace({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:692d917f9a18699c9018a94a057846d7bba70f153eec1a6d2780a3b4eb0b9c3f"
+      ]
+    },
+    {
+      "fingerprint": "sha256:b1d0350d1b8882761d66826506fe378bd35921e8795ae30784e66629ed74ba97",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/DataNestApp.tsx\",\"detail\":\"2587 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:dbe810562d3e2905a17d840f709050ab06d6d1a09f3af36d40ffd1e74cdb7990"
+      ]
+    },
+    {
+      "fingerprint": "sha256:506b7f3cddbb5249e009246bb6b92dd600bd2dd4539894db1c8094020308c102",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestApp.tsx\",\"line\":435,\"detail\":\"1361-line function: export default function DataNestApp({session}:{session:Session}) {\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:46c53e013aa4653bccd0296909dbd3c4abe43105eee858d7fbae30656bdb7ae2"
+      ]
+    },
+    {
+      "fingerprint": "sha256:9ad817b687fe25ef29101158a56f6bc75beb305d039249df015ae05396c46f99",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestApp.tsx\",\"line\":1872,\"detail\":\"211-line function: function UnifiPlanner({project,currentUserId,jobs,capabilities,reload,setNotice,setError,canOperate,page,total,onPage,activeJobId}:{project:\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:0c6f15c71f099225ab1281f6cd870221e009b5dc436a0cba2dffef2338b20159"
+      ]
+    },
+    {
+      "fingerprint": "sha256:d92f4556fffe0bc3b6ed05ad8c353394aa620ca7ce63b4899aae4f2fd2ccf46f",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestApp.tsx\",\"line\":2113,\"detail\":\"236-line function: function Scheduler({projectId,projectName,projectSlug,currentUserId,role,jobs,capabilities,onStatus,canOperate,page,total,onPage,onNavigate,\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:988c0a84072f69ee8a197cb9652a1392e4bfa1e7bcfc17edf9b2fbb14f26783e"
+      ]
+    },
+    {
+      "fingerprint": "sha256:554fe78f950289b47a00e316810e5b84bb4e13cc1d615b1fd625975a1fba2a2f",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestApp.tsx\",\"line\":2411,\"detail\":\"95-line function: function SchedulerGantt({projectName,projectSlug,jobs,onStatus,canOperate,activeJobId,userInterests}:{projectName:string;projectSlug:string;\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:1ee95740b1073718c7b7ea04688298f6ae6d0f8d99731bb945ce674347252d04"
+      ]
+    },
+    {
+      "fingerprint": "sha256:b76125497dbfb70275b93cc41c29b3ab9b0a37fdb7c4394803151c59264b9c1b",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DataNestDashboard.tsx\",\"line\":84,\"detail\":\"236-line function: export default function DataNestDashboard({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:9c9a81c143ceff717434695bca53141f6360633bb8b4c2978162d43168cfcee5"
+      ]
+    },
+    {
+      "fingerprint": "sha256:4a4315aad7f88f7cd8b93b2f5be5a8548d7309475eaa57919507c1472388f36f",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/DevelopmentWorkContributionDashboard.tsx\",\"line\":88,\"detail\":\"120-line function: export default function DevelopmentWorkContributionDashboard({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:18db7be4f7d673228777d4e9de70c74e186de8d5d6571689de06a863a0f9740f"
+      ]
+    },
+    {
+      "fingerprint": "sha256:6b9567a1bd2e8a67dc8b30c870e8b63984f908c8f05c5b90539710a09b0af03e",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ExecutionAuthorityPanel.tsx\",\"line\":85,\"detail\":\"442-line function: export default function ExecutionAuthorityPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:043242f26fe3dcaa0fb9786d0de5fcef5fbf54ce08d84b6d941b93e145d08428"
+      ]
+    },
+    {
+      "fingerprint": "sha256:b996e56e84521ffd41383f1c15374003abac825d72a98cd2eb5b5a6b3fc1ded7",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/ExternalAiSidebar.tsx\",\"detail\":\"1072 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:3e041082988896383c91aac1f7e2f141adfae4e72313c36752adc774eddacbbb"
+      ]
+    },
+    {
+      "fingerprint": "sha256:1e12684f8b200f62d55bdcdbb2264bc59bcc7f5ab73d82d05f3b0ae013fd0b6f",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ExternalAiSidebar.tsx\",\"line\":61,\"detail\":\"1011-line function: export default function ExternalAiSidebar({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:040dfcf21fd52fb315a43de7fa43b28cd791e54f244e5b22c673ea367c48f9bf"
+      ]
+    },
+    {
+      "fingerprint": "sha256:db465f73ac6ebfb9cd9938d4d15e668fb7d3beeac2b64b3f795a9099789bbe72",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ExternalAiSidebar.tsx\",\"line\":601,\"detail\":\"103-line function: async function startSession(mode:\\\"sidebar\\\"|\\\"companion\\\"|\\\"popout\\\"){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:7effb9cf78933615cf308bb52cd7094d1c8d396aa8edd4c0968d23f09b4343df"
+      ]
+    },
+    {
+      "fingerprint": "sha256:cad2afbfc68ca08a221cf54692e8514acbeae696658832a29a181afd1fc594d8",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ExternalAuditor.tsx\",\"line\":11,\"detail\":\"116-line function: export default function ExternalAuditor({projectId,role}:ExternalAuditorProps){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:e92276f54be24972ed58d9fcd129ecb487c80a8452df922cd5e65a23f49a205f"
+      ]
+    },
+    {
+      "fingerprint": "sha256:1afb9315af100f64de435b2e4c8496348c69b6054d58cdef11f930109f7dead4",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/GovernanceControlMonitor.tsx\",\"line\":66,\"detail\":\"201-line function: export default function GovernanceControlMonitor({projectId}:{projectId:string}){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:20cacd88c52d1c3fb07e033ba98f903842fafba2eafe7ff4f421f20c9440e468"
+      ]
+    },
+    {
+      "fingerprint": "sha256:009b7b780e109a3832e5b9cd7514a995dba3f71e1565e3f83d4e5d863d5d3526",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/GovernanceImprovementPanel.tsx\",\"detail\":\"991 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:5daf66f7374b4a5e8084b39992865f6733ef68fd09a539b5dabf63e324d7bd0e"
+      ]
+    },
+    {
+      "fingerprint": "sha256:7741e055d60637a388dff919728fcdac75ca24155d314b30cff092bfb812ee17",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/GovernanceWorkspace.tsx\",\"line\":90,\"detail\":\"479-line function: export default function GovernanceWorkspace({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:07e0397ccde9ced2fcbc1de5d0089ad14667ebe898da4df976bf11abe8fd5f9e"
+      ]
+    },
+    {
+      "fingerprint": "sha256:51774c1410a06b479222de6dcec38845542dccd6b134861a333c570e36d0ed40",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/IntelligenceFabricPanel.tsx\",\"line\":51,\"detail\":\"219-line function: export default function IntelligenceFabricPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:cbbadbb5e289f7f48d2baf9d2deeb1b3e1dcee30a6e9f565a0c3ea06ea49c521"
+      ]
+    },
+    {
+      "fingerprint": "sha256:bd16ca2556b5e62b4b69a7ac76262ac55e04145fd7bb5d74875611e289cccedf",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/OwnerOptimizerDashboard.tsx\",\"line\":90,\"detail\":\"283-line function: export default function OwnerOptimizerDashboard({projectId}:{projectId:string}){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:f582e7062673d1dc62af4145ed830821d5545d6bf11a3b497b0631c980d6750c"
+      ]
+    },
+    {
+      "fingerprint": "sha256:a0bd0ea8d593b2a93746660631cb850418433f64946b8f594736afe11a900244",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/PortfolioRegistryPanel.tsx\",\"line\":55,\"detail\":\"408-line function: export default function PortfolioRegistryPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:32f1eaffb2197714a3cc770709f7a09ce9364c9c3d9cc85c06f6090fdd446bb5"
+      ]
+    },
+    {
+      "fingerprint": "sha256:3a098c32642ce068b3fe7beb5c4459e812831bbbfadedc3f2e61e15710d06435",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ProductLab.tsx\",\"line\":48,\"detail\":\"446-line function: export default function ProductLab({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:cb53f07250d4be75a30785b4c000ff83c78ac00297072ef63d3b712d02b971eb"
+      ]
+    },
+    {
+      "fingerprint": "sha256:0afb25d37f249648dd8c5b565d6d36bc90c821b989639c1f949b5c0579948fa5",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"large_source_file\",\"file\":\"src/components/ProductsWorkspace.tsx\",\"detail\":\"1076 lines exceeds the 900-line review threshold.\",\"recommendation\":\"Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:2e854e7948660fc789b468c242484fb28e275918eb074c4b1e26b451cba0face"
+      ]
+    },
+    {
+      "fingerprint": "sha256:5e593dcb98ae580da0c8a6561b88372b28ee8428908492242b3afa3e3ee4e43d",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ProductsWorkspace.tsx\",\"line\":204,\"detail\":\"872-line function: export default function ProductsWorkspace({projectId,currentUserId,role}:Props){\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:475b796a602e8c91e517f7f6c3283c6250bc3846ef1417f1f171dbf0ee3f400e"
+      ]
+    },
+    {
+      "fingerprint": "sha256:64af5987cf937f647856627d6c35abb89c663a5646e80da38117c6b466179c2a",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ProjectMembersPanel.tsx\",\"line\":64,\"detail\":\"388-line function: export default function ProjectMembersPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:f492b84777fa58a32b0d7d00d354a5685f03a72e1684262a7b18ab4164b67d55"
+      ]
+    },
+    {
+      "fingerprint": "sha256:08471bf3800880895fab87882b6f097b7381492f2ee73ce7c20b42a13d008fc4",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/RecoveryDiagnosticsPanel.tsx\",\"line\":30,\"detail\":\"105-line function: export default function RecoveryDiagnosticsPanel({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:8ef2b71a776a8310d7c88a315b836baed541cfa141d82ced910c916dcf84d67e"
+      ]
+    },
+    {
+      "fingerprint": "sha256:5e25ae3e4a47c83747aaa986b0ee0be3bd3da473b52f60ad6fe876a2c7c9eaa9",
+      "source": "regulator",
+      "type": "harmony-requirement",
+      "priority": "medium",
+      "title": "Review code/workflow streamlining candidate",
+      "detail": "{\"severity\":\"medium\",\"category\":\"code-structure\",\"code\":\"long_function\",\"file\":\"src/components/ResonanceHome.tsx\",\"line\":25,\"detail\":\"197-line function: export default function ResonanceHome({\",\"recommendation\":\"Extract pure helpers or domain operations, then keep the orchestration function narrow.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "regulator.requirements",
+        "sha256:66f162a3756eafadda91636f2834b6d89aa0c31cce141b6bcf170e0bddc6ffa7"
+      ]
+    },
+    {
+      "fingerprint": "sha256:1013ff09934dbe85e4d55446b5a72529ae20caee67318336f1d14d3d39b3a912",
+      "source": "knowledge",
+      "type": "learning-optimization",
+      "priority": "medium",
+      "title": "Review Knowledge optimization candidate",
+      "detail": "{\"category\":\"architecture\",\"evidenceCount\":84,\"recommendation\":\"Review repeated architecture changes for a reusable check, shared component, documented pattern, or automated verification before adopting another one-off fix.\",\"authority\":\"review_required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "knowledge.optimizationCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:4b27dc406327ff5128226937ef6183971757be3ac4c122980953c43ed6b6b3c4",
+      "source": "knowledge",
+      "type": "learning-optimization",
+      "priority": "medium",
+      "title": "Review Knowledge optimization candidate",
+      "detail": "{\"category\":\"testing\",\"evidenceCount\":48,\"recommendation\":\"Review repeated testing changes for a reusable check, shared component, documented pattern, or automated verification before adopting another one-off fix.\",\"authority\":\"review_required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "knowledge.optimizationCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:53900382e1fd587c6f5d3280a9766046d6ea2960d61457cd18e57ff82528fb9a",
+      "source": "knowledge",
+      "type": "learning-optimization",
+      "priority": "medium",
+      "title": "Review Knowledge optimization candidate",
+      "detail": "{\"category\":\"governance\",\"evidenceCount\":40,\"recommendation\":\"Review repeated governance changes for a reusable check, shared component, documented pattern, or automated verification before adopting another one-off fix.\",\"authority\":\"review_required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "knowledge.optimizationCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:9554bb7876246daa971ada7b8930a57d5c3c1df778a8b21ce04a057b05abdb05",
+      "source": "knowledge",
+      "type": "learning-optimization",
+      "priority": "medium",
+      "title": "Review Knowledge optimization candidate",
+      "detail": "{\"category\":\"security\",\"evidenceCount\":38,\"recommendation\":\"Review repeated security changes for a reusable check, shared component, documented pattern, or automated verification before adopting another one-off fix.\",\"authority\":\"review_required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "knowledge.optimizationCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:fb8f6459476255829413dded35735d280915aa5384310cca132c4f3332b4e609",
+      "source": "knowledge",
+      "type": "learning-optimization",
+      "priority": "medium",
+      "title": "Review Knowledge optimization candidate",
+      "detail": "{\"category\":\"ai\",\"evidenceCount\":36,\"recommendation\":\"Review repeated ai changes for a reusable check, shared component, documented pattern, or automated verification before adopting another one-off fix.\",\"authority\":\"review_required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "knowledge.optimizationCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:70b0cc3e92259e447ce1815c43fc029fc0c48fdedecde95a24e6c236ca9525ad",
+      "source": "knowledge",
+      "type": "learning-optimization",
+      "priority": "medium",
+      "title": "Review Knowledge optimization candidate",
+      "detail": "{\"category\":\"deployment\",\"evidenceCount\":28,\"recommendation\":\"Review repeated deployment changes for a reusable check, shared component, documented pattern, or automated verification before adopting another one-off fix.\",\"authority\":\"review_required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "knowledge.optimizationCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:246dbbb8c4fb7810b6ea1ec5e2cb93adc747bec56f16892c724b6454abcbb620",
+      "source": "knowledge",
+      "type": "learning-optimization",
+      "priority": "medium",
+      "title": "Review Knowledge optimization candidate",
+      "detail": "{\"category\":\"ux\",\"evidenceCount\":25,\"recommendation\":\"Review repeated ux changes for a reusable check, shared component, documented pattern, or automated verification before adopting another one-off fix.\",\"authority\":\"review_required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "knowledge.optimizationCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:8229240108c790c7b17bb739a62d0d26dc235cdd69bb41e8351f726229fac3b8",
+      "source": "knowledge",
+      "type": "learning-optimization",
+      "priority": "medium",
+      "title": "Review Knowledge optimization candidate",
+      "detail": "{\"category\":\"reliability\",\"evidenceCount\":19,\"recommendation\":\"Review repeated reliability changes for a reusable check, shared component, documented pattern, or automated verification before adopting another one-off fix.\",\"authority\":\"review_required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "knowledge.optimizationCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:a01406a7579938c10499e19c5877dbc9ca9b79ac4a50d15f48afd4f442400af2",
+      "source": "knowledge",
+      "type": "learning-optimization",
+      "priority": "medium",
+      "title": "Review Knowledge optimization candidate",
+      "detail": "{\"category\":\"data\",\"evidenceCount\":12,\"recommendation\":\"Review repeated data changes for a reusable check, shared component, documented pattern, or automated verification before adopting another one-off fix.\",\"authority\":\"review_required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "knowledge.optimizationCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:afb615abf097b87bb85dca6ac05c8f4cc06c1fa4d01ecd697cb4e08873b7dbad",
+      "source": "knowledge",
+      "type": "learning-optimization",
+      "priority": "medium",
+      "title": "Review Knowledge optimization candidate",
+      "detail": "{\"category\":\"maintenance\",\"evidenceCount\":3,\"recommendation\":\"Review repeated maintenance changes for a reusable check, shared component, documented pattern, or automated verification before adopting another one-off fix.\",\"authority\":\"review_required\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "knowledge.optimizationCandidates"
+      ]
+    },
+    {
+      "fingerprint": "sha256:466121dc519c3df0ce06e69e77a993689cb31941ec809db2dbd109274ea45ba5",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"branch-cleaner.yml\",\"gateId\":\"branch-cleaner\",\"gateType\":\"manual_mutation\",\"reviewDomains\":[\"ownerOperator\"],\"baselinePlanningHours\":24,\"minimumPassPlanningHours\":6,\"maximumSofteningHours\":18,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:3f657680d34a35088daf02deb9b9c32530c254b579adb533d99d5568bf3e8693",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"ci.yml\",\"gateId\":\"ci\",\"gateType\":\"automated_validation\",\"reviewDomains\":[\"engineeringReview\"],\"baselinePlanningHours\":24,\"minimumPassPlanningHours\":6,\"maximumSofteningHours\":18,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:166734c1eba5ff898f6de03bcbc2ed9f4f05222c72202c42da7c8fc8505eacf4",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"datanest-ai-certification.yml\",\"gateId\":\"datanest-ai-certification\",\"gateType\":\"automated_validation\",\"reviewDomains\":[\"engineeringReview\",\"governanceReview\"],\"baselinePlanningHours\":48,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":36,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:7c73a5be77a3d4fb942f4c2f9bd0a382c5411ec909fd3608d392370b66636a4c",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"datanest-ai-file-worker-deploy.yml\",\"gateId\":\"datanest-ai-file-worker-deploy\",\"gateType\":\"manual_mutation\",\"reviewDomains\":[\"operationsReview\",\"securityReview\"],\"baselinePlanningHours\":48,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":36,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:b12cc2a126319ea4d1601179938e112cc66ecb4333e24864e42800afbf935f21",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"edge-function-validation.yml\",\"gateId\":\"edge-function-validation\",\"gateType\":\"automated_validation\",\"reviewDomains\":[\"engineeringReview\",\"securityReview\"],\"baselinePlanningHours\":36,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":24,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:a3a57623b4a1b68d51423bac6b11cd323b7216367f4f59cec006c41c791d9a0d",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"migration-replay-validation.yml\",\"gateId\":\"migration-replay-validation\",\"gateType\":\"automated_validation\",\"reviewDomains\":[\"engineeringReview\",\"operationsReview\"],\"baselinePlanningHours\":36,\"minimumPassPlanningHours\":6,\"maximumSofteningHours\":30,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:da7eb9be5b92fb077a08c14cdfb8d080c97d019aceb0aa5d1cb1c4322a50f10d",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"mirror-production-import.yml\",\"gateId\":\"mirror-production-import\",\"gateType\":\"manual_mutation\",\"reviewDomains\":[\"engineeringReview\",\"governanceReview\",\"operationsReview\"],\"baselinePlanningHours\":60,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":48,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:5a0306150176ad5834a73eade7613dd150541a518e7706e8d9eba77494565076",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"pages.yml\",\"gateId\":\"pages\",\"gateType\":\"manual_mutation\",\"reviewDomains\":[\"governanceReview\",\"legalReview\",\"externalReview\"],\"baselinePlanningHours\":72,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":60,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:b991fb21b105309a8a17350d885bce6d7f4681f569db02cc68791b0bc15d5f04",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"pr-verification.yml\",\"gateId\":\"pr-verification\",\"gateType\":\"automated_validation\",\"reviewDomains\":[\"engineeringReview\",\"visualReview\"],\"baselinePlanningHours\":36,\"minimumPassPlanningHours\":6,\"maximumSofteningHours\":30,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:57b31b0232c03a52a068bf0203838fa9fe91a39b23d15748c4f60ca9caee9ef8",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"ronsas-app-validation.yml\",\"gateId\":\"ronsas-app-validation\",\"gateType\":\"automated_validation\",\"reviewDomains\":[\"engineeringReview\",\"visualReview\"],\"baselinePlanningHours\":48,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":36,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:4faea918369d4c9d8634baea24fb7532d28e6e0996badcaf57f7edeb39c3201c",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"security-scan.yml\",\"gateId\":\"security-scan\",\"gateType\":\"automated_validation\",\"reviewDomains\":[\"securityReview\"],\"baselinePlanningHours\":36,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":24,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:3db8cc6a15a7306f8bb73afe1c5a4d02edde173a059d471772fdd27e189260c4",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"ui-owner-test-mode-expiry.yml\",\"gateId\":\"ui-owner-test-mode-expiry\",\"gateType\":\"automated_enforcement\",\"reviewDomains\":[\"ownerOperator\"],\"baselinePlanningHours\":12,\"minimumPassPlanningHours\":6,\"maximumSofteningHours\":6,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:be37a6261e7f5968b92f57696a9cce89fee7aa65dac69dfed2a673eb90981147",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"ui-test-mode.yml\",\"gateId\":\"ui-test-mode\",\"gateType\":\"automated_evidence\",\"reviewDomains\":[\"visualReview\",\"governanceReview\"],\"baselinePlanningHours\":48,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":36,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:b306a473cc2b5c891c9aef19445b47c27cd72b0210dbdf3e50dba29068a9787c",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"workflow-reviewer.yml\",\"gateId\":\"workflow-reviewer\",\"gateType\":\"automated_analysis\",\"reviewDomains\":[\"engineeringReview\",\"operationsReview\"],\"baselinePlanningHours\":36,\"minimumPassPlanningHours\":6,\"maximumSofteningHours\":30,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:a35261d581f29a67f876b027d003adbd9626994ab0135e29dd7ef80e584d32ea",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"production-edge-function-release.yml\",\"gateId\":\"production-edge-function-release\",\"gateType\":\"manual_mutation\",\"reviewDomains\":[\"engineeringReview\",\"securityReview\",\"operationsReview\"],\"baselinePlanningHours\":60,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":48,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:cc1867ef8ff6bd98053e09df9781daf4a530675fbfc50cddd06162f9059c2036",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"sec01-governance-certification.yml\",\"gateId\":\"sec01-governance-certification\",\"gateType\":\"automated_validation\",\"reviewDomains\":[\"securityReview\",\"governanceReview\"],\"baselinePlanningHours\":48,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":36,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:61b7f7881c291e5ca0cfd785309979dd81afabe9145c7f5aa3fc1d8068317879",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"resonance-forge-phase-a.yml\",\"gateId\":\"resonance-forge-phase-a\",\"gateType\":\"automated_validation\",\"reviewDomains\":[\"engineeringReview\",\"securityReview\",\"governanceReview\"],\"baselinePlanningHours\":60,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":48,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:2ad55edce3bcae3b1d519b264a356b2a7ab6562141e9d5b82658c982f05a858d",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"boundaries-assessment.yml\",\"gateId\":\"boundaries-assessment\",\"gateType\":\"automated_validation\",\"reviewDomains\":[\"governanceReview\",\"engineeringReview\"],\"baselinePlanningHours\":36,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":24,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:88ba67c3c4bec7d0acb97fd695cd61cdb8001e685dc1cacf47842a01013c1636",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"knowledge-tree.yml\",\"gateId\":\"knowledge-tree\",\"gateType\":\"automated_analysis\",\"reviewDomains\":[\"engineeringReview\",\"governanceReview\"],\"baselinePlanningHours\":36,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":24,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:e460c9a91413ce33c0c2777590e613c9ee5705d28dafea46704bfdcafdd88b9a",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"maintenance.yml\",\"gateId\":\"maintenance\",\"gateType\":\"automated_enforcement\",\"reviewDomains\":[\"operationsReview\",\"governanceReview\"],\"baselinePlanningHours\":48,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":36,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:d53ca6ad1f6868fb1c85d4565ec1c18b34ba97c93868c9c8d1d622e81e1a447a",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"botsquad.yml\",\"gateId\":\"botsquad\",\"gateType\":\"automated_analysis\",\"reviewDomains\":[\"engineeringReview\",\"visualReview\",\"governanceReview\"],\"baselinePlanningHours\":48,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":36,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:209e7ffcb6d6f6aea015a6c8fb1e15422ad08040e7ffca0fd373a468bcf27e1a",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"environment-tree.yml\",\"gateId\":\"environment-tree\",\"gateType\":\"automated_analysis\",\"reviewDomains\":[\"engineeringReview\",\"operationsReview\",\"governanceReview\"],\"baselinePlanningHours\":48,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":36,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:0156f43126365f3555e85e3aba7ae0dbad63adf901a060565717dba2f990bf17",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"enforcer.yml\",\"gateId\":\"enforcer\",\"gateType\":\"automated_enforcement\",\"reviewDomains\":[\"securityReview\",\"governanceReview\",\"engineeringReview\"],\"baselinePlanningHours\":48,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":36,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:896de8a23e01fe74e01d487b4959dbee819f5d72c3bb5c9852e41b543426b8d7",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"guardian.yml\",\"gateId\":\"guardian\",\"gateType\":\"automated_enforcement\",\"reviewDomains\":[\"engineeringReview\",\"operationsReview\",\"securityReview\",\"governanceReview\"],\"baselinePlanningHours\":60,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":48,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:4eb1ab2f8ace1286a14c5a6be74abd79d2fc89fb5c38d6a1f153394a4d2829ae",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"conductor.yml\",\"gateId\":\"conductor\",\"gateType\":\"automated_enforcement\",\"reviewDomains\":[\"engineeringReview\",\"operationsReview\",\"governanceReview\"],\"baselinePlanningHours\":60,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":48,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:35bf9d89347a94277ea5c748551e04ccb66b359b513b50f45cca5eb3fb313bd2",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"suggester.yml\",\"gateId\":\"suggester\",\"gateType\":\"automated_analysis\",\"reviewDomains\":[\"engineeringReview\",\"operationsReview\",\"governanceReview\"],\"baselinePlanningHours\":48,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":36,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:8e1bba2cd14fd7ae8e441a24a53eff7a8c46556a8367585db8333ac1635693ba",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"calmer.yml\",\"gateId\":\"calmer\",\"gateType\":\"automated_analysis\",\"reviewDomains\":[\"governanceReview\",\"securityReview\"],\"baselinePlanningHours\":36,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":24,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:7699bf2a8740a95d3a4a79ad20f0a485b8035de72dc621f445663c96a54d5603",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"regulator.yml\",\"gateId\":\"regulator\",\"gateType\":\"automated_analysis\",\"reviewDomains\":[\"governanceReview\",\"securityReview\",\"operationsReview\"],\"baselinePlanningHours\":60,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":48,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:ec5e831106ec365b1bc8b2b46b631f84762a0677a7913f4501edd80ed0fcfae7",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"visibility-utility.yml\",\"gateId\":\"visibility-utility\",\"gateType\":\"automated_analysis\",\"reviewDomains\":[\"engineeringReview\",\"visualReview\",\"governanceReview\"],\"baselinePlanningHours\":48,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":36,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    },
+    {
+      "fingerprint": "sha256:6500b86a3448498e3bf74528440e6ca84e16bc75cd969a6d6c628909a3a93b67",
+      "source": "calmer",
+      "type": "governance-friction",
+      "priority": "low",
+      "title": "Apply CALMER minimum-pass planning window",
+      "detail": "{\"workflowFile\":\"liberty-in-all.yml\",\"gateId\":\"liberty-in-all\",\"gateType\":\"automated_evidence\",\"reviewDomains\":[\"engineeringReview\",\"securityReview\",\"governanceReview\"],\"baselinePlanningHours\":48,\"minimumPassPlanningHours\":12,\"maximumSofteningHours\":36,\"hardControlsPreserved\":true,\"softeningSuspended\":false,\"note\":\"Planning/evidence-response softening only; automated checks and authority requirements remain unchanged.\"}",
+      "automationClass": "review-required",
+      "actionId": null,
+      "evidence": [
+        "calmer.gateSoftening"
+      ]
+    }
+  ],
+  "commands": [],
+  "summary": {
+    "total": 152,
+    "autonomousSafe": 0,
+    "reviewRequired": 151,
+    "awaitingSynchronization": 1,
+    "newSincePrevious": 6
+  },
+  "controls": {
+    "maySuggestContinuously": true,
+    "mayQueueOnlyAllowlistedAutonomousCommands": true,
+    "mayMutateCanonicalMain": false,
+    "mayMerge": false,
+    "mayDeployProduction": false,
+    "mayChangeBoundaries": false,
+    "maySuppressEnforcerFindings": false,
+    "deduplicateByFingerprint": true,
+    "preserveEvidenceLineage": true
+  },
+  "triggeringConductorRunId": null
+}
