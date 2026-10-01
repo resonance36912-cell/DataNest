@@ -2,6 +2,17 @@
 
 **DataNest** is the canonical Resonance AppDev web control plane. It governs product execution intent, promotion, evidence and lifecycle state while preserving separate source, backend and delivery authorities.
 
+### Declaration of Intent
+
+DataNest has published a proposed **Human + DataNest / Resonance Declaration of Intent v1.0**, explicitly subject to human approval and independent external AI assurance review.
+
+- Proposed declaration: docs/DECLARATION_OF_INTENT.md
+- External AI auditor call: Issue #388
+- Adoption/review PR: PR #389
+
+The declaration is a governance pledge, not a certification, statutory designation, production authorization or substitute for human accountability.
+
+
 
 ## Independent assurance services
 
