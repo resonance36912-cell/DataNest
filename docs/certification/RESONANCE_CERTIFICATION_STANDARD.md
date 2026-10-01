@@ -140,12 +140,15 @@ Service descriptions, certification status, and claim limitations must remain sy
 
 ## 11. Commercial governance
 
-The current market posture remains:
+The current market posture is:
 
-- introductory pricing is published;
-- paid checkout is currently disabled pending payment-provider connection;
-- early engagements may remain promotional at governed discretion;
-- future pricing requires a separate governed commercial decision;
+- published introductory pricing is active;
+- bank-transfer/EFT settlement through the business bank account is the primary payment method;
+- issued invoices are denominated in ZAR;
+- foreign-currency requests may be quoted separately, but the settlement invoice is ZAR and the bank handles applicable conversion/settlement processing;
+- bank account details are supplied on issued invoices and are not stored in source code or public catalog metadata;
+- automated card checkout is disabled;
+- tax treatment is applied according to the business's current registration and applicable South African requirements;
 - no certificate may be sold as a shortcut around evidence or review requirements.
 
 ## 12. Market claims and disclosure
