@@ -6,7 +6,7 @@ import { RESONANCE_CERTIFICATION_STANDARD } from "@/lib/resonanceCertification";
 import PageHeader from "@/components/platform/PageHeader";
 import StatusIndicator from "@/components/platform/StatusIndicator";
 
-type Props={projectId:string;role:string};
+type Props={projectId:string};
 
 const prices:Record<string,{display:string;note:string}>={
   "RCS-SVC-01":{display:"USD 750",note:"Fixed introductory scope"},
