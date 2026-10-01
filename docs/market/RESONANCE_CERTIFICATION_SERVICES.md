@@ -2,7 +2,7 @@
 
 **Authority:** Resonance DataNest  
 **Standard:** RCS 1.0  
-**Commercial state:** Free promotion; paid checkout disabled
+**Commercial state:** Introductory pricing published; paid checkout not yet connected
 
 ## Offering
 
