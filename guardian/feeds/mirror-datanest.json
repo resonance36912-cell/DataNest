@@ -1,0 +1,196 @@
+{
+  "schemaVersion": "datanest-guardian-health-feed-v1",
+  "target": "mirror",
+  "generatedAt": "2026-10-01T20:36:40.033Z",
+  "authority": "health-advisory",
+  "productionAuthorization": false,
+  "status": "critical",
+  "healthScore": 70,
+  "driftCount": 2,
+  "checks": [
+    {
+      "id": "tree-contracts",
+      "status": "healthy",
+      "weight": 15,
+      "earned": 15,
+      "detail": "All required specialized-tree contracts are present."
+    },
+    {
+      "id": "environment",
+      "status": "healthy",
+      "weight": 25,
+      "earned": 25,
+      "detail": "All required ENVIRONMENT dimensions match the optimal blueprint."
+    },
+    {
+      "id": "enforcer",
+      "status": "critical",
+      "weight": 20,
+      "earned": 0,
+      "detail": "ENFORCER status: block"
+    },
+    {
+      "id": "knowledge",
+      "status": "healthy",
+      "weight": 10,
+      "earned": 10,
+      "detail": "Knowledge feed contains 118 approved item(s)."
+    },
+    {
+      "id": "source-health",
+      "status": "healthy",
+      "weight": 10,
+      "earned": 10,
+      "detail": "0 high, 49 medium, 13 low reviewer finding(s); 50 streamlining candidate(s)."
+    },
+    {
+      "id": "branch-health",
+      "status": "degraded",
+      "weight": 10,
+      "earned": 0,
+      "detail": "0 branch(es); 0 safely redundant candidate(s), 0 review branch(es), 0 unresolved."
+    },
+    {
+      "id": "botsquad-feed",
+      "status": "healthy",
+      "weight": 5,
+      "earned": 5,
+      "detail": "BOTSQUAD consolidated feed available from 14 bot(s)."
+    },
+    {
+      "id": "coordination",
+      "status": "healthy",
+      "weight": 0,
+      "earned": 0,
+      "detail": "CONDUCTOR and SUGGESTER coordination state is fresh."
+    },
+    {
+      "id": "governance-harmony",
+      "status": "healthy",
+      "weight": 0,
+      "earned": 0,
+      "detail": "CALMER and REGULATOR preserve non-negotiable authority, security and financial boundaries."
+    },
+    {
+      "id": "market-visibility",
+      "status": "healthy",
+      "weight": 0,
+      "earned": 0,
+      "detail": "VISIBILITY-UTILITY SEO 100/100; platform coverage 100%."
+    },
+    {
+      "id": "remote-repositories",
+      "status": "healthy",
+      "weight": 0,
+      "earned": 0,
+      "detail": "Required remote repository health probes are available and aligned."
+    },
+    {
+      "id": "blueprint-integrity",
+      "status": "healthy",
+      "weight": 5,
+      "earned": 5,
+      "detail": "All blueprint source files were snapshot successfully."
+    }
+  ],
+  "environment": {
+    "available": true,
+    "compatible": true,
+    "dimensions": {
+      "source-control": {
+        "status": "compatible",
+        "detail": "Canonical source repository matches the DataNest authority contract.",
+        "adaptationClass": "none"
+      },
+      "runtime": {
+        "status": "compatible",
+        "detail": "Node 22 setup is present in shared repository automation.",
+        "adaptationClass": "none"
+      },
+      "ci-runner": {
+        "status": "compatible",
+        "detail": "Ubuntu 24.04 runner usage is present.",
+        "adaptationClass": "none"
+      },
+      "delivery": {
+        "status": "compatible",
+        "detail": "Canonical delivery is GitHub Pages.",
+        "adaptationClass": "none"
+      },
+      "backend": {
+        "status": "compatible",
+        "detail": "Backend authority is Supabase.",
+        "adaptationClass": "none"
+      },
+      "ai-inference": {
+        "status": "compatible",
+        "detail": "Provider-neutral DataNest AI architecture is discoverable.",
+        "adaptationClass": "none"
+      },
+      "registry": {
+        "status": "compatible",
+        "detail": "Resonance Forge remains in governed-mirror mode.",
+        "adaptationClass": "none"
+      },
+      "backup-recovery": {
+        "status": "compatible",
+        "detail": "Governed backup/recovery authority is cataloged.",
+        "adaptationClass": "none"
+      },
+      "dependency-posture": {
+        "status": "compatible",
+        "detail": "Locked dependency state is present for reproducible automation.",
+        "adaptationClass": "none"
+      },
+      "branch-hygiene": {
+        "status": "compatible",
+        "detail": "BOTSQUAD and ENVIRONMENT automation branches are protected from generic cleanup.",
+        "adaptationClass": "none"
+      },
+      "evidence-observability": {
+        "status": "compatible",
+        "detail": "Specialized tree contracts are discoverable.",
+        "adaptationClass": "safe-auto-generated-metadata"
+      }
+    },
+    "drift": [],
+    "reviewRequired": []
+  },
+  "enforcer": {
+    "status": "block",
+    "blockers": [
+      "security-workflow-cancelled"
+    ],
+    "reviews": [],
+    "securityWorkflow": {
+      "available": true,
+      "status": "completed",
+      "conclusion": "cancelled",
+      "id": 36921535225,
+      "url": "https://github.com/DataNest-Supository/DataNest/actions/runs/36921535225",
+      "headSha": "375d1a318eefddc5d46af0c104b9ccff58ef6e0d",
+      "createdAt": "2026-10-01T20:26:09Z",
+      "updatedAt": "2026-10-01T20:32:16Z",
+      "targetSha": "375d1a318eefddc5d46af0c104b9ccff58ef6e0d"
+    }
+  },
+  "knowledge": {
+    "itemCount": 118,
+    "generatedAt": "2026-10-01T20:30:38.507Z"
+  },
+  "branches": {
+    "redundantBranchCount": 0,
+    "reviewBranchCount": 0,
+    "unresolvedBranchCount": 0
+  },
+  "source": {
+    "high": 0,
+    "medium": 49,
+    "redundancyCandidateCount": 50
+  },
+  "healingCandidateCounts": {
+    "redundantBranches": 0,
+    "codeSafeRefinements": 13,
+    "codeStreamliningCandidates": 50
+  }
+}

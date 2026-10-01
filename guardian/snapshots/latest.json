@@ -1,0 +1,1700 @@
+{
+  "schemaVersion": "datanest-guardian-snapshot-v1",
+  "generatedAt": "2026-10-01T20:36:40.033Z",
+  "headSha": "e273dae7b78a18ff2c23c4f91bc483aad837604c",
+  "authority": "health-observation-and-safe-healing",
+  "productionAuthorization": false,
+  "status": "critical",
+  "health": {
+    "score": 70,
+    "max": 100
+  },
+  "checks": [
+    {
+      "id": "tree-contracts",
+      "status": "healthy",
+      "weight": 15,
+      "earned": 15,
+      "detail": "All required specialized-tree contracts are present."
+    },
+    {
+      "id": "environment",
+      "status": "healthy",
+      "weight": 25,
+      "earned": 25,
+      "detail": "All required ENVIRONMENT dimensions match the optimal blueprint."
+    },
+    {
+      "id": "enforcer",
+      "status": "critical",
+      "weight": 20,
+      "earned": 0,
+      "detail": "ENFORCER status: block"
+    },
+    {
+      "id": "knowledge",
+      "status": "healthy",
+      "weight": 10,
+      "earned": 10,
+      "detail": "Knowledge feed contains 118 approved item(s)."
+    },
+    {
+      "id": "source-health",
+      "status": "healthy",
+      "weight": 10,
+      "earned": 10,
+      "detail": "0 high, 49 medium, 13 low reviewer finding(s); 50 streamlining candidate(s)."
+    },
+    {
+      "id": "branch-health",
+      "status": "degraded",
+      "weight": 10,
+      "earned": 0,
+      "detail": "0 branch(es); 0 safely redundant candidate(s), 0 review branch(es), 0 unresolved."
+    },
+    {
+      "id": "botsquad-feed",
+      "status": "healthy",
+      "weight": 5,
+      "earned": 5,
+      "detail": "BOTSQUAD consolidated feed available from 14 bot(s)."
+    },
+    {
+      "id": "coordination",
+      "status": "healthy",
+      "weight": 0,
+      "earned": 0,
+      "detail": "CONDUCTOR and SUGGESTER coordination state is fresh."
+    },
+    {
+      "id": "governance-harmony",
+      "status": "healthy",
+      "weight": 0,
+      "earned": 0,
+      "detail": "CALMER and REGULATOR preserve non-negotiable authority, security and financial boundaries."
+    },
+    {
+      "id": "market-visibility",
+      "status": "healthy",
+      "weight": 0,
+      "earned": 0,
+      "detail": "VISIBILITY-UTILITY SEO 100/100; platform coverage 100%."
+    },
+    {
+      "id": "remote-repositories",
+      "status": "healthy",
+      "weight": 0,
+      "earned": 0,
+      "detail": "Required remote repository health probes are available and aligned."
+    },
+    {
+      "id": "blueprint-integrity",
+      "status": "healthy",
+      "weight": 5,
+      "earned": 5,
+      "detail": "All blueprint source files were snapshot successfully."
+    }
+  ],
+  "blueprint": {
+    "schemaVersion": "datanest-guardian-blueprint-v1",
+    "blueprintVersion": 1,
+    "digest": "sha256:97a989e1bd12ed1544c12915706441e9a5e52d3c6de32a9b9a7e5993803f98bd",
+    "sourceHashes": {
+      "config/guardian.blueprint.json": {
+        "sha256": "sha256:290a38bd3c91dc1334576acb2580955bfad138471a0cd7accc4fe8c8ff59c8e2",
+        "bytes": 4183
+      },
+      "config/guardian.tree.json": {
+        "sha256": "sha256:f18b37c12257e6e04e5dc5a81b887402674bd80db1b3e3e1fa58436eb0155ca9",
+        "bytes": 3104
+      },
+      "config/environment.tree.json": {
+        "sha256": "sha256:79c29c38cecc4d8cc190332f86e7b2a104f5c07d2b7f4d8db0177b0f1afef551",
+        "bytes": 4797
+      },
+      "config/boundaries.policy.json": {
+        "sha256": "sha256:5f125bcd56a6558191b5b1d7bce9d93870f30f6a73671fa333e9cb3516a94caf",
+        "bytes": 17357
+      },
+      "config/knowledge-tree.json": {
+        "sha256": "sha256:10313232a1716c24eb2a768d308ef72f4c60e1c17234724e6af87543940b8614",
+        "bytes": 2966
+      },
+      "config/botsquad.tree.json": {
+        "sha256": "sha256:4f9eb70715d0e6fd4606cfb32130226bbdd2cc85af9bd958e372717f851d871d",
+        "bytes": 4542
+      },
+      "config/enforcer.tree.json": {
+        "sha256": "sha256:445717d620e091300cbb924e42f3ce0c475265c1a2b22e866f21deff71071a42",
+        "bytes": 2169
+      },
+      "config/supository.catalog.json": {
+        "sha256": "sha256:cd4b5c175c34b01b8d96148e21babdcb3cfc2e27165dae6fb0dbc5d408d0e7b7",
+        "bytes": 11621
+      },
+      "config/repository-boundary.json": {
+        "sha256": "sha256:cd3d6bd36db5463af91014bde84c416ba9e52006d80d3b812322d70b4b02b4b3",
+        "bytes": 10670
+      },
+      "infra/reson8-forge/specialized-trees.json": {
+        "sha256": "sha256:a0dfaf6707437bd63760b02562e757a1121f9efc9eea6d6c5d691fc65118b6ca",
+        "bytes": 4827
+      },
+      "branch-cleaner.config.json": {
+        "sha256": "sha256:a79872432df4b33ec87c6494e3f8e54e441a09a6faed8f9b99ff212dea87ab3b",
+        "bytes": 2007
+      },
+      "workflow-reviewer.config.json": {
+        "sha256": "sha256:69ea02b1f708238426ba7b9c2f848905e64a370c98bc7ee8cc46747a4f0a2085",
+        "bytes": 972
+      },
+      "package.json": {
+        "sha256": "sha256:a4a1463fe169864e1f76bc5edc53aa942f085bcc091bb2f0383381fa0187e0b9",
+        "bytes": 3146
+      },
+      "config/conductor.tree.json": {
+        "sha256": "sha256:20a13c966ec7abfc459d5ddeee616b9b1ebcc026cc036dd515c61af00467262d",
+        "bytes": 6211
+      },
+      "config/suggester.tree.json": {
+        "sha256": "sha256:4c7db5a24b723707850902c08cc7dbcc55221ef4a625a8eb460d5091d06ef951",
+        "bytes": 1807
+      },
+      "config/calmer.tree.json": {
+        "sha256": "sha256:9694313e7ab82300946317723501496b59bbbadebed077abc0bc42b9d83b9808",
+        "bytes": 3063
+      },
+      "config/regulator.tree.json": {
+        "sha256": "sha256:f2e71da162951da8fe221492c600203ea67c576bf8729926f1c95c15cd48046f",
+        "bytes": 2357
+      },
+      "config/visibility-utility.tree.json": {
+        "sha256": "sha256:7deb63abadf81b0e13436eb480fea8cc2e34acc397ddeb8eb4c3269289e68abc",
+        "bytes": 5071
+      },
+      "docs/DATANEST_SYSTEM_CHARTER.md": {
+        "sha256": "sha256:c71cffbc52a866b586ee8d63c51b398d007d4074d6aecff5f9b1583170cf169d",
+        "bytes": 32504
+      },
+      "config/liberty-in-all.standard.json": {
+        "sha256": "sha256:a5b74cdb85439186fa2833858daf8721f1cb2249ad694fb76e3a0575e8245dc2",
+        "bytes": 5100
+      }
+    }
+  },
+  "observed": {
+    "sourceEvidence": {
+      "environment": {
+        "valid": true,
+        "reasons": [],
+        "generatedAt": "2026-10-01T20:30:42.228Z",
+        "ageMinutes": 5.963416666666666,
+        "maxAgeMinutes": 420,
+        "headSha": null,
+        "digest": "sha256:708d6bfc96949185a03d07ca8bf3d969fe99f17827b69ad82c06800f12a027f4"
+      },
+      "enforcer": {
+        "valid": true,
+        "reasons": [],
+        "generatedAt": "2026-10-01T20:32:30.709Z",
+        "ageMinutes": 4.1554,
+        "maxAgeMinutes": 210,
+        "headSha": null,
+        "digest": "sha256:4c67a7679bfa54cc3fce0686de6330d3ff04dc1715a8b04b283938acf28c75c3"
+      },
+      "knowledge": {
+        "valid": true,
+        "reasons": [],
+        "generatedAt": "2026-10-01T20:30:38.507Z",
+        "ageMinutes": 6.025433333333333,
+        "maxAgeMinutes": 420,
+        "headSha": null,
+        "digest": "sha256:f573eb60267fa84820a1f9b7627ef8f110ad3d438d9103a5dbd8464d4e45fb1c"
+      },
+      "botsquad": {
+        "valid": true,
+        "reasons": [],
+        "generatedAt": "2026-10-01T20:32:05.669Z",
+        "ageMinutes": 4.572733333333334,
+        "maxAgeMinutes": 420,
+        "headSha": null,
+        "digest": "sha256:0451eac2bc79941e768fc85a70f74d8ba597450967623f0344714a46212021cb"
+      },
+      "calmer": {
+        "valid": true,
+        "reasons": [],
+        "generatedAt": "2026-10-01T20:34:18.746Z",
+        "ageMinutes": 2.3547833333333332,
+        "maxAgeMinutes": 45,
+        "headSha": null,
+        "digest": "sha256:39a162447d3edd0ab68172e77877e4f764ef6ae90787c916c00f5b94fb68dfc5"
+      },
+      "regulator": {
+        "valid": true,
+        "reasons": [],
+        "generatedAt": "2026-10-01T20:34:36.057Z",
+        "ageMinutes": 2.0662666666666665,
+        "maxAgeMinutes": 45,
+        "headSha": null,
+        "digest": "sha256:0dcc26684172b4772968ca4fdff21b5ed7f9210cc64937f50e0bfe00be44bc3a"
+      },
+      "visibility": {
+        "valid": true,
+        "reasons": [],
+        "generatedAt": "2026-10-01T19:49:57.496Z",
+        "ageMinutes": 46.70895,
+        "maxAgeMinutes": 240,
+        "headSha": null,
+        "digest": "sha256:0174d50a4e18614f7b1812f73a83ced4b2d68d13754c61ee338506652ccb59d1"
+      }
+    },
+    "trees": {
+      "required": [
+        "knowledge",
+        "boundaries",
+        "botsquad",
+        "environment",
+        "enforcer",
+        "guardian",
+        "conductor",
+        "suggester",
+        "calmer",
+        "regulator",
+        "visibility-utility",
+        "liberty-in-all"
+      ],
+      "missing": []
+    },
+    "environment": {
+      "available": true,
+      "compatible": true,
+      "dimensions": {
+        "source-control": {
+          "status": "compatible",
+          "detail": "Canonical source repository matches the DataNest authority contract.",
+          "adaptationClass": "none"
+        },
+        "runtime": {
+          "status": "compatible",
+          "detail": "Node 22 setup is present in shared repository automation.",
+          "adaptationClass": "none"
+        },
+        "ci-runner": {
+          "status": "compatible",
+          "detail": "Ubuntu 24.04 runner usage is present.",
+          "adaptationClass": "none"
+        },
+        "delivery": {
+          "status": "compatible",
+          "detail": "Canonical delivery is GitHub Pages.",
+          "adaptationClass": "none"
+        },
+        "backend": {
+          "status": "compatible",
+          "detail": "Backend authority is Supabase.",
+          "adaptationClass": "none"
+        },
+        "ai-inference": {
+          "status": "compatible",
+          "detail": "Provider-neutral DataNest AI architecture is discoverable.",
+          "adaptationClass": "none"
+        },
+        "registry": {
+          "status": "compatible",
+          "detail": "Resonance Forge remains in governed-mirror mode.",
+          "adaptationClass": "none"
+        },
+        "backup-recovery": {
+          "status": "compatible",
+          "detail": "Governed backup/recovery authority is cataloged.",
+          "adaptationClass": "none"
+        },
+        "dependency-posture": {
+          "status": "compatible",
+          "detail": "Locked dependency state is present for reproducible automation.",
+          "adaptationClass": "none"
+        },
+        "branch-hygiene": {
+          "status": "compatible",
+          "detail": "BOTSQUAD and ENVIRONMENT automation branches are protected from generic cleanup.",
+          "adaptationClass": "none"
+        },
+        "evidence-observability": {
+          "status": "compatible",
+          "detail": "Specialized tree contracts are discoverable.",
+          "adaptationClass": "safe-auto-generated-metadata"
+        }
+      },
+      "drift": [],
+      "reviewRequired": []
+    },
+    "enforcer": {
+      "status": "block",
+      "blockers": [
+        "security-workflow-cancelled"
+      ],
+      "reviews": [],
+      "securityWorkflow": {
+        "available": true,
+        "status": "completed",
+        "conclusion": "cancelled",
+        "id": 36921535225,
+        "url": "https://github.com/DataNest-Supository/DataNest/actions/runs/36921535225",
+        "headSha": "375d1a318eefddc5d46af0c104b9ccff58ef6e0d",
+        "createdAt": "2026-10-01T20:26:09Z",
+        "updatedAt": "2026-10-01T20:32:16Z",
+        "targetSha": "375d1a318eefddc5d46af0c104b9ccff58ef6e0d"
+      }
+    },
+    "knowledge": {
+      "itemCount": 118,
+      "generatedAt": "2026-10-01T20:30:38.507Z"
+    },
+    "botsquad": {
+      "available": true,
+      "botCount": 14,
+      "generatedAt": "2026-10-01T20:32:05.669Z"
+    },
+    "coordination": {
+      "conductor": {
+        "available": true,
+        "generatedAt": "2026-10-01T20:34:37.571Z",
+        "allProcessesFresh": false,
+        "nextCommand": {
+          "type": "wait",
+          "source": "conductor",
+          "workflow": null,
+          "workflowName": null,
+          "inputs": {},
+          "reason": "processes-pending",
+          "pending": [
+            {
+              "id": "security",
+              "due": false,
+              "active": true,
+              "retryCooldown": false,
+              "blockedBy": []
+            },
+            {
+              "id": "enforcer",
+              "due": false,
+              "active": false,
+              "retryCooldown": true,
+              "blockedBy": [
+                "security"
+              ]
+            },
+            {
+              "id": "guardian",
+              "due": true,
+              "active": false,
+              "retryCooldown": false,
+              "blockedBy": [
+                "enforcer"
+              ]
+            },
+            {
+              "id": "calmer",
+              "due": true,
+              "active": false,
+              "retryCooldown": false,
+              "blockedBy": [
+                "guardian",
+                "enforcer"
+              ]
+            },
+            {
+              "id": "regulator",
+              "due": true,
+              "active": false,
+              "retryCooldown": false,
+              "blockedBy": [
+                "calmer",
+                "guardian",
+                "enforcer"
+              ]
+            },
+            {
+              "id": "visibility-utility",
+              "due": true,
+              "active": false,
+              "retryCooldown": false,
+              "blockedBy": [
+                "regulator"
+              ]
+            }
+          ],
+          "fingerprint": "sha256:cadd27f2d0bff80b2ddbe0a076d702475512c776493767e2d9c4f27ce32fd24f"
+        }
+      },
+      "suggester": {
+        "available": true,
+        "generatedAt": "2026-10-01T20:30:59.058Z",
+        "suggestionCount": 152,
+        "autonomousCommandCount": 0
+      },
+      "calmer": {
+        "available": true,
+        "generatedAt": "2026-10-01T20:34:18.746Z",
+        "status": "softening-suspended",
+        "tier": "UNQUALIFIED"
+      },
+      "regulator": {
+        "available": true,
+        "generatedAt": "2026-10-01T20:34:36.057Z",
+        "status": "blocked",
+        "requirementCount": 58
+      },
+      "visibilityUtility": {
+        "available": true,
+        "generatedAt": "2026-10-01T19:49:57.496Z",
+        "status": "ready",
+        "seoScore": 100,
+        "visibilityScore": 100,
+        "platformCoveragePercent": 100
+      }
+    },
+    "branches": {
+      "available": false,
+      "branchCount": 0,
+      "redundantBranchCount": 0,
+      "redundantBranches": [],
+      "reviewBranchCount": 0,
+      "reviewBranches": [],
+      "unresolvedBranchCount": 0,
+      "unresolvedBranches": [],
+      "cleanerMode": "report-unavailable",
+      "deleted": [],
+      "failed": []
+    },
+    "source": {
+      "available": true,
+      "filesReviewed": 317,
+      "high": 0,
+      "medium": 49,
+      "low": 13,
+      "findings": 62,
+      "safeRefinementCount": 13,
+      "safeRefinements": [
+        {
+          "file": ".github/workflows/notify-mirror-canonical.yml",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "docs/ADVERSARIAL_STRESS_TEST_2026-09-28.md",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "docs/DATANEST_AI_ARCHITECTURE.md",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "docs/governance/AUTOMATION_X_ANNOTATION.md",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "docs/superpowers/plans/2026-09-24-datanest-ai-governed-memory.md",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "scripts/emit-automation-x-annotation.mjs",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "src/app/datanest-ai-zoom.css",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "src/app/external-auditor.css",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "src/components/DataNestApp.tsx",
+          "refinements": [
+            "removed_trailing_whitespace",
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "src/components/ExternalAuditor.tsx",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "src/components/ImpactScoringWorkspace.tsx",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "src/lib/externalAuditStandards.ts",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "src/lib/externalAuditTypes.ts",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        }
+      ],
+      "redundancyCandidates": [
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "scripts/enforcer-monitor.mjs",
+          "line": 46,
+          "detail": "164-line function: export function buildEnforcerAssessment({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "scripts/guardian-health.mjs",
+          "line": 202,
+          "detail": "374-line function: export function buildGuardianSnapshot({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "scripts/regulator-engine.mjs",
+          "line": 23,
+          "detail": "174-line function: export function buildRegulatorState({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "scripts/suggester-engine.mjs",
+          "line": 22,
+          "detail": "290-line function: export function buildSuggesterFeed({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/AdminRndModeToggle.tsx",
+          "line": 34,
+          "detail": "243-line function: export default function AdminRndModeToggle({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/AdminRndModeToggle.tsx",
+          "line": 55,
+          "detail": "166-line function: async function loadAndSynchronizeMirror(){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/AiOperationsDashboard.tsx",
+          "line": 79,
+          "detail": "419-line function: export default function AiOperationsDashboard({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/AiReconciliationPanel.tsx",
+          "line": 32,
+          "detail": "148-line function: export default function AiReconciliationPanel({projectId}:{projectId:string}){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/AuthGate.tsx",
+          "line": 36,
+          "detail": "315-line function: export default function AuthGate() {",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/CollaborationVisual.tsx",
+          "line": 45,
+          "detail": "207-line function: export default function CollaborationVisual({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "large_source_file",
+          "file": "src/components/DataNestAiCertificationPanel.tsx",
+          "detail": "984 lines exceeds the 900-line review threshold.",
+          "recommendation": "Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestAiCertificationPanel.tsx",
+          "line": 203,
+          "detail": "781-line function: export default function DataNestAiCertificationPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestAiChatPanel.tsx",
+          "line": 121,
+          "detail": "415-line function: export default function DataNestAiChatPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestAiChatPanel.tsx",
+          "line": 209,
+          "detail": "117-line function: async function send(event:FormEvent){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestAiWorkspace.tsx",
+          "line": 63,
+          "detail": "437-line function: export default function DataNestAiWorkspace({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "large_source_file",
+          "file": "src/components/DataNestApp.tsx",
+          "detail": "2587 lines exceeds the 900-line review threshold.",
+          "recommendation": "Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestApp.tsx",
+          "line": 435,
+          "detail": "1361-line function: export default function DataNestApp({session}:{session:Session}) {",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestApp.tsx",
+          "line": 1872,
+          "detail": "211-line function: function UnifiPlanner({project,currentUserId,jobs,capabilities,reload,setNotice,setError,canOperate,page,total,onPage,activeJobId}:{project:",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestApp.tsx",
+          "line": 2113,
+          "detail": "236-line function: function Scheduler({projectId,projectName,projectSlug,currentUserId,role,jobs,capabilities,onStatus,canOperate,page,total,onPage,onNavigate,",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestApp.tsx",
+          "line": 2411,
+          "detail": "95-line function: function SchedulerGantt({projectName,projectSlug,jobs,onStatus,canOperate,activeJobId,userInterests}:{projectName:string;projectSlug:string;",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestDashboard.tsx",
+          "line": 84,
+          "detail": "236-line function: export default function DataNestDashboard({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DevelopmentWorkContributionDashboard.tsx",
+          "line": 88,
+          "detail": "120-line function: export default function DevelopmentWorkContributionDashboard({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ExecutionAuthorityPanel.tsx",
+          "line": 85,
+          "detail": "442-line function: export default function ExecutionAuthorityPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "large_source_file",
+          "file": "src/components/ExternalAiSidebar.tsx",
+          "detail": "1072 lines exceeds the 900-line review threshold.",
+          "recommendation": "Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ExternalAiSidebar.tsx",
+          "line": 61,
+          "detail": "1011-line function: export default function ExternalAiSidebar({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ExternalAiSidebar.tsx",
+          "line": 601,
+          "detail": "103-line function: async function startSession(mode:\"sidebar\"|\"companion\"|\"popout\"){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ExternalAuditor.tsx",
+          "line": 11,
+          "detail": "116-line function: export default function ExternalAuditor({projectId,role}:ExternalAuditorProps){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/GovernanceControlMonitor.tsx",
+          "line": 66,
+          "detail": "201-line function: export default function GovernanceControlMonitor({projectId}:{projectId:string}){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "large_source_file",
+          "file": "src/components/GovernanceImprovementPanel.tsx",
+          "detail": "991 lines exceeds the 900-line review threshold.",
+          "recommendation": "Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/GovernanceWorkspace.tsx",
+          "line": 90,
+          "detail": "479-line function: export default function GovernanceWorkspace({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/IntelligenceFabricPanel.tsx",
+          "line": 51,
+          "detail": "219-line function: export default function IntelligenceFabricPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/OwnerOptimizerDashboard.tsx",
+          "line": 90,
+          "detail": "283-line function: export default function OwnerOptimizerDashboard({projectId}:{projectId:string}){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/PortfolioRegistryPanel.tsx",
+          "line": 55,
+          "detail": "408-line function: export default function PortfolioRegistryPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ProductLab.tsx",
+          "line": 48,
+          "detail": "446-line function: export default function ProductLab({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "large_source_file",
+          "file": "src/components/ProductsWorkspace.tsx",
+          "detail": "1076 lines exceeds the 900-line review threshold.",
+          "recommendation": "Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ProductsWorkspace.tsx",
+          "line": 204,
+          "detail": "872-line function: export default function ProductsWorkspace({projectId,currentUserId,role}:Props){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ProjectMembersPanel.tsx",
+          "line": 64,
+          "detail": "388-line function: export default function ProjectMembersPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/RecoveryDiagnosticsPanel.tsx",
+          "line": 30,
+          "detail": "105-line function: export default function RecoveryDiagnosticsPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ResonanceHome.tsx",
+          "line": 25,
+          "detail": "197-line function: export default function ResonanceHome({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ResonancePortfolioPulse.tsx",
+          "line": 62,
+          "detail": "113-line function: export default function ResonancePortfolioPulse({products,records,loading}:Props){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ResourceFabricPanel.tsx",
+          "line": 53,
+          "detail": "266-line function: export default function ResourceFabricPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/RndDeviceAdministration.tsx",
+          "line": 83,
+          "detail": "244-line function: export default function RndDeviceAdministration({projectId,role}:{projectId:string;role:AdminRole}){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/SparksWorkspace.tsx",
+          "line": 54,
+          "detail": "413-line function: export default function SparksWorkspace({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/StakeholderWorkspace.tsx",
+          "line": 114,
+          "detail": "367-line function: export default function StakeholderWorkspace({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ThinkTankWorkspace.tsx",
+          "line": 57,
+          "detail": "574-line function: export default function ThinkTankWorkspace({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/TransparencyWorkspace.tsx",
+          "line": 100,
+          "detail": "318-line function: export default function TransparencyWorkspace(){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/TrustPolicyPanel.tsx",
+          "line": 46,
+          "detail": "451-line function: export default function TrustPolicyPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "low",
+          "category": "maintenance",
+          "code": "dense_deferred_work",
+          "file": "scripts/workflow-reviewer.mjs",
+          "detail": "6 TODO/FIXME/HACK markers remain in this file.",
+          "recommendation": "Convert durable work items into tracked issues and remove obsolete inline reminders."
+        },
+        {
+          "severity": "low",
+          "category": "workflow-deduplication",
+          "code": "reusable_step_candidate",
+          "file": ".github/workflows/botsquad.yml",
+          "detail": "uses:actions/checkout@v4 appears across 13 workflows.",
+          "recommendation": "Consider centralizing this repeated step; affected workflows: .github/workflows/botsquad.yml, .github/workflows/boundaries-assessment.yml, .github/workflows/calmer.yml, .github/workflows/conductor.yml, .github/workflows/enforcer.yml, .github/workflows/environment-tree.yml, .github/workflows/guardian.yml, .github/workflows/knowledge-tree.yml, .github/workflows/liberty-in-all.yml, .github/workflows/maintenance.yml, .github/workflows/regulator.yml, .github/workflows/suggester.yml, .github/workflows/visibility-utility.yml."
+        },
+        {
+          "severity": "low",
+          "category": "workflow-deduplication",
+          "code": "reusable_step_candidate",
+          "file": ".github/workflows/botsquad.yml",
+          "detail": "uses:actions/upload-artifact@v4 appears across 13 workflows.",
+          "recommendation": "Consider centralizing this repeated step; affected workflows: .github/workflows/botsquad.yml, .github/workflows/boundaries-assessment.yml, .github/workflows/calmer.yml, .github/workflows/conductor.yml, .github/workflows/enforcer.yml, .github/workflows/environment-tree.yml, .github/workflows/guardian.yml, .github/workflows/knowledge-tree.yml, .github/workflows/liberty-in-all.yml, .github/workflows/maintenance.yml, .github/workflows/regulator.yml, .github/workflows/suggester.yml, .github/workflows/visibility-utility.yml."
+        }
+      ]
+    },
+    "remoteRepositories": {
+      "DataNest-Supository/Mirror-DataNest": {
+        "available": true,
+        "required": true,
+        "mode": "observe-health-delegate-healing",
+        "defaultBranch": "main",
+        "expectedDefaultBranch": "main",
+        "defaultBranchMatches": true,
+        "branchCount": 100,
+        "branches": [
+          "automation/botsquad-inbox",
+          "automation/knowledge-inbox",
+          "chore/align-mirror-production-terminology-20261001",
+          "chore/external-audit-production-trace",
+          "chore/final-mirror-production-readme-20261001",
+          "chore/fresh-main-validation-20260928",
+          "chore/sync-cloudflare-production-migrations-20260928",
+          "ci/datanest-security-scan",
+          "ci-remove-remote-desktop-dependency",
+          "codex/convergent-canonical-refresh-20261001",
+          "codex/cumulative-learning-readiness",
+          "codex/datanest-life-domain",
+          "codex/fix-sync-workflow-yaml-20261001",
+          "codex/mirror-boundary-candidate-gates-20261001-v2",
+          "codex/mirror-boundary-candidate-gates-20261001-v3",
+          "codex/mirror-boundary-candidate-gates-20261001",
+          "codex/mirror-owner-access-recovery-20261001",
+          "codex/mirror-review-optimize-20260930",
+          "codex/reson8-github-io",
+          "converge/append-only-intake-current-main-20260928",
+          "converge/datanest-ai-live-conversation-current-main-20260928",
+          "converge/issue-18-latest-main-20260927",
+          "converge/security-gates-current-main-20260928",
+          "coordination/account-workspace-protocol",
+          "datanest-supository-canonical-forge",
+          "design/datanest-business-os-20260929",
+          "design/datanest-cloud-only-ronsas",
+          "design/datanest-learning-fabric-20260926",
+          "design/datanest-phase-c-trust-data-policy-20260927",
+          "design/datanest-phase-d-approved-conformance-20260927",
+          "design/datanest-phase-d-authority-execution-20260927",
+          "design/datanest-product-hierarchy",
+          "design/external-audit-optimizer-20260929",
+          "design/resonance-datanest-ui-governance-system-2026-09-29",
+          "docs/datanest-ai-cloudflare-bootstrap-20260928",
+          "docs/datanest-file-upload-design-20260925",
+          "docs/datanext-mirror-guidelines",
+          "docs/ui-production-gate-evidence-88945f1",
+          "docs/ui-release-gate-verification-20260930",
+          "enhance/branch-cleaner-archive-awareness-20260927",
+          "enhance/branch-cleaner-archived-prune-20260927",
+          "enhance/branch-cleaner-divergent-families-20260927",
+          "enhance/branch-cleaner-family-containment-20260927",
+          "enhance/branch-cleaner-merge-activity-20260927",
+          "feat/admin-system-optimizer-collaboration-20260930",
+          "feat/ai-owner-test-mode-timeframes-20260930",
+          "feat/all-worktree-gate-timeframes-20260930",
+          "feat/all-worktree-gate-timeframes-v2-20260930",
+          "feat/canonical-memory-consolidation",
+          "feat/center-datanest-ai-chat",
+          "feat/cinematic-workspace-ux",
+          "feat/collective-verified-memory-optimization",
+          "feat/continuous-governance-optimization-v1-rebased",
+          "feat/continuous-governance-optimization-v1",
+          "feat/control-center-development-analytics",
+          "feat/data-sovereignty-model",
+          "feat/data-sovereignty-model-mainline",
+          "feat/datanest-ai-chat-directly-below-hero",
+          "feat/datanest-ai-command-access",
+          "feat/datanest-ai-command-access-v2",
+          "feat/datanest-ai-command-console",
+          "feat/datanest-ai-command-context-lock",
+          "feat/datanest-ai-command-context-lock-v2",
+          "feat/datanest-ai-command-context-lock-v3",
+          "feat/datanest-ai-command-context-lock-v4",
+          "feat/datanest-ai-hero-presence",
+          "feat/datanest-ai-instant-chat",
+          "feat/datanest-ai-live-20260928-v2",
+          "feat/datanest-ai-live-20260928-v3",
+          "feat/datanest-ai-live-20260928",
+          "feat/datanest-ai-live-conversation-polish",
+          "feat/datanest-ai-live-conversation-polish-v2",
+          "feat/datanest-ai-live-transcript",
+          "feat/datanest-ai-quick-commands",
+          "feat/datanest-ai-quick-commands-v2",
+          "feat/datanest-ai-session-drafts",
+          "feat/datanest-ai-vertical-command-flow",
+          "feat/datanest-ai-vertical-command-flow-v2",
+          "feat/datanest-business-os-phase-1-native",
+          "feat/datanest-business-os-phase-1-release",
+          "feat/datanest-purposeful-transitions",
+          "feat/development-work-contribution-dashboard-v1",
+          "feat/development-work-expertise-routing-20260928",
+          "feat/development-work-expertise-routing-v2-20260928",
+          "feat/development-work-requirement-focus-20260929",
+          "feat/evidence-derivation-lineage",
+          "feat/governance-ai-impact-assessments-v1-current",
+          "feat/governance-ai-impact-assessments-v1-current2",
+          "feat/governance-ai-impact-assessments-v1-rebased",
+          "feat/governance-ai-impact-assessments-v1",
+          "feat/governance-control-evidence-graph-v1-rebased",
+          "feat/governance-control-evidence-graph-v1",
+          "feat/governance-outcome-feedback-v1-current",
+          "feat/governance-outcome-feedback-v1",
+          "feat/job-00010-reson8-adt",
+          "feat/knowledge-boundaries-maintenance-20261001",
+          "feat/language-metadata-review",
+          "feat/language-reviewer-registry",
+          "feat/legal-eagle-dual-advocacy-product",
+          "feat/legal-eagle-dual-advocacy-product-reconciled-20260928"
+        ],
+        "pushedAt": "2026-10-01T20:09:11Z",
+        "updatedAt": "2026-10-01T19:13:26Z",
+        "healingAuthority": "Mirror-DataNest local maintenance"
+      },
+      "DataNest-Supository/FREETREE": {
+        "available": false,
+        "required": false,
+        "mode": "isolated-observe-only",
+        "reason": "not_found"
+      }
+    }
+  },
+  "drift": {
+    "optimalConditionDrift": [
+      {
+        "control": "enforcer",
+        "expected": "pass",
+        "observed": "block"
+      },
+      {
+        "control": "branch-health",
+        "available": false,
+        "failed": []
+      }
+    ],
+    "sincePrevious": {
+      "previousAvailable": true,
+      "sourceChanges": [],
+      "environmentChanges": []
+    }
+  },
+  "healing": {
+    "policy": {
+      "autonomous": [
+        "delete Git branches proven to have zero unique commits and no open PR via existing branch-cleaner live revalidation",
+        "byte-safe text normalization via existing workflow-reviewer",
+        "refresh generated GUARDIAN health snapshots and feeds"
+      ],
+      "pullRequestOnly": [
+        "behavioral source refactoring",
+        "non-trivial duplicate-code removal",
+        "dependency changes",
+        "runtime/provider/backend changes",
+        "tree contract changes",
+        "workflow behavior changes"
+      ],
+      "forbidden": [
+        "delete unique or unresolved Git history",
+        "weaken Boundaries or ENFORCER",
+        "change production authority",
+        "synchronize or heal FREETREE automatically",
+        "publish secrets or private authentication material"
+      ]
+    },
+    "candidates": {
+      "redundantBranches": [],
+      "codeSafeRefinements": [
+        {
+          "file": ".github/workflows/notify-mirror-canonical.yml",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "docs/ADVERSARIAL_STRESS_TEST_2026-09-28.md",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "docs/DATANEST_AI_ARCHITECTURE.md",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "docs/governance/AUTOMATION_X_ANNOTATION.md",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "docs/superpowers/plans/2026-09-24-datanest-ai-governed-memory.md",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "scripts/emit-automation-x-annotation.mjs",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "src/app/datanest-ai-zoom.css",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "src/app/external-auditor.css",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "src/components/DataNestApp.tsx",
+          "refinements": [
+            "removed_trailing_whitespace",
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "src/components/ExternalAuditor.tsx",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "src/components/ImpactScoringWorkspace.tsx",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "src/lib/externalAuditStandards.ts",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        },
+        {
+          "file": "src/lib/externalAuditTypes.ts",
+          "refinements": [
+            "normalized_terminal_newline"
+          ]
+        }
+      ],
+      "codeStreamliningCandidates": [
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "scripts/enforcer-monitor.mjs",
+          "line": 46,
+          "detail": "164-line function: export function buildEnforcerAssessment({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "scripts/guardian-health.mjs",
+          "line": 202,
+          "detail": "374-line function: export function buildGuardianSnapshot({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "scripts/regulator-engine.mjs",
+          "line": 23,
+          "detail": "174-line function: export function buildRegulatorState({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "scripts/suggester-engine.mjs",
+          "line": 22,
+          "detail": "290-line function: export function buildSuggesterFeed({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/AdminRndModeToggle.tsx",
+          "line": 34,
+          "detail": "243-line function: export default function AdminRndModeToggle({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/AdminRndModeToggle.tsx",
+          "line": 55,
+          "detail": "166-line function: async function loadAndSynchronizeMirror(){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/AiOperationsDashboard.tsx",
+          "line": 79,
+          "detail": "419-line function: export default function AiOperationsDashboard({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/AiReconciliationPanel.tsx",
+          "line": 32,
+          "detail": "148-line function: export default function AiReconciliationPanel({projectId}:{projectId:string}){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/AuthGate.tsx",
+          "line": 36,
+          "detail": "315-line function: export default function AuthGate() {",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/CollaborationVisual.tsx",
+          "line": 45,
+          "detail": "207-line function: export default function CollaborationVisual({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "large_source_file",
+          "file": "src/components/DataNestAiCertificationPanel.tsx",
+          "detail": "984 lines exceeds the 900-line review threshold.",
+          "recommendation": "Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestAiCertificationPanel.tsx",
+          "line": 203,
+          "detail": "781-line function: export default function DataNestAiCertificationPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestAiChatPanel.tsx",
+          "line": 121,
+          "detail": "415-line function: export default function DataNestAiChatPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestAiChatPanel.tsx",
+          "line": 209,
+          "detail": "117-line function: async function send(event:FormEvent){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestAiWorkspace.tsx",
+          "line": 63,
+          "detail": "437-line function: export default function DataNestAiWorkspace({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "large_source_file",
+          "file": "src/components/DataNestApp.tsx",
+          "detail": "2587 lines exceeds the 900-line review threshold.",
+          "recommendation": "Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestApp.tsx",
+          "line": 435,
+          "detail": "1361-line function: export default function DataNestApp({session}:{session:Session}) {",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestApp.tsx",
+          "line": 1872,
+          "detail": "211-line function: function UnifiPlanner({project,currentUserId,jobs,capabilities,reload,setNotice,setError,canOperate,page,total,onPage,activeJobId}:{project:",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestApp.tsx",
+          "line": 2113,
+          "detail": "236-line function: function Scheduler({projectId,projectName,projectSlug,currentUserId,role,jobs,capabilities,onStatus,canOperate,page,total,onPage,onNavigate,",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestApp.tsx",
+          "line": 2411,
+          "detail": "95-line function: function SchedulerGantt({projectName,projectSlug,jobs,onStatus,canOperate,activeJobId,userInterests}:{projectName:string;projectSlug:string;",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DataNestDashboard.tsx",
+          "line": 84,
+          "detail": "236-line function: export default function DataNestDashboard({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/DevelopmentWorkContributionDashboard.tsx",
+          "line": 88,
+          "detail": "120-line function: export default function DevelopmentWorkContributionDashboard({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ExecutionAuthorityPanel.tsx",
+          "line": 85,
+          "detail": "442-line function: export default function ExecutionAuthorityPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "large_source_file",
+          "file": "src/components/ExternalAiSidebar.tsx",
+          "detail": "1072 lines exceeds the 900-line review threshold.",
+          "recommendation": "Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ExternalAiSidebar.tsx",
+          "line": 61,
+          "detail": "1011-line function: export default function ExternalAiSidebar({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ExternalAiSidebar.tsx",
+          "line": 601,
+          "detail": "103-line function: async function startSession(mode:\"sidebar\"|\"companion\"|\"popout\"){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ExternalAuditor.tsx",
+          "line": 11,
+          "detail": "116-line function: export default function ExternalAuditor({projectId,role}:ExternalAuditorProps){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/GovernanceControlMonitor.tsx",
+          "line": 66,
+          "detail": "201-line function: export default function GovernanceControlMonitor({projectId}:{projectId:string}){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "large_source_file",
+          "file": "src/components/GovernanceImprovementPanel.tsx",
+          "detail": "991 lines exceeds the 900-line review threshold.",
+          "recommendation": "Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/GovernanceWorkspace.tsx",
+          "line": 90,
+          "detail": "479-line function: export default function GovernanceWorkspace({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/IntelligenceFabricPanel.tsx",
+          "line": 51,
+          "detail": "219-line function: export default function IntelligenceFabricPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/OwnerOptimizerDashboard.tsx",
+          "line": 90,
+          "detail": "283-line function: export default function OwnerOptimizerDashboard({projectId}:{projectId:string}){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/PortfolioRegistryPanel.tsx",
+          "line": 55,
+          "detail": "408-line function: export default function PortfolioRegistryPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ProductLab.tsx",
+          "line": 48,
+          "detail": "446-line function: export default function ProductLab({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "large_source_file",
+          "file": "src/components/ProductsWorkspace.tsx",
+          "detail": "1076 lines exceeds the 900-line review threshold.",
+          "recommendation": "Split cohesive responsibilities into smaller modules and preserve public behavior with focused tests."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ProductsWorkspace.tsx",
+          "line": 204,
+          "detail": "872-line function: export default function ProductsWorkspace({projectId,currentUserId,role}:Props){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ProjectMembersPanel.tsx",
+          "line": 64,
+          "detail": "388-line function: export default function ProjectMembersPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/RecoveryDiagnosticsPanel.tsx",
+          "line": 30,
+          "detail": "105-line function: export default function RecoveryDiagnosticsPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ResonanceHome.tsx",
+          "line": 25,
+          "detail": "197-line function: export default function ResonanceHome({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ResonancePortfolioPulse.tsx",
+          "line": 62,
+          "detail": "113-line function: export default function ResonancePortfolioPulse({products,records,loading}:Props){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ResourceFabricPanel.tsx",
+          "line": 53,
+          "detail": "266-line function: export default function ResourceFabricPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/RndDeviceAdministration.tsx",
+          "line": 83,
+          "detail": "244-line function: export default function RndDeviceAdministration({projectId,role}:{projectId:string;role:AdminRole}){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/SparksWorkspace.tsx",
+          "line": 54,
+          "detail": "413-line function: export default function SparksWorkspace({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/StakeholderWorkspace.tsx",
+          "line": 114,
+          "detail": "367-line function: export default function StakeholderWorkspace({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/ThinkTankWorkspace.tsx",
+          "line": 57,
+          "detail": "574-line function: export default function ThinkTankWorkspace({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/TransparencyWorkspace.tsx",
+          "line": 100,
+          "detail": "318-line function: export default function TransparencyWorkspace(){",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "medium",
+          "category": "code-structure",
+          "code": "long_function",
+          "file": "src/components/TrustPolicyPanel.tsx",
+          "line": 46,
+          "detail": "451-line function: export default function TrustPolicyPanel({",
+          "recommendation": "Extract pure helpers or domain operations, then keep the orchestration function narrow."
+        },
+        {
+          "severity": "low",
+          "category": "maintenance",
+          "code": "dense_deferred_work",
+          "file": "scripts/workflow-reviewer.mjs",
+          "detail": "6 TODO/FIXME/HACK markers remain in this file.",
+          "recommendation": "Convert durable work items into tracked issues and remove obsolete inline reminders."
+        },
+        {
+          "severity": "low",
+          "category": "workflow-deduplication",
+          "code": "reusable_step_candidate",
+          "file": ".github/workflows/botsquad.yml",
+          "detail": "uses:actions/checkout@v4 appears across 13 workflows.",
+          "recommendation": "Consider centralizing this repeated step; affected workflows: .github/workflows/botsquad.yml, .github/workflows/boundaries-assessment.yml, .github/workflows/calmer.yml, .github/workflows/conductor.yml, .github/workflows/enforcer.yml, .github/workflows/environment-tree.yml, .github/workflows/guardian.yml, .github/workflows/knowledge-tree.yml, .github/workflows/liberty-in-all.yml, .github/workflows/maintenance.yml, .github/workflows/regulator.yml, .github/workflows/suggester.yml, .github/workflows/visibility-utility.yml."
+        },
+        {
+          "severity": "low",
+          "category": "workflow-deduplication",
+          "code": "reusable_step_candidate",
+          "file": ".github/workflows/botsquad.yml",
+          "detail": "uses:actions/upload-artifact@v4 appears across 13 workflows.",
+          "recommendation": "Consider centralizing this repeated step; affected workflows: .github/workflows/botsquad.yml, .github/workflows/boundaries-assessment.yml, .github/workflows/calmer.yml, .github/workflows/conductor.yml, .github/workflows/enforcer.yml, .github/workflows/environment-tree.yml, .github/workflows/guardian.yml, .github/workflows/knowledge-tree.yml, .github/workflows/liberty-in-all.yml, .github/workflows/maintenance.yml, .github/workflows/regulator.yml, .github/workflows/suggester.yml, .github/workflows/visibility-utility.yml."
+        }
+      ],
+      "environmentReview": [],
+      "unresolvedBranches": []
+    }
+  }
+}
