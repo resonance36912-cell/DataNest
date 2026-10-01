@@ -1,0 +1,100 @@
+{
+  "schemaVersion": "datanest-environment-feed-v1",
+  "target": "regulator",
+  "authority": "advisory",
+  "productionAuthorization": false,
+  "generatedAt": "2026-10-01T20:30:42.228Z",
+  "environmentCompatible": true,
+  "findings": [
+    {
+      "dimension": "source-control",
+      "status": "compatible",
+      "detail": "Canonical source repository matches the DataNest authority contract.",
+      "adaptationClass": "none"
+    },
+    {
+      "dimension": "runtime",
+      "status": "compatible",
+      "detail": "Node 22 setup is present in shared repository automation.",
+      "adaptationClass": "none"
+    },
+    {
+      "dimension": "ci-runner",
+      "status": "compatible",
+      "detail": "Ubuntu 24.04 runner usage is present.",
+      "adaptationClass": "none"
+    },
+    {
+      "dimension": "delivery",
+      "status": "compatible",
+      "detail": "Canonical delivery is GitHub Pages.",
+      "adaptationClass": "none"
+    },
+    {
+      "dimension": "backend",
+      "status": "compatible",
+      "detail": "Backend authority is Supabase.",
+      "adaptationClass": "none"
+    },
+    {
+      "dimension": "ai-inference",
+      "status": "compatible",
+      "detail": "Provider-neutral DataNest AI architecture is discoverable.",
+      "adaptationClass": "none"
+    },
+    {
+      "dimension": "registry",
+      "status": "compatible",
+      "detail": "Resonance Forge remains in governed-mirror mode.",
+      "adaptationClass": "none"
+    },
+    {
+      "dimension": "backup-recovery",
+      "status": "compatible",
+      "detail": "Governed backup/recovery authority is cataloged.",
+      "adaptationClass": "none"
+    },
+    {
+      "dimension": "dependency-posture",
+      "status": "compatible",
+      "detail": "Locked dependency state is present for reproducible automation.",
+      "adaptationClass": "none"
+    },
+    {
+      "dimension": "branch-hygiene",
+      "status": "compatible",
+      "detail": "BOTSQUAD and ENVIRONMENT automation branches are protected from generic cleanup.",
+      "adaptationClass": "none"
+    },
+    {
+      "dimension": "evidence-observability",
+      "status": "compatible",
+      "detail": "Specialized tree contracts are discoverable.",
+      "adaptationClass": "safe-auto-generated-metadata"
+    }
+  ],
+  "reviewRequired": [],
+  "adaptationPolicy": {
+    "safeAuto": [
+      "generated environment state and compatibility feeds",
+      "non-authorizing automation-branch refresh",
+      "deterministic metadata normalization"
+    ],
+    "humanReviewRequired": [
+      "runtime major changes",
+      "dependency upgrades",
+      "hosting/provider changes",
+      "backend changes",
+      "repository permission changes",
+      "production workflow changes",
+      "Forge authority changes",
+      "secret or credential changes"
+    ],
+    "forbidden": [
+      "implicit production authority transfer",
+      "automatic governance weakening",
+      "automatic secret disclosure",
+      "automatic FREETREE synchronization"
+    ]
+  }
+}
