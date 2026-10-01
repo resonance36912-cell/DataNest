@@ -153,3 +153,11 @@ test("Portfolio Pulse receives governed products with Portfolio Registry lifecyc
   assert.match(products,/governedProductLifecycle\(product,portfolioItems\)/);
   assert.match(products,/ResonancePortfolioPulse products=\{catalogProductsForPulse\}/);
 });
+
+test("Resonance Certification & Assurance is a governed market service offering",()=>{
+  assert.match(products,/Resonance Certification & Assurance/);
+  assert.match(products,/certification|assurance/i);
+  assert.match(productMigration,/resonance-certification-service-offering|RCS-SVC-01/);
+  assert.match(productMigration,/billing_enabled,false/);
+  assert.match(productMigration,/external_accreditation_claim',false/);
+});
