@@ -1,0 +1,538 @@
+{
+  "schemaVersion": "datanest-calmer-feed-v1",
+  "generatedAt": "2026-10-01T20:34:18.746Z",
+  "authority": "minimum-friction-advisory",
+  "productionAuthorization": false,
+  "status": "softening-suspended",
+  "tier": "UNQUALIFIED",
+  "metrics": {
+    "accuracy": 0.875,
+    "performance": 0.84,
+    "security": 0,
+    "contribution": 1
+  },
+  "packages": [
+    {
+      "scope": "functions",
+      "tier": "UNQUALIFIED",
+      "metrics": {
+        "accuracy": 0.875,
+        "performance": 0.84,
+        "security": 0,
+        "contribution": 1
+      },
+      "benefits": [],
+      "evidenceReuseMinutes": 0,
+      "fastLaneEligible": false
+    },
+    {
+      "scope": "processes",
+      "tier": "UNQUALIFIED",
+      "metrics": {
+        "accuracy": 0.875,
+        "performance": 0.84,
+        "security": 0,
+        "contribution": 1
+      },
+      "benefits": [],
+      "evidenceReuseMinutes": 0,
+      "fastLaneEligible": false
+    },
+    {
+      "scope": "builds",
+      "tier": "UNQUALIFIED",
+      "metrics": {
+        "accuracy": 0.875,
+        "performance": 0.84,
+        "security": 0,
+        "contribution": 1
+      },
+      "benefits": [],
+      "evidenceReuseMinutes": 0,
+      "fastLaneEligible": false
+    }
+  ],
+  "gateSoftening": [
+    {
+      "workflowFile": "branch-cleaner.yml",
+      "gateId": "branch-cleaner",
+      "gateType": "manual_mutation",
+      "reviewDomains": [
+        "ownerOperator"
+      ],
+      "baselinePlanningHours": 24,
+      "minimumPassPlanningHours": 24,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "ci.yml",
+      "gateId": "ci",
+      "gateType": "automated_validation",
+      "reviewDomains": [
+        "engineeringReview"
+      ],
+      "baselinePlanningHours": 24,
+      "minimumPassPlanningHours": 24,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "datanest-ai-certification.yml",
+      "gateId": "datanest-ai-certification",
+      "gateType": "automated_validation",
+      "reviewDomains": [
+        "engineeringReview",
+        "governanceReview"
+      ],
+      "baselinePlanningHours": 48,
+      "minimumPassPlanningHours": 48,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "datanest-ai-file-worker-deploy.yml",
+      "gateId": "datanest-ai-file-worker-deploy",
+      "gateType": "manual_mutation",
+      "reviewDomains": [
+        "operationsReview",
+        "securityReview"
+      ],
+      "baselinePlanningHours": 48,
+      "minimumPassPlanningHours": 48,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "edge-function-validation.yml",
+      "gateId": "edge-function-validation",
+      "gateType": "automated_validation",
+      "reviewDomains": [
+        "engineeringReview",
+        "securityReview"
+      ],
+      "baselinePlanningHours": 36,
+      "minimumPassPlanningHours": 36,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "migration-replay-validation.yml",
+      "gateId": "migration-replay-validation",
+      "gateType": "automated_validation",
+      "reviewDomains": [
+        "engineeringReview",
+        "operationsReview"
+      ],
+      "baselinePlanningHours": 36,
+      "minimumPassPlanningHours": 36,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "mirror-production-import.yml",
+      "gateId": "mirror-production-import",
+      "gateType": "manual_mutation",
+      "reviewDomains": [
+        "engineeringReview",
+        "governanceReview",
+        "operationsReview"
+      ],
+      "baselinePlanningHours": 60,
+      "minimumPassPlanningHours": 60,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "pages.yml",
+      "gateId": "pages",
+      "gateType": "manual_mutation",
+      "reviewDomains": [
+        "governanceReview",
+        "legalReview",
+        "externalReview"
+      ],
+      "baselinePlanningHours": 72,
+      "minimumPassPlanningHours": 72,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "pr-verification.yml",
+      "gateId": "pr-verification",
+      "gateType": "automated_validation",
+      "reviewDomains": [
+        "engineeringReview",
+        "visualReview"
+      ],
+      "baselinePlanningHours": 36,
+      "minimumPassPlanningHours": 36,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "ronsas-app-validation.yml",
+      "gateId": "ronsas-app-validation",
+      "gateType": "automated_validation",
+      "reviewDomains": [
+        "engineeringReview",
+        "visualReview"
+      ],
+      "baselinePlanningHours": 48,
+      "minimumPassPlanningHours": 48,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "security-scan.yml",
+      "gateId": "security-scan",
+      "gateType": "automated_validation",
+      "reviewDomains": [
+        "securityReview"
+      ],
+      "baselinePlanningHours": 36,
+      "minimumPassPlanningHours": 36,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "ui-owner-test-mode-expiry.yml",
+      "gateId": "ui-owner-test-mode-expiry",
+      "gateType": "automated_enforcement",
+      "reviewDomains": [
+        "ownerOperator"
+      ],
+      "baselinePlanningHours": 12,
+      "minimumPassPlanningHours": 12,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "ui-test-mode.yml",
+      "gateId": "ui-test-mode",
+      "gateType": "automated_evidence",
+      "reviewDomains": [
+        "visualReview",
+        "governanceReview"
+      ],
+      "baselinePlanningHours": 48,
+      "minimumPassPlanningHours": 48,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "workflow-reviewer.yml",
+      "gateId": "workflow-reviewer",
+      "gateType": "automated_analysis",
+      "reviewDomains": [
+        "engineeringReview",
+        "operationsReview"
+      ],
+      "baselinePlanningHours": 36,
+      "minimumPassPlanningHours": 36,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "production-edge-function-release.yml",
+      "gateId": "production-edge-function-release",
+      "gateType": "manual_mutation",
+      "reviewDomains": [
+        "engineeringReview",
+        "securityReview",
+        "operationsReview"
+      ],
+      "baselinePlanningHours": 60,
+      "minimumPassPlanningHours": 60,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "sec01-governance-certification.yml",
+      "gateId": "sec01-governance-certification",
+      "gateType": "automated_validation",
+      "reviewDomains": [
+        "securityReview",
+        "governanceReview"
+      ],
+      "baselinePlanningHours": 48,
+      "minimumPassPlanningHours": 48,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "resonance-forge-phase-a.yml",
+      "gateId": "resonance-forge-phase-a",
+      "gateType": "automated_validation",
+      "reviewDomains": [
+        "engineeringReview",
+        "securityReview",
+        "governanceReview"
+      ],
+      "baselinePlanningHours": 60,
+      "minimumPassPlanningHours": 60,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "boundaries-assessment.yml",
+      "gateId": "boundaries-assessment",
+      "gateType": "automated_validation",
+      "reviewDomains": [
+        "governanceReview",
+        "engineeringReview"
+      ],
+      "baselinePlanningHours": 36,
+      "minimumPassPlanningHours": 36,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "knowledge-tree.yml",
+      "gateId": "knowledge-tree",
+      "gateType": "automated_analysis",
+      "reviewDomains": [
+        "engineeringReview",
+        "governanceReview"
+      ],
+      "baselinePlanningHours": 36,
+      "minimumPassPlanningHours": 36,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "maintenance.yml",
+      "gateId": "maintenance",
+      "gateType": "automated_enforcement",
+      "reviewDomains": [
+        "operationsReview",
+        "governanceReview"
+      ],
+      "baselinePlanningHours": 48,
+      "minimumPassPlanningHours": 48,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "botsquad.yml",
+      "gateId": "botsquad",
+      "gateType": "automated_analysis",
+      "reviewDomains": [
+        "engineeringReview",
+        "visualReview",
+        "governanceReview"
+      ],
+      "baselinePlanningHours": 48,
+      "minimumPassPlanningHours": 48,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "environment-tree.yml",
+      "gateId": "environment-tree",
+      "gateType": "automated_analysis",
+      "reviewDomains": [
+        "engineeringReview",
+        "operationsReview",
+        "governanceReview"
+      ],
+      "baselinePlanningHours": 48,
+      "minimumPassPlanningHours": 48,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "enforcer.yml",
+      "gateId": "enforcer",
+      "gateType": "automated_enforcement",
+      "reviewDomains": [
+        "securityReview",
+        "governanceReview",
+        "engineeringReview"
+      ],
+      "baselinePlanningHours": 48,
+      "minimumPassPlanningHours": 48,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "guardian.yml",
+      "gateId": "guardian",
+      "gateType": "automated_enforcement",
+      "reviewDomains": [
+        "engineeringReview",
+        "operationsReview",
+        "securityReview",
+        "governanceReview"
+      ],
+      "baselinePlanningHours": 60,
+      "minimumPassPlanningHours": 60,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "conductor.yml",
+      "gateId": "conductor",
+      "gateType": "automated_enforcement",
+      "reviewDomains": [
+        "engineeringReview",
+        "operationsReview",
+        "governanceReview"
+      ],
+      "baselinePlanningHours": 60,
+      "minimumPassPlanningHours": 60,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "suggester.yml",
+      "gateId": "suggester",
+      "gateType": "automated_analysis",
+      "reviewDomains": [
+        "engineeringReview",
+        "operationsReview",
+        "governanceReview"
+      ],
+      "baselinePlanningHours": 48,
+      "minimumPassPlanningHours": 48,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "calmer.yml",
+      "gateId": "calmer",
+      "gateType": "automated_analysis",
+      "reviewDomains": [
+        "governanceReview",
+        "securityReview"
+      ],
+      "baselinePlanningHours": 36,
+      "minimumPassPlanningHours": 36,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "regulator.yml",
+      "gateId": "regulator",
+      "gateType": "automated_analysis",
+      "reviewDomains": [
+        "governanceReview",
+        "securityReview",
+        "operationsReview"
+      ],
+      "baselinePlanningHours": 60,
+      "minimumPassPlanningHours": 60,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "visibility-utility.yml",
+      "gateId": "visibility-utility",
+      "gateType": "automated_analysis",
+      "reviewDomains": [
+        "engineeringReview",
+        "visualReview",
+        "governanceReview"
+      ],
+      "baselinePlanningHours": 48,
+      "minimumPassPlanningHours": 48,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "liberty-in-all.yml",
+      "gateId": "liberty-in-all",
+      "gateType": "automated_evidence",
+      "reviewDomains": [
+        "engineeringReview",
+        "securityReview",
+        "governanceReview"
+      ],
+      "baselinePlanningHours": 48,
+      "minimumPassPlanningHours": 48,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    },
+    {
+      "workflowFile": "branch-protection-tree.yml",
+      "gateId": "branch-protection-tree",
+      "gateType": "automated_validation",
+      "reviewDomains": [
+        "engineeringReview",
+        "governanceReview"
+      ],
+      "baselinePlanningHours": 36,
+      "minimumPassPlanningHours": 36,
+      "maximumSofteningHours": 0,
+      "hardControlsPreserved": true,
+      "softeningSuspended": true,
+      "note": "Planning/evidence-response softening only; automated checks and authority requirements remain unchanged."
+    }
+  ],
+  "summary": {
+    "gateCount": 31,
+    "softenableGateCount": 0,
+    "totalPotentialPlanningHoursReduced": 0,
+    "hardControlsRemoved": 0
+  }
+}
