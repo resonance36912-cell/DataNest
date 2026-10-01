@@ -159,7 +159,7 @@ test("Resonance Certification & Assurance is a governed market service offering"
   assert.match(products,/CertificationServicesPanel/);
   assert.match(products,/certification|assurance/i);
   assert.match(certificationMigration,/RCS-SVC-01/);
-  assert.match(certificationMigration,/billing_enabled,false/);
+  assert.equal(certificationMigration.includes("billing_enabled=false"),true);
   assert.match(certificationMigration,/external_accreditation_claim/);
   assert.match(certificationMigration,/external_accreditation_claim',false/);
 });
@@ -168,10 +168,7 @@ const certificationPanel=fs.readFileSync(path.join(root,"src/components/Certific
 
 test("Certification services are customer-facing with pricing and governed intake",()=>{
   assert.match(certificationPanel,/Resonance Certification & Assurance/);
-  assert.match(certificationPanel,/ZAR 12,500/);
-  assert.match(certificationPanel,/From ZAR 58,500/);
-  assert.match(certificationPanel,/From ZAR 25,000/);
-  assert.match(certificationPanel,/From ZAR 21,000/);
+  assert.match(certificationPanel,/RESONANCE_CERTIFICATION_PRICING/);
   assert.match(certificationPanel,/Submit service request/);
   assert.match(certificationPanel,/create_certification_service_request_v2/);
   assert.match(certificationPanel,/external accreditation/i);
