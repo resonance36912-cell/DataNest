@@ -349,6 +349,13 @@ declare
   certification_product uuid;
   portfolio_id uuid;
 begin
+  if not exists (
+    select 1 from public.projects where id=target_project
+  ) then
+    raise notice 'Skipping Resonance Certification product seed: target project % is not present in this environment.',target_project;
+    return;
+  end if;
+
   select id into certification_product
   from public.products
   where project_id=target_project and slug='resonance-certification-assurance';
