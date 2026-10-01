@@ -68,8 +68,8 @@ export default function CertificationServicesPanel({projectId}:Props){
           <p className="eyebrow">{service.code}</p>
           <h3>{service.name}</h3>
           <p>{service.description}</p>
-          <strong>{price?.display||"Quote required"}</strong>
-          <small>{price?.note}</small>
+          <strong>{price?.displayPrice||"Quote required"}</strong>
+          <small>{price?.scopeNote}</small>
           <span>{service.output}</span>
           <button type="button" onClick={()=>{setServiceCode(service.code);window.requestAnimationFrame(()=>document.getElementById("certification-service-request")?.scrollIntoView({behavior:"smooth",block:"start"}));}}>
             Request this service
