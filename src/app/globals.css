@@ -5361,3 +5361,7 @@ html[data-motion-paused="true"] .workspaceArrival,html[data-motion-paused="true"
   .certificationServiceGrid,.certificationClassStrip,.certificationServiceRequest{grid-template-columns:1fr}
   .certificationServiceRequest>div:first-child,.certificationServiceRequest .wide{grid-column:auto}
 }
+
+.certificationPaymentNotice{display:grid;gap:4px;margin-top:12px;padding:11px 13px;border:1px solid rgba(134,224,255,.2);border-radius:12px;background:rgba(88,189,255,.035)}
+.certificationPaymentNotice b{font-size:11px}
+.certificationPaymentNotice span{color:var(--muted);font-size:10px;line-height:1.5}
