@@ -7,7 +7,8 @@ export type ResonanceCertificationClass={
 
 export type ResonanceCertificationPricing={
   serviceCode:string;
-  currency:"USD";
+  currency:"ZAR";
+  referenceUsd:number;
   priceModel:"fixed_introductory"|"starting_at";
   amount:number;
   displayPrice:string;
@@ -24,11 +25,11 @@ export type ResonanceCertificationService={
 };
 
 export const RESONANCE_CERTIFICATION_PRICING=[
-  {serviceCode:"RCS-SVC-01",currency:"USD",priceModel:"fixed_introductory",amount:750,displayPrice:"USD 750",scopeNote:"Fixed introductory scope."},
-  {serviceCode:"RCS-SVC-02",currency:"USD",priceModel:"starting_at",amount:3500,displayPrice:"From USD 3,500",scopeNote:"Final quote depends on scope and evidence complexity."},
-  {serviceCode:"RCS-SVC-03",currency:"USD",priceModel:"fixed_introductory",amount:750,displayPrice:"USD 750",scopeNote:"Standalone; may be included in a full certification engagement."},
-  {serviceCode:"RCS-SVC-04",currency:"USD",priceModel:"starting_at",amount:1500,displayPrice:"From USD 1,500",scopeNote:"Based on prior scope and evidence refresh."},
-  {serviceCode:"RCS-SVC-05",currency:"USD",priceModel:"starting_at",amount:1250,displayPrice:"From USD 1,250",scopeNote:"Alignment review; not external accreditation."}
+  {serviceCode:"RCS-SVC-01",currency:"ZAR",referenceUsd:750,priceModel:"fixed_introductory",amount:12500,displayPrice:"ZAR 12,500",scopeNote:"Fixed introductory scope; bank-transfer settlement."},
+  {serviceCode:"RCS-SVC-02",currency:"ZAR",referenceUsd:3500,priceModel:"starting_at",amount:58500,displayPrice:"From ZAR 58,500",scopeNote:"Final quote depends on scope and evidence complexity; bank-transfer settlement."},
+  {serviceCode:"RCS-SVC-03",currency:"ZAR",referenceUsd:750,priceModel:"fixed_introductory",amount:12500,displayPrice:"ZAR 12,500",scopeNote:"Standalone; may be included in a full certification engagement."},
+  {serviceCode:"RCS-SVC-04",currency:"ZAR",referenceUsd:1500,priceModel:"starting_at",amount:25000,displayPrice:"From ZAR 25,000",scopeNote:"Based on prior scope and evidence refresh."},
+  {serviceCode:"RCS-SVC-05",currency:"ZAR",referenceUsd:1250,priceModel:"starting_at",amount:21000,displayPrice:"From ZAR 21,000",scopeNote:"Alignment review; not external accreditation."}
 ] satisfies readonly ResonanceCertificationPricing[];
 
 export const RESONANCE_CERTIFICATION_STANDARD={
