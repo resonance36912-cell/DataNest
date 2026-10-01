@@ -14,7 +14,7 @@ test("RCS defines internal certification boundaries and market claim controls",(
     "RCS-DATA-01",
     "RCS-OPS-01",
     "RCS-MKT-01",
-    "introductory pricing is published",
+    "published introductory pricing is active",
     "paid checkout is currently disabled",
     "does not by itself represent ISO certification",
     "third-party / accredited certification"
