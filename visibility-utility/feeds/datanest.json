@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "datanest-visibility-utility-feed-v1",
+  "generatedAt": "2026-10-01T19:49:57.496Z",
+  "authority": "visibility-market-intelligence-advisory",
+  "productionAuthorization": false,
+  "status": "ready",
+  "seoScore": 100,
+  "visibilityScore": 100,
+  "platformCoveragePercent": 100,
+  "missingInputs": [
+    "global-trends",
+    "local-trends",
+    "analytics",
+    "commercial-baseline"
+  ],
+  "recommendedForConsideration": [
+    "ecosystem-cross-promotion",
+    "product-led-public-proof",
+    "owned-search-content"
+  ],
+  "routes": [
+    {
+      "id": "ecosystem-cross-promotion",
+      "label": "Reson8/RONSAS ecosystem cross-promotion",
+      "costClass": "low",
+      "speed": "fast",
+      "opportunityScore": 70,
+      "confidence": "low",
+      "projectedOutcome": {
+        "basis": "scenario-relative-index",
+        "currentBaselineIndex": 100,
+        "reachIndex": 112,
+        "activationIndexRange": [
+          95,
+          125
+        ],
+        "revenue": null
+      },
+      "assumptions": [
+        "No outcome is guaranteed.",
+        "Historical/trend input coverage is limited; treat as directional only.",
+        "No paid-spend authorization is implied."
+      ],
+      "implementationClass": "review-required"
+    },
+    {
+      "id": "product-led-public-proof",
+      "label": "Product-led public proof + demos",
+      "costClass": "low-medium",
+      "speed": "medium",
+      "opportunityScore": 69,
+      "confidence": "low",
+      "projectedOutcome": {
+        "basis": "scenario-relative-index",
+        "currentBaselineIndex": 100,
+        "reachIndex": 111,
+        "activationIndexRange": [
+          94,
+          125
+        ],
+        "revenue": null
+      },
+      "assumptions": [
+        "No outcome is guaranteed.",
+        "Historical/trend input coverage is limited; treat as directional only.",
+        "No paid-spend authorization is implied."
+      ],
+      "implementationClass": "review-required"
+    },
+    {
+      "id": "owned-search-content",
+      "label": "Owned search + public evidence",
+      "costClass": "low",
+      "speed": "medium",
+      "opportunityScore": 68,
+      "confidence": "low",
+      "projectedOutcome": {
+        "basis": "scenario-relative-index",
+        "currentBaselineIndex": 100,
+        "reachIndex": 111,
+        "activationIndexRange": [
+          94,
+          124
+        ],
+        "revenue": null
+      },
+      "assumptions": [
+        "No outcome is guaranteed.",
+        "Historical/trend input coverage is limited; treat as directional only.",
+        "No paid-spend authorization is implied."
+      ],
+      "implementationClass": "review-required"
+    },
+    {
+      "id": "partnership-referral",
+      "label": "Partnership + referral channels",
+      "costClass": "medium",
+      "speed": "medium",
+      "opportunityScore": 65,
+      "confidence": "low",
+      "projectedOutcome": {
+        "basis": "scenario-relative-index",
+        "currentBaselineIndex": 100,
+        "reachIndex": 109,
+        "activationIndexRange": [
+          93,
+          122
+        ],
+        "revenue": null
+      },
+      "assumptions": [
+        "No outcome is guaranteed.",
+        "Historical/trend input coverage is limited; treat as directional only.",
+        "No paid-spend authorization is implied."
+      ],
+      "implementationClass": "review-required"
+    },
+    {
+      "id": "community-education",
+      "label": "Community + educational content",
+      "costClass": "low-medium",
+      "speed": "medium",
+      "opportunityScore": 64,
+      "confidence": "low",
+      "projectedOutcome": {
+        "basis": "scenario-relative-index",
+        "currentBaselineIndex": 100,
+        "reachIndex": 109,
+        "activationIndexRange": [
+          93,
+          122
+        ],
+        "revenue": null
+      },
+      "assumptions": [
+        "No outcome is guaranteed.",
+        "Historical/trend input coverage is limited; treat as directional only.",
+        "No paid-spend authorization is implied."
+      ],
+      "implementationClass": "review-required"
+    }
+  ]
+}
