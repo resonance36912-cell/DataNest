@@ -16,7 +16,7 @@ create table if not exists public.certification_service_invoices (
   invoice_number text not null,
   issue_date date not null default current_date,
   due_date date,
-  invoice_currency text not null check (invoice_currency in ('ZAR','USD','EUR','GBP')),
+  invoice_currency text not null default 'ZAR' check (invoice_currency='ZAR'),
   invoice_amount numeric(14,2) not null check (invoice_amount>0),
   settlement_currency text not null default 'ZAR' check (settlement_currency='ZAR'),
   payment_method text not null default 'bank_transfer' check (payment_method='bank_transfer'),
@@ -110,8 +110,8 @@ begin
     raise insufficient_privilege using message='Operator access is required to issue an invoice.';
   end if;
 
-  if target_invoice_currency not in ('ZAR','USD','EUR','GBP') then
-    raise exception 'Unsupported invoice currency.';
+  if target_invoice_currency is distinct from 'ZAR' then
+    raise exception 'Certification invoices settle in ZAR. Foreign-currency quotes must be converted into the ZAR settlement amount before invoice issuance.';
   end if;
 
   if target_invoice_amount is null or target_invoice_amount<=0 then
@@ -191,7 +191,7 @@ begin
   update public.certification_service_invoices
   set
     payment_status=case
-      when target_received_currency=i.settlement_currency and target_received_amount>=i.invoice_amount then 'paid'
+      when target_received_currency='ZAR' and target_received_amount>=i.invoice_amount then 'paid'
       when target_received_amount>0 then 'partially_paid'
       else 'payment_pending'
     end,
