@@ -156,7 +156,7 @@ test("Portfolio Pulse receives governed products with Portfolio Registry lifecyc
 });
 
 test("Resonance Certification & Assurance is a governed market service offering",()=>{
-  assert.match(products,/Resonance Certification & Assurance/);
+  assert.match(products,/CertificationServicesPanel/);
   assert.match(products,/certification|assurance/i);
   assert.match(certificationMigration,/RCS-SVC-01/);
   assert.match(certificationMigration,/billing_enabled,false/);
@@ -186,7 +186,7 @@ const bankPanel=fs.readFileSync(path.join(root,"src/components/CertificationServ
 test("bank-transfer payment intake is a governed commercial path",()=>{
   assert.equal(bankPaymentMigration.includes("settlement_currency text not null default 'ZAR'"),true);
   assert.equal(bankPaymentMigration.includes("payment_method text not null default 'bank_transfer'"),true);
-  assert.equal(bankPaymentMigration.includes("issued invoices are denominated in ZAR"),true);
+  assert.equal(bankPaymentMigration.includes("invoice_currency text not null default 'ZAR'"),true);
   assert.equal(certificationLaunchMigration.includes("published_pricing_bank_transfer"),true);
   assert.equal(bankPanel.includes("Bank transfer / EFT"),true);
   assert.equal(bankPanel.includes("target_requested_currency:requestedCurrency"),true);
