@@ -58,7 +58,7 @@ export default function CertificationServicesPanel({projectId}:Props){
       eyebrow="BUSINESS · CERTIFICATION & ASSURANCE"
       title="Resonance Certification & Assurance"
       description="Evidence-led certification, readiness, standards alignment, surveillance and governed evidence services delivered through DataNest."
-      meta={<StatusIndicator label="Free promotion" tone="success" detail="Introductory commercial pricing published · paid checkout not yet connected"/>}
+      meta={<StatusIndicator label="Introductory pricing" tone="success" detail="Paid checkout not yet connected"/>}
     />
 
     <div className="certificationServiceGrid">
