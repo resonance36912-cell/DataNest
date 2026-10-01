@@ -339,6 +339,10 @@ grant execute on function public.issue_resonance_certification_v1(
 revoke all on function public.set_resonance_certification_status_v1(uuid,text,text) from public,anon;
 grant execute on function public.set_resonance_certification_status_v1(uuid,text,text) to authenticated;
 
+create unique index if not exists product_records_product_type_code_unique_idx
+  on public.product_records(project_id,product_id,record_type,code)
+  where code is not null;
+
 do $$
 declare
   target_project uuid:='c2aa30c1-fc82-4524-8510-021ac0fef967';
@@ -490,9 +494,5 @@ begin
     set name=excluded.name,status=excluded.status,sort_order=excluded.sort_order,payload=excluded.payload,updated_at=now();
 end;
 $$;
-
-create unique index if not exists product_records_product_type_code_unique_idx
-  on public.product_records(project_id,product_id,record_type,code)
-  where code is not null;
 
 commit;
