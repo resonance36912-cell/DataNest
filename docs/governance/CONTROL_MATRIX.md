@@ -13,6 +13,7 @@
 | Canonical-write provenance | invariant: direct push forbidden | `.github/workflows/canonical-write-watchdog.yml` | `tests/unit/canonical-write-watchdog.test.mjs` | Open anomaly incidents | GitHub native protection for prevention |
 | Native protection observation | enforcement model | `.github/workflows/native-protection-audit.yml` | Native audit evaluation | 90-day workflow artifact | GitHub administration read |
 | Ownership governance | `.github/CODEOWNERS` + `docs/governance/OWNERSHIP.md` | CODEOWNERS review routing | GitHub pull-request mechanics | Ownership registry | GitHub account identity |
+| Resonance Certification Standard | `docs/certification/RESONANCE_CERTIFICATION_STANDARD.md` | External-audit + certification database gates | Certification service contract tests + governed SQL functions | Certificate credential + audit events | Authorized human issuance decision |
 | Policy-change evidence | invariant + destructive-operation contract | PR review | BRANCH-X policy validation | Governed PR history | GitHub native review enforcement |
 
 ## Current closure condition
