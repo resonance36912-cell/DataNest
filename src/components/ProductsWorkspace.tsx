@@ -585,7 +585,7 @@ export default function ProductsWorkspace({projectId,currentUserId,role}:Props){
       ]:[]}
       emptyState={<span>No governed product evidence is loaded yet. Import or register product records before release review.</span>}
     />
-    <CertificationServicesPanel projectId={projectId} role={role}/>
+    <CertificationServicesPanel projectId={projectId}/>
     <nav className="productsModeTabs" aria-label="Products workspace mode">
       <button type="button" className={productsSection==="products"?"active":""} aria-pressed={productsSection==="products"} onClick={()=>setProductsMode("products")}>Governed Products</button>
       <button type="button" className={productsSection==="portfolio"?"active":""} aria-pressed={productsSection==="portfolio"} onClick={()=>setProductsMode("portfolio")}>Portfolio Registry</button>
