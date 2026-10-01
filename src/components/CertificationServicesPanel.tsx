@@ -2,19 +2,12 @@
 
 import { FormEvent,useMemo,useState } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { RESONANCE_CERTIFICATION_STANDARD } from "@/lib/resonanceCertification";
+import { RESONANCE_CERTIFICATION_PRICING,RESONANCE_CERTIFICATION_STANDARD } from "@/lib/resonanceCertification";
 import PageHeader from "@/components/platform/PageHeader";
 import StatusIndicator from "@/components/platform/StatusIndicator";
 
 type Props={projectId:string};
 
-const prices:Record<string,{display:string;note:string}>={
-  "RCS-SVC-01":{display:"USD 750",note:"Fixed introductory scope"},
-  "RCS-SVC-02":{display:"From USD 3,500",note:"Final quote depends on scope and evidence complexity"},
-  "RCS-SVC-03":{display:"USD 750",note:"Standalone; may be included in a full certification engagement"},
-  "RCS-SVC-04":{display:"From USD 1,500",note:"Based on prior scope and evidence refresh"},
-  "RCS-SVC-05":{display:"From USD 1,250",note:"Alignment review; not external accreditation"}
-};
 
 export default function CertificationServicesPanel({projectId}:Props){
   const [serviceCode,setServiceCode]=useState("RCS-SVC-01");
@@ -70,7 +63,7 @@ export default function CertificationServicesPanel({projectId}:Props){
 
     <div className="certificationServiceGrid">
       {RESONANCE_CERTIFICATION_STANDARD.services.map(service=>{
-        const price=prices[service.code];
+        const price=RESONANCE_CERTIFICATION_PRICING.find(item=>item.serviceCode===service.code);
         return <article className="certificationServiceCard" key={service.code}>
           <p className="eyebrow">{service.code}</p>
           <h3>{service.name}</h3>
@@ -121,7 +114,7 @@ export default function CertificationServicesPanel({projectId}:Props){
       <label className="wide">Scope summary<textarea required value={scope} onChange={e=>setScope(e.target.value)} placeholder="What is being assessed, and what should the engagement determine?"/></label>
       {error&&<div className="errorBanner">{error}</div>}
       {notice&&<div className="noticeBanner">{notice}</div>}
-      <div className="externalAuditActions"><button disabled={busy||!targetName.trim()||!scope.trim()} type="submit">{busy?"Submitting…":"Submit service request"}</button><span className="muted">{selectedService.name} · {prices[serviceCode]?.display||"Quote required"}</span></div>
+      <div className="externalAuditActions"><button disabled={busy||!targetName.trim()||!scope.trim()} type="submit">{busy?"Submitting…":"Submit service request"}</button><span className="muted">{selectedService.name} · {RESONANCE_CERTIFICATION_PRICING.find(item=>item.serviceCode===serviceCode)?.displayPrice||"Quote required"}</span></div>
     </form>
   </section>;
 }
