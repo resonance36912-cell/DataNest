@@ -5,7 +5,7 @@
     "id": "RCS",
     "version": "1.0"
   },
-  "commercialState": "free_promotion",
+  "commercialState": "introductory_pricing_published",
   "paymentState": "checkout_not_connected",
   "claimBoundary": "Internal Resonance certification; not ISO certification, accreditation, regulatory approval or third-party conformity certification.",
   "services": [
