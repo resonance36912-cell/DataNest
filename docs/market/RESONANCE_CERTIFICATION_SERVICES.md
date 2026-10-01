@@ -2,7 +2,7 @@
 
 **Authority:** Resonance DataNest  
 **Standard:** RCS 1.0  
-**Commercial state:** Introductory pricing published; paid checkout not yet connected
+**Commercial state:** Introductory pricing published; bank-transfer/EFT settlement active; automated card checkout disabled
 
 ## Offering
 
@@ -47,7 +47,7 @@ Automation may prepare evidence and records but cannot self-issue certification.
 
 ## Commercial boundary
 
-The current offering is intentionally priced as a published introductory business offering. Billing remains disabled. Future pricing requires a separate governed commercial decision and does not alter certification criteria.
+The current offering is intentionally priced as a published introductory business offering. Settlement is through business-bank transfer/EFT in ZAR; automated card checkout remains disabled. Future pricing requires a separate governed commercial decision and does not alter certification criteria.
 
 ## Transparency
 
