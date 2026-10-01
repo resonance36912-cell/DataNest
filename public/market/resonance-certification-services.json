@@ -7,32 +7,35 @@
   },
   "commercialState": "introductory_pricing_published",
   "paymentState": "checkout_not_connected",
+  "settlementCurrency": "ZAR",
+  "paymentMethod": "bank_transfer",
+  "automatedCheckout": "disabled",
   "claimBoundary": "Internal Resonance certification; not ISO certification, accreditation, regulatory approval or third-party conformity certification.",
   "services": [
     {
       "code": "RCS-SVC-01",
       "name": "Certification Readiness Assessment",
-      "displayPrice": "USD 750"
+      "displayPrice": "ZAR 12,500"
     },
     {
       "code": "RCS-SVC-02",
       "name": "Resonance Certification Assessment",
-      "displayPrice": "From USD 3,500"
+      "displayPrice": "From ZAR 58,500"
     },
     {
       "code": "RCS-SVC-03",
       "name": "Certification & Evidence Pack",
-      "displayPrice": "USD 750"
+      "displayPrice": "ZAR 12,500"
     },
     {
       "code": "RCS-SVC-04",
       "name": "Surveillance & Renewal",
-      "displayPrice": "From USD 1,500"
+      "displayPrice": "From ZAR 25,000"
     },
     {
       "code": "RCS-SVC-05",
       "name": "Standards Alignment Review",
-      "displayPrice": "From USD 1,250"
+      "displayPrice": "From ZAR 21,000"
     }
   ],
   "intake": "Authenticated DataNest project participants may submit a governed service request; formal certification issuance remains human-review-gated.",
