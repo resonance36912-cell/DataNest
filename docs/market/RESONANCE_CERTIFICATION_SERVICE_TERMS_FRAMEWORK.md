@@ -22,11 +22,11 @@ Published introductory prices are:
 
 | Service | Introductory pricing |
 |---|---:|
-| Certification Readiness Assessment | USD 750 |
-| Resonance Certification Assessment | From USD 3,500 |
-| Certification & Evidence Pack | USD 750 |
-| Surveillance & Renewal | From USD 1,500 |
-| Standards Alignment Review | From USD 1,250 |
+| Certification Readiness Assessment | ZAR 12,500 |
+| Resonance Certification Assessment | From ZAR 58,500 |
+| Certification & Evidence Pack | ZAR 12,500 |
+| Surveillance & Renewal | From ZAR 25,000 |
+| Standards Alignment Review | From ZAR 21,000 |
 
 Starting prices are not fixed quotations. Final pricing may vary with scope, number of certification classes, evidence volume, systems assessed, integrations, jurisdiction, complexity and required review effort.
 
