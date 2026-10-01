@@ -5,7 +5,7 @@
     "id": "RCS",
     "version": "1.0"
   },
-  "commercialState": "introductory_pricing_published",
+  "commercialState": "published_pricing_bank_transfer",
   "paymentState": "checkout_not_connected",
   "settlementCurrency": "ZAR",
   "paymentMethod": "bank_transfer",
