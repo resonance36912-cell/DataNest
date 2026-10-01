@@ -4,6 +4,7 @@ import fs from "node:fs";
 
 test("public certification market catalog matches governed ZAR commercial state",()=>{
   const catalog=JSON.parse(fs.readFileSync("public/market/resonance-certification-services.json","utf8"));
+  assert.equal(catalog.commercialState,"published_pricing_bank_transfer");
   assert.equal(catalog.settlementCurrency,"ZAR");
   assert.equal(catalog.paymentMethod,"bank_transfer");
   assert.equal(catalog.automatedCheckout,"disabled");
@@ -18,4 +19,5 @@ test("public certification market catalog matches governed ZAR commercial state"
     ]
   );
   assert.equal(catalog.intake.includes("human-review-gated"),true);
+  assert.ok(catalog.services.every(item=>!item.displayPrice.includes("USD")));
 });
