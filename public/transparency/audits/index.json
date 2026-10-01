@@ -232,6 +232,35 @@
         "role_effect": false,
         "production_authorization": false
       }
+    },
+    {
+      "id": "pr-365-liberty-in-all-final-validation",
+      "title": "PR #365 · LIBERTY-IN-ALL Final Validation Evidence",
+      "document_type": "pull_request_validation_evidence",
+      "version": "1.0",
+      "status": "published_evidence_candidate",
+      "audit_result_status": "source_pr_closed_unmerged_checks_successful",
+      "published_at": "2026-10-01",
+      "source": "pr-365-liberty-in-all-evidence.json",
+      "baseline": {
+        "pull_request": 365,
+        "source_commit": "aeccb98be7ed4929a7086a1dba1bdf9685066618",
+        "merged": false
+      },
+      "validation": {
+        "observed_workflows": 5,
+        "successful_workflows": 5,
+        "exact_head_bound": true
+      },
+      "authority": {
+        "governance_effect": false,
+        "financial_effect": false,
+        "ownership_effect": false,
+        "role_effect": false,
+        "production_authorization": false,
+        "merge_authorization": false,
+        "certification_effect": false
+      }
     }
   ]
 }
