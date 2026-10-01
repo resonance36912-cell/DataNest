@@ -142,9 +142,9 @@ Service descriptions, certification status, and claim limitations must remain sy
 
 The current market posture remains:
 
-- free promotion is active;
-- paid checkout is disabled;
-- no pricing is implied by the service catalog;
+- introductory pricing is published;
+- paid checkout is currently disabled pending payment-provider connection;
+- early engagements may remain promotional at governed discretion;
 - future pricing requires a separate governed commercial decision;
 - no certificate may be sold as a shortcut around evidence or review requirements.
 
