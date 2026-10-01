@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "evidence_id": "pr-365-liberty-in-all-final-validation",
+  "title": "PR #365 · LIBERTY-IN-ALL final validation evidence",
+  "status": "published_evidence_candidate",
+  "captured_at": "2026-10-01",
+  "source": {
+    "repository": "DataNest-Supository/DataNest",
+    "pull_request": 365,
+    "pull_request_url": "https://github.com/DataNest-Supository/DataNest/pull/365",
+    "title": "Add LIBERTY-IN-ALL continuous indexing and traceability standard",
+    "state": "closed",
+    "merged": false,
+    "draft": false,
+    "base_branch": "main",
+    "head_branch": "feature/liberty-in-all-standard",
+    "head_sha": "aeccb98be7ed4929a7086a1dba1bdf9685066618",
+    "closed_at": "2026-10-01T11:08:26Z"
+  },
+  "validation": {
+    "scope": "workflow conclusions observed for the exact source head SHA",
+    "all_observed_checks_completed_successfully": true,
+    "workflow_runs": [
+      {
+        "name": "CI",
+        "run_number": 2893,
+        "run_id": 36849542973,
+        "conclusion": "success"
+      },
+      {
+        "name": "LIBERTY-IN-ALL Traceability Standard",
+        "run_number": 8,
+        "run_id": 36849542899,
+        "conclusion": "success"
+      },
+      {
+        "name": "VISIBILITY-UTILITY Market Presence Tree",
+        "run_number": 9,
+        "run_id": 36849542769,
+        "conclusion": "success"
+      },
+      {
+        "name": "Workflow Reviewer & Code Cleaner",
+        "run_number": 349,
+        "run_id": 36849542963,
+        "conclusion": "success"
+      },
+      {
+        "name": "Resonance Forge Phase A",
+        "run_number": 151,
+        "run_id": 36849543322,
+        "conclusion": "success"
+      }
+    ]
+  },
+  "publication_snapshot": {
+    "comparison_base": "main",
+    "comparison_base_sha": "5845d549745458297600e2c9d084d5cdb46500ca",
+    "relation": "diverged",
+    "source_head_ahead_by_commits": 191,
+    "source_head_behind_by_commits": 140,
+    "publication_policy": "publish evidence from the historical source head; do not replay the stale diverged branch wholesale"
+  },
+  "assertions": {
+    "source_head_is_historical_evidence": true,
+    "source_pr_was_merged": false,
+    "validation_is_bound_to_exact_head_sha": true,
+    "evidence_publication_grants_production_authority": false,
+    "evidence_publication_grants_merge_authority": false,
+    "evidence_publication_is_a_certification_claim": false
+  },
+  "authority": {
+    "governance_effect": false,
+    "financial_effect": false,
+    "ownership_effect": false,
+    "role_effect": false,
+    "production_authorization": false,
+    "merge_authorization": false
+  }
+}
