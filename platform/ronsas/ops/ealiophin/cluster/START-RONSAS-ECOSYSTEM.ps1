@@ -66,12 +66,12 @@ function Get-ListenerRecord([int]$Port) {
         foreach ($line in @(& $netstat -ano -p tcp 2>$null)) {
             if ([string]$line -notmatch '^\s*TCP\s+(\S+)\s+\S+\s+LISTENING\s+(\d+)\s*$') { continue }
             $endpoint = [string]$Matches[1]
-            $pid = [int]$Matches[2]
+            $listenerProcessId = [int]$Matches[2]
             $address = $null; $seenPort = $null
             if ($endpoint -match '^\[([^\]]+)\]:(\d+)$') { $address=$Matches[1]; $seenPort=[int]$Matches[2] }
             elseif ($endpoint -match '^(.+):(\d+)$') { $address=$Matches[1]; $seenPort=[int]$Matches[2] }
             if ($seenPort -eq $Port) {
-                return [pscustomobject]@{ LocalAddress=[string]$address; LocalPort=$Port; OwningProcess=$pid; Source='netstat' }
+                return [pscustomobject]@{ LocalAddress=[string]$address; LocalPort=$Port; OwningProcess=$listenerProcessId; Source='netstat' }
             }
         }
     }
@@ -101,7 +101,68 @@ function Wait-Http([string]$Name, [string]$Url, [int]$Seconds = 30) {
 }
 function Assert-KnownPort([string]$Name, [int]$Port, [string]$Expected) {
     $listener = Get-ListenerRecord $Port
-    if (-not $listener) { return $null }
+    if (-not $listener) {
+        $identityForRetry = $KnownEndpointIdentities[$Name]
+        if ($identityForRetry -and (Test-Http ([string]$identityForRetry.url))) {
+            for ($attempt = 1; $attempt -le 8 -and -not $listener; $attempt++) {
+                Start-Sleep -Milliseconds 250
+                $listener = Get-ListenerRecord $Port
+            }
+        }
+    }
+    if (-not $listener) {
+        $identity = $KnownEndpointIdentities[$Name]
+        if (-not $identity) { return $null }
+        try {
+            $response = Invoke-WebRequest -UseBasicParsing -Uri ([string]$identity.url) -TimeoutSec 5
+        } catch {
+            return $null
+        }
+        $contentType = [string]$response.Headers['Content-Type']
+        $contentMatches = [string]$response.Content -like ('*' + [string]$identity.marker + '*')
+        if ($response.StatusCode -ne 200 -or $contentType -notlike ([string]$identity.contentType + '*') -or -not $contentMatches) {
+            throw "$Name endpoint is reachable without a Windows listener record, but its fingerprint is not recognized. No process was stopped."
+        }
+        $reservedStatePids = @()
+        if (Test-Path -LiteralPath $StatePath -PathType Leaf) {
+            try {
+                $priorState = Get-Content -LiteralPath $StatePath -Raw | ConvertFrom-Json
+                $stateMatches = @($priorState.services | Where-Object { [string]$_.name -eq $Name -and [int]$_.port -eq $Port })
+                if ($stateMatches.Count -eq 1) {
+                    $statePid = 0
+                    if ($stateMatches[0].PSObject.Properties['pid'] -and [int]$stateMatches[0].pid -gt 0) { $statePid = [int]$stateMatches[0].pid }
+                    elseif ($stateMatches[0].PSObject.Properties['launcherPid'] -and [int]$stateMatches[0].launcherPid -gt 0) { $statePid = [int]$stateMatches[0].launcherPid }
+                    if ($statePid -gt 0) {
+                        $stateProcess = Get-CimInstance Win32_Process -Filter "ProcessId=$statePid" -ErrorAction SilentlyContinue
+                        if ($stateProcess -and [string]$stateProcess.Name -ieq [string]$identity.process) {
+                            Write-Host "[SAFE REUSE] $Name has no Windows listener record; resolved to prior governed PID $statePid by state + endpoint fingerprint + expected process." -ForegroundColor Yellow
+                            return [pscustomobject]@{ pid=$statePid; owned=$false; command=[string]$stateProcess.CommandLine; identity='no-listener-record-state-and-endpoint' }
+                        }
+                    }
+                }
+                foreach ($svc in @($priorState.services | Where-Object { [string]$_.name -ne $Name })) {
+                    if ($svc.PSObject.Properties['pid'] -and [int]$svc.pid -gt 0) { $reservedStatePids += [int]$svc.pid }
+                    if ($svc.PSObject.Properties['launcherPid'] -and [int]$svc.launcherPid -gt 0) { $reservedStatePids += [int]$svc.launcherPid }
+                }
+                $reservedStatePids = @($reservedStatePids | Select-Object -Unique)
+            } catch {
+                Write-Warning "Could not use prior governed state to resolve $Name listener identity: $($_.Exception.Message)"
+            }
+        }
+        $allowBlankCommandLine = ([string]$identity.process -notin @('python.exe','node.exe','powershell.exe','pwsh.exe'))
+        $candidates = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object {
+            [string]$_.Name -ieq [string]$identity.process -and
+            ([string]$_.CommandLine -like "*$Expected*" -or ($allowBlankCommandLine -and [string]::IsNullOrWhiteSpace([string]$_.CommandLine))) -and
+            ([int]$_.ProcessId -notin $reservedStatePids)
+        })
+        if ($candidates.Count -ne 1) {
+            Write-Warning "[SAFE REUSE] $Name endpoint fingerprint is valid, but Windows does not expose an attributable listener/process. Reusing as unowned without process mutation."
+            return [pscustomobject]@{ pid=0; owned=$false; command=''; identity='endpoint-fingerprint-only-unowned' }
+        }
+        $resolvedPid = [int]$candidates[0].ProcessId
+        Write-Host "[SAFE REUSE] $Name has no Windows listener record; resolved to PID $resolvedPid by endpoint fingerprint + unique expected process." -ForegroundColor Yellow
+        return [pscustomobject]@{ pid=$resolvedPid; owned=$false; command=[string]$candidates[0].CommandLine; identity='no-listener-record-endpoint-and-unique-process' }
+    }
     $listenerPid = [int]$listener.OwningProcess
     $cmd = if ($listenerPid -gt 0) { Get-CommandLine $listenerPid } else { '' }
     if ($cmd -like "*$Expected*") {
@@ -129,8 +190,9 @@ function Assert-KnownPort([string]$Name, [int]$Port, [string]$Expected) {
     }
 
     if ($listenerPid -eq 0) {
+        $allowBlankCommandLine = ([string]$identity.process -notin @('python.exe','node.exe','powershell.exe','pwsh.exe'))
         $candidates = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object {
-            [string]$_.Name -ieq [string]$identity.process -and [string]$_.CommandLine -like "*$Expected*"
+            [string]$_.Name -ieq [string]$identity.process -and ([string]$_.CommandLine -like "*$Expected*" -or ($allowBlankCommandLine -and [string]::IsNullOrWhiteSpace([string]$_.CommandLine)))
         })
         if ($candidates.Count -ne 1) {
             throw "$Name port $Port is exposed through PID 0, but exactly one matching $($identity.process) process was not found. No process was stopped."
@@ -285,8 +347,18 @@ if (-not (Test-BackendReady)) {
 }
 $backendUrl = 'http://127.0.0.1:8787/v1/backend/health'
 $services += [pscustomobject]@{name='sovereign-backend';port=58600;url=$backendUrl;pid=(Get-ListenerPid 58600);owned=$false;root=$AppDev}
-$opsRuntimeCandidate = Join-Path (Split-Path $PSScriptRoot -Parent) 'runtime'
-$opsRuntime = if (Test-Path -LiteralPath $opsRuntimeCandidate -PathType Container) { $opsRuntimeCandidate } else { $Runtime }
+$opsRuntimeCandidates = @(
+    (Join-Path (Split-Path $PSScriptRoot -Parent) 'runtime'),
+    (Join-Path $PSScriptRoot 'runtime')
+)
+$opsRuntime = @($opsRuntimeCandidates | Where-Object { Test-Path -LiteralPath $_ -PathType Container } | Select-Object -First 1)
+if (-not $opsRuntime) {
+    throw ('Governed RONSAS runtime source bundle is missing. Checked: ' + ($opsRuntimeCandidates -join '; '))
+}
+$opsRuntime = [string]$opsRuntime[0]
+if ([IO.Path]::GetFullPath($opsRuntime).TrimEnd('\') -eq [IO.Path]::GetFullPath($Runtime).TrimEnd('\')) {
+    throw 'Governed RONSAS runtime source bundle must be distinct from the mutable live runtime directory.'
+}
 $sttSource = Join-Path $opsRuntime 'syncvision-local-stt.py'
 if (-not (Test-Path -LiteralPath $sttSource -PathType Leaf)) { throw "STT runtime source missing: $sttSource" }
 $sttTarget = Join-Path $Runtime 'syncvision-local-stt.py'

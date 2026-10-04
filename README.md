@@ -15,4 +15,4 @@ Canonical Resonance monorepo candidate for DataNest governance, Resonance Hub ru
 
 ## Consolidation status
 
-This repository is an isolated recovery/consolidation candidate. Original source repositories remain unchanged. Promotion to a new forge is blocked until source reconciliation, security checks, component builds, cross-system validation and human governance approval complete.
+This repository is the locally reconciled canonical candidate. Original source repositories remain unchanged. Ealiophin source/runtime reconciliation and local governance validation are certified; remote forge promotion remains blocked pending final security/component transfer validation and human governance approval.

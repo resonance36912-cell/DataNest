@@ -25,11 +25,11 @@ function Get-ListenerPid([int]$Port) {
         foreach ($line in @(& $netstat -ano -p tcp 2>$null)) {
             if ([string]$line -notmatch '^\s*TCP\s+(\S+)\s+\S+\s+LISTENING\s+(\d+)\s*$') { continue }
             $endpoint = [string]$Matches[1]
-            $pid = [int]$Matches[2]
+            $listenerProcessId = [int]$Matches[2]
             $seenPort = $null
             if ($endpoint -match '^\[[^\]]+\]:(\d+)$') { $seenPort=[int]$Matches[1] }
             elseif ($endpoint -match '^.+:(\d+)$') { $seenPort=[int]$Matches[1] }
-            if ($seenPort -eq $Port) { return $pid }
+            if ($seenPort -eq $Port) { return $listenerProcessId }
         }
     }
 
