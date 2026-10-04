@@ -16,13 +16,19 @@ if(Test-Path -LiteralPath $indexPath){
 } else { Fail 'ops/index/TRACEABILITY-INDEX.json missing' }
 
 if($idx){
-  $ids=@(); $ids += @($idx.platforms.canonicalId); $ids += @($idx.nodes.canonicalId); $ids += @($idx.services.canonicalId)
+  $ids=@(); $ids += @($idx.platforms.canonicalId); $ids += @($idx.applications.canonicalId); $ids += @($idx.nodes.canonicalId); $ids += @($idx.services.canonicalId)
   $dupes=$ids | Group-Object | Where-Object Count -gt 1
   if($dupes){ Fail ('duplicate canonical IDs: '+(($dupes.Name)-join ', ')) } else { Pass 'canonical IDs are unique' }
 }
 
-$required=@('apps\datanest','apps\hub','platform\ronsas','platform\open-nova','governance\rcgf','ops','evidence','docs','tests')
+$required=@('apps\datanest','apps\hub','apps\epublisher','apps\creative-studio','apps\sync-vision','apps\youtube-optimizer','platform\ronsas','platform\open-nova','governance\rcgf','services\sovereign-backend','ops','evidence','docs','tests')
 foreach($rel in $required){ if(Test-Path -LiteralPath (Join-Path $root $rel)){ Pass "canonical path present: $rel" } else { Fail "canonical path missing: $rel" } }
+if($idx){
+  foreach($app in @($idx.applications)){
+    $p=Join-Path $root ([string]$app.repoPath)
+    if(Test-Path -LiteralPath $p){ Pass "indexed application path present: $($app.canonicalId)" } else { Fail "indexed application path missing: $($app.canonicalId) -> $($app.repoPath)" }
+  }
+}
 
 $nestedGit=Get-ChildItem -LiteralPath $root -Directory -Recurse -Force -Filter '.git' -ErrorAction SilentlyContinue | Where-Object FullName -ne (Join-Path $root '.git')
 if($nestedGit){ Fail ('nested .git directories found: '+(($nestedGit.FullName)-join '; ')) } else { Pass 'no nested .git directories' }
@@ -31,8 +37,12 @@ if(Test-Path (Join-Path $root '.git')){
   $tracked = & git -C $root ls-files
   $badTracked = $tracked | Where-Object { ($_ -match '(^|/)(node_modules|\.next|\.output|dist|coverage|\.cache)/|(^|/)\.env($|\.)|\.(pem|key|p12|pfx)$|(^|/)id_rsa($|\.)') -and ($_ -notmatch '(^|/)\.env(?:\.[^/]+)?\.example$') }
   if($badTracked){ Fail ('forbidden generated/secret-like tracked paths: '+($badTracked -join '; ')) } else { Pass 'no forbidden generated/secret-like tracked paths' }
+  $savedEap=$ErrorActionPreference
+  $ErrorActionPreference='Continue'
   $gitCheck = (& git -C $root diff --check 2>&1 | Out-String)
-  if($LASTEXITCODE -eq 0){ Pass 'git diff --check passes' } else { Fail ('git diff --check failed: '+$gitCheck.Trim()) }
+  $gitExit=$LASTEXITCODE
+  $ErrorActionPreference=$savedEap
+  if($gitExit -eq 0){ Pass 'git diff --check passes' } else { Fail ('git diff --check failed: '+$gitCheck.Trim()) }
 }
 
 $publicRoots=@((Join-Path $root 'apps\hub\public\ops'), (Join-Path $root 'apps\datanest\public\ops'))
@@ -45,6 +55,16 @@ foreach($pr in $publicRoots){
     try { Get-Content $jf.FullName -Raw | ConvertFrom-Json | Out-Null; Pass "public JSON valid: $($jf.Name)" }
     catch { Fail "public JSON invalid: $($jf.FullName)" }
   }
+}
+
+if($idx){
+  $catalogPath=Join-Path $root 'apps\hub\public\ops\catalog.json'
+  try {
+    $catalog=Get-Content -LiteralPath $catalogPath -Raw | ConvertFrom-Json
+    $known=@($idx.platforms.canonicalId)+@($idx.applications.canonicalId)
+    $unknown=@($catalog.applications.canonical_id) | Where-Object { $_ -and ($_ -notin $known) }
+    if($unknown){ Fail ('public catalog canonical IDs missing from internal index: '+($unknown -join ', ')) } else { Pass 'public catalog IDs resolve to internal canonical index' }
+  } catch { Fail "public catalog/index cross-check failed: $($_.Exception.Message)" }
 }
 
 $moduleRegistry=Join-Path $root 'platform\ronsas\ops\ealiophin\cluster\RONSAS-MODULES.json'

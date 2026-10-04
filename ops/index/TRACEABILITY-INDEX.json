@@ -310,5 +310,52 @@
                       "hubStagedPaths":  8,
                       "hubStagedPatch":  "resonance-hub-Weed-staged.patch",
                       "openNovaManifestVerifiedFiles":  199
-                  }
+                  },
+    "applications":  [
+                         {
+                             "canonicalId":  "RSN-APP-EPUBLISHER",
+                             "canonicalName":  "Resonance ePublisher",
+                             "slug":  "epublisher",
+                             "repoPath":  "apps/epublisher",
+                             "authority":  "publication-workflow-application",
+                             "aliases":  [
+                                             "ePublisher",
+                                             "RONSAS ePublisher"
+                                         ]
+                         },
+                         {
+                             "canonicalId":  "RSN-APP-CREATIVE-STUDIO",
+                             "canonicalName":  "Resonance Creative Studio",
+                             "slug":  "creative-studio",
+                             "repoPath":  "apps/creative-studio",
+                             "authority":  "creative-production-application",
+                             "aliases":  [
+                                             "Creative Studio",
+                                             "RONSAS Creative Studio"
+                                         ]
+                         },
+                         {
+                             "canonicalId":  "RSN-APP-SYNC-VISION",
+                             "canonicalName":  "Resonance Sync Vision",
+                             "slug":  "sync-vision",
+                             "repoPath":  "apps/sync-vision",
+                             "authority":  "syncvision-application",
+                             "aliases":  [
+                                             "Sync Vision",
+                                             "SyncVision",
+                                             "RONSAS Sync Vision"
+                                         ]
+                         },
+                         {
+                             "canonicalId":  "RSN-APP-YOUTUBE-OPTIMIZER",
+                             "canonicalName":  "Resonance YouTube Optimizer",
+                             "slug":  "youtube-optimizer",
+                             "repoPath":  "apps/youtube-optimizer",
+                             "authority":  "youtube-optimization-application",
+                             "aliases":  [
+                                             "YouTube Optimizer",
+                                             "RONSAS YouTube Optimizer"
+                                         ]
+                         }
+                     ]
 }
