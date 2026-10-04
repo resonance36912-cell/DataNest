@@ -1,0 +1,40 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+
+# Dependencies and generated outputs
+node_modules/
+.next/
+.output/
+dist/
+build/
+coverage/
+.cache/
+.pytest_cache/
+__pycache__/
+*.pyc
+
+# Local runtime/state
+audit-runtime/
+runtime/secrets/
+runtime/state/
+.ronsas/state/
+*.log
+*.sarif
+
+# Editor/OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local migration scratch
+_evidence-local/
+_tmp/
