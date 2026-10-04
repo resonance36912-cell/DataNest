@@ -5,8 +5,8 @@ import path from "node:path";
 import {fileURLToPath} from "node:url";
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"../..");
-const pages=fs.readFileSync(path.join(root,".github/workflows/pages.yml"),"utf8");
-const certification=fs.readFileSync(path.join(root,".github/workflows/datanest-ai-certification.yml"),"utf8");
+const pages=fs.readFileSync(path.join(root,".github/workflows/pages.yml"),"utf8").replace(/\r\n/g,"\n");
+const certification=fs.readFileSync(path.join(root,".github/workflows/datanest-ai-certification.yml"),"utf8").replace(/\r\n/g,"\n");
 
 test("Pages release verification uses the canonical database contract and current main SHA",()=>{
   assert.match(pages,/push:\n    branches:\n      - main/);

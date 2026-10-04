@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 
 const source=readFileSync(new URL("../../supabase/functions/send-job-invite/index.ts",import.meta.url),"utf8");
 const config=readFileSync(new URL("../../supabase/config.toml",import.meta.url),"utf8");
-const validation=readFileSync(new URL("../../.github/workflows/edge-function-validation.yml",import.meta.url),"utf8");
+const validation=readFileSync(new URL("../../.github/workflows/edge-function-validation.yml",import.meta.url),"utf8").replace(/\r\n/g,"\n");
 
 test("send-job-invite remains canonical, authenticated, and validated",()=>{
   assert.match(source,/Deno\.serve/);

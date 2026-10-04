@@ -4,10 +4,12 @@ import { execFileSync } from "node:child_process";
 export function gitTrackedObjectTreeSha256(pathspec, ref = "HEAD") {
   const normalizedRoot = String(pathspec || "").replace(/^\.\//, "").replace(/\/$/, "");
   if (!normalizedRoot) throw new Error("A Git pathspec root is required.");
+  const gitPrefix = execFileSync("git", ["rev-parse", "--show-prefix"], { encoding: "utf8" }).trim().replaceAll("\\", "/");
+  const scopedRoot = `${gitPrefix}${normalizedRoot}`;
 
   const listing = execFileSync(
     "git",
-    ["ls-tree", "-r", "-z", "--full-tree", ref, "--", normalizedRoot],
+    ["ls-tree", "-r", "-z", "--full-tree", ref, "--", scopedRoot],
     { encoding: "utf8" },
   );
 
@@ -28,8 +30,8 @@ export function gitTrackedObjectTreeSha256(pathspec, ref = "HEAD") {
 
   const hash = createHash("sha256");
   for (const entry of entries) {
-    const relativePath = entry.path.startsWith(`${normalizedRoot}/`)
-      ? entry.path.slice(normalizedRoot.length + 1)
+    const relativePath = entry.path.startsWith(`${scopedRoot}/`)
+      ? entry.path.slice(scopedRoot.length + 1)
       : entry.path;
     hash.update(Buffer.from(`${entry.mode} ${entry.type} ${entry.object}\t${relativePath}\n`, "utf8"));
   }

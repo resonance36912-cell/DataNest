@@ -3,6 +3,7 @@
 import { execFileSync } from "node:child_process";
 import { extname, resolve } from "node:path";
 import { readFileSync, writeFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 
 export const SCANNER_VERSION = "resonance-secret-integrity-v1";
 const MAX_TEXT_BYTES = 2 * 1024 * 1024;
@@ -100,15 +101,17 @@ function scanCurrentTree() {
 
 function scanHistory() {
   const findings = [];
-  const entries = git(["rev-list", "--objects", "HEAD"]).split("\n").map((line) => line.trim()).filter(Boolean);
+  const prefix = git(["rev-parse", "--show-prefix"]).trim().replaceAll("\\", "/");
+  const entries = git(["rev-list", "--objects", "HEAD", "--", "."]).split("\n").map((line) => line.trim()).filter(Boolean);
   const seenBlobs = new Set();
   for (const entry of entries) {
     const firstSpace = entry.indexOf(" ");
     if (firstSpace === -1) continue;
     const objectId = entry.slice(0, firstSpace);
     const file = entry.slice(firstSpace + 1);
-    if (seenBlobs.has(objectId) || ignored(file) || !isTextPath(file)) continue;
-    const historicalPath = file.replaceAll("\\", "/");
+    const displayFile = prefix && file.startsWith(prefix) ? file.slice(prefix.length) : file;
+    if (seenBlobs.has(objectId) || ignored(displayFile) || !isTextPath(displayFile)) continue;
+    const historicalPath = displayFile.replaceAll("\\", "/");
     if (/^(?:tests?|fixtures?)\//i.test(historicalPath) || historicalPath === "scripts/resonance-secret-scan.mjs") continue;
     seenBlobs.add(objectId);
     let type;
@@ -117,7 +120,7 @@ function scanHistory() {
     let raw;
     try { raw = execFileSync("git", ["cat-file", "blob", objectId], { maxBuffer: MAX_TEXT_BYTES + 1 }); } catch { continue; }
     if (raw.length > MAX_TEXT_BYTES || raw.includes(0)) continue;
-    findings.push(...findFindings(raw.toString("utf8"), "history:" + objectId + ":" + file));
+    findings.push(...findFindings(raw.toString("utf8"), "history:" + objectId + ":" + displayFile));
   }
   return findings;
 }
@@ -169,26 +172,28 @@ export function selfTest() {
   }
 }
 
-if (process.argv.includes("--self-test")) {
-  selfTest();
-  console.log("Resonance Secret Integrity self-test passed.");
-  process.exit(0);
-}
-if (process.argv.includes("--version")) {
-  console.log(SCANNER_VERSION);
-  process.exit(0);
-}
+if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
+  if (process.argv.includes("--self-test")) {
+    selfTest();
+    console.log("Resonance Secret Integrity self-test passed.");
+    process.exit(0);
+  }
+  if (process.argv.includes("--version")) {
+    console.log(SCANNER_VERSION);
+    process.exit(0);
+  }
 
-const outputIndex = process.argv.indexOf("--output");
-const output = outputIndex >= 0 ? process.argv[outputIndex + 1] : "resonance-secret-scan.sarif";
-if (!output) throw new Error("--output requires a file path");
-const history = !process.argv.includes("--no-history");
-const findings = scanRepository({ history });
-writeSarif(output, findings);
-console.log("Resonance Secret Integrity " + SCANNER_VERSION);
-console.log("History scan: " + (history ? "enabled" : "disabled"));
-console.log("Findings: " + findings.length);
-if (findings.length) {
-  for (const finding of findings) console.error("::error file=" + finding.file + ",line=" + finding.line + "::" + finding.rule + ": potential secret detected (value redacted)");
-  process.exit(1);
+  const outputIndex = process.argv.indexOf("--output");
+  const output = outputIndex >= 0 ? process.argv[outputIndex + 1] : "resonance-secret-scan.sarif";
+  if (!output) throw new Error("--output requires a file path");
+  const history = !process.argv.includes("--no-history");
+  const findings = scanRepository({ history });
+  writeSarif(output, findings);
+  console.log("Resonance Secret Integrity " + SCANNER_VERSION);
+  console.log("History scan: " + (history ? "enabled" : "disabled"));
+  console.log("Findings: " + findings.length);
+  if (findings.length) {
+    for (const finding of findings) console.error("::error file=" + finding.file + ",line=" + finding.line + "::" + finding.rule + ": potential secret detected (value redacted)");
+    process.exit(1);
+  }
 }

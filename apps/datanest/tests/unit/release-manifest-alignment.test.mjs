@@ -14,7 +14,7 @@ const manifestScript=readFileSync(
 const pagesWorkflow=readFileSync(
   new URL("../../.github/workflows/pages.yml",import.meta.url),
   "utf8"
-);
+).replace(/\r\n/g,"\n");
 const manifestWriter=fileURLToPath(
   new URL("../../scripts/write-release-manifest.mjs",import.meta.url)
 );
@@ -112,7 +112,7 @@ test("file worker production deployment is bound to an exact SHA and protected e
   const workflow=readFileSync(
     new URL("../../.github/workflows/datanest-ai-file-worker-deploy.yml",import.meta.url),
     "utf8"
-  );
+  ).replace(/\r\n/g,"\n");
   assert.match(workflow,/release_sha:/);
   assert.match(workflow,/ref: \$\{\{ inputs\.release_sha \}\}/);
   assert.match(workflow,/git merge-base --is-ancestor/);
@@ -139,7 +139,7 @@ test("governed Edge Function deployment treats timeframe as advisory",()=>{
   const workflow=readFileSync(
     new URL("../../.github/workflows/production-edge-function-release.yml",import.meta.url),
     "utf8"
-  );
+  ).replace(/\r\n/g,"\n");
   assert.match(workflow,/  deploy:\n    name: Deploy governed Edge Functions from exact release SHA/);
   assert.match(workflow,/release_mode:[\s\S]*default: progressive_live/);
 });
