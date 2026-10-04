@@ -49,7 +49,7 @@ export const Route = createFileRoute("/")({
         { property: "og:url", content: `${origin}/` },
         { property: "og:image", content: `${origin}/og-logo.png` },
         { property: "og:image:alt", content: "The Resonance logo" },
-        { property: "og:site_name", content: "RONSAS" },
+        { property: "og:site_name", content: "Resonance Hub" },
         { name: "twitter:card", content: "summary_large_image" },
         {
           name: "twitter:title",
@@ -68,13 +68,13 @@ export const Route = createFileRoute("/")({
         {
           rel: "alternate",
           type: "application/rss+xml",
-          title: "RONSAS | Latest Updates (RSS)",
+          title: "Resonance Hub | Latest Updates (RSS)",
           href: `${origin}/api/public/updates/rss`,
         },
         {
           rel: "alternate",
           type: "application/atom+xml",
-          title: "RONSAS | Latest Updates (Atom)",
+          title: "Resonance Hub | Latest Updates (Atom)",
           href: `${origin}/api/public/updates/atom`,
         },
       ],
@@ -86,7 +86,7 @@ export const Route = createFileRoute("/")({
             "@graph": [
               {
                 "@type": "Organization",
-                name: "RONSAS",
+                name: "Resonance AppDev",
                 alternateName: "The Resonance",
                 url: `${origin}/`,
                 logo: `${origin}/og-logo.png`,
@@ -100,8 +100,8 @@ export const Route = createFileRoute("/")({
               },
               {
                 "@type": "WebSite",
-                name: "RONSAS",
-                alternateName: "The Resonance",
+                name: "Resonance Hub",
+                alternateName: "Reson8.life",
                 url: `${origin}/`,
               },
               {
@@ -709,7 +709,7 @@ function Index() {
           <div>
             <div className="inline-flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.25em] text-white/65 border border-white/10 rounded-full px-4 py-1.5 mb-5">
               <span className="size-1.5 rounded-full bg-[hsl(295_90%_60%)] shadow-[0_0_10px_hsl(295_90%_60%)]" />
-              RONSAS · Sovereign application suite
+              Resonance AppDev · Sovereign application suite
             </div>
             <h1 className="font-display text-[2.5rem] sm:text-5xl md:text-6xl lg:text-[4.5rem] font-bold tracking-[-0.035em] leading-[0.96] text-balance mb-8">
               AI tools for South African creators, publishers, schools, and small businesses.
@@ -761,7 +761,7 @@ function Index() {
           <ul className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-[11px] font-mono uppercase tracking-[0.18em] text-white/65">
             {[
               "Built in South Africa",
-              "RONSAS governed",
+              "Resonance governed",
               "Free promotional access",
               "No payment required",
               "Cost study active",

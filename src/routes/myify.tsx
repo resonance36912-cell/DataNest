@@ -24,7 +24,7 @@ import {
 export const Route = createFileRoute("/myify")({
   head: () => ({
     meta: [
-      { title: "MYIFY · DataNest · RONSAS" },
+      { title: "MYIFY · DataNest · Resonance Hub" },
       {
         name: "description",
         content:
@@ -273,7 +273,7 @@ function MyifyWorkspace() {
       <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
         <header className="workspace-panel mb-6 flex flex-wrap items-start justify-between gap-5 p-5 sm:p-6">
           <div>
-            <p className="workspace-kicker">RONSAS · MYIFY</p>
+            <p className="workspace-kicker">Resonance Hub · MYIFY</p>
             <h1 className="mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">MYIFY</h1>
             <p className="mt-1 text-sm font-medium text-primary">May Your Intentions Find You</p>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">

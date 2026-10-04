@@ -191,7 +191,7 @@ export const ECOSYSTEM_REGISTRY: Record<string, EcosystemEntry> = {
   },
   nova_studio: {
     key: "nova_studio",
-    label: "RONSAS Nova Studio",
+    label: "Resonance Nova Studio",
     url: `${HUB_URL}/nova`,
     status: "pilot",
     tagline:
@@ -201,7 +201,7 @@ export const ECOSYSTEM_REGISTRY: Record<string, EcosystemEntry> = {
 
   resonance_app_dev: {
     key: "resonance_app_dev",
-    label: "The Resonance App Dev",
+    label: "Resonance AppDev",
     url: "https://reson8.life",
     status: "live",
     tagline: "The in-house dev team building every app in the Resonance ecosystem.",
