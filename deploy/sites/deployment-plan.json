@@ -15,6 +15,29 @@
     "status": "prepared-pending-account-and-remote-creation",
     "productionAuthority": "protected-main-only"
   },
+  "nodes": [
+    {
+      "id": "RSN-NODE-EALIOPHIN-PRD-01",
+      "role": "production-master-runtime-authority",
+      "promotionAuthority": true,
+      "currentMigrationObservation": "online-observed"
+    },
+    {
+      "id": "RSN-NODE-WEED-DR-01",
+      "role": "support-worker-compatibility-recovery",
+      "promotionAuthority": false,
+      "currentMigrationObservation": "online-observed"
+    },
+    {
+      "id": "RSN-NODE-SPIDER-DR-01",
+      "role": "support-worker-disaster-recovery",
+      "promotionAuthority": false,
+      "currentMigrationObservation": "offline-pending-fresh-audit",
+      "readinessRecord": "ops/nodes/SPIDER-READINESS.json",
+      "forgeImportBlocked": false,
+      "fullTopologyCertificationBlockedUntilFreshAudit": true
+    }
+  ],
   "domains": {
     "canonicalHub": "reson8.life",
     "canonicalHubWww": "www.reson8.life",

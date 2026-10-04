@@ -68,3 +68,5 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\ops\export\push-gitlab.ps1
 ## Rollback
 
 The all-refs `.bundle` and local mirror repository are the provider-independent rollback source. Never delete them after GitLab onboarding. Rebuild any provider from the bundle rather than relying on provider-specific export formats.
+## Node inclusion
+The canonical handoff includes Ealiophin, Weed and Spider in the governed topology. Ealiophin retains production authority; Weed and Spider remain support/DR workers with no direct production promotion authority. Spider is currently offline and therefore remains `included-pending-fresh-audit`; this does not prevent source-forge import but must remain visible until its direct node audit is completed.

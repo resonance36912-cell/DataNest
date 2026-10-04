@@ -1,0 +1,34 @@
+{
+  "schema": "resonance-node-readiness/v1",
+  "recordedOn": "2026-10-04",
+  "canonicalId": "RSN-NODE-SPIDER-DR-01",
+  "machineAlias": "Spider",
+  "environment": "RSN-ENV-DR",
+  "role": "support-worker-disaster-recovery",
+  "promotionAuthority": false,
+  "desktopCommander": {
+    "deviceId": "36b21a2a-f70e-4efb-8773-4ac5f0454417",
+    "statusAtRecord": "offline",
+    "freshWorkstationAudit": false
+  },
+  "governedSource": {
+    "workerControls": "platform/ronsas/ops/workers/spider",
+    "canonicalIndex": "ops/index/TRACEABILITY-INDEX.json",
+    "productionAuthorityNode": "RSN-NODE-EALIOPHIN-PRD-01"
+  },
+  "migrationDisposition": {
+    "includedInCanonicalTopology": true,
+    "forgeImportBlocked": false,
+    "fullTopologyCertificationBlockedUntilFreshAudit": true,
+    "workerPromotionToProductionAllowed": false
+  },
+  "freshAuditRequirements": [
+    "Confirm Desktop Commander Spider device is online and identity matches the recorded device ID.",
+    "Capture current Git checkout roots, branches, HEADs, remotes, worktree status and local changes without destructive cleanup.",
+    "Verify RONSAS Spider worker scripts and node-local manifests against the canonical source hashes.",
+    "Verify Dropbox handoff state is evidence transport only and contains no editable source authority.",
+    "Inventory active Resonance/RONSAS processes and listeners and confirm Spider is not acting as production authority.",
+    "Preserve any divergent or dirty source as bundle/patch evidence before reconciliation.",
+    "Record final Spider readiness evidence and update currentObservation in the traceability index only after direct observation."
+  ]
+}

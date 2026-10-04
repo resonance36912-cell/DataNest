@@ -135,3 +135,13 @@ A successful GitLab import is not a production deployment. Production promotion 
 - GitLab merge-request approvals: https://docs.gitlab.com/user/project/merge_requests/approvals/
 - GitLab Pages: https://docs.gitlab.com/user/project/pages/
 - GitLab CI Pages publish syntax: https://docs.gitlab.com/ci/yaml/#pages
+
+## Three-node topology gate
+The forge migration explicitly includes all three governed nodes:
+- `RSN-NODE-EALIOPHIN-PRD-01` — production-master/runtime authority.
+- `RSN-NODE-WEED-DR-01` — support/recovery worker and current local consolidation/export host.
+- `RSN-NODE-SPIDER-DR-01` — support/disaster-recovery worker with no production promotion authority.
+
+Spider's current readiness record is `ops/nodes/SPIDER-READINESS.json`, with certification evidence at `evidence/certification/SPIDER-NODE-READINESS-20261004.md`. Spider was offline at the current checkpoint, so the canonical evidence deliberately makes no fresh filesystem, Git, process or listener claims for that machine.
+
+Spider being offline does not block the non-destructive GitLab source import. It does block declaring the complete three-node topology/DR posture freshly certified. When Spider reconnects, perform its direct re-entry audit, preserve any divergent or dirty work before reconciliation, compare its worker controls with `platform/ronsas/ops/workers/spider`, and update the traceability index only from direct observation.

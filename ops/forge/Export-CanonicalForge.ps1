@@ -44,6 +44,18 @@ $openNovaRoot = Join-Path $root 'platform\open-nova'
 & $ps.Source -NoProfile -ExecutionPolicy Bypass -File $openNovaVerifier -RootPath $openNovaRoot
 if ($LASTEXITCODE -ne 0) { throw 'Open Nova manifest verification failed; forge export blocked.' }
 
+$spiderReadinessPath = Join-Path $root 'ops\nodes\SPIDER-READINESS.json'
+if (-not (Test-Path -LiteralPath $spiderReadinessPath -PathType Leaf)) {
+  throw 'Spider readiness record is missing; forge export blocked.'
+}
+$spider = Get-Content -LiteralPath $spiderReadinessPath -Raw | ConvertFrom-Json
+if ([string]$spider.canonicalId -ne 'RSN-NODE-SPIDER-DR-01') {
+  throw 'Spider readiness record has the wrong canonical node ID.'
+}
+if ([bool]$spider.promotionAuthority) {
+  throw 'Spider must not hold production promotion authority.'
+}
+
 New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
 $bundleName = "$RepositoryName-main-$short.bundle"
 $bundlePath = Join-Path $OutputDir $bundleName
@@ -69,6 +81,20 @@ $manifest = [ordered]@{
     traceability = 'passed'
     openNovaBuildManifest = 'passed-261-files'
   }
+  nodeReadiness = [ordered]@{
+    ealiophin = 'online-observed-production-authority'
+    weed = 'online-observed-support-recovery'
+    spider = [ordered]@{
+      canonicalId = [string]$spider.canonicalId
+      role = [string]$spider.role
+      statusAtExport = [string]$spider.desktopCommander.statusAtRecord
+      freshWorkstationAudit = [bool]$spider.desktopCommander.freshWorkstationAudit
+      promotionAuthority = [bool]$spider.promotionAuthority
+      includedInCanonicalTopology = [bool]$spider.migrationDisposition.includedInCanonicalTopology
+      forgeImportBlocked = [bool]$spider.migrationDisposition.forgeImportBlocked
+      fullTopologyCertificationBlockedUntilFreshAudit = [bool]$spider.migrationDisposition.fullTopologyCertificationBlockedUntilFreshAudit
+    }
+  }
   bundle = [ordered]@{
     file = $bundleName
     bytes = [int64]$file.Length
@@ -82,7 +108,7 @@ $manifest = [ordered]@{
   }
 }
 
-$json = $manifest | ConvertTo-Json -Depth 6
+$json = $manifest | ConvertTo-Json -Depth 8
 [IO.File]::WriteAllText($manifestPath, $json + [Environment]::NewLine, (New-Object Text.UTF8Encoding($false)))
 
 Write-Host "Forge export created: $bundlePath" -ForegroundColor Green
