@@ -36,12 +36,15 @@ Runtime observations:
 - Dropbox desktop processes are running and `C:\Users\iamas\Dropbox\RONS-Audit\RONS-AI-AUDIT-REPOSITORY` is present.
 - No listeners were observed on governed production/runtime ports `4173, 3101, 3201, 3301, 3401, 7863, 7864, 7868, 8787`; this is consistent with Spider's support/DR role.
 
-## Upstream transport limitation
-Fresh GitHub fetches from Spider fail at the Git/TLS transport layer. Port 443 and normal HTTPS to `github.com` succeed, while Git-for-Windows using system Schannel reports connection resets / `SEC_E_MESSAGE_ALTERED`. A repository-local OpenSSL backend was tested without disabling certificate verification; private repository transfers still fail with connection-reset / bad-record-MAC errors. The automated worker loop had successfully synced the control repo at `2026-10-04T17:15+02:00` before its Hub fetch failed; later manual refresh attempts for both governed private origins reset.
+## Upstream transport observation
+A fresh three-attempt sample was run after the local worker audit. The legacy RONSAS control origin failed all three attempts with connection-reset or Windows Schannel `SEC_E_MESSAGE_ALTERED` errors. The `resonance-hub` origin was intermittent: two attempts reset and one succeeded, returning `refs/heads/ronsas/ealiophin-production` at exact local/governed head `0329aeb42c3f10b26febb638482207468a050332`.
 
-No TLS verification was disabled, no firewall/security policy was weakened, and no production promotion was attempted. The repository-local OpenSSL test override was removed after testing, so the worker repositories retain their pre-audit Git transport configuration.
+No TLS verification was disabled, no firewall/security policy was weakened, and no production promotion was attempted. Repository-local transport test overrides were removed. This certifies Spider local alignment, but not stable legacy-origin transport.
 
-Because upstream refs could not be freshly fetched, this evidence certifies the **directly observed local worker state and alignment to the latest available Weed/Ealiophin references**, not freshness against GitHub beyond those references.
+Because the target forge is GitLab, the remaining transport action is to repoint Spider worker remotes to the governed GitLab authority after import and demonstrate stable fresh fetches before relying on remote DR synchronization.
+
+## Preserved divergent source evidence
+Historical or dirty Spider sources were preserved before reconciliation rather than merged blindly. The evidence manifest is `spider-audit-20261004/SPIDER-AUDIT-MANIFEST-20261004.json`, SHA-256 `B3AE5A432DF2EB2C44B5B9D1E3F9DF9E1EAF28909B5D4418E97BE3F4BBEFE7A6`. It indexes the local Hub branch bundle, historical PR/worktree bundles, the ChatGPT-hosted prototype bundle/working patch/untracked hashes, and the uncommitted Sovereign Resonance AppDev ZIP/hash inventory.
 
 ## Current result
-**Online and freshly audited — local worker state aligned; upstream Git transport degraded.** Spider remains a support/DR worker with `promotionAuthority=false`. Production promotion remains governed elsewhere.
+**Online and freshly audited — local worker state aligned; legacy Git transport degraded/intermittent.** Spider remains a support/DR worker with `promotionAuthority=false`. Non-destructive GitLab forge import is not blocked; remote Spider synchronization remains gated until post-import GitLab remotes demonstrate stable fresh fetches.

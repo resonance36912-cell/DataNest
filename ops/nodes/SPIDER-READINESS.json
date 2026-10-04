@@ -10,7 +10,7 @@
     "deviceId": "36b21a2a-f70e-4efb-8773-4ac5f0454417",
     "statusAtRecord": "online",
     "freshWorkstationAudit": true,
-    "observedAt": "2026-10-04T18:12:34+02:00"
+    "observedAt": "2026-10-04T18:20:00+02:00"
   },
   "governedSource": {
     "workerControls": "platform/ronsas/ops/workers/spider",
@@ -29,15 +29,15 @@
       "branch": "main",
       "head": "819b773a263c277693031d76c1b4d32542365fd7",
       "dirty": false,
-      "originReachability": "current-ls-remote-failed-schannel-SEC_E_MESSAGE_ALTERED",
-      "alignment": "matches-Weed-RONSAS-control-checkout-head-observed-2026-10-04"
+      "originReachability": "sample-3-of-3-failed-connection-reset-or-SEC_E_MESSAGE_ALTERED",
+      "alignment": "head-is-ancestor-of-current-Weed-canonical-main"
     },
     "hubRepository": {
       "branch": "ronsas/ealiophin-production",
       "head": "0329aeb42c3f10b26febb638482207468a050332",
       "dirty": false,
-      "originReachability": "current-ls-remote-failed-connection-reset",
-      "alignment": "matches-Ealiophin-latest-locally-available-origin-tracking-ref"
+      "originReachability": "intermittent-sample-2-of-3-failed-1-of-3-passed-exact-head-0329aeb42c3f10b26febb638482207468a050332",
+      "alignment": "successful-sample-returned-exact-local-head-but-transport-is-intermittent"
     },
     "promotionBridge": {
       "branch": "ronsas/windows-mcp-root-20260915",
@@ -65,5 +65,5 @@
     "legacyHubRemoteSyncReady": false,
     "postGitLabRemoteRepointRequired": true
   },
-  "remainingGate": "After GitLab import, repoint Spider worker Git remotes from the degraded legacy private GitHub origins to the governed GitLab authority and record successful fresh fetches before declaring remote DR synchronization ready. Local worker state remains aligned and promotionAuthority=false."
+  "remainingGate": "After GitLab import, repoint Spider worker Git remotes from the degraded/intermittent legacy private GitHub origins to governed GitLab authority and record stable successful fresh fetches before relying on remote DR synchronization. Local worker state remains aligned and promotionAuthority=false."
 }
