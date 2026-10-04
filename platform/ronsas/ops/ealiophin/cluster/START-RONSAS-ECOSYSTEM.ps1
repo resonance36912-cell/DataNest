@@ -114,6 +114,22 @@ function Assert-KnownPort([string]$Name, [int]$Port, [string]$Expected) {
         if ($response.StatusCode -ne 200 -or $contentType -notlike ([string]$identity.contentType + '*') -or -not $contentMatches) {
             throw "$Name endpoint is reachable without a Windows listener record, but its fingerprint is not recognized. No process was stopped."
         }
+        if (Test-Path -LiteralPath $StatePath -PathType Leaf) {
+            try {
+                $priorState = Get-Content -LiteralPath $StatePath -Raw | ConvertFrom-Json
+                $stateMatches = @($priorState.services | Where-Object { [string]$_.name -eq $Name -and [int]$_.port -eq $Port -and [int]$_.pid -gt 0 })
+                if ($stateMatches.Count -eq 1) {
+                    $statePid = [int]$stateMatches[0].pid
+                    $stateProcess = Get-CimInstance Win32_Process -Filter "ProcessId=$statePid" -ErrorAction SilentlyContinue
+                    if ($stateProcess -and [string]$stateProcess.Name -ieq [string]$identity.process) {
+                        Write-Host "[SAFE REUSE] $Name has no Windows listener record; resolved to prior governed PID $statePid by state + endpoint fingerprint + expected process." -ForegroundColor Yellow
+                        return [pscustomobject]@{ pid=$statePid; owned=$false; command=[string]$stateProcess.CommandLine; identity='no-listener-record-state-and-endpoint' }
+                    }
+                }
+            } catch {
+                Write-Warning "Could not use prior governed state to resolve $Name listener identity: $($_.Exception.Message)"
+            }
+        }
         $allowBlankCommandLine = ([string]$identity.process -notin @('python.exe','node.exe','powershell.exe','pwsh.exe'))
         $candidates = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object {
             [string]$_.Name -ieq [string]$identity.process -and
