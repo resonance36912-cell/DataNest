@@ -1,0 +1,88 @@
+{
+  "schema": "resonance-open-nova-research-policy/v1",
+  "mode": "sovereign-local-research",
+  "enabled": true,
+  "loopback_only": true,
+  "allowed_origins": [
+    "http://localhost:3101",
+    "http://127.0.0.1:3101"
+  ],
+  "external_ai_allowed": false,
+  "paid_api_allowed": false,
+  "credentials_allowed": false,
+  "cookies_allowed": false,
+  "runtime_network_purpose": "Public source discovery and retrieval only",
+  "providers": {
+    "bing_rss": {
+      "enabled": true,
+      "host": "www.bing.com"
+    },
+    "wikipedia": {
+      "enabled": true,
+      "host": "en.wikipedia.org"
+    },
+    "youtube_public": {
+      "enabled": true,
+      "hosts": [
+        "www.youtube.com",
+        "youtube.com",
+        "youtu.be"
+      ],
+      "captions_when_public": true,
+      "metadata_fallback": true
+    }
+  },
+  "limits": {
+    "max_topic_chars": 240,
+    "max_sources": 14,
+    "max_urls": 20,
+    "max_content_chars": 30000
+  },
+  "network": {
+    "allow_http": false,
+    "max_concurrency": 3,
+    "connect_timeout_seconds": 4,
+    "read_timeout_seconds": 12,
+    "dns_timeout_seconds": 3,
+    "max_redirects": 3,
+    "max_response_bytes": 2000000,
+    "max_discovery_bytes": 3000000,
+    "max_verify_bytes": 65536
+  },
+  "cache": {
+    "discovery_ttl_seconds": 21600,
+    "extraction_ttl_seconds": 86400,
+    "max_entries": 192
+  },
+  "jobs": {
+    "max_concurrency": 2,
+    "max_retained": 64,
+    "ttl_seconds": 86400
+  },
+  "url_policy": {
+    "schemes": [
+      "http",
+      "https"
+    ],
+    "ports": [
+      80,
+      443
+    ],
+    "deny_credentials_in_url": true,
+    "deny_private_loopback_linklocal_multicast_reserved": true,
+    "validate_every_redirect": true,
+    "trust_environment_proxies": false
+  },
+  "receipts": {
+    "append_only": true,
+    "hash_topics_instead_of_storing_raw": true,
+    "hash_source_content": true,
+    "record_external_ai_used": false,
+    "record_paid_api_used": false
+  },
+  "truthfulness": {
+    "reachability_is_not_fact_verification": true,
+    "caption_absence_must_be_labeled": true,
+    "search_snippets_are_not_source_content": true
+  }
+}

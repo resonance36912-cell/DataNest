@@ -1,0 +1,37 @@
+{
+  "schema": "resonance-service-bindings/v1",
+  "created_at": "2026-09-07T00:00:00Z",
+  "app_id": "rons-hub-backend",
+  "network_scope": "loopback_only",
+  "bindings": [
+    {
+      "service_id": "postgres",
+      "kind": "database",
+      "endpoint": "postgresql://127.0.0.1:55432/resonance",
+      "secret_refs": ["runtime/secrets/postgres-password"]
+    },
+    {
+      "service_id": "auth",
+      "kind": "auth",
+      "endpoint": "http://127.0.0.1:58680",
+      "secret_refs": ["runtime/secrets/auth-signing-key"]
+    },
+    {
+      "service_id": "storage",
+      "kind": "storage",
+      "endpoint": "http://127.0.0.1:59000",
+      "secret_refs": [
+        "runtime/secrets/storage-access-key",
+        "runtime/secrets/storage-secret-key"
+      ]
+    },
+    {
+      "service_id": "gateway",
+      "kind": "gateway",
+      "endpoint": "http://127.0.0.1:58600",
+      "secret_refs": ["runtime/secrets/postgres-password"]
+    }
+  ],
+  "contains_secret_values": false,
+  "external_ai_required": false
+}

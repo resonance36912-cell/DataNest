@@ -1,0 +1,14 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: resonance-ollama
+    restart: unless-stopped
+    volumes:
+      - resonance_ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+
+# v0.3 intentionally runs the Foundry Controller on the host so it can invoke
+# a rootless local container engine without mounting a privileged Docker socket.
+volumes:
+  resonance_ollama:

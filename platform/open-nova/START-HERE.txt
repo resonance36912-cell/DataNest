@@ -1,0 +1,18 @@
+RESONANCE OPEN NOVA v1.5.8
+
+Windows start:
+
+1. Open the downloaded ResonanceAppDev_ZeroCredit_v1.5.8 ZIP.
+2. Double-click 00-START-OPEN-NOVA.cmd.
+3. Leave the command window open while it extracts, verifies, installs, and starts Open Nova.
+
+The launcher can also be run from an extracted folder.
+
+Safety boundaries:
+- External AI is denied by default.
+- Production cutover is disabled.
+- The original application repository is not modified.
+- One-time network provisioning is limited to pinned prebuilt Python wheels.
+- Normal operation uses OPEN-NOVA-OFFLINE.cmd.
+
+V1.5.8 can automatically install CPython 3.13 and Git through Windows Package Manager during the explicit FIRST-RUN workflow.

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resonance Aurum Operations</title>
+  <style>
+    :root{--bg:#f7f5fb;--panel:#fff;--ink:#201a2b;--muted:#6f6579;--accent:#6d28d9;--accent2:#b7791f;--danger:#b42318;--ok:#087a52;--line:#e7e1ee}
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(135deg,#f9f6ff,#fffaf1);color:var(--ink)}
+    header{padding:24px 30px;background:#221633;color:white;display:flex;align-items:center;justify-content:space-between;gap:20px;position:sticky;top:0;z-index:10;box-shadow:0 4px 18px #0002}
+    header h1{margin:0;font-size:22px}header small{color:#d9cfe8}.status{padding:7px 11px;border-radius:999px;background:#ffffff20;font-size:13px}
+    main{max-width:1500px;margin:auto;padding:24px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:20px}
+    .card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 30px #3d28580b}.card{padding:18px}.card b{font-size:27px;display:block;margin-top:6px}.card span{color:var(--muted);font-size:13px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.panel{padding:20px;overflow:hidden}.panel.full{grid-column:1/-1}.panel h2{font-size:18px;margin:0 0 14px}.panel h3{font-size:15px;margin:18px 0 8px;color:var(--muted)}
+    form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px}form .wide{grid-column:1/-1}label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
+    input,select,textarea,button{font:inherit}input,select,textarea{width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:10px;background:white}textarea{min-height:72px;resize:vertical}
+    button{border:0;border-radius:10px;padding:10px 14px;background:var(--accent);color:white;cursor:pointer;font-weight:600}button.secondary{background:#eee8f7;color:#4b2b75}button.gold{background:var(--accent2)}button.danger{background:var(--danger)}button.small{padding:6px 9px;font-size:12px}
+    button:disabled{opacity:.5;cursor:not-allowed}.toolbar{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:10px}.toolbar input{max-width:280px}
+    .table-wrap{overflow:auto;max-height:420px;border:1px solid var(--line);border-radius:12px}table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;white-space:nowrap}th{position:sticky;top:0;background:#faf8fc;color:var(--muted);z-index:1}tr:last-child td{border-bottom:0}
+    .pill{display:inline-block;padding:3px 7px;border-radius:999px;background:#eee8f7;font-size:11px}.pill.low{background:#fee4e2;color:#912018}.pill.ok{background:#d1fadf;color:#05603a}
+    #toast{position:fixed;right:18px;bottom:18px;max-width:440px;padding:14px 16px;border-radius:12px;background:#221633;color:white;box-shadow:0 12px 35px #0004;display:none;z-index:99}.error{background:#7a271a!important}.success{background:#05603a!important}
+    .order-items{grid-column:1/-1;border:1px dashed var(--line);padding:10px;border-radius:12px}.order-row{display:grid;grid-template-columns:1fr 110px 50px;gap:8px;margin-bottom:8px}.muted{color:var(--muted);font-size:12px}.empty{padding:20px;text-align:center;color:var(--muted)}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}.panel.full{grid-column:auto}form{grid-template-columns:1fr}form .wide{grid-column:auto}header{position:static}.order-row{grid-template-columns:1fr 90px 45px}}
+  </style>
+</head>
+<body>
+<header>
+  <div><h1>Resonance Aurum Operations</h1><small>Sovereign local inventory, customers, orders, invoices, backups and audit history</small></div>
+  <div id="health" class="status">Checking local service...</div>
+</header>
+<main>
+  <section class="cards">
+    <div class="card"><span>Products</span><b id="sum-products">0</b></div>
+    <div class="card"><span>Customers</span><b id="sum-customers">0</b></div>
+    <div class="card"><span>Orders</span><b id="sum-orders">0</b></div>
+    <div class="card"><span>Low-stock alerts</span><b id="sum-low">0</b></div>
+    <div class="card"><span>Inventory value</span><b id="sum-value">R0.00</b></div>
+    <div class="card"><span>Outstanding</span><b id="sum-outstanding">R0.00</b></div>
+  </section>
+
+  <section class="panel full" style="margin-bottom:18px">
+    <div class="toolbar" style="margin-bottom:0;flex-wrap:wrap">
+      <div><h2 style="margin:0 0 4px">Local data controls</h2><span class="muted">Create verified local backups and export portable CSV records.</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="gold" onclick="createBackup()">Create local backup</button>
+        <button class="secondary" onclick="downloadExport('products')">Export products</button>
+        <button class="secondary" onclick="downloadExport('customers')">Export customers</button>
+        <button class="secondary" onclick="downloadExport('orders')">Export orders</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="panel">
+      <h2>Products & Stock</h2>
+      <form id="product-form">
+        <div><label>SKU</label><input name="sku" required placeholder="AUR-100"></div>
+        <div><label>Product name</label><input name="name" required placeholder="Aurum Hair & Skin Elixir"></div>
+        <div><label>Unit price (R)</label><input name="unit_price" type="number" min="0" step="0.01" value="299" required></div>
+        <div><label>Opening stock</label><input name="initial_stock" type="number" min="0" step="1" value="0" required></div>
+        <div><label>Reorder level</label><input name="reorder_level" type="number" min="0" step="1" value="5" required></div>
+        <div><label>Description</label><input name="description" placeholder="Optional"></div>
+        <div class="wide"><button type="submit">Add product</button></div>
+      </form>
+      <div class="toolbar"><input id="product-search" placeholder="Search products"><button class="secondary small" onclick="loadAll()">Refresh</button></div>
+      <div class="table-wrap"><table><thead><tr><th>SKU</th><th>Product</th><th>Price</th><th>Stock</th><th>Reorder</th><th>Action</th></tr></thead><tbody id="products-body"></tbody></table></div>
+    </div>
+
+    <div class="panel">
+      <h2>Customers</h2>
+      <form id="customer-form">
+        <div><label>Name</label><input name="name" required></div>
+        <div><label>Email</label><input name="email" type="email"></div>
+        <div><label>Phone</label><input name="phone"></div>
+        <div><label>Address</label><input name="address"></div>
+        <div class="wide"><button type="submit">Add customer</button></div>
+      </form>
+      <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Address</th></tr></thead><tbody id="customers-body"></tbody></table></div>
+    </div>
+
+    <div class="panel full">
+      <h2>Create Order</h2>
+      <form id="order-form">
+        <div><label>Customer</label><select id="order-customer" required></select></div>
+        <div><label>Notes</label><input id="order-notes" placeholder="Optional"></div>
+        <div class="order-items">
+          <div class="toolbar"><strong>Order items</strong><button type="button" class="secondary small" onclick="addOrderRow()">Add item</button></div>
+          <div id="order-items"></div>
+        </div>
+        <div class="wide"><button type="submit" class="gold">Create order and reserve stock</button></div>
+      </form>
+    </div>
+
+    <div class="panel full">
+      <h2>Orders, Payments & Invoices</h2>
+      <div class="table-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Status</th><th>Total</th><th>Paid</th><th>Balance</th><th>Date</th><th>Actions</th></tr></thead><tbody id="orders-body"></tbody></table></div>
+    </div>
+
+    <div class="panel">
+      <h2>Low-stock Alerts</h2>
+      <div id="low-stock"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Audit History</h2>
+      <div class="table-wrap"><table><thead><tr><th>Time</th><th>Action</th><th>Entity</th><th>Details</th></tr></thead><tbody id="audit-body"></tbody></table></div>
+    </div>
+  </section>
+</main>
+<div id="toast"></div>
+<script>
+let products=[]; let customers=[]; let orders=[];
+const money=n=>`R${Number(n||0).toFixed(2)}`;
+const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+function toast(message,type='success'){const el=document.getElementById('toast');el.textContent=message;el.className=type;el.style.display='block';setTimeout(()=>el.style.display='none',5000)}
+async function api(path,options={}){const response=await fetch(path,{headers:{'Content-Type':'application/json',...(options.headers||{})},...options});let body;try{body=await response.json()}catch{body={detail:await response.text()}}if(!response.ok)throw new Error(typeof body.detail==='string'?body.detail:JSON.stringify(body.detail||body));return body}
+function formObject(form){return Object.fromEntries(new FormData(form).entries())}
+async function loadAll(){try{const [health,summary,p,c,o,low,audit]=await Promise.all([api('/api/health'),api('/api/summary'),api('/api/products'),api('/api/customers'),api('/api/orders'),api('/api/low-stock'),api('/api/audit?limit=50')]);products=p;customers=c;orders=o;renderHealth(health);renderSummary(summary);renderProducts();renderCustomers();renderOrders();renderLow(low);renderAudit(audit);refreshOrderSelects()}catch(e){document.getElementById('health').textContent='Local service error';toast(e.message,'error')}}
+function renderHealth(h){document.getElementById('health').textContent=`Local • ${h.status} • v${h.version}`}
+function renderSummary(s){document.getElementById('sum-products').textContent=s.products;document.getElementById('sum-customers').textContent=s.customers;document.getElementById('sum-orders').textContent=s.orders;document.getElementById('sum-low').textContent=s.low_stock;document.getElementById('sum-value').textContent=money(s.inventory_value);document.getElementById('sum-outstanding').textContent=money(s.outstanding_balance)}
+function renderProducts(){const q=document.getElementById('product-search').value.toLowerCase();const rows=products.filter(p=>`${p.sku} ${p.name}`.toLowerCase().includes(q));document.getElementById('products-body').innerHTML=rows.length?rows.map(p=>`<tr><td>${esc(p.sku)}</td><td>${esc(p.name)}<br><span class="muted">${esc(p.description)}</span></td><td>${money(p.unit_price)}</td><td><span class="pill ${p.low_stock?'low':'ok'}">${p.stock_quantity}</span></td><td>${p.reorder_level}</td><td><button class="small secondary" onclick="adjustStock(${p.id},'${esc(p.name).replace(/'/g,'\\\'')}')">Adjust</button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">No products yet.</td></tr>'}
+function renderCustomers(){document.getElementById('customers-body').innerHTML=customers.length?customers.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.email)}</td><td>${esc(c.phone)}</td><td>${esc(c.address)}</td></tr>`).join(''):'<tr><td colspan="4" class="empty">No customers yet.</td></tr>'}
+function renderOrders(){document.getElementById('orders-body').innerHTML=orders.length?orders.map(o=>{const cancelled=o.status==='cancelled';const actions=[`<button class="small secondary" onclick="window.open('/invoice/${o.id}','_blank')">Invoice</button>`];if(!cancelled&&o.balance>0)actions.push(`<button class="small gold" onclick="takePayment(${o.id},${o.balance})">Payment</button>`);if(!cancelled&&Number(o.paid_total)===0)actions.push(`<button class="small danger" onclick="cancelOrder(${o.id},'${esc(o.order_number).replace(/'/g,'\'')}')">Cancel</button>`);return `<tr><td>${esc(o.order_number)}</td><td>${esc(o.customer_name)}</td><td><span class="pill ${o.status==='paid'?'ok':cancelled?'low':''}">${esc(o.status)}</span></td><td>${money(o.subtotal)}</td><td>${money(o.paid_total)}</td><td>${cancelled?'—':money(o.balance)}</td><td>${esc(o.created_at.slice(0,10))}</td><td>${actions.join(' ')}</td></tr>`}).join(''):'<tr><td colspan="8" class="empty">No orders yet.</td></tr>'}
+function renderLow(rows){document.getElementById('low-stock').innerHTML=rows.length?`<div class="table-wrap"><table><thead><tr><th>Product</th><th>Stock</th><th>Reorder</th></tr></thead><tbody>${rows.map(p=>`<tr><td>${esc(p.name)}</td><td><span class="pill low">${p.stock_quantity}</span></td><td>${p.reorder_level}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No low-stock alerts.</div>'}
+function renderAudit(rows){document.getElementById('audit-body').innerHTML=rows.length?rows.map(a=>`<tr><td>${esc(a.created_at.replace('T',' ').slice(0,19))}</td><td>${esc(a.action)}</td><td>${esc(a.entity_type)} #${esc(a.entity_id)}</td><td>${esc(JSON.stringify(a.details))}</td></tr>`).join(''):'<tr><td colspan="4" class="empty">No audit events yet.</td></tr>'}
+function refreshOrderSelects(){const customer=document.getElementById('order-customer');const current=customer.value;customer.innerHTML='<option value="">Select customer</option>'+customers.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');customer.value=current;document.querySelectorAll('.order-product').forEach(select=>{const val=select.value;select.innerHTML='<option value="">Select product</option>'+products.filter(p=>p.stock_quantity>0).map(p=>`<option value="${p.id}">${esc(p.name)} (${p.stock_quantity} available)</option>`).join('');select.value=val})}
+function addOrderRow(){const div=document.createElement('div');div.className='order-row';div.innerHTML='<select class="order-product" required></select><input class="order-qty" type="number" min="1" value="1" required><button type="button" class="danger small" onclick="this.parentElement.remove()">×</button>';document.getElementById('order-items').appendChild(div);refreshOrderSelects()}
+async function adjustStock(id,name){const delta=prompt(`Stock adjustment for ${name}. Use a positive number to add or a negative number to remove:`,'1');if(delta===null)return;const parsed=Number(delta);if(!Number.isInteger(parsed)||parsed===0){toast('Enter a non-zero whole number.','error');return}const reason=prompt('Reason for adjustment:','Stock count adjustment');if(!reason)return;try{await api(`/api/products/${id}/adjust-stock`,{method:'POST',body:JSON.stringify({quantity_delta:parsed,reason})});toast('Stock updated.');await loadAll()}catch(e){toast(e.message,'error')}}
+async function takePayment(orderId,balance){const amount=prompt(`Payment amount (maximum ${money(balance)}):`,Number(balance).toFixed(2));if(amount===null)return;const method=prompt('Payment method:','EFT');if(!method)return;const reference=prompt('Payment reference (optional):','')??'';try{await api(`/api/orders/${orderId}/payments`,{method:'POST',body:JSON.stringify({amount:Number(amount),method,reference})});toast('Payment recorded.');await loadAll()}catch(e){toast(e.message,'error')}}
+async function cancelOrder(orderId,orderNumber){if(!confirm(`Cancel ${orderNumber} and restore its stock? This is allowed only before any payment is recorded.`))return;try{await api(`/api/orders/${orderId}/cancel`,{method:'POST'});toast(`Order ${orderNumber} cancelled and stock restored.`);await loadAll()}catch(e){toast(e.message,'error')}}
+async function createBackup(){try{const result=await api('/api/backups',{method:'POST'});toast(`Backup created: ${result.filename} (${result.sha256.slice(0,12)}...)`)}catch(e){toast(e.message,'error')}}
+function downloadExport(kind){window.location.href=`/api/export/${kind}.csv`}
+document.getElementById('product-form').addEventListener('submit',async e=>{e.preventDefault();const d=formObject(e.target);d.unit_price=Number(d.unit_price);d.initial_stock=Number(d.initial_stock);d.reorder_level=Number(d.reorder_level);try{await api('/api/products',{method:'POST',body:JSON.stringify(d)});e.target.reset();e.target.unit_price.value='299';e.target.initial_stock.value='0';e.target.reorder_level.value='5';toast('Product added.');await loadAll()}catch(err){toast(err.message,'error')}});
+document.getElementById('customer-form').addEventListener('submit',async e=>{e.preventDefault();const d=formObject(e.target);try{await api('/api/customers',{method:'POST',body:JSON.stringify(d)});e.target.reset();toast('Customer added.');await loadAll()}catch(err){toast(err.message,'error')}});
+document.getElementById('order-form').addEventListener('submit',async e=>{e.preventDefault();const items=[...document.querySelectorAll('.order-row')].map(r=>({product_id:Number(r.querySelector('.order-product').value),quantity:Number(r.querySelector('.order-qty').value)})).filter(i=>i.product_id&&i.quantity);const payload={customer_id:Number(document.getElementById('order-customer').value),notes:document.getElementById('order-notes').value,items};if(!payload.customer_id||!items.length){toast('Choose a customer and at least one product.','error');return}try{const order=await api('/api/orders',{method:'POST',body:JSON.stringify(payload)});toast(`Order ${order.order_number} created.`);document.getElementById('order-items').innerHTML='';addOrderRow();document.getElementById('order-notes').value='';await loadAll()}catch(err){toast(err.message,'error')}});
+document.getElementById('product-search').addEventListener('input',renderProducts);
+addOrderRow();loadAll();setInterval(()=>api('/api/health').then(renderHealth).catch(()=>document.getElementById('health').textContent='Disconnected'),30000);
+</script>
+</body>
+</html>

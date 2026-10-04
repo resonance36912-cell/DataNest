@@ -1,0 +1,4 @@
+FROM docker.io/library/node:22-bookworm-slim
+WORKDIR /workspace
+ENV NODE_ENV=test npm_config_update_notifier=false npm_config_audit=false npm_config_fund=false
+CMD ["node", "--version"]

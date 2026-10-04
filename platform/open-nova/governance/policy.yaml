@@ -1,0 +1,349 @@
+version: '1.2'
+name: Resonance Sovereign Foundry Governance
+mode: zero-credit
+principles:
+  local_first: true
+  human_sovereignty: true
+  reversible_changes: true
+  receipt_visibility: true
+  provider_independence: true
+  offline_survival: true
+  no_silent_self_modification: true
+  least_privilege_execution: true
+  transactional_repairs: true
+  network_denied_builds: true
+  controller_owned_registry: true
+  loopback_only_preview: true
+  portable_generated_source: true
+  local_supply_chain: true
+  migration_is_copy_only: true
+  artifact_integrity_required: true
+  sbom_required: true
+  suite_migration_control: true
+  local_export_required: true
+  non_destructive_backup: true
+  sovereign_service_fabric: true
+  local_service_discovery: true
+  secret_reference_only: true
+  loopback_service_default: true
+  provider_neutral_adapters: true
+  reversible_provider_cutover: true
+  no_semantic_guessing: true
+  executable_sovereign_backend: true
+  local_secret_ownership: true
+  governed_schema_migrations: true
+  health_gated_cutover: true
+  evidence_based_sovereignty_score: true
+  release_certification_separation: true
+  control_plane_read_only_default: true
+  local_machine_evidence: true
+  first_app_pilot_before_suite_cutover: true
+  real_source_evidence_required: true
+  local_cutover_before_production: true
+  production_cutover_never_automatic: true
+  real_source_ingestion_is_copy_only: true
+  source_path_privacy: true
+  deterministic_migration_execution_only: true
+  rollback_before_provider_rewrite: true
+  first_real_execution_evidence_required: true
+providers:
+  local:
+    allowed: true
+    preferred: true
+  external:
+    allowed: false
+    requires_explicit_approval: true
+execution:
+  write_receipts: true
+  append_only_receipts: true
+  chain_receipts: true
+  require_governance_before_model_call: true
+  deny_if_policy_missing: true
+  workspace_root: .
+  max_file_bytes: 1048576
+  max_command_seconds: 120
+  allow_overwrite_without_confirmation: false
+protected_path_segments:
+- .open-nova
+- open-nova-adapters
+protected_paths:
+- governance/
+- docs/governance/
+- .github/CODEOWNERS
+- .env
+- .env.sovereign
+- runtime/receipts/
+- runtime/registry/
+- runtime/supply-chain/
+- runtime/migrations/
+- runtime/migration-control/
+- runtime/exports/
+- runtime/secrets/
+- runtime/certifications/
+- runtime/deployment/
+- runtime/cutover/
+- runtime/source-ingestion/
+- runtime/migration-execution/
+- runtime/workstation/
+- runtime/real-execution/
+allowed_tasks:
+  git_status:
+    command:
+    - git
+    - status
+    - --short
+    mutates_workspace: false
+  controller_tests:
+    command:
+    - python
+    - -m
+    - pytest
+    - -q
+    - tests
+    mutates_workspace: false
+isolated_runner:
+  engine: podman
+  require_rootless: true
+  allowed_project_prefixes:
+  - apps
+  max_seconds: 180
+  memory: 768m
+  cpus: '1.0'
+  pids_limit: 128
+  user: 1000:1000
+  network: none
+  pull: never
+  read_only_root: true
+  no_new_privileges: true
+  tasks:
+    python_compile:
+      image: resonance-runner-python:0.3
+      command:
+      - python
+      - -m
+      - compileall
+      - -q
+      - .
+    python_tests:
+      image: resonance-runner-python:0.3
+      command:
+      - python
+      - -m
+      - pytest
+      - -q
+    node_test:
+      image: resonance-runner-node:0.3
+      command:
+      - npm
+      - test
+      - --
+      - --runInBand
+    node_build:
+      image: resonance-runner-node:0.3
+      command:
+      - npm
+      - run
+      - build
+dependency_policy:
+  deny_remote_sources: true
+  require_exact_python_versions: true
+  require_node_lockfile: true
+  installation_during_isolated_execution: false
+  registry_network_access_during_build: false
+security_scan:
+  max_files: 500
+  max_file_bytes: 512000
+  block_severities:
+  - critical
+  - high
+repair_cycle:
+  enabled: true
+  provider: local_only
+  max_attempts: 2
+  max_files_per_attempt: 12
+  deletes_allowed: false
+  rollback_on_failure: true
+  commit_only_after_pass: true
+high_impact_actions:
+  require_human_approval:
+  - production_deploy
+  - destructive_database_change
+  - secret_rotation
+  - governance_change
+  - external_provider_enablement
+  - delete_repository
+  - force_push
+  - history_rewrite
+  - network_enablement_for_generated_code
+app_factory:
+  default_template: python-fastapi
+  supported_templates:
+  - python-fastapi
+  - static-web
+  max_generated_files: 60
+  max_generated_total_bytes: 2500000
+  generation_strategy_default: deterministic
+  local_model_generation_allowed: true
+  external_generation_allowed: false
+  require_static_validation_before_registry_validated: true
+preview:
+  bind_host: 127.0.0.1
+  port_min: 4310
+  port_max: 4399
+  auto_start_generated_code: false
+  production_deployment: false
+supply_chain:
+  artifact_store: runtime/supply-chain/artifacts
+  artifact_inbox: imports/artifacts
+  artifact_index: runtime/supply-chain/artifacts.jsonl
+  network_downloads_allowed: false
+  content_addressed_storage: true
+  hash_algorithm: sha256
+  sbom_format: cyclonedx-1.5
+  max_artifact_bytes: 1000000000
+  verify_before_use: true
+  signing_algorithm: Ed25519
+  signing_private_key: runtime/secrets/attestation.key
+  signing_public_key: runtime/secrets/attestation.pub.pem
+migration:
+  source_root: imports/projects
+  destination_root: apps
+  copy_only: true
+  source_mutation_allowed: false
+  overwrite_existing_app: false
+  block_secret_files: true
+  max_files: 5000
+  max_total_bytes: 250000000
+  external_service_detection: true
+  require_human_confirmation_for_import: true
+suite_control:
+  catalog: governance/suite.yaml
+  replacements: governance/local-service-replacements.yaml
+  plan_root: runtime/migration-control/plans
+  apps_root: apps
+  import_root: imports/projects
+  max_scan_files: 5000
+  controller_owned: true
+  destructive_migration_actions: false
+exports:
+  apps_root: apps
+  export_root: runtime/exports
+  max_files: 10000
+  max_total_bytes: 1000000000
+  include_secrets: false
+  include_git_history: false
+  source_mutation_allowed: false
+  require_human_confirmation: true
+service_fabric:
+  manifest: governance/service-fabric.yaml
+  runtime_root: runtime/service-fabric
+  apps_root: apps
+  bindings_dirname: .open-nova
+  controller_owned: true
+  require_loopback_bind: true
+  health_timeout_seconds: 0.35
+  inline_secret_values_allowed: false
+  automatic_service_downloads_allowed: false
+  compose_pull_policy: never
+  internal_network: true
+  require_human_confirmation_for_binding_write: true
+  require_human_confirmation_for_runtime_write: true
+adapter_engine:
+  apps_root: apps
+  runtime_root: runtime/migrations
+  adapter_dirname: open-nova-adapters
+  max_scan_files: 5000
+  max_file_bytes: 512000
+  automatic_semantic_guessing: false
+  source_rewrite_requires_confirmation: true
+  ambiguous_provider_operations_are_blockers: true
+  destructive_schema_changes_require_human_approval: true
+  rollback_on_partial_failure: true
+  external_ai_required: false
+backend_runtime:
+  manifest: governance/backend-runtime.yaml
+  apps_root: apps
+  runtime_root: runtime/backend-runtime
+  secrets_root: runtime/secrets
+  require_confirmation: true
+  network_downloads_allowed: false
+  public_bind_allowed: false
+  destructive_schema_auto_execute: false
+  migration_shell_allowed: false
+  migration_timeout_seconds: 120
+  cutover_requires_health_certification: true
+release_candidate:
+  governance: governance/release.yaml
+  control_plane_read_only_default: true
+  release_candidate_integrity_is_not_operational_certification: true
+  operational_certification_requires_runtime_health: true
+  certification_records_append_only: true
+local_deployment:
+  runtime_root: runtime/deployment
+  network_provisioning_default: false
+  require_git: true
+  require_container_engine: true
+  require_openssl: true
+  ollama_optional_for_deterministic_mode: true
+  write_evidence_requires_confirmation: true
+  first_app_default: reson8-life
+  production_cutover_automatic: false
+cutover:
+  apps_root: apps
+  runtime_root: runtime/cutover
+  require_confirmation: true
+  production_cutover_allowed: false
+  max_fingerprint_files: 10000
+  max_fingerprint_bytes: 1000000000
+  baseline_required: true
+  regression_target_required: true
+  runtime_health_required: true
+source_ingestion:
+  stage_root: imports/projects
+  apps_root: apps
+  runtime_root: runtime/source-ingestion
+  require_confirmation: true
+  source_mutation_allowed: false
+  overwrite_staged_source: false
+  overwrite_managed_app: false
+  record_absolute_source_path: false
+  reject_secret_files: true
+  reject_symlinks_and_reparse_points: true
+  max_files: 10000
+  max_total_bytes: 1000000000
+migration_execution:
+  runtime_root: runtime/migration-execution
+  require_current_baseline: true
+  require_verified_checkpoint: true
+  deterministic_supported_rewrites_only: true
+  unsupported_semantics_are_blockers: true
+  rollback_on_verification_failure: true
+  production_cutover_allowed: false
+  network_access_allowed: false
+  external_ai_allowed: false
+workstation_bridge:
+  runtime_root: runtime/workstation
+  stage_root: imports/projects
+  apps_root: apps
+  source_ingestion_root: runtime/source-ingestion
+  require_confirmation: true
+  require_clean_repo: true
+  record_absolute_repository_path: false
+  record_remote_urls: false
+  reject_tracked_secrets: true
+  reject_symlinks_and_reparse_points: true
+  reject_submodules_for_automatic_staging: true
+  git_lfs_requires_manual_verification: true
+  max_files: 10000
+  max_total_bytes: 1000000000
+  network_access_allowed: false
+  external_ai_allowed: false
+real_execution:
+  runtime_root: runtime/real-execution
+  require_confirmation: true
+  repository_admission_is_copy_only: true
+  require_clean_git_snapshot: true
+  require_verified_checkpoint_before_rewrite: true
+  network_access_allowed: false
+  external_ai_allowed: false
+  production_cutover_allowed: false

@@ -1,0 +1,1304 @@
+{
+    "schema":  "resonance-build-manifest/v1",
+    "release":  "1.5.8-sealed-r5-20260911",
+    "file_count":  259,
+    "aggregate_algorithm":  "sha256(path`tsha256`tbytes`n)",
+    "aggregate_sha256":  "a867ce67d3849f4c18baefe519428bbabcd2a259e8a375e6b70fa8116b7a0c92",
+    "files":  [
+                  {
+                      "path":  ".env.sovereign.example",
+                      "sha256":  "fd734279fd0650d6c4e37e1baf5674bc866cd9de64d17bbc05bebe6c29229618",
+                      "bytes":  724
+                  },
+                  {
+                      "path":  ".gitignore.sovereign.additions",
+                      "sha256":  "11f2e5a0c3dff6a3615ecd2b80bef9ef13dbb95dfa45d94d7fb0eebf876887b2",
+                      "bytes":  1138
+                  },
+                  {
+                      "path":  "00 START SOVEREIGN RESONANCE APPDEV.cmd",
+                      "sha256":  "e7fbd0da909f7a0b2a44ab04c8b43ef46db946aaab004d43f9a7981b1447d08e",
+                      "bytes":  158
+                  },
+                  {
+                      "path":  "00-START-OPEN-NOVA.cmd",
+                      "sha256":  "5fa5c33590d32461495fff96838437f1a986649dd7b5df581401af7d2c25b1bd",
+                      "bytes":  6296
+                  },
+                  {
+                      "path":  "01 STATUS SOVEREIGN RESONANCE APPDEV.cmd",
+                      "sha256":  "c281a2e4c943a12baa5017452138412cb7ecc058e44b46f4bfb9260d31750bc0",
+                      "bytes":  133
+                  },
+                  {
+                      "path":  "99 STOP SOVEREIGN RESONANCE APPDEV.cmd",
+                      "sha256":  "7da3a7273258e25fc44148350ce26f2764ca0520f3772725da829ed24af566f4",
+                      "bytes":  131
+                  },
+                  {
+                      "path":  "apps/aurum-operations/.gitignore",
+                      "sha256":  "849806ace5f20cad9ecc3eeaf7c42796d8b1baa41128ad9350dcc9b4465a841e",
+                      "bytes":  69
+                  },
+                  {
+                      "path":  "apps/aurum-operations/app.py",
+                      "sha256":  "a6dffb605c1c0b25aed59c645b56b0426832dc52bc86f378448f6f052354f43a",
+                      "bytes":  41276
+                  },
+                  {
+                      "path":  "apps/aurum-operations/AURUM_RELEASE.json",
+                      "sha256":  "19eaa9ce8a7e04e98b280abc8d73dde92850f476a00236d1ee828c44b0e9f753",
+                      "bytes":  882
+                  },
+                  {
+                      "path":  "apps/aurum-operations/backups/.gitkeep",
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "bytes":  0
+                  },
+                  {
+                      "path":  "apps/aurum-operations/BUILD-MANIFEST.sha256",
+                      "sha256":  "9ed0bc64125a9e7bd371a43f20496fde1fa620dcd65ed3b96f7f08b8960deb64",
+                      "bytes":  1002
+                  },
+                  {
+                      "path":  "apps/aurum-operations/data/.gitkeep",
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "bytes":  0
+                  },
+                  {
+                      "path":  "apps/aurum-operations/README-AURUM.md",
+                      "sha256":  "3e15d33485e091496571b4a01f31c0e5b3ff26955e186052f11e4b50ed81840d",
+                      "bytes":  1460
+                  },
+                  {
+                      "path":  "apps/aurum-operations/requirements.txt",
+                      "sha256":  "de0cf422c383abbb17e3f5aa8566985503695062036c15aa5fbe9cbe71a1c0d8",
+                      "bytes":  68
+                  },
+                  {
+                      "path":  "apps/aurum-operations/START-AURUM-OPERATIONS.cmd",
+                      "sha256":  "0c84390894809d2751acb02ee612e40ad87aa258445cd4c57210086088f00570",
+                      "bytes":  3094
+                  },
+                  {
+                      "path":  "apps/aurum-operations/static/index.html",
+                      "sha256":  "a16919b4a0e8362246a0a3a2c3a0aff7784b3aaeb63a66db6b6ac211b036ffb6",
+                      "bytes":  17661
+                  },
+                  {
+                      "path":  "apps/aurum-operations/tests/__init__.py",
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "bytes":  0
+                  },
+                  {
+                      "path":  "apps/aurum-operations/tests/test_app.py",
+                      "sha256":  "6ca8a9f98c82965e624236a642507468496784b9fb050395250793808b96cfd1",
+                      "bytes":  9162
+                  },
+                  {
+                      "path":  "apps/aurum-operations/VERIFY-AURUM-OPERATIONS.cmd",
+                      "sha256":  "a07f4b4b8d45ca58a6c2a899f1bbed2c1d93fee0572e837d0844f8ce99b03fa9",
+                      "bytes":  1082
+                  },
+                  {
+                      "path":  "apps/rons-hub-backend/.env.sovereign.example",
+                      "sha256":  "9c904b6076eb10f7bb65dcd476ab8fa7532aa817a1f5372d76722cbef7aae9f9",
+                      "bytes":  221
+                  },
+                  {
+                      "path":  "apps/rons-hub-backend/.open-nova/backend-certification.json",
+                      "sha256":  "7610cfe1159d3a1eb6cec1e24f828337e3ac08991fb31ee01766e4aacdbffd69",
+                      "bytes":  972
+                  },
+                  {
+                      "path":  "apps/rons-hub-backend/.open-nova/service-bindings.json",
+                      "sha256":  "34cee80769243e58cb8586653f971e57072a165e2bc5de436a25f2a61fb146ce",
+                      "bytes":  1006
+                  },
+                  {
+                      "path":  "apps/rons-hub-backend/001_rons_hub_entitlements.sql",
+                      "sha256":  "d33e8ffe31d12c26dd378c00a4b1814dcea8de93e99022d0d07d673a48ff2af4",
+                      "bytes":  1517
+                  },
+                  {
+                      "path":  "apps/rons-hub-backend/002_identity_links.sql",
+                      "sha256":  "80f909fabd4c87172a69ce3ad25d749ea7881bf06c9c96da24d66e357d9b53d1",
+                      "bytes":  716
+                  },
+                  {
+                      "path":  "apps/rons-hub-backend/003_user_roles.sql",
+                      "sha256":  "4e005a47ae0ec5a67a875817bcec0f41ff18b001a5134bf02ff41c0fb4daae48",
+                      "bytes":  436
+                  },
+                  {
+                      "path":  "apps/rons-hub-backend/004_admin_bootstrap.sql",
+                      "sha256":  "2c3a7805cdf893262d342a86dfaa437203c9a8e8c5a1bfecf5371cb003b18f1c",
+                      "bytes":  1924
+                  },
+                  {
+                      "path":  "apps/rons-hub-backend/005_entitlement_log.sql",
+                      "sha256":  "239d860505198ec464dea28d7f832f135cae96cf6c9b6193b10a7630e61168b7",
+                      "bytes":  770
+                  },
+                  {
+                      "path":  "apps/rons-hub-backend/006_ci_settings.sql",
+                      "sha256":  "43bf1772d427dfeaa81fc80385dfb80922906b6933795dacb6e399e73f995943",
+                      "bytes":  936
+                  },
+                  {
+                      "path":  "apps/rons-hub-backend/007_billing_reads.sql",
+                      "sha256":  "0e7650266ca0150e74e73e77b54b1515c8c46492a9364f687d6ec39ceff8dc74",
+                      "bytes":  3465
+                  },
+                  {
+                      "path":  "apps/rons-hub-backend/008_payfast_launch_audit.sql",
+                      "sha256":  "d8e27420d90493852cfe531930a1a9bd9a0f5650ec60ce90ca173a4137ac0995",
+                      "bytes":  1104
+                  },
+                  {
+                      "path":  "apps/rons-hub-backend/open-nova-adapters/supabase-compat.ts",
+                      "sha256":  "6e906e7a2379d6f142d68966a6bdde4782255ffbce134badfafabbcb788f63dd",
+                      "bytes":  1728
+                  },
+                  {
+                      "path":  "docker-compose.sovereign.yml",
+                      "sha256":  "0ced31d17f1910602060e56ab3325f91309e98b3cbce9a3f9ade02ac3e166dc6",
+                      "bytes":  391
+                  },
+                  {
+                      "path":  "docs/architecture/OPEN_NOVA_V1.0.md",
+                      "sha256":  "4bc609433c94e1705085cafd3c99740d1b5d5d4f16f8e118ef200ddc5adb6fe5",
+                      "bytes":  2930
+                  },
+                  {
+                      "path":  "docs/architecture/OPEN_NOVA_V1.1.md",
+                      "sha256":  "858bbd1ab9b45f34e219eb55d6679c086c281e89312cc7986fc68ae3a62ffd93",
+                      "bytes":  1351
+                  },
+                  {
+                      "path":  "docs/architecture/OPEN_NOVA_V1.2.md",
+                      "sha256":  "879bab3369a9988da876215fb67f08873c1beef6faaa3b8848d28cc9aa993bd5",
+                      "bytes":  2908
+                  },
+                  {
+                      "path":  "docs/architecture/OPEN_NOVA_V1.3.md",
+                      "sha256":  "56411746d275f12f9370d5c32fad5f1c931f32a016510e149b23853d15620d58",
+                      "bytes":  2759
+                  },
+                  {
+                      "path":  "docs/architecture/OPEN_NOVA_V1.4.md",
+                      "sha256":  "f522f0f8d4ccd09e0c2f7883f4f54bbb4bb36c51234cae5128fdde26a48199b1",
+                      "bytes":  2636
+                  },
+                  {
+                      "path":  "docs/architecture/OPEN_NOVA_V1.5.md",
+                      "sha256":  "ef3fd4c8898d16a9898f26c538d13e109a11a363c2486a4a8dadd97fa9cc7349",
+                      "bytes":  1416
+                  },
+                  {
+                      "path":  "docs/architecture/ZERO_CREDIT_MODE_V0.1.md",
+                      "sha256":  "151b9d07eadac12c68f55148072952dfbf54e58f9be3c83fcf916cc6b64006ce",
+                      "bytes":  1161
+                  },
+                  {
+                      "path":  "docs/architecture/ZERO_CREDIT_MODE_V0.2.md",
+                      "sha256":  "e44eb5c1d892aea74d0c51b9483e94624271a97d5a63c67e53cbfb01fe584452",
+                      "bytes":  1847
+                  },
+                  {
+                      "path":  "docs/architecture/ZERO_CREDIT_MODE_V0.3.md",
+                      "sha256":  "07aecf50c531572d5475539981c102ef23999f597e34cdb48eec4cfdc4a95306",
+                      "bytes":  2397
+                  },
+                  {
+                      "path":  "docs/architecture/ZERO_CREDIT_MODE_V0.4.md",
+                      "sha256":  "68893f1010b74e61e44d6ab2853e912f7470e524ca5b597bccc6825466a947c3",
+                      "bytes":  3112
+                  },
+                  {
+                      "path":  "docs/architecture/ZERO_CREDIT_MODE_V0.5.md",
+                      "sha256":  "386a5708b56ef5f1acded5f92320a80904153d29937777be0f54726d10cff399",
+                      "bytes":  3414
+                  },
+                  {
+                      "path":  "docs/architecture/ZERO_CREDIT_MODE_V0.6.md",
+                      "sha256":  "47aff787dbd521e5bc0710cdefe8538454a1e31474fb9df53d45141f919dcc00",
+                      "bytes":  2178
+                  },
+                  {
+                      "path":  "docs/architecture/ZERO_CREDIT_MODE_V0.7.md",
+                      "sha256":  "fd2ad3623ea7e82a1da1f6732de05daa15eb9bf9ee19235eabf90cf7aa5f77e8",
+                      "bytes":  3036
+                  },
+                  {
+                      "path":  "docs/architecture/ZERO_CREDIT_MODE_V0.8.md",
+                      "sha256":  "a825e62589aac995fe0cb6e4608c0dd338ec8d8f8c3e83ed2f9ecdff30747bd6",
+                      "bytes":  2329
+                  },
+                  {
+                      "path":  "docs/architecture/ZERO_CREDIT_MODE_V0.9.md",
+                      "sha256":  "89a2b6316e5bc715746633b829c333b1d866b25b73108305c1fdb3eaeb34865f",
+                      "bytes":  2351
+                  },
+                  {
+                      "path":  "docs/migration/FIRST_APP_MIGRATION_V1.1.md",
+                      "sha256":  "61595045cca47541d81d0588d2054103a7fb8c021962f6ef63b6003c7c4be8f9",
+                      "bytes":  1327
+                  },
+                  {
+                      "path":  "docs/operator/FIRST_REAL_APP_CUTOVER_V1.2.md",
+                      "sha256":  "5998693444a604ce0a7f622f40efaae6af0abc6341d4b65298b055d79aff3aba",
+                      "bytes":  1855
+                  },
+                  {
+                      "path":  "docs/operator/FIRST_REAL_REPOSITORY_EXECUTION_V1.5.md",
+                      "sha256":  "2b7f109735f50014fc2ea9c28c59184eb7fe9d14eb0f2f5cc8ef3286b236334a",
+                      "bytes":  1227
+                  },
+                  {
+                      "path":  "docs/operator/LOCAL_EXECUTION_HANDOFF_V1.5.1.md",
+                      "sha256":  "b64310d8e997867909f004012c1f692a3cf0167ac1622c370106595b84dbffe1",
+                      "bytes":  1581
+                  },
+                  {
+                      "path":  "docs/operator/LOCAL_PC_DEPLOYMENT_V1.1.md",
+                      "sha256":  "56ae5d1087d82c4a865a1c53cfe72ff0a34160d5c1559735d6137b32ebdabdea",
+                      "bytes":  1562
+                  },
+                  {
+                      "path":  "docs/operator/ONE_CLICK_LOCAL_HANDOFF_V1.5.3.md",
+                      "sha256":  "a270029a946a96f941683b42ebe5519601f39f175706004f0d25662f2c54205e",
+                      "bytes":  762
+                  },
+                  {
+                      "path":  "docs/operator/REAL_EXECUTION_EVIDENCE_HANDOFF_V1.5.2.md",
+                      "sha256":  "1fafc1cf69582c341ce77a4776f589355deca70c0b187dd8a47e43e0a220e1e7",
+                      "bytes":  2825
+                  },
+                  {
+                      "path":  "docs/operator/REAL_SOURCE_MIGRATION_V1.3.md",
+                      "sha256":  "a52e8a96f4bcde89654b63b1fa58c45f7f27a8e89a8acaba7fc0f6cd4d43b208",
+                      "bytes":  2334
+                  },
+                  {
+                      "path":  "docs/operator/SOVEREIGN_WORKSTATION_V1.4.md",
+                      "sha256":  "35f4383c04a02077a8a5f513f0c4e1a03a111d006b545f4dd7f314eabbd04873",
+                      "bytes":  2484
+                  },
+                  {
+                      "path":  "foundry_controller/__init__.py",
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "bytes":  0
+                  },
+                  {
+                      "path":  "foundry_controller/app/__init__.py",
+                      "sha256":  "a18b75fa651e4ff2eee3ad9cc94b46291ec87d621ad4cda75d06e58c8528dcc4",
+                      "bytes":  54
+                  },
+                  {
+                      "path":  "foundry_controller/app/adapter_engine.py",
+                      "sha256":  "6c30930d29bf1739f0c130eafd9873e2ae45fc0a55ef998155e02f9734df5cf0",
+                      "bytes":  24237
+                  },
+                  {
+                      "path":  "foundry_controller/app/agent.py",
+                      "sha256":  "c51851367a174617bb52b3b5d298613513486454c2a05e3cbe185fcbacf33e72",
+                      "bytes":  8536
+                  },
+                  {
+                      "path":  "foundry_controller/app/app_factory.py",
+                      "sha256":  "b44badf245ecf0c7ea5389f57e5508a65c738d188d1ddb583f490de419598032",
+                      "bytes":  8927
+                  },
+                  {
+                      "path":  "foundry_controller/app/backend_runtime.py",
+                      "sha256":  "6ad801ea97fb323d9929180ded0e6039d9099b5929288cf14dd5d5e7069fb40b",
+                      "bytes":  17246
+                  },
+                  {
+                      "path":  "foundry_controller/app/backup_export.py",
+                      "sha256":  "7cfba39d67207bb823c522b78a5e0b8ef5aba90e4c336f0cf94b5e5de69433a2",
+                      "bytes":  5908
+                  },
+                  {
+                      "path":  "foundry_controller/app/build_cycle.py",
+                      "sha256":  "b6879b5355d1d37ed3a29ce2168252f6a4245e3c738df4644918c4a838782bd1",
+                      "bytes":  3875
+                  },
+                  {
+                      "path":  "foundry_controller/app/builder_ui.py",
+                      "sha256":  "b5920a87255d330a766854749f206fee8dc86f51ef42b6cf6407b6803c174a21",
+                      "bytes":  20826
+                  },
+                  {
+                      "path":  "foundry_controller/app/control_plane.py",
+                      "sha256":  "6825df92eb1b55bd4314496c54e1d80cbd23735e98e9add0ccb75ac793f83275",
+                      "bytes":  3254
+                  },
+                  {
+                      "path":  "foundry_controller/app/cutover.py",
+                      "sha256":  "750171f82334ed5bf79b3c293c9860f3bb663b90d3b5e8bce91de1978a7a3bdd",
+                      "bytes":  28063
+                  },
+                  {
+                      "path":  "foundry_controller/app/local_deployment.py",
+                      "sha256":  "af71e23eef79f0202e28f2b99b4ece54622b83d6f5355a3b56985aeb0f55d9bd",
+                      "bytes":  13960
+                  },
+                  {
+                      "path":  "foundry_controller/app/local_handoff.py",
+                      "sha256":  "067c0d85f66c0b246ec1ada30237805d63baafb28b92fb8d68ea5bd57c38b4de",
+                      "bytes":  3609
+                  },
+                  {
+                      "path":  "foundry_controller/app/main.py",
+                      "sha256":  "16167fc6eddedec0cf201a8feb89670edd294a69a9fbca7b124db9b3c696a052",
+                      "bytes":  72583
+                  },
+                  {
+                      "path":  "foundry_controller/app/migration.py",
+                      "sha256":  "5e0125216afbcc3b45998b8bf22896f6814b20deafae629205e997d5b48f76f2",
+                      "bytes":  8805
+                  },
+                  {
+                      "path":  "foundry_controller/app/real_execution.py",
+                      "sha256":  "218f34b19761b5c3649c0f0f4c52e88b646c88f2f80e425b13887b480dfbd22e",
+                      "bytes":  15067
+                  },
+                  {
+                      "path":  "foundry_controller/app/registry.py",
+                      "sha256":  "8056b1bb58b74cad401e84632aa3c4e9e5ef5da43c64caec48771d0be57c8068",
+                      "bytes":  4076
+                  },
+                  {
+                      "path":  "foundry_controller/app/release_candidate.py",
+                      "sha256":  "dce656ff550734c09b4480c6979e0f7efeeb28ee115dcd38daae802b1e6a24df",
+                      "bytes":  6303
+                  },
+                  {
+                      "path":  "foundry_controller/app/research_service.py",
+                      "sha256":  "5c68783d0a3ad424e72748efa6ac727e62b0318bda88bbb95d449882a3037955",
+                      "bytes":  70445
+                  },
+                  {
+                      "path":  "foundry_controller/app/runner.py",
+                      "sha256":  "beaff673feabedb033b9590bb0e81b5c3d444eba7909877be7d9f5c334827696",
+                      "bytes":  14636
+                  },
+                  {
+                      "path":  "foundry_controller/app/service_fabric.py",
+                      "sha256":  "8d40cc149274c6391181cf78c9dacec34d20a9b5682c9c210ce9f519d419d449",
+                      "bytes":  18224
+                  },
+                  {
+                      "path":  "foundry_controller/app/source_execution.py",
+                      "sha256":  "390a12fcbed2117774f72d21b2992457f9968c3bf83abd260a00b977a7b2d47f",
+                      "bytes":  20939
+                  },
+                  {
+                      "path":  "foundry_controller/app/sovereignty.py",
+                      "sha256":  "9d17b7b78e4e69c961cb7fd874a9092e9f89e2e06e1785f05523e1da808876a0",
+                      "bytes":  6709
+                  },
+                  {
+                      "path":  "foundry_controller/app/suite_control.py",
+                      "sha256":  "720df0d6686db4290f866a1d30b11f2a9f83b13c3eb496bf28f5e9f1cd40e90c",
+                      "bytes":  11707
+                  },
+                  {
+                      "path":  "foundry_controller/app/supply_chain.py",
+                      "sha256":  "8408a5c4e0588d2b08946a0cde90d0d0bcd10a5cf972076f6c820e8cb4ed6bfe",
+                      "bytes":  16308
+                  },
+                  {
+                      "path":  "foundry_controller/app/workstation_bridge.py",
+                      "sha256":  "000bfdb1fcfef2e36c31ac5f758a80f35f5ba1aa5ca4a7532636d3d912847c1d",
+                      "bytes":  22188
+                  },
+                  {
+                      "path":  "foundry_controller/Dockerfile",
+                      "sha256":  "523ddf80ed27e1d1004fece307e84d8a52939198c1f92e95283eef6bacf4169d",
+                      "bytes":  417
+                  },
+                  {
+                      "path":  "foundry_controller/requirements.txt",
+                      "sha256":  "9cabdf48fc88cacfe640555268c1cbf72dcb87ab4db1921cec40cf51e2db71d7",
+                      "bytes":  102
+                  },
+                  {
+                      "path":  "governance/backend-runtime.yaml",
+                      "sha256":  "4e3a9e7ff8d998b48880889b37df80120d3dcf78709ce4d51e05489fc4c6b04f",
+                      "bytes":  680
+                  },
+                  {
+                      "path":  "governance/local-service-replacements.yaml",
+                      "sha256":  "b9a3f427db51220122491dd7a3af359cd77a14b0907731dbb30a30ac4230563e",
+                      "bytes":  1428
+                  },
+                  {
+                      "path":  "governance/policy.yaml",
+                      "sha256":  "0291f66024434315dbf0378099a69a4e4e5c5634988a8dc8c55b8ba5d9a67988",
+                      "bytes":  9783
+                  },
+                  {
+                      "path":  "governance/provider-neutral-api.yaml",
+                      "sha256":  "0ae715d0c8cfa0fb891bd1707f6eb0f6d7380cc274614118c3644901f7b8f057",
+                      "bytes":  1865
+                  },
+                  {
+                      "path":  "governance/release.yaml",
+                      "sha256":  "0f33506d3599e3b60f4032d2ef336137d49f6ed8dc745cf231b5ccf835d6590d",
+                      "bytes":  1185
+                  },
+                  {
+                      "path":  "governance/research-policy.json",
+                      "sha256":  "d54811b18ccc294211e3bedb34c7f04f626b56e42660a23d6d75da859d1a2bce",
+                      "bytes":  2101
+                  },
+                  {
+                      "path":  "governance/service-fabric.yaml",
+                      "sha256":  "0c92ce5137bd69b5b86a0bb4ae5481ea8eb55298ab742749914770c0c3b76170",
+                      "bytes":  2403
+                  },
+                  {
+                      "path":  "governance/suite.yaml",
+                      "sha256":  "b249c11af7c16bdc87030ab9a668840660cae1325d1cb40294788f496d078661",
+                      "bytes":  1032
+                  },
+                  {
+                      "path":  "OPEN-NOVA-FIRST-RUN.cmd",
+                      "sha256":  "750682d9ed54a140242e9808d67d7f3989a04738bb369e1d4aa684339ebf8155",
+                      "bytes":  650
+                  },
+                  {
+                      "path":  "OPEN-NOVA-OFFLINE.cmd",
+                      "sha256":  "6f0ec12daeed9322f1565274a525727f7a1672041e7c1b6aba94b72deacbb677",
+                      "bytes":  628
+                  },
+                  {
+                      "path":  "pytest.ini",
+                      "sha256":  "b160d82f7811555051f8966d8e02750a985227c1d022208c784e606946f2eada",
+                      "bytes":  42
+                  },
+                  {
+                      "path":  "README-SOVEREIGN.md",
+                      "sha256":  "c7d0de0456129aa9afb491fcf3ef385038ebaf1b57ecd72ef7fc25973768dc80",
+                      "bytes":  3329
+                  },
+                  {
+                      "path":  "RELEASE.json",
+                      "sha256":  "60454f3420ace676307520ffe6dd0f3722b79283a872d8052cfee033774094e9",
+                      "bytes":  3760
+                  },
+                  {
+                      "path":  "REPAIR-OPEN-NOVA-RUNTIME.cmd",
+                      "sha256":  "b25ac04d06914fd623857acf85771bb7e78f137c6c8f76758864f0b205a38968",
+                      "bytes":  597
+                  },
+                  {
+                      "path":  "runner/node/Containerfile",
+                      "sha256":  "cc44133827ddcf571cd9402639f8ecd590baf2132b1a61ef93092dd275195224",
+                      "bytes":  186
+                  },
+                  {
+                      "path":  "runner/python/Containerfile",
+                      "sha256":  "e7434abf3bf54eebecef8a7b969c1afac155b43595f832df29084336b0fa3325",
+                      "bytes":  231
+                  },
+                  {
+                      "path":  "runtime/backend-runtime/.gitkeep",
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "bytes":  0
+                  },
+                  {
+                      "path":  "runtime/backend-runtime/compose.backend.yml",
+                      "sha256":  "24cc581dcb6874e0a901a89ea1c6400de351ba614bbf735e0623ac49154d7e93",
+                      "bytes":  3256
+                  },
+                  {
+                      "path":  "runtime/receipts/.gitkeep",
+                      "sha256":  "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+                      "bytes":  2
+                  },
+                  {
+                      "path":  "runtime/secrets/.gitkeep",
+                      "sha256":  "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+                      "bytes":  2
+                  },
+                  {
+                      "path":  "RUNTIME-DATA-BOUNDARY.md",
+                      "sha256":  "b59d32d681345a9d79816c71c4fa2f545b1e720c849db29205e979d30ef9f4e3",
+                      "bytes":  355
+                  },
+                  {
+                      "path":  "scripts/adapter-assess.ps1",
+                      "sha256":  "2c690f5c6e03f8f48caf882c1634a510f49beb5be693e932ca4f12023e36f108",
+                      "bytes":  246
+                  },
+                  {
+                      "path":  "scripts/adapter-cutover.ps1",
+                      "sha256":  "5a14182834a4524fe3491224ecb90f673aa3a5e00029652d03e24540287e1507",
+                      "bytes":  307
+                  },
+                  {
+                      "path":  "scripts/adapter-generate.ps1",
+                      "sha256":  "0ef091c036e59da11e9ee1f27ca42238da20a5d7911caba3020203596b7deb48",
+                      "bytes":  308
+                  },
+                  {
+                      "path":  "scripts/adapter-rollback.ps1",
+                      "sha256":  "e0a685d8ebcea840d609eaa561987df0fa20f060702f5e84034087a94837bbe3",
+                      "bytes":  414
+                  },
+                  {
+                      "path":  "scripts/adapter-verify.ps1",
+                      "sha256":  "69a7678f04074084b186b0851cfff7dffcfad5820481ab9cfcd05ec6146aacfd",
+                      "bytes":  246
+                  },
+                  {
+                      "path":  "scripts/app-certify-operational.ps1",
+                      "sha256":  "8e52ede18b0c8e7f7199307b31b65c80d131a9ff4f47374d211e5d92aaffcee9",
+                      "bytes":  455
+                  },
+                  {
+                      "path":  "scripts/app-sovereignty-score.ps1",
+                      "sha256":  "83fba443b697e7dcf2b26ca0ba72329c4ed0ee8da5471a7cb6dff89c26096000",
+                      "bytes":  393
+                  },
+                  {
+                      "path":  "scripts/backend-certify-app.ps1",
+                      "sha256":  "2fd1d2652e3ef6288457cfb830699de68f87a19c6dcf5c28b9faaa8d63319ac0",
+                      "bytes":  203
+                  },
+                  {
+                      "path":  "scripts/backend-migrate-app.ps1",
+                      "sha256":  "d4b4ab233d8aaf2ab3700d2270adac30d92426aef8f65638cdcb2c440b1062c1",
+                      "bytes":  531
+                  },
+                  {
+                      "path":  "scripts/backend-runtime-init.ps1",
+                      "sha256":  "6368fe29214880f9db8756c75612a2a9f404dadc58da956535d68b70fa106b97",
+                      "bytes":  731
+                  },
+                  {
+                      "path":  "scripts/backend-runtime-status.ps1",
+                      "sha256":  "e88f4e655bd7da66f0af181a3220d4da086a51f8498d218bcb753a006704fb68",
+                      "bytes":  138
+                  },
+                  {
+                      "path":  "scripts/backend-runtime-stop.ps1",
+                      "sha256":  "715efee418b0fa98172113bddde9273f1143acb0eb9dddea62a232fa865d60a5",
+                      "bytes":  455
+                  },
+                  {
+                      "path":  "scripts/bootstrap-offline.ps1",
+                      "sha256":  "3d515982dd98ec4675aacf15cf095d5f19a4b08997a5044ba88f679b0d5cc9b4",
+                      "bytes":  2387
+                  },
+                  {
+                      "path":  "scripts/bootstrap-sovereign.ps1",
+                      "sha256":  "8f645fe62d466be6a3a32ebfca875c19b7d22ef6ef38f1bb630bb1fc2aecc5c9",
+                      "bytes":  2419
+                  },
+                  {
+                      "path":  "scripts/build-backend-services.ps1",
+                      "sha256":  "c009d2b5c0f005e14754ee4627c7a1921c74c00dbff9773f70315fe809adbfc8",
+                      "bytes":  1307
+                  },
+                  {
+                      "path":  "scripts/build-runner-images.ps1",
+                      "sha256":  "58097a9f5386a0cc82c4438980dc4d789b5dfdcd28c522d47477dd3e29feea76",
+                      "bytes":  799
+                  },
+                  {
+                      "path":  "scripts/collect-first-real-evidence.ps1",
+                      "sha256":  "09b86bb33e7ba27520241f8f0be1c51c665dce3b84e879a5ea19d1bb7eea8b46",
+                      "bytes":  1257
+                  },
+                  {
+                      "path":  "scripts/cutover-baseline.ps1",
+                      "sha256":  "6bafdf4b2906fa1dfc54a13998bdc8cc44bf1bcba6d69a8e07d51084df091e81",
+                      "bytes":  313
+                  },
+                  {
+                      "path":  "scripts/cutover-certify-local.ps1",
+                      "sha256":  "655e4e15c660d61da918252ed3a8763bb416427e65496dc6bcb5a0bbde094384",
+                      "bytes":  318
+                  },
+                  {
+                      "path":  "scripts/cutover-checkpoint.ps1",
+                      "sha256":  "1e3fa90be02cf788ede183ed74e1fe7c896c944a4c3528c6f0e953f10f226746",
+                      "bytes":  315
+                  },
+                  {
+                      "path":  "scripts/cutover-plan.ps1",
+                      "sha256":  "e823970cc252fd53115dd62ae3fba29930e2a8d8ed8127fbe02c0261cdda1654",
+                      "bytes":  223
+                  },
+                  {
+                      "path":  "scripts/cutover-preview.ps1",
+                      "sha256":  "b810aaa688cc5b20d84a3ef06d27b7c0daff831419b11c531bf342f97e35da69",
+                      "bytes":  363
+                  },
+                  {
+                      "path":  "scripts/cutover-regression.ps1",
+                      "sha256":  "7f76de8daa523e1e2eaf531b5e3e91ea3129aede518ec9e5961b91abdb18b173",
+                      "bytes":  352
+                  },
+                  {
+                      "path":  "scripts/evidence-handoff.py",
+                      "sha256":  "d2cfc9d400e4013c9054494ff5fdbed1ddf37b77e25a6cb46d94ab50ce71d208",
+                      "bytes":  13267
+                  },
+                  {
+                      "path":  "scripts/export-app.ps1",
+                      "sha256":  "a4edd6ee1a14ae25c8b823ca143b1e9c49f00e05c1807d9f6cbd44270572c895",
+                      "bytes":  347
+                  },
+                  {
+                      "path":  "scripts/first-app-migration-plan.ps1",
+                      "sha256":  "e9a68f5465ebdce8bcfdfd14ff8d61d8f5d2b1029452512b18a07213e16b8a95",
+                      "bytes":  478
+                  },
+                  {
+                      "path":  "scripts/first-real-execution.ps1",
+                      "sha256":  "7218ba131ccd6298fdb2e9defca8d6e1970926ce1988657e7756d56ba03fe611",
+                      "bytes":  1715
+                  },
+                  {
+                      "path":  "scripts/first-real-execution-admit.ps1",
+                      "sha256":  "8c24dcefdaac5f53c9e82d18ea5f7d64cd05a7a722af8c88251f56a2192e763e",
+                      "bytes":  485
+                  },
+                  {
+                      "path":  "scripts/first-real-execution-assess.ps1",
+                      "sha256":  "bbb29fab16ef478896b55a34072f3b0a23cddb5be2a2faeb83363dddbdaf8a1d",
+                      "bytes":  382
+                  },
+                  {
+                      "path":  "scripts/first-real-execution-evidence.ps1",
+                      "sha256":  "a2d23c909905e989b34e39ad113c7aca4e06a770e8c0786a95007ab94c6a6bfd",
+                      "bytes":  200
+                  },
+                  {
+                      "path":  "scripts/first-real-execution-migrate.ps1",
+                      "sha256":  "d4b87d8819452cd99d74273982b2bc9856d28f9785e1092b0e901c047758adc9",
+                      "bytes":  414
+                  },
+                  {
+                      "path":  "scripts/first-real-execution-prepare.ps1",
+                      "sha256":  "285027429c719d5483651d92afcef37781796312453bc476d3e6d3e7a20854f3",
+                      "bytes":  407
+                  },
+                  {
+                      "path":  "scripts/first-real-execution-report.ps1",
+                      "sha256":  "0bbaa759f5f39e9ec6b6d5a35472fba478d598e75559e095f890e14bd6005a7d",
+                      "bytes":  467
+                  },
+                  {
+                      "path":  "scripts/first-real-execution-status.ps1",
+                      "sha256":  "cdf87137dd2e42a2fd71b5a6b815ba2427b10dbe1eb1f6683666330740a180b9",
+                      "bytes":  194
+                  },
+                  {
+                      "path":  "scripts/init-attestation-key.ps1",
+                      "sha256":  "63ea7e3c4c865492e6352b8808dd6bd4d6ee4d156220c4362fa869ccb5f72fbb",
+                      "bytes":  737
+                  },
+                  {
+                      "path":  "scripts/local-execution-handoff.py",
+                      "sha256":  "1dbc8281e279f5f65fa21ec2420f22456b6caf1ee29f721110edeaf3f8828368",
+                      "bytes":  5153
+                  },
+                  {
+                      "path":  "scripts/local-pc-preflight.ps1",
+                      "sha256":  "027db0c931f493a38837bb4c7d994c8934a071b30cd8c37c23eb9a0cdae17b6d",
+                      "bytes":  1720
+                  },
+                  {
+                      "path":  "scripts/migration-execution-prepare.ps1",
+                      "sha256":  "47412568e5aa391022d01e9088b27909758d667826613a1383efb9a6ff26e058",
+                      "bytes":  347
+                  },
+                  {
+                      "path":  "scripts/migration-execution-rollback.ps1",
+                      "sha256":  "2277d0ae963bc99caa47ac88bbd001dab6663a20c70c5774fed4806810ce1a81",
+                      "bytes":  459
+                  },
+                  {
+                      "path":  "scripts/migration-execution-run-supported.ps1",
+                      "sha256":  "8c98741fbc4b68070c2a289c61d83e04abe705e1afc414c8d7327fde353e9a21",
+                      "bytes":  357
+                  },
+                  {
+                      "path":  "scripts/migration-execution-verify.ps1",
+                      "sha256":  "f68f5343fd8d72b63ebf0c8ae54d2a9ee27a142522e3948e73c1e822dab60799",
+                      "bytes":  286
+                  },
+                  {
+                      "path":  "scripts/one-click-first-real.ps1",
+                      "sha256":  "e3c2c50d8c9318782a019690838b500575513415ba0777f4948ce4eb47eed6e6",
+                      "bytes":  2216
+                  },
+                  {
+                      "path":  "scripts/open-nova-status.ps1",
+                      "sha256":  "27d53a7ab7ba9dd270c08457102ef327d6773ce49abaf56f111c2f6c172ff2e6",
+                      "bytes":  345
+                  },
+                  {
+                      "path":  "scripts/open-nova-workstation.ps1",
+                      "sha256":  "b7a9dc07fc0f16231edb650c8802b3473b7c2afb23448757a7afbdb84149ac92",
+                      "bytes":  2417
+                  },
+                  {
+                      "path":  "scripts/platform/start_or_repair_sovereign_appdev.ps1",
+                      "sha256":  "d97785531b1cc1f938d54ff2180f0081467b1d21d36c189f94e4f80e65a08211",
+                      "bytes":  4037
+                  },
+                  {
+                      "path":  "scripts/platform/status_sovereign_appdev.ps1",
+                      "sha256":  "d3bbc333273ba930c43e0cbccb94b0b99d86494bee6d4acc8dd4a0959b8c7996",
+                      "bytes":  1152
+                  },
+                  {
+                      "path":  "scripts/platform/stop_sovereign_appdev.ps1",
+                      "sha256":  "ff9e0833d8505bd1c4fe21ba9c03c6fa2f3a257c795ac082fbf77394fc1a27fc",
+                      "bytes":  785
+                  },
+                  {
+                      "path":  "scripts/platform/verify-release-manifest.ps1",
+                      "sha256":  "acdb56a34304e9e36f3bb2bc6d46d1e6580d6096dbd0ac9d0505b514a6b11cdc",
+                      "bytes":  1838
+                  },
+                  {
+                      "path":  "scripts/prepare-offline-wheelhouse.ps1",
+                      "sha256":  "869776854b9158801cdab42c75beb2f007297f7dcfda2abf3469923cfa37c648",
+                      "bytes":  791
+                  },
+                  {
+                      "path":  "scripts/provision-backend-cache.ps1",
+                      "sha256":  "f7ef41910c57a75ec3323f94292c5c58f46bfd11efeb1278cd226c48f3713665",
+                      "bytes":  793
+                  },
+                  {
+                      "path":  "scripts/provision-open-nova-once.ps1",
+                      "sha256":  "5018763f1a8f2d80b6168af7b7e71f4d9411046b73422d382fa373c521d9d6ce",
+                      "bytes":  10041
+                  },
+                  {
+                      "path":  "scripts/release-certify-rc.ps1",
+                      "sha256":  "95df33bd66a2d508972bf05258f0f2c6496bea8a47f01b25bdf3251b0874a99c",
+                      "bytes":  450
+                  },
+                  {
+                      "path":  "scripts/release-preflight.ps1",
+                      "sha256":  "13e04592e475f61abc0b5a4e3a3fad7ece289b485fee394b448b6994feddf7b0",
+                      "bytes":  351
+                  },
+                  {
+                      "path":  "scripts/repository-bridge-stage.ps1",
+                      "sha256":  "19f8b7aa58c9f57319f725a2a65a8243b62222db3872d93b81a279aaa0f7c8ee",
+                      "bytes":  907
+                  },
+                  {
+                      "path":  "scripts/repository-bridge-status.ps1",
+                      "sha256":  "668585fc4fe8e27bbca7c8235c11a0dbc472f29d3e84566b3c5ed5aadc90c4ac",
+                      "bytes":  330
+                  },
+                  {
+                      "path":  "scripts/repository-bridge-verify.ps1",
+                      "sha256":  "31dd4efd674606b8f122d21ca97d7fc45fed95e0211fbafbc2e1b7d1634f0547",
+                      "bytes":  330
+                  },
+                  {
+                      "path":  "scripts/run-and-package-first-real.ps1",
+                      "sha256":  "2cbf562d439bf083b0d6f31ad7693c3e4d2ec0bc3c3e47ccb6866cff7cf67d65",
+                      "bytes":  938
+                  },
+                  {
+                      "path":  "scripts/run-first-real-local.ps1",
+                      "sha256":  "b8ee53c56b91a244e82e003cc5141b98c4eb709eec9a532aac5073caa803b3b3",
+                      "bytes":  2101
+                  },
+                  {
+                      "path":  "scripts/run-foundry-host.ps1",
+                      "sha256":  "33648bc78863ae1055c549169ecb4e3678df1fa1b763324268019f97474fd7d2",
+                      "bytes":  961
+                  },
+                  {
+                      "path":  "scripts/service-fabric-bind-app.ps1",
+                      "sha256":  "542c787b16e86a6376aa89b5becf81bc178a0ddd6b86387e7abe46b9ebaf2346",
+                      "bytes":  610
+                  },
+                  {
+                      "path":  "scripts/service-fabric-preflight.ps1",
+                      "sha256":  "11d7491a4ec3f6a6e1b5d75b8e42ac93ad6dc2cdce03d9e5ff7711167329ce85",
+                      "bytes":  961
+                  },
+                  {
+                      "path":  "scripts/service-fabric-status.ps1",
+                      "sha256":  "47b5d411450d2cab6ce826f8b9d1b1555026fbe60c207d8388f88f56f047bc0f",
+                      "bytes":  365
+                  },
+                  {
+                      "path":  "scripts/service-fabric-write-runtime.ps1",
+                      "sha256":  "2d3c8023c3d583f2da4ef323f239a42ac251f2efe3bc4235d644dfc0d128bcc3",
+                      "bytes":  441
+                  },
+                  {
+                      "path":  "scripts/source-import-governed.ps1",
+                      "sha256":  "7cae4e910c527920e3feb8f52bc144b74eda721ddb17c527110b898a26868e7c",
+                      "bytes":  343
+                  },
+                  {
+                      "path":  "scripts/source-ingestion-status.ps1",
+                      "sha256":  "a89b63ffa6321af4c2222ec54586581b9018b9f8b36be0147e25df7175194bed",
+                      "bytes":  283
+                  },
+                  {
+                      "path":  "scripts/source-ingest-local.ps1",
+                      "sha256":  "2cf82d1ce4ec5c28ee75d37d2c032cdba2d91189e5c91316bcb865b6c1a48bf4",
+                      "bytes":  552
+                  },
+                  {
+                      "path":  "scripts/stage-first-app-source.ps1",
+                      "sha256":  "254e6568de360fb17ebeb57cfc6c126fce9fba1812524840e6858dd7d1a2b701",
+                      "bytes":  1426
+                  },
+                  {
+                      "path":  "scripts/stage-migration-project.ps1",
+                      "sha256":  "708fa001ee748cd5a6a9224ec35cede6d3f86bb006ce40ff6b92e55a938ef4a7",
+                      "bytes":  764
+                  },
+                  {
+                      "path":  "scripts/start-open-nova-offline.ps1",
+                      "sha256":  "9c1103210045cfd4a94dc1c0174b35e5e77cf2e180c8cf9f8ada327844bb76b5",
+                      "bytes":  1453
+                  },
+                  {
+                      "path":  "scripts/suite-status.ps1",
+                      "sha256":  "3bf87abfa1c3a8dfdac037a2021ba1a2d19db41844f442829264ff3885cbcf36",
+                      "bytes":  192
+                  },
+                  {
+                      "path":  "scripts/verify-build-manifest.ps1",
+                      "sha256":  "db155c8c5fec0b03ae5cfc86ea0e39feb1c20ce70be3d054c44b241a59e1c827",
+                      "bytes":  1661
+                  },
+                  {
+                      "path":  "scripts/verify-zero-credit.ps1",
+                      "sha256":  "0c74aa31ce331e49d4a2365eebbc9911dd585d572a2d7cf586fbdac64393407b",
+                      "bytes":  4144
+                  },
+                  {
+                      "path":  "scripts/workstation-initialize.ps1",
+                      "sha256":  "f553887775d932123e4520f8a8703b03353875ee0075265bb61a8a82d1dfa036",
+                      "bytes":  311
+                  },
+                  {
+                      "path":  "scripts/workstation-status.ps1",
+                      "sha256":  "5948023f4d4a8e425bc96a57c448d97c49df3f6f7470cf7068f5f3f8f7677843",
+                      "bytes":  213
+                  },
+                  {
+                      "path":  "services/__init__.py",
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "bytes":  0
+                  },
+                  {
+                      "path":  "services/auth/__init__.py",
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "bytes":  0
+                  },
+                  {
+                      "path":  "services/auth/app.py",
+                      "sha256":  "bf925e0f689aa04364b11b8d75b14fb6a3de28a18e70e7e63e51f4bfac936ca0",
+                      "bytes":  9932
+                  },
+                  {
+                      "path":  "services/auth/Containerfile",
+                      "sha256":  "dcb9b79bd2dfafe38725e1ffb090af49e8cd753ae0ef2f667cbd09baf20eda35",
+                      "bytes":  382
+                  },
+                  {
+                      "path":  "services/auth/requirements.txt",
+                      "sha256":  "385ecdd29b9ed6fed15c84c2527af614802f046f8890332fd36dcb094799c598",
+                      "bytes":  50
+                  },
+                  {
+                      "path":  "services/gateway/__init__.py",
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "bytes":  0
+                  },
+                  {
+                      "path":  "services/gateway/app.py",
+                      "sha256":  "c9448f942e115cfd70c02181a83b6d91cc1d8187d7101dcb7eb2157fd2fd59ef",
+                      "bytes":  21252
+                  },
+                  {
+                      "path":  "services/gateway/billing_read.py",
+                      "sha256":  "178bb8071bb2ccb7435eaf2053b003e0c9b98e32afe24cff398c604e930a3ed4",
+                      "bytes":  4496
+                  },
+                  {
+                      "path":  "services/gateway/bootstrap.py",
+                      "sha256":  "1e2de3361cb6fe6171335b2d4ce32c4fea23db422fa96073e3ea1886af2ff42a",
+                      "bytes":  4459
+                  },
+                  {
+                      "path":  "services/gateway/checkout_audit.py",
+                      "sha256":  "9376a237bc4e1ac5b3c8370b927f26cdcac17dedc5f3856c320b167b2bd2338f",
+                      "bytes":  2798
+                  },
+                  {
+                      "path":  "services/gateway/Containerfile",
+                      "sha256":  "198b2e7afd76b75db5bce28d305290fb38df68d9d906758e6896f3ca94046a26",
+                      "bytes":  600
+                  },
+                  {
+                      "path":  "services/gateway/requirements.txt",
+                      "sha256":  "23bcaccf921aef74a38752aa6d4ce8dc1e0c6a4c587ba7dec3f285711b0c8bba",
+                      "bytes":  87
+                  },
+                  {
+                      "path":  "services/gateway/subscription_mirror.py",
+                      "sha256":  "0bbd2144a3f1590163484b512066f77412dfc048af715f766033e4621c608c90",
+                      "bytes":  5472
+                  },
+                  {
+                      "path":  "services/README.md",
+                      "sha256":  "34f3a55ab6f6f99135bd90ae7b86d4797713a3a9328fa5abf347030b911603be",
+                      "bytes":  1076
+                  },
+                  {
+                      "path":  "services/storage/__init__.py",
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "bytes":  0
+                  },
+                  {
+                      "path":  "services/storage/app.py",
+                      "sha256":  "48d95f464af1d709309b811f0335d3913c6f7d051cc9aac50ab657bcc698cd9c",
+                      "bytes":  1826
+                  },
+                  {
+                      "path":  "services/storage/Containerfile",
+                      "sha256":  "a9ed97fcb92ae2b41cb8bd76a998352b891eeb18b081bc25495e16066f6a0e12",
+                      "bytes":  388
+                  },
+                  {
+                      "path":  "services/storage/requirements.txt",
+                      "sha256":  "3b4f6bfd843af90d11867a0e5ed4ccb0936645921504a36cb41f52ccd3ccb6e2",
+                      "bytes":  33
+                  },
+                  {
+                      "path":  "services/wheelhouse/.gitkeep",
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "bytes":  0
+                  },
+                  {
+                      "path":  "services/wheelhouse/annotated_types-0.8.0-py3-none-any.whl",
+                      "sha256":  "f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0",
+                      "bytes":  13427
+                  },
+                  {
+                      "path":  "services/wheelhouse/anyio-4.15.0-py3-none-any.whl",
+                      "sha256":  "7ecd9937369ffce8bba0b5ccb9b3a9507b101b0ed50256aecfbab27e6c2acb99",
+                      "bytes":  131908
+                  },
+                  {
+                      "path":  "services/wheelhouse/certifi-2026.7.22-py3-none-any.whl",
+                      "sha256":  "62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775",
+                      "bytes":  136983
+                  },
+                  {
+                      "path":  "services/wheelhouse/click-8.5.0-py3-none-any.whl",
+                      "sha256":  "255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360",
+                      "bytes":  125251
+                  },
+                  {
+                      "path":  "services/wheelhouse/fastapi-0.116.1-py3-none-any.whl",
+                      "sha256":  "c46ac7c312df840f0c9e220f7964bada936781bc4e2e6eb71f1c4d7553786565",
+                      "bytes":  95631
+                  },
+                  {
+                      "path":  "services/wheelhouse/h11-0.16.0-py3-none-any.whl",
+                      "sha256":  "63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86",
+                      "bytes":  37515
+                  },
+                  {
+                      "path":  "services/wheelhouse/httpcore-1.0.9-py3-none-any.whl",
+                      "sha256":  "2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55",
+                      "bytes":  78784
+                  },
+                  {
+                      "path":  "services/wheelhouse/httpx-0.28.1-py3-none-any.whl",
+                      "sha256":  "d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad",
+                      "bytes":  73517
+                  },
+                  {
+                      "path":  "services/wheelhouse/idna-3.19-py3-none-any.whl",
+                      "sha256":  "815e7be7a7806d54abb586dc943addc79e8b2ee16915059658cbeff4b1b43bf4",
+                      "bytes":  68550
+                  },
+                  {
+                      "path":  "services/wheelhouse/psycopg_binary-3.2.9-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+                      "sha256":  "76eddaf7fef1d0994e3d536ad48aa75034663d3a07f6f7e3e601105ae73aeff6",
+                      "bytes":  4436160
+                  },
+                  {
+                      "path":  "services/wheelhouse/psycopg-3.2.9-py3-none-any.whl",
+                      "sha256":  "01a8dadccdaac2123c916208c96e06631641c0566b22005493f09663c7a8d3b6",
+                      "bytes":  202705
+                  },
+                  {
+                      "path":  "services/wheelhouse/pydantic_core-2.33.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+                      "sha256":  "8f57a69461af2a5fa6e6bbd7a5f60d3b7e6cebb687f55106933188e79ad155c1",
+                      "bytes":  2002028
+                  },
+                  {
+                      "path":  "services/wheelhouse/pydantic-2.11.7-py3-none-any.whl",
+                      "sha256":  "dde5df002701f6de26248661f6835bbe296a47bf73990135c7d07ce741b9623b",
+                      "bytes":  444782
+                  },
+                  {
+                      "path":  "services/wheelhouse/starlette-0.47.3-py3-none-any.whl",
+                      "sha256":  "89c0778ca62a76b826101e7c709e70680a1699ca7da6b44d38eb0a7e61fe4b51",
+                      "bytes":  72991
+                  },
+                  {
+                      "path":  "services/wheelhouse/typing_extensions-4.16.0-py3-none-any.whl",
+                      "sha256":  "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+                      "bytes":  45571
+                  },
+                  {
+                      "path":  "services/wheelhouse/typing_inspection-0.4.4-py3-none-any.whl",
+                      "sha256":  "65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147",
+                      "bytes":  14750
+                  },
+                  {
+                      "path":  "services/wheelhouse/tzdata-2026.3-py2.py3-none-any.whl",
+                      "sha256":  "dc096730c87af6cab1b171c9d532be840741ff5d459015e7f6947bd7d7e54931",
+                      "bytes":  348168
+                  },
+                  {
+                      "path":  "services/wheelhouse/uvicorn-0.35.0-py3-none-any.whl",
+                      "sha256":  "197535216b25ff9b785e29a0b79199f55222193d47f820816e7da751e9bc8d4a",
+                      "bytes":  66406
+                  },
+                  {
+                      "path":  "START-HERE.txt",
+                      "sha256":  "45c779d954a451d2c16ee946653bdf47c89737de770ce5b27eb6b66ee7a7a12d",
+                      "bytes":  692
+                  },
+                  {
+                      "path":  "tests/test_adapter_engine_api_v08.py",
+                      "sha256":  "62d5a8c7bcf443ffaf8c9a90d6093999b034ec1a1069b5d7268e89221a3f704f",
+                      "bytes":  2685
+                  },
+                  {
+                      "path":  "tests/test_adapter_engine_v08.py",
+                      "sha256":  "009fac2859d7545a1b7c04edbbaac7b5e65dd824ae60d6b5e54fcafade027387",
+                      "bytes":  5972
+                  },
+                  {
+                      "path":  "tests/test_backend_runtime_api_v09.py",
+                      "sha256":  "6498bc5e7eb0a1bb814e5498c7a94082f23438971c8e0c34aaae5e33119b4da4",
+                      "bytes":  2576
+                  },
+                  {
+                      "path":  "tests/test_backend_runtime_v09.py",
+                      "sha256":  "2ece24bf96bae9c8da16b5fe1f18ae8e7fe6d7db4b3605f1291ad726e3e0c699",
+                      "bytes":  8879
+                  },
+                  {
+                      "path":  "tests/test_backend_services_v09.py",
+                      "sha256":  "ed6f3247f1d62512768267daf26230623ed5ce34ea036f1ce8140b29afdd9260",
+                      "bytes":  14393
+                  },
+                  {
+                      "path":  "tests/test_billing_reads_v14.py",
+                      "sha256":  "d40746ad06cf765bca1aaa1eb32c2ca1ead407d1b23ba54e0bb05a933a550732",
+                      "bytes":  2137
+                  },
+                  {
+                      "path":  "tests/test_checkout_audit_v15.py",
+                      "sha256":  "3fcadf6ef406790ecb42f1dab7a012262b9bcf8c74bf6c66f81b59f468b0c27a",
+                      "bytes":  3070
+                  },
+                  {
+                      "path":  "tests/test_cutover_api_v12.py",
+                      "sha256":  "8577dcf4f7caa6c3133a0c2c00c7b2324ebec231e4e4212fcffcfb52f277bbdc",
+                      "bytes":  1835
+                  },
+                  {
+                      "path":  "tests/test_cutover_v12.py",
+                      "sha256":  "9306e260f202248666c888e59e6a72563a47973a8d58f3beae34dce141305a67",
+                      "bytes":  7986
+                  },
+                  {
+                      "path":  "tests/test_entitlement_audit_v01.py",
+                      "sha256":  "d358409c1a9b6bac014b9ed160f1c6b68df3b055133a3002b402efc25f5f685b",
+                      "bytes":  1340
+                  },
+                  {
+                      "path":  "tests/test_evidence_handoff_v152.py",
+                      "sha256":  "46149d7b30fd537b57f64efffa9e0b15fbe973649b97dfb08e746a4af11be5ce",
+                      "bytes":  5228
+                  },
+                  {
+                      "path":  "tests/test_factory_api_v04.py",
+                      "sha256":  "e59bce40217ab477c2171df39260f843021736bab7d5ceb445e9071983cd3220",
+                      "bytes":  1509
+                  },
+                  {
+                      "path":  "tests/test_local_deployment_api_v11.py",
+                      "sha256":  "68643f8932bc1196165704f2850258e7d122b46e53040f7cbd0a5b5ab7099a9a",
+                      "bytes":  2749
+                  },
+                  {
+                      "path":  "tests/test_local_deployment_v11.py",
+                      "sha256":  "171f7ef48f70f563b5ec4440af4696f92603615ecae9d780ef7537d84ecdb075",
+                      "bytes":  5286
+                  },
+                  {
+                      "path":  "tests/test_local_handoff_v151.py",
+                      "sha256":  "f4122af4897bdefca12fa91fab790d4cec37c3fe4b376453540d9b430209edde",
+                      "bytes":  2342
+                  },
+                  {
+                      "path":  "tests/test_migration_v05.py",
+                      "sha256":  "10b8e43b5b2a8e6fbe2fa7cf252b6ae5fd462e52e92ab16cfb62bcace69f37ca",
+                      "bytes":  3000
+                  },
+                  {
+                      "path":  "tests/test_real_execution_api_v15.py",
+                      "sha256":  "76b977b3513d40216fa34f8722b3a87ed131ade54276889f1cdfd32b7ab13d07",
+                      "bytes":  3323
+                  },
+                  {
+                      "path":  "tests/test_real_execution_v15.py",
+                      "sha256":  "b850b309471858ed71b59073f67ad98a328bd28b1267d895efeba972ff8e82ab",
+                      "bytes":  3987
+                  },
+                  {
+                      "path":  "tests/test_release_api_v10.py",
+                      "sha256":  "5d6cb075d0449216db51523d5f4c31cd08156f43f6cd3c5f258543d199ffb206",
+                      "bytes":  2253
+                  },
+                  {
+                      "path":  "tests/test_research_service_v02.py",
+                      "sha256":  "adf81ecebd71240b12f1470513d8aefa3ee563e400cbf7a966039d64ed7f714e",
+                      "bytes":  10064
+                  },
+                  {
+                      "path":  "tests/test_rons_hub_backend_v01.py",
+                      "sha256":  "26427e2a06ebac351b8dfe47548237aff6edff0d29cee1f490523712e153f8cd",
+                      "bytes":  4856
+                  },
+                  {
+                      "path":  "tests/test_service_fabric_api_v07.py",
+                      "sha256":  "33b7258fa93b5a5fc58ec509e7d38cbbb5ea553b45959a528b6a5eafa8bcc2ec",
+                      "bytes":  3081
+                  },
+                  {
+                      "path":  "tests/test_service_fabric_v07.py",
+                      "sha256":  "352371a91367219b391e516d9b6d12cd4576d879134becd6cb303d965f0c28ab",
+                      "bytes":  7077
+                  },
+                  {
+                      "path":  "tests/test_source_execution_api_v13.py",
+                      "sha256":  "0ba092b999ce6a0e130959f5befdf706e85fda60a19d54c019857d85cdf5668c",
+                      "bytes":  630
+                  },
+                  {
+                      "path":  "tests/test_source_execution_v13.py",
+                      "sha256":  "ec6ffac6de20e1503ae82c4794f76ae5010dec2e1365d4b2078832238db98de5",
+                      "bytes":  7317
+                  },
+                  {
+                      "path":  "tests/test_sovereign_agent.py",
+                      "sha256":  "0c3a624d99ef23feb88a395b52ae5e399038fd853aaeb0b9212079bd91f70571",
+                      "bytes":  1521
+                  },
+                  {
+                      "path":  "tests/test_sovereign_factory_v04.py",
+                      "sha256":  "85d1dbfbfbc716785582238e210d781531d8c1317044ac799cab461665016f51",
+                      "bytes":  4626
+                  },
+                  {
+                      "path":  "tests/test_sovereign_runner_v03.py",
+                      "sha256":  "04447af52e1dad1b587f32e7c17a1126362a37905dc2434772103b27847c5f9c",
+                      "bytes":  8081
+                  },
+                  {
+                      "path":  "tests/test_sovereignty_v10.py",
+                      "sha256":  "b530971ea9200dc4b3d1bba5e2fd7bb6b83e5bdfe852ee583e0e3f93e7b62904",
+                      "bytes":  5385
+                  },
+                  {
+                      "path":  "tests/test_subscription_mirror_v01.py",
+                      "sha256":  "1ad6522aeb905bc643c7bdc0f86f620e75e1a8b2d38eeb9f859a8f555a37b785",
+                      "bytes":  2778
+                  },
+                  {
+                      "path":  "tests/test_suite_control_v06.py",
+                      "sha256":  "24f1cdc1e40e7a506273a2a648548e4758d4f2e950b3c3abc626c7daa239b3ec",
+                      "bytes":  7871
+                  },
+                  {
+                      "path":  "tests/test_supply_chain_api_v05.py",
+                      "sha256":  "0687bd5d50732d6593ba4624281907f69a06f6cfdea9d3a36ddb18dbb7a2b22a",
+                      "bytes":  3882
+                  },
+                  {
+                      "path":  "tests/test_supply_chain_v05.py",
+                      "sha256":  "b8c459d302d2de601ce48b7d02cb025b7dc47166bcb4471520b7b0005ccdd697",
+                      "bytes":  4115
+                  },
+                  {
+                      "path":  "tests/test_v153_one_click_handoff.py",
+                      "sha256":  "6a85e01ecaf49cc5e298fd4ba80888796b3c869bf9b19c8656734809906ceb15",
+                      "bytes":  1625
+                  },
+                  {
+                      "path":  "tests/test_v154_windows_powershell_compat.py",
+                      "sha256":  "98475e74397af56e56eec084452e562b25cfdff68a913d5871783d6f93aa5c5c",
+                      "bytes":  985
+                  },
+                  {
+                      "path":  "tests/test_v155_python313_binary_runtime.py",
+                      "sha256":  "fcb1a41bdf97f938b75053e0ad7a6ee700f9f5a8f76ee2ad2ec6c59296943a03",
+                      "bytes":  1522
+                  },
+                  {
+                      "path":  "tests/test_v155_zero_extraction_launcher.py",
+                      "sha256":  "4b6efd6b95db5647849b848cbfa8c2657e4fd69a7e64c098a49c22d970dce2e6",
+                      "bytes":  1613
+                  },
+                  {
+                      "path":  "tests/test_v156_consolidated_bootstrap.py",
+                      "sha256":  "184245123ee46b7c93d808195c0f1ba4f16dc416cd7dfbca9103127b199f45d1",
+                      "bytes":  2229
+                  },
+                  {
+                      "path":  "tests/test_v157_runtime_resume.py",
+                      "sha256":  "4f966d37444ad3cd21c54b87d61f37c73be0c03926d75a9f9b61a9159611ab69",
+                      "bytes":  1340
+                  },
+                  {
+                      "path":  "tests/test_workstation_bridge_api_v14.py",
+                      "sha256":  "5d1e9cf8c5a8cd36195bfc6d555fce2ff57aebcb926ce502685c7a92ef5846c0",
+                      "bytes":  3041
+                  },
+                  {
+                      "path":  "tests/test_workstation_bridge_v14.py",
+                      "sha256":  "7aa56b11f39986cbecfe524fdc20196f64f0260f04b8158a90e1dd4bc44ab64d",
+                      "bytes":  4696
+                  },
+                  {
+                      "path":  "THIRD-PARTY-NOTICES.md",
+                      "sha256":  "c31959f0503c687b41c2e00513440d70ae1f4274bc3a94bab5df0ab4da544511",
+                      "bytes":  484
+                  }
+              ]
+}

@@ -1,0 +1,37 @@
+{
+  "application": "aurum-operations",
+  "name": "Resonance Aurum Operations",
+  "release": "0.2.2",
+  "mode": "sovereign-local",
+  "external_ai_required": false,
+  "hosted_database_required": false,
+  "default_bind_host": "127.0.0.1",
+  "default_port": 4345,
+  "features": [
+    "products",
+    "product_updates",
+    "stock_adjustments",
+    "batches",
+    "customers",
+    "customer_updates",
+    "orders",
+    "order_cancellation_with_stock_restore",
+    "payments",
+    "printable_invoices",
+    "low_stock_alerts",
+    "stock_movements",
+    "audit_history",
+    "verified_local_backups",
+    "csv_exports",
+    "local_sqlite",
+    "health_checks",
+    "automated_tests",
+    "system_python_fallback"
+  ],
+  "governance": {
+    "production_cutover": false,
+    "network_bind": "loopback-only",
+    "data_location": "application-local",
+    "external_ai": "not-required"
+  }
+}

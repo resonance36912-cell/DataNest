@@ -1,0 +1,33 @@
+version: '1.5'
+name: Resonance Open Nova Sovereign Release Governance v1.5
+release_channel: release-candidate
+minimum_app_score: 90
+minimum_platform_score: 90
+certification:
+  require_confirmation: true
+  require_external_ai_denied: true
+  require_registry_chain_valid: true
+  require_policy_local_first: true
+  require_supply_chain_evidence: true
+  require_offline_dependency_cache_for_operational: true
+  require_backend_health_for_operational: true
+  require_loopback_services: true
+  allow_self_certification_of_unverified_runtime: false
+  record_root: runtime/certifications
+  require_local_deployment_evidence_for_operational: true
+  require_first_app_pilot_before_suite_cutover: true
+  require_real_source_cutover_evidence_for_production: true
+control_plane:
+  read_only_by_default: true
+  expose_secret_values: false
+  localhost_only: true
+workstation_bridge:
+  require_clean_git_snapshot: true
+  require_repository_provenance_hash: true
+  record_remote_urls: false
+  allow_network_clone: false
+first_real_execution:
+  require_clean_local_git_repository: true
+  require_copy_only_admission: true
+  require_execution_evidence_integrity: true
+  production_cutover_allowed: false

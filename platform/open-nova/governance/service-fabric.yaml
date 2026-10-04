@@ -1,0 +1,71 @@
+version: "0.9"
+name: Resonance Sovereign Service Fabric
+mode: local-only
+principles:
+  provider_neutral_contracts: true
+  loopback_only_default: true
+  no_inline_secret_values: true
+  local_image_only: true
+  no_automatic_downloads: true
+  replaceable_adapters: true
+services:
+  - service_id: postgres
+    kind: database
+    endpoint: postgresql://127.0.0.1:55432/resonance
+    image: postgres:16.6-alpine
+    container_port: 5432
+    required: true
+    secret_refs:
+      - runtime/secrets/postgres-password
+    description: Local relational persistence contract for sovereign applications.
+  - service_id: auth
+    kind: auth
+    endpoint: http://127.0.0.1:58680
+    image: resonance-service-auth:0.9
+    container_port: 8080
+    required: true
+    secret_refs:
+      - runtime/secrets/auth-signing-key
+      - runtime/secrets/auth-exchange-key
+    description: Local identity and session contract; implementation is replaceable behind the adapter.
+  - service_id: storage
+    kind: storage
+    endpoint: http://127.0.0.1:59000
+    image: resonance-service-storage:0.9
+    container_port: 9000
+    required: true
+    secret_refs:
+      - runtime/secrets/storage-access-key
+      - runtime/secrets/storage-secret-key
+    description: Local object/file storage contract for application assets.
+  - service_id: gateway
+    kind: gateway
+    endpoint: http://127.0.0.1:58600
+    image: resonance-service-gateway:0.9
+    container_port: 8000
+    required: true
+    secret_refs:
+      - runtime/secrets/postgres-password
+      - runtime/secrets/gateway-procedure-key
+    description: Loopback-only application gateway and routing boundary.
+  - service_id: ollama
+    kind: ai
+    endpoint: http://127.0.0.1:11434
+    image: null
+    required: false
+    secret_refs: []
+    description: Local model provider used by Open Nova when locally installed.
+  - service_id: foundry-controller
+    kind: controller
+    endpoint: http://127.0.0.1:8787
+    image: null
+    required: false
+    secret_refs: []
+    description: Resonance Open Nova governed application-development control plane.
+  - service_id: secrets
+    kind: secrets
+    endpoint: file://runtime/secrets
+    image: null
+    required: true
+    secret_refs: []
+    description: Protected local secret-reference boundary. Secret values are never returned by the service-fabric API.
