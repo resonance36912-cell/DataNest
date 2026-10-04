@@ -190,8 +190,9 @@ function Assert-KnownPort([string]$Name, [int]$Port, [string]$Expected) {
     }
 
     if ($listenerPid -eq 0) {
+        $allowBlankCommandLine = ([string]$identity.process -notin @('python.exe','node.exe','powershell.exe','pwsh.exe'))
         $candidates = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object {
-            [string]$_.Name -ieq [string]$identity.process -and [string]$_.CommandLine -like "*$Expected*"
+            [string]$_.Name -ieq [string]$identity.process -and ([string]$_.CommandLine -like "*$Expected*" -or ($allowBlankCommandLine -and [string]::IsNullOrWhiteSpace([string]$_.CommandLine)))
         })
         if ($candidates.Count -ne 1) {
             throw "$Name port $Port is exposed through PID 0, but exactly one matching $($identity.process) process was not found. No process was stopped."
