@@ -2,10 +2,16 @@
   "schema": "resonance-sites-candidate@1",
   "generatedAt": "2026-10-04T17:03:00+02:00",
   "updatedOn": "2026-10-04",
-  "status": "candidate-rebuild-required-before-production",
+  "status": "rebuilt-candidate-awaiting-forge-domain-and-human-approval",
   "canonicalRepository": "DataNest-Supository-CANONICAL-STAGING",
-  "canonicalHeadAtManifest": "3c6b4bb0889b53f8d25ab2897e453c980c25ab7b",
+  "artifactSourceCommit": "3c6b4bb0889b53f8d25ab2897e453c980c25ab7b",
+  "controlHeadAtRebuild": "76422105595ab5f6eed89d196f3efaddd56f86eb",
   "mergedEaliophinHead": "93803e8e78b430e31c035307c11b48d8e75377cb",
+  "sourceBundle": {
+    "name": "Weed-release-source-3c6b4bb0.bundle",
+    "sha256": "D167AA26B1DE66FBB38AC662B29094C565B745966C5B2EB14A4F1238AE1A0080",
+    "bytes": 49622948
+  },
   "traceability": {
     "passed": 35,
     "failed": 0,
@@ -18,34 +24,44 @@
     "repairCommit": "93803e8e78b430e31c035307c11b48d8e75377cb",
     "reconciliationCommit": "3c6b4bb0889b53f8d25ab2897e453c980c25ab7b"
   },
+  "buildVerification": {
+    "dataNestStatic": "passed",
+    "ronsasBundledApps": 7,
+    "hubCommercialSecurityGates": "passed",
+    "hubNitroCloudflareBuild": "passed"
+  },
   "artifacts": [
     {
-      "name": "DataNest-Sites-static-candidate-20261004.zip",
-      "role": "public-static-candidate",
-      "sha256": "27D8DB7277F46855A59961C438EDF829579E8D6D0DFDB31B84A1F7F23CD24489",
-      "bytes": 28790705,
+      "name": "DataNest-Sites-static-release-3c6b4bb0-20261004.zip",
+      "role": "public-static-release-candidate",
+      "sourceCommit": "3c6b4bb0889b53f8d25ab2897e453c980c25ab7b",
+      "sha256": "82204DC45B6C38A4C2BE7FD67ACC2349225CBBE45EC35DDB76D6C990A9AB76C9",
+      "bytes": 28847538,
       "productionCertified": false,
-      "note": "Static DataNest plus seven RONSAS app bundles. Rebuild from the final clean release checkout because repository history advanced during candidate generation."
+      "note": "Fresh static DataNest build plus seven RONSAS app bundles from the frozen audited source worktree. Awaiting remote-forge, domain/TLS and human promotion gates."
     },
     {
-      "name": "Resonance-Hub-Nitro-cloudflare-candidate-20261004.zip",
-      "role": "hub-server-runtime-candidate",
-      "sha256": "AB2386960A51C8FCDE37444FEE69ECE91E87C5D5510749A4361688302201E374",
-      "bytes": 3375476,
+      "name": "Resonance-Hub-Nitro-cloudflare-release-3c6b4bb0-20261004.zip",
+      "role": "hub-server-runtime-release-candidate",
+      "sourceCommit": "3c6b4bb0889b53f8d25ab2897e453c980c25ab7b",
+      "sha256": "2A0A0719B34DBF89B8FE02254F9765C752A2BF8EFE7C9333E5EFF7012418F371",
+      "bytes": 3403414,
       "productionCertified": false,
-      "note": "TanStack Start/Nitro Cloudflare-module build. Keep SSR, server functions and APIs on a supported server runtime rather than flattening them into static Sites assets."
+      "note": "Fresh TanStack Start/Nitro Cloudflare-module build from the same frozen audited source. SSR, server functions and APIs remain on a supported server runtime rather than a static Sites layer."
     }
   ],
   "deploymentModel": {
     "sitesLayer": "DataNest public/static presentation and other lightweight public surfaces",
     "hubRuntime": "Nitro Cloudflare-module or another supported scalable server runtime",
     "statefulServices": "Supabase and governed sovereign services remain external to Sites",
-    "dns": "No cutover performed. Custom-domain binding/TLS must be verified on the chosen provider origin before promotion."
+    "customDomain": "OpenAI documents ChatGPT Sites custom-domain connection where the feature is available. Verify the Site settings > Add domain control, capture provider-issued DNS records, and verify TLS before any cutover.",
+    "dns": "No cutover performed and no DNS records changed."
   },
   "hardGates": [
-    "Rebuild all deployable artifacts from the final clean release checkout.",
-    "Establish and protect the new forge repository authority.",
-    "Verify provider-issued Sites/Pages origin and custom-domain support before DNS changes.",
-    "Record human governance approval before production promotion."
+    "Establish and protect the new GitLab forge repository authority, then verify a fresh clone matches the governed export/source history.",
+    "Run or reproduce the approved build gates from remote forge authority before production promotion.",
+    "Verify the target ChatGPT Site exposes Add domain, record the provider-issued DNS values, and verify TLS before DNS changes.",
+    "Update Supabase Auth/OAuth redirects, CSP/CORS, canonical metadata, robots and sitemap origins as part of the governed cutover.",
+    "Record human governance approval before production promotion or DNS cutover."
   ]
 }

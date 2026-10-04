@@ -1,41 +1,115 @@
 stages:
-  - validate
+  - audit
+  - test
   - build
+  - certify
   - deploy
+  - promote
 
 default:
   interruptible: true
+  retry:
+    max: 1
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
 
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH'
+    - if: '$CI_COMMIT_TAG'
 
 variables:
+  GIT_DEPTH: "0"
+  npm_config_audit: "false"
+  npm_config_fund: "false"
   CI: "true"
   DATANEST_STATIC_EXPORT: "true"
   NEXT_PUBLIC_BASE_PATH: "/DataNest"
   SUPABASE_URL: "$NEXT_PUBLIC_SUPABASE_URL"
   SUPABASE_PUBLISHABLE_KEY: "$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
 
-traceability:
-  stage: validate
-  image: mcr.microsoft.com/powershell:7.5-alpine-3.20
+.audit_rules: &audit_rules
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH'
+    - if: '$CI_COMMIT_TAG'
+
+.cert_rules: &cert_rules
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG'
+
+.node_job: &node_job
+  image: node:22-bookworm
   before_script:
-    - apk add --no-cache git
-    - git config --global --add safe.directory "$CI_PROJECT_DIR"
-  script:
-    - pwsh -NoLogo -NoProfile -File ops/validation/Test-ResonanceTraceability.ps1 -RepoRoot "$CI_PROJECT_DIR"
+    - node --version
+    - npm --version
 
-open-nova-manifest:
-  stage: validate
-  image: mcr.microsoft.com/powershell:7.5-alpine-3.20
-  script:
-    - pwsh -NoLogo -NoProfile -File platform/open-nova/scripts/verify-build-manifest.ps1 -RootPath "$CI_PROJECT_DIR/platform/open-nova"
+.bun_job: &bun_job
+  image: node:22-bookworm
+  before_script:
+    - node --version
+    - npm install --global bun@1.3.14
+    - bun --version
 
-build-datanest:
+canonical:traceability:
+  stage: audit
+  image: mcr.microsoft.com/powershell:7.4-debian-12
+  <<: *audit_rules
+  script:
+    - pwsh -NoProfile -File ops/validation/Test-ResonanceTraceability.ps1 -RepoRoot .
+
+canonical:git-hygiene:
+  stage: audit
+  image: alpine/git:2.47.2
+  <<: *audit_rules
+  script:
+    - |
+      BASE="${CI_MERGE_REQUEST_DIFF_BASE_SHA:-$CI_COMMIT_BEFORE_SHA}"
+      if [ -n "$BASE" ] && [ "$BASE" != "0000000000000000000000000000000000000000" ] && git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+        git diff --check "$BASE" "$CI_COMMIT_SHA"
+      else
+        git diff --check HEAD^
+      fi
+    - test -z "$(find . -mindepth 2 -type d -name .git -print -quit)"
+
+open-nova:sealed-manifest:
+  stage: audit
+  image: mcr.microsoft.com/powershell:7.4-debian-12
+  <<: *audit_rules
+  script:
+    - pwsh -NoProfile -File platform/open-nova/scripts/verify-build-manifest.ps1 -RootPath platform/open-nova
+
+datanest:test:
+  <<: *node_job
+  stage: test
+  rules:
+    - changes:
+        - apps/datanest/**/*
+        - apps/ronsas/**/*
+        - ops/index/**/*
+        - .gitlab-ci.yml
+  cache:
+    key:
+      files:
+        - apps/datanest/package-lock.json
+    paths:
+      - apps/datanest/.npm/
+  script:
+    - cd apps/datanest
+    - npm ci --cache .npm --prefer-offline
+    - npm run check
+    - npm test
+    - npm run check:contracts
+    - npm audit --omit=dev --audit-level=high
+
+datanest:build:
+  <<: *node_job
   stage: build
-  image: node:24-bookworm-slim
+  needs: ["datanest:test"]
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -45,15 +119,13 @@ build-datanest:
         - ops/index/**/*
         - .gitlab-ci.yml
   before_script:
+    - node --version
+    - npm --version
     - test -n "$NEXT_PUBLIC_SUPABASE_URL"
     - test -n "$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
-    - cd apps/datanest
-    - npm ci --no-audit --no-fund
   script:
-    - npm test
-    - npm run check
-    - npm run check:contracts
-    - npm audit --omit=dev --audit-level=high
+    - cd apps/datanest
+    - npm ci --prefer-offline
     - npm run build
     - node scripts/build-ronsas-pages.mjs
     - test -s out/index.html
@@ -63,20 +135,19 @@ build-datanest:
       - apps/datanest/out/
     expire_in: 7 days
 
-build-hub:
-  stage: build
-  image: oven/bun:1.3.14
+hub:test-build:
+  <<: *bun_job
+  stage: test
   rules:
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      changes:
+    - changes:
         - apps/hub/**/*
         - packages/**/*
         - .gitlab-ci.yml
-  before_script:
+  script:
     - cd apps/hub
     - bun install --frozen-lockfile
-  script:
+    - bun run lint
+    - bun test scripts/lib/
     - bun run verify:pinned-deps
     - bun run verify:back-to-hub
     - bun run verify:no-stale-domains
@@ -86,6 +157,7 @@ build-hub:
     - bun run verify:sovereign-itn
     - bun run verify:transparency-copy
     - bun run verify:discernment-usage
+    - bun run verify:app-registry
     - bun run build
     - test -f .output/nitro.json
   artifacts:
@@ -94,11 +166,136 @@ build-hub:
       - apps/hub/.output/
     expire_in: 7 days
 
-create-pages:
-  stage: deploy
-  image: alpine:3.20
+.bun_app: &bun_app
+  <<: *bun_job
+  stage: test
+
+app:epublisher:
+  <<: *bun_app
+  rules:
+    - changes:
+        - apps/epublisher/**/*
+        - .gitlab-ci.yml
+  script:
+    - cd apps/epublisher
+    - bun install --frozen-lockfile
+    - bun run lint
+    - bun test
+    - bun run build
+
+app:creative-studio:
+  <<: *bun_app
+  rules:
+    - changes:
+        - apps/creative-studio/**/*
+        - .gitlab-ci.yml
+  script:
+    - cd apps/creative-studio
+    - bun install --frozen-lockfile
+    - bun run lint
+    - bun test
+    - bun run build
+
+app:sync-vision:
+  <<: *bun_app
+  rules:
+    - changes:
+        - apps/sync-vision/**/*
+        - .gitlab-ci.yml
+  script:
+    - cd apps/sync-vision
+    - bun install --frozen-lockfile
+    - bun run lint
+    - bun run typecheck
+    - bun test
+    - bun run build
+
+app:youtube-optimizer:
+  <<: *bun_app
+  rules:
+    - changes:
+        - apps/youtube-optimizer/**/*
+        - .gitlab-ci.yml
+  script:
+    - cd apps/youtube-optimizer
+    - bun install --frozen-lockfile
+    - bun run lint
+    - bun run typecheck
+    - bun test
+    - bun run check:config
+    - bun run build
+
+open-nova:test:
+  stage: test
+  image: python:3.12-slim
+  rules:
+    - changes:
+        - platform/open-nova/**/*
+        - .gitlab-ci.yml
+  before_script:
+    - python -m pip install --upgrade pip
+    - python -m pip install -r platform/open-nova/foundry_controller/requirements.txt -r platform/open-nova/services/auth/requirements.txt -r platform/open-nova/services/gateway/requirements.txt -r platform/open-nova/services/storage/requirements.txt
+  script:
+    - cd platform/open-nova
+    - python -m compileall -q foundry_controller services
+    - python -m pytest -q
+
+sovereign-backend:test:
+  stage: test
+  image: python:3.12-slim
+  rules:
+    - changes:
+        - services/sovereign-backend/**/*
+        - .gitlab-ci.yml
+  before_script:
+    - python -m pip install --upgrade pip
+    - python -m pip install -r services/sovereign-backend/requirements-dev.txt
+  script:
+    - cd services/sovereign-backend
+    - python -m compileall -q services
+    - python -m pytest -q
+
+canonical:certify:
+  stage: certify
+  image: alpine:3.21
+  <<: *cert_rules
   needs:
-    - job: build-datanest
+    - job: canonical:traceability
+    - job: canonical:git-hygiene
+    - job: open-nova:sealed-manifest
+    - job: datanest:test
+      optional: true
+    - job: datanest:build
+      optional: true
+    - job: hub:test-build
+      optional: true
+    - job: app:epublisher
+      optional: true
+    - job: app:creative-studio
+      optional: true
+    - job: app:sync-vision
+      optional: true
+    - job: app:youtube-optimizer
+      optional: true
+    - job: open-nova:test
+      optional: true
+    - job: sovereign-backend:test
+      optional: true
+  script:
+    - mkdir -p evidence/ci
+    - printf '{"schema":"rsn-ci-certification/v1","commit":"%s","pipeline":"%s","ref":"%s","status":"certified"}\n' "$CI_COMMIT_SHA" "$CI_PIPELINE_ID" "$CI_COMMIT_REF_NAME" > evidence/ci/certification.json
+  artifacts:
+    when: always
+    expire_in: 1 year
+    paths:
+      - evidence/ci/certification.json
+
+pages:candidate:
+  stage: deploy
+  image: alpine:3.21
+  needs:
+    - job: canonical:certify
+    - job: datanest:build
       artifacts: true
   script:
     - test -s apps/datanest/out/index.html
@@ -110,4 +307,20 @@ create-pages:
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       when: manual
+    - when: never
   allow_failure: false
+
+governance:approve-production:
+  stage: promote
+  image: alpine:3.21
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: manual
+    - if: '$CI_COMMIT_TAG =~ /^rsn-canonical-v/'
+      when: manual
+    - when: never
+  allow_failure: false
+  needs: ["canonical:certify"]
+  script:
+    - echo "Human governance checkpoint approved for $CI_COMMIT_SHA"
+    - echo "Deployment remains provider-decoupled and must use the governed release procedure."
