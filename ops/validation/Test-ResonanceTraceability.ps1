@@ -8,7 +8,7 @@ $pass = New-Object System.Collections.Generic.List[string]
 function Pass([string]$m){ $pass.Add($m); Write-Host "PASS: $m" -ForegroundColor Green }
 function Fail([string]$m){ $fail.Add($m); Write-Host "FAIL: $m" -ForegroundColor Red }
 
-$indexPath = Join-Path $root 'ops\index\TRACEABILITY-INDEX.json'
+$indexPath = Join-Path $root 'ops/index/TRACEABILITY-INDEX.json'
 $idx = $null
 if(Test-Path -LiteralPath $indexPath){
   try { $idx = Get-Content -LiteralPath $indexPath -Raw | ConvertFrom-Json; Pass 'traceability index parses as JSON' }
@@ -21,7 +21,7 @@ if($idx){
   if($dupes){ Fail ('duplicate canonical IDs: '+(($dupes.Name)-join ', ')) } else { Pass 'canonical IDs are unique' }
 }
 
-$required=@('apps\datanest','apps\hub','apps\epublisher','apps\creative-studio','apps\sync-vision','apps\youtube-optimizer','platform\ronsas','platform\open-nova','governance\rcgf','services\sovereign-backend','ops','evidence','docs','tests')
+$required=@('apps/datanest','apps/hub','apps/epublisher','apps/creative-studio','apps/sync-vision','apps/youtube-optimizer','platform/ronsas','platform/open-nova','governance/rcgf','services/sovereign-backend','ops','evidence','docs','tests')
 foreach($rel in $required){ if(Test-Path -LiteralPath (Join-Path $root $rel)){ Pass "canonical path present: $rel" } else { Fail "canonical path missing: $rel" } }
 if($idx){
   foreach($app in @($idx.applications)){
@@ -45,7 +45,7 @@ if(Test-Path (Join-Path $root '.git')){
   if($gitExit -eq 0){ Pass 'git diff --check passes' } else { Fail ('git diff --check failed: '+$gitCheck.Trim()) }
 }
 
-$publicRoots=@((Join-Path $root 'apps\hub\public\ops'), (Join-Path $root 'apps\datanest\public\ops'))
+$publicRoots=@((Join-Path $root 'apps/hub/public/ops'), (Join-Path $root 'apps/datanest/public/ops'))
 $forbidden='BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|password\s*[:=]|secret\s*[:=]|token\s*[:=]|postgres(ql)?://|C:\\Users\\|C:\\Resonance\\|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+'
 foreach($pr in $publicRoots){
   if(-not (Test-Path $pr)){ Fail "public operating plane missing: $pr"; continue }
@@ -58,7 +58,7 @@ foreach($pr in $publicRoots){
 }
 
 if($idx){
-  $catalogPath=Join-Path $root 'apps\hub\public\ops\catalog.json'
+  $catalogPath=Join-Path $root 'apps/hub/public/ops/catalog.json'
   try {
     $catalog=Get-Content -LiteralPath $catalogPath -Raw | ConvertFrom-Json
     $known=@($idx.platforms.canonicalId)+@($idx.applications.canonicalId)
@@ -67,7 +67,7 @@ if($idx){
   } catch { Fail "public catalog/index cross-check failed: $($_.Exception.Message)" }
 }
 
-$moduleRegistry=Join-Path $root 'platform\ronsas\ops\ealiophin\cluster\RONSAS-MODULES.json'
+$moduleRegistry=Join-Path $root 'platform/ronsas/ops/ealiophin/cluster/RONSAS-MODULES.json'
 if((Test-Path $moduleRegistry) -and $idx){
   try {
     $mr=Get-Content $moduleRegistry -Raw|ConvertFrom-Json
