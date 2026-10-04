@@ -114,18 +114,28 @@ function Assert-KnownPort([string]$Name, [int]$Port, [string]$Expected) {
         if ($response.StatusCode -ne 200 -or $contentType -notlike ([string]$identity.contentType + '*') -or -not $contentMatches) {
             throw "$Name endpoint is reachable without a Windows listener record, but its fingerprint is not recognized. No process was stopped."
         }
+        $reservedStatePids = @()
         if (Test-Path -LiteralPath $StatePath -PathType Leaf) {
             try {
                 $priorState = Get-Content -LiteralPath $StatePath -Raw | ConvertFrom-Json
-                $stateMatches = @($priorState.services | Where-Object { [string]$_.name -eq $Name -and [int]$_.port -eq $Port -and [int]$_.pid -gt 0 })
+                $stateMatches = @($priorState.services | Where-Object { [string]$_.name -eq $Name -and [int]$_.port -eq $Port })
                 if ($stateMatches.Count -eq 1) {
-                    $statePid = [int]$stateMatches[0].pid
-                    $stateProcess = Get-CimInstance Win32_Process -Filter "ProcessId=$statePid" -ErrorAction SilentlyContinue
-                    if ($stateProcess -and [string]$stateProcess.Name -ieq [string]$identity.process) {
-                        Write-Host "[SAFE REUSE] $Name has no Windows listener record; resolved to prior governed PID $statePid by state + endpoint fingerprint + expected process." -ForegroundColor Yellow
-                        return [pscustomobject]@{ pid=$statePid; owned=$false; command=[string]$stateProcess.CommandLine; identity='no-listener-record-state-and-endpoint' }
+                    $statePid = 0
+                    if ($stateMatches[0].PSObject.Properties['pid'] -and [int]$stateMatches[0].pid -gt 0) { $statePid = [int]$stateMatches[0].pid }
+                    elseif ($stateMatches[0].PSObject.Properties['launcherPid'] -and [int]$stateMatches[0].launcherPid -gt 0) { $statePid = [int]$stateMatches[0].launcherPid }
+                    if ($statePid -gt 0) {
+                        $stateProcess = Get-CimInstance Win32_Process -Filter "ProcessId=$statePid" -ErrorAction SilentlyContinue
+                        if ($stateProcess -and [string]$stateProcess.Name -ieq [string]$identity.process) {
+                            Write-Host "[SAFE REUSE] $Name has no Windows listener record; resolved to prior governed PID $statePid by state + endpoint fingerprint + expected process." -ForegroundColor Yellow
+                            return [pscustomobject]@{ pid=$statePid; owned=$false; command=[string]$stateProcess.CommandLine; identity='no-listener-record-state-and-endpoint' }
+                        }
                     }
                 }
+                foreach ($svc in @($priorState.services | Where-Object { [string]$_.name -ne $Name })) {
+                    if ($svc.PSObject.Properties['pid'] -and [int]$svc.pid -gt 0) { $reservedStatePids += [int]$svc.pid }
+                    if ($svc.PSObject.Properties['launcherPid'] -and [int]$svc.launcherPid -gt 0) { $reservedStatePids += [int]$svc.launcherPid }
+                }
+                $reservedStatePids = @($reservedStatePids | Select-Object -Unique)
             } catch {
                 Write-Warning "Could not use prior governed state to resolve $Name listener identity: $($_.Exception.Message)"
             }
@@ -133,7 +143,8 @@ function Assert-KnownPort([string]$Name, [int]$Port, [string]$Expected) {
         $allowBlankCommandLine = ([string]$identity.process -notin @('python.exe','node.exe','powershell.exe','pwsh.exe'))
         $candidates = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object {
             [string]$_.Name -ieq [string]$identity.process -and
-            ([string]$_.CommandLine -like "*$Expected*" -or ($allowBlankCommandLine -and [string]::IsNullOrWhiteSpace([string]$_.CommandLine)))
+            ([string]$_.CommandLine -like "*$Expected*" -or ($allowBlankCommandLine -and [string]::IsNullOrWhiteSpace([string]$_.CommandLine))) -and
+            ([int]$_.ProcessId -notin $reservedStatePids)
         })
         if ($candidates.Count -ne 1) {
             throw "$Name endpoint is healthy without a Windows listener record, but exactly one matching $($identity.process) process was not found. No process was stopped."
