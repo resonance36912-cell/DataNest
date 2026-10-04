@@ -12,7 +12,7 @@ const edge=fs.readFileSync(path.join(root,"supabase/functions/datanest-ai-chat/i
 const impact=fs.readFileSync(path.join(root,"supabase/migrations/20260928220000_reconcile_production_impact_scoring_governed.sql"),"utf8");
 const intakeV1=fs.readFileSync(path.join(root,"supabase/migrations/20260928223500_add_development_work_contribution_intake.sql"),"utf8");
 const intakeV2=fs.readFileSync(path.join(root,"supabase/migrations/20260929235100_link_development_work_requirement_focus.sql"),"utf8");
-const runtimeFix=fs.readFileSync(path.join(root,"supabase/migrations/20260928223619_fix_development_command_runtime_access.sql"),"utf8");
+const runtimeFix=fs.readFileSync(path.join(root,"supabase/migrations/20260928223619_fix_development_command_runtime_access.sql"),"utf8").replace(/\r\n/g,"\n");
 
 const sections=[
   ["ui_ux","UI & UX"],["frontend","Frontend"],["backend","Backend"],["data","Data"],["ai","AI"],

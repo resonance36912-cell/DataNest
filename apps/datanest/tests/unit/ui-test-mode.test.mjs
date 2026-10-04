@@ -5,19 +5,19 @@ import { readFileSync } from "node:fs";
 const testModeWorkflow=readFileSync(
   new URL("../../.github/workflows/ui-test-mode.yml",import.meta.url),
   "utf8"
-);
+).replace(/\r\n/g,"\n");
 const productionWorkflow=readFileSync(
   new URL("../../.github/workflows/pages.yml",import.meta.url),
   "utf8"
-);
+).replace(/\r\n/g,"\n");
 const ronsasWorkflow=readFileSync(
   new URL("../../.github/workflows/ronsas-app-validation.yml",import.meta.url),
   "utf8"
-);
+).replace(/\r\n/g,"\n");
 const expiryWorkflow=readFileSync(
   new URL("../../.github/workflows/ui-owner-test-mode-expiry.yml",import.meta.url),
   "utf8"
-);
+).replace(/\r\n/g,"\n");
 
 test("UI Test Mode is explicit, candidate-only, and produces review evidence",()=>{
   assert.match(testModeWorkflow,/name: DataNest UI Test Mode/);

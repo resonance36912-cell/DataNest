@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 const pages=readFileSync(
   new URL("../../.github/workflows/pages.yml",import.meta.url),
   "utf8"
-);
+).replace(/\r\n/g,"\n");
 
 test("Pages production uses the protected environment instead of Owner Test Mode checks",()=>{
   assert.match(pages,/environment:\n      name: github-pages/);

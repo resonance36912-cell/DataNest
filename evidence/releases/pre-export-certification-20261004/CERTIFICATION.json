@@ -1,0 +1,106 @@
+{
+    "schema":  "resonance-pre-export-certification/v1",
+    "generated_at":  "2026-10-04T15:55:37.8275617Z",
+    "repository":  "DataNest-Supository",
+    "branch":  "remediation/pre-export-certification-20261004",
+    "base_commit":  "11eb38fd6b617412a60454ca62e593813842d572",
+    "overall_status":  "blocked-remediation-required",
+    "promotion_authorized":  false,
+    "human_review_status":  "pending",
+    "runtime":  {
+                    "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                    "ronsas_status":  "ready",
+                    "healthy":  18,
+                    "total":  18,
+                    "required_down":  0
+                },
+    "canonical_validation":  {
+                                 "passed":  35,
+                                 "failed":  0,
+                                 "secret_history_findings":  0,
+                                 "open_nova_manifest_files_verified":  261
+                             },
+    "components":  [
+                       {
+                           "id":  "RSN-PLT-DATANEST",
+                           "tests":  "1161 passed, 0 failed",
+                           "typecheck":  "pass",
+                           "production_contract":  "pass",
+                           "secret_scan":  "pass",
+                           "build":  "pass",
+                           "status":  "pass"
+                       },
+                       {
+                           "id":  "RSN-APP-HUB",
+                           "tests":  "605 passed, 0 failed",
+                           "security_invariants":  "pass",
+                           "catalog_parity":  "16 SKUs byte-identical",
+                           "pricing_policy":  "pass after verifier aligned to governed free-promotion mode",
+                           "typecheck":  "pass",
+                           "local_production_build":  "pass",
+                           "lint":  "blocked: 58740 findings, predominantly CRLF/Prettier; 58537 auto-fixable",
+                           "public_registry":  "blocked: 5 URLs returned HTTP 530",
+                           "status":  "blocked"
+                       },
+                       {
+                           "id":  "RSN-APP-EPUBLISHER",
+                           "tests":  "pass",
+                           "types":  "pass",
+                           "build":  "pass",
+                           "production_dependency_audit":  "blocked: 5 high, 1 low",
+                           "quality":  "large chunk warning",
+                           "status":  "blocked"
+                       },
+                       {
+                           "id":  "RSN-APP-CREATIVE-STUDIO",
+                           "tests":  "138 passed",
+                           "build":  "pass",
+                           "lint":  "blocked: substantive TypeScript/ESLint debt",
+                           "production_dependency_audit":  "blocked: 5 high, 1 low",
+                           "quality":  "main JS about 2.83 MB minified",
+                           "status":  "blocked"
+                       },
+                       {
+                           "id":  "RSN-APP-SYNC-VISION",
+                           "tests":  "12 passed",
+                           "typecheck":  "pass",
+                           "build":  "pass",
+                           "lint":  "blocked: 586 errors, 103 warnings",
+                           "production_dependency_audit":  "blocked: 5 high, 1 low",
+                           "status":  "blocked"
+                       },
+                       {
+                           "id":  "RSN-APP-YOUTUBE-OPTIMIZER",
+                           "tests":  "18 passed",
+                           "typecheck":  "pass",
+                           "build":  "pass",
+                           "lint":  "blocked: 22572 errors, 13 warnings, predominantly CRLF/Prettier; 22470 auto-fixable",
+                           "status":  "blocked"
+                       },
+                       {
+                           "id":  "RSN-PLT-OPENNOVA",
+                           "manifest":  "261 files verified",
+                           "status":  "pass"
+                       }
+                   ],
+    "blockers":  [
+                     "Production dependency vulnerabilities in ePublisher, Creative Studio, and Sync Vision: each 5 high + 1 low with dev dependencies omitted.",
+                     "Creative Studio substantive lint debt.",
+                     "Sync Vision lint debt: 586 errors / 103 warnings.",
+                     "Hub and YouTube Optimizer repository-wide CRLF/Prettier migration debt; do not weaken lint rules.",
+                     "Public Resonance app registry URLs return HTTP 530 and require deployment/DNS re-hosting.",
+                     "Human reviewer approval remains mandatory before main promotion/export push."
+                 ],
+    "warnings":  [
+                     "Hub uses vite 7.3.6 while its builder warns that ^8 is expected.",
+                     "Hub contains deprecated createServerFn().inputValidator() calls.",
+                     "Creative Studio and ePublisher have large production chunk warnings."
+                 ],
+    "next_actions":  [
+                         "Remediate production dependency vulnerabilities without forced breaking upgrades.",
+                         "Create dedicated line-ending/format normalization commits for Hub and YouTube Optimizer, then rerun lint.",
+                         "Resolve substantive Creative Studio and Sync Vision lint errors without disabling rules.",
+                         "Re-host public endpoints and rerun app-registry verification.",
+                         "Rerun full certification and require human approval before GitLab export."
+                     ]
+}

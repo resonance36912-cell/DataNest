@@ -15,7 +15,7 @@ test("every active worktree workflow gate is covered by the shared timeframe reg
     .filter((name)=>name.endsWith(".yml"))
     .filter((name)=>name!==reusable)
     .filter((name)=>{
-      const source=readFileSync(new URL(`../../.github/workflows/${name}`,import.meta.url),"utf8");
+      const source=readFileSync(new URL(`../../.github/workflows/${name}`,import.meta.url),"utf8").replace(/\r\n/g,"\n");
       return !/^# worktree-gate:\s*false\s*$/m.test(source) && /\n  gate-timeframe:\n/.test(source);
     })
     .sort();
@@ -25,7 +25,7 @@ test("every active worktree workflow gate is covered by the shared timeframe reg
 test("every worktree gate invokes the reusable DataNest AI timeframe policy",()=>{
   for(const [workflowFile,profile] of Object.entries(profiles)){
     if(workflowFile==="pages.yml") continue;
-    const source=readFileSync(new URL(`../../.github/workflows/${workflowFile}`,import.meta.url),"utf8");
+    const source=readFileSync(new URL(`../../.github/workflows/${workflowFile}`,import.meta.url),"utf8").replace(/\r\n/g,"\n");
     assert.match(source,/\n  gate-timeframe:\n/,`${workflowFile} missing gate-timeframe job`);
     assert.match(source,/uses: \.\/\.github\/workflows\/worktree-gate-timeframe\.yml/);
     assert.match(source,new RegExp(`gate_id: ["']?${profile.gateId.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}["']?`));
@@ -81,7 +81,7 @@ test("Owner overrides are bounded, auditable, and limited to manual mutation gat
 });
 
 test("shared workflow publishes summary and retained machine-readable evidence",()=>{
-  const source=readFileSync(new URL("../../.github/workflows/worktree-gate-timeframe.yml",import.meta.url),"utf8");
+  const source=readFileSync(new URL("../../.github/workflows/worktree-gate-timeframe.yml",import.meta.url),"utf8").replace(/\r\n/g,"\n");
   assert.match(source,/GITHUB_STEP_SUMMARY|propose-worktree-gate-timeframe\.mjs/);
   assert.match(source,/worktree-gate-timeframe-\$\{\{ inputs\.gate_id \}\}-\$\{\{ github\.run_id \}\}/);
   assert.match(source,/retention-days: 30/);
@@ -90,7 +90,7 @@ test("shared workflow publishes summary and retained machine-readable evidence",
 
 test("manual workflows expose bounded Owner override inputs",()=>{
   for(const workflow of ["branch-cleaner.yml","datanest-ai-file-worker-deploy.yml","mirror-production-import.yml"]){
-    const source=readFileSync(new URL(`../../.github/workflows/${workflow}`,import.meta.url),"utf8");
+    const source=readFileSync(new URL(`../../.github/workflows/${workflow}`,import.meta.url),"utf8").replace(/\r\n/g,"\n");
     assert.match(source,/gate_timeframe_override_hours:/,`${workflow} missing override input`);
     assert.match(source,/override_hours: \$\{\{ inputs\.gate_timeframe_override_hours \|\| '' \}\}/);
   }

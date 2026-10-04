@@ -10,11 +10,11 @@ const verifier=fileURLToPath(
 const pagesWorkflow=readFileSync(
   new URL("../../.github/workflows/pages.yml",import.meta.url),
   "utf8"
-);
+).replace(/\r\n/g,"\n");
 const ronsasWorkflow=readFileSync(
   new URL("../../.github/workflows/ronsas-app-validation.yml",import.meta.url),
   "utf8"
-);
+).replace(/\r\n/g,"\n");
 
 const valid={
   // Keep authorized-release contract tests deterministic even when the parent

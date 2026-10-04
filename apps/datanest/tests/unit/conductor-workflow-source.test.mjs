@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 const workflow=readFileSync(
   new URL("../../.github/workflows/conductor.yml",import.meta.url),
   "utf8"
-);
+).replace(/\r\n/g,"\n");
 
 const mainDispatchGuard=/github\.event_name == 'workflow_dispatch'[\s\S]*?github\.ref == 'refs\/heads\/main'/;
 const scheduleGuard=/github\.event_name == 'schedule'/;

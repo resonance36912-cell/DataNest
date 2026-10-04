@@ -10,7 +10,7 @@ const importWorkflow=readFileSync(
 const pagesWorkflow=readFileSync(
   new URL("../../.github/workflows/pages.yml",import.meta.url),
   "utf8"
-);
+).replace(/\r\n/g,"\n");
 const governanceWriter=readFileSync(
   new URL("../../scripts/write-ui-governance-evidence.mjs",import.meta.url),
   "utf8"
