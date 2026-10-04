@@ -147,6 +147,10 @@ function Assert-KnownPort([string]$Name, [int]$Port, [string]$Expected) {
             ([int]$_.ProcessId -notin $reservedStatePids)
         })
         if ($candidates.Count -ne 1) {
+            if ($Name -eq 'ai-broker') {
+                Write-Warning '[SAFE REUSE] ai-broker endpoint fingerprint is valid, but Windows does not expose an attributable listener/process. Reusing as unowned without process mutation.'
+                return [pscustomobject]@{ pid=0; owned=$false; command=''; identity='endpoint-fingerprint-only-unowned' }
+            }
             throw "$Name endpoint is healthy without a Windows listener record, but exactly one matching $($identity.process) process was not found. No process was stopped."
         }
         $resolvedPid = [int]$candidates[0].ProcessId
