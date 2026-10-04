@@ -1,0 +1,16 @@
+FROM python:3.12.10-slim
+WORKDIR /app
+COPY services/wheelhouse /wheelhouse
+COPY services/gateway/requirements.txt /app/requirements.txt
+RUN pip install --no-index --find-links=/wheelhouse -r requirements.txt
+COPY services/gateway/bootstrap.py /app/bootstrap.py
+COPY services/gateway/subscription_mirror.py /app/subscription_mirror.py
+COPY services/gateway/billing_read.py /app/billing_read.py
+COPY services/gateway/checkout_audit.py /app/checkout_audit.py
+COPY services/gateway/payfast_settlement.py /app/payfast_settlement.py
+COPY services/gateway/governance.py /app/governance.py
+COPY services/gateway/cost_usage.py /app/cost_usage.py
+COPY services/gateway/app.py /app/app.py
+USER 65532:65532
+EXPOSE 8000
+CMD ["uvicorn","app:app","--host","0.0.0.0","--port","8000"]

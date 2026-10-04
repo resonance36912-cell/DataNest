@@ -1,0 +1,28 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Runtime / secrets
+.env
+.env.*
+!.env.example
+!.env.sovereign.example
+secrets/
+runtime/
+*.db
+*.sqlite*
+*.log
+*.pid
+
+# Build/editor
+dist/
+build/
+services/wheelhouse/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,20 @@
+{
+  "schema": "ronsas.source-authority.v1",
+  "component": "sovereign-backend",
+  "repository": "https://github.com/resonance36912-cell/rons-sovereign-backend-source",
+  "visibility": "private",
+  "default_branch": "main",
+  "control_repository": "https://github.com/resonance36912-cell/RONSAS",
+  "local_path": "%USERPROFILE%\\Resonance\\OpenNova\\sources\\rons-sovereign-backend-source",
+  "baseline_source": "ResonanceAppDev_ZeroCredit_v1.5.8",
+  "promotion": "review-branch-ci-merge-build-canary-promote",
+  "excludes": [
+    "runtime secrets",
+    "database volumes",
+    "auth databases",
+    "object storage",
+    "container state",
+    "logs",
+    "caches"
+  ]
+}
