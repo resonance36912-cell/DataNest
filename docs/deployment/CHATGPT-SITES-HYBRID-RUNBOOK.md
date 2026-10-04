@@ -92,7 +92,7 @@ After canonical GitLab import is certified, recreate `Mirror-DataNest` as a fork
 - `RSN-NODE-SPIDER-DR-01` is included as a support/disaster-recovery worker with no production promotion authority.
 - Spider governed worker controls live at `platform/ronsas/ops/workers/spider` and are hash-verified by `platform/ronsas/scripts/verify-worker-ops-manifests.ts`.
 - Spider readiness is tracked at `ops/nodes/SPIDER-READINESS.json` with evidence at `evidence/certification/SPIDER-NODE-READINESS-20261004.md`.
-- The Desktop Commander remote registry still reports Spider offline during this audit, so no fresh workstation filesystem/Git/runtime claims are made. This does not block non-destructive forge import, but it blocks claiming the three-node DR topology is freshly certified until Spider is directly audited.
+- Spider was directly audited online on 2026-10-04. Its sealed canonical bundle validated at 35/35 traceability and 261 Open Nova files, and all four governed Spider worker scripts match canonical SHA-256 hashes. The remaining Spider gate is reliable GitHub reachability for both governed private origins. The control repo synced successfully earlier on 2026-10-04, but current manual refreshes of both the RONSAS control and `resonance-hub` origins reset the connection.
 ## Custom-domain strategy
 The canonical Hub brand domain remains `reson8.life`.
 
@@ -156,7 +156,8 @@ Preserve the same logical gates even though GitHub is no longer the forge:
 - [x] Open Nova sealed manifest verifies 261 files.
 - [x] Local DataNest + 7 RONSAS and Hub/Nitro release candidates rebuilt from frozen audited source `3c6b4bb0` and SHA-256 sealed.
 - [x] Spider governed worker controls included and manifest-verified; sealed worker-control artifact recorded.
-- [ ] Fresh direct Spider workstation audit completed before declaring full three-node topology/DR certification.
+- [x] Fresh direct Spider workstation audit completed; local repos, worker controls and sealed canonical reference are aligned.
+- [ ] Restore Spider `resonance-hub` origin reachability and record a successful remote check/fetch before declaring the Spider DR sync path fully ready.
 - [ ] New GitLab forge/project authority established and protected.
 - [ ] Final migration bundle generated from a clean committed head and hash recorded.
 - [ ] Fresh clone from GitLab matches the migration/export SHA exactly.

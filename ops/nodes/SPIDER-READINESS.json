@@ -8,27 +8,53 @@
   "promotionAuthority": false,
   "desktopCommander": {
     "deviceId": "36b21a2a-f70e-4efb-8773-4ac5f0454417",
-    "statusAtRecord": "offline",
-    "freshWorkstationAudit": false
+    "statusAtRecord": "online",
+    "freshWorkstationAudit": true,
+    "observedAt": "2026-10-04T18:01:36.5646466+02:00"
   },
   "governedSource": {
     "workerControls": "platform/ronsas/ops/workers/spider",
     "canonicalIndex": "ops/index/TRACEABILITY-INDEX.json",
     "productionAuthorityNode": "RSN-NODE-EALIOPHIN-PRD-01"
   },
+  "freshAudit": {
+    "result": "passed-with-git-origin-connectivity-warning",
+    "canonicalBundleHead": "7a66e5a2db48c03678123716506217754761f21b",
+    "canonicalBundleSha256": "4DA0BE19D1EDC8BB35CD5DC308425FE82BC1BAEA23893B7907350D293E6C1566",
+    "traceability": "35-passed-0-failed",
+    "openNovaBuildManifest": "261-files-verified",
+    "workerControlHashesExact": true,
+    "ronsasAlignment": true,
+    "controlRepository": {
+      "branch": "main",
+      "head": "819b773a263c277693031d76c1b4d32542365fd7",
+      "dirty": false,
+      "originReachability": "last-success-2026-10-04T17:15+02; current-refresh-connection-reset",
+      "alignment": "matches-Weed-control-head"
+    },
+    "hubRepository": {
+      "branch": "ronsas/ealiophin-production",
+      "head": "0329aeb42c3f10b26febb638482207468a050332",
+      "dirty": false,
+      "originReachability": "current-refresh-connection-reset",
+      "alignment": "matches-Ealiophin-latest-local-origin-tracking-ref"
+    },
+    "promotionBridge": {
+      "branch": "ronsas/windows-mcp-root-20260915",
+      "head": "f865ee1c2b416185f77dc52a04daa859ee34a80d",
+      "dirty": false
+    },
+    "dropboxAuditHandoffPresent": true,
+    "workerLoopObserved": true,
+    "productionListenerObserved": false
+  },
   "migrationDisposition": {
     "includedInCanonicalTopology": true,
     "forgeImportBlocked": false,
-    "fullTopologyCertificationBlockedUntilFreshAudit": true,
-    "workerPromotionToProductionAllowed": false
+    "fullTopologyCertificationBlockedUntilFreshAudit": false,
+    "fullTopologyCertificationBlockedByHubOriginReachability": true,
+    "workerPromotionToProductionAllowed": false,
+    "fullTopologyCertificationBlockedByGitOriginReachability": true
   },
-  "freshAuditRequirements": [
-    "Confirm Desktop Commander Spider device is online and identity matches the recorded device ID.",
-    "Capture current Git checkout roots, branches, HEADs, remotes, worktree status and local changes without destructive cleanup.",
-    "Verify RONSAS Spider worker scripts and node-local manifests against the canonical source hashes.",
-    "Verify Dropbox handoff state is evidence transport only and contains no editable source authority.",
-    "Inventory active Resonance/RONSAS processes and listeners and confirm Spider is not acting as production authority.",
-    "Preserve any divergent or dirty source as bundle/patch evidence before reconciliation.",
-    "Record final Spider readiness evidence and update currentObservation in the traceability index only after direct observation."
-  ]
+  "remainingGate": "Restore reliable Spider GitHub reachability for both the RONSAS control and resonance-hub origins, then record successful fresh fetches before declaring the Spider DR sync path fully ready."
 }

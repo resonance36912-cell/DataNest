@@ -40,7 +40,7 @@
    - SHA-256: `A475A9EE2328C2CE98F65A2DA7DC050B3008D1DE5EF3387BE5E6FEBB4453B7A0`
    - ZIP bytes: `4,219`
    - Scope: governed Spider worker manifest plus `Publish-RonsasControlMirror.ps1`, `Start-RonsasWorkerLoop.ps1`, `Sync-RonsasWorker.ps1`, and `Verify-RONSAS.ps1`.
-   - Status: sealed worker-control release candidate; **not freshly workstation-certified** because the remote Spider device registry remains offline.
+   - Status: sealed worker-control release candidate; fresh Spider audit completed and local worker hashes match canonical. **Full DR sync readiness remains gated by the current Git-origin connection-reset condition.**
 
 The older `*-candidate-20261004.zip` files remain historical evidence only and are superseded by the `*-release-3c6b4bb0-20261004.zip` artifacts above for this local release-candidate cycle.
 
@@ -52,8 +52,8 @@ The older `*-candidate-20261004.zip` files remain historical evidence only and a
 - Readiness record: `ops/nodes/SPIDER-READINESS.json`.
 - Dedicated readiness evidence: `evidence/certification/SPIDER-NODE-READINESS-20261004.md`.
 - Desktop Commander remote device ID: `36b21a2a-f70e-4efb-8773-4ac5f0454417`.
-- Current remote registry state during this audit: offline; therefore no fresh filesystem, Git, listener or runtime assertions are made for Spider.
-- Spider being offline does **not** block non-destructive GitLab forge import, but full three-node topology/DR certification remains blocked until a direct Spider audit is completed.
+- Current remote registry state: online and directly audited. Spider validated the sealed canonical bundle at 35/35 traceability and 261 Open Nova files; its four governed worker scripts match canonical SHA-256 hashes exactly.
+- Spider fresh audit is complete and does **not** block non-destructive GitLab forge import. The control repo synced successfully earlier on 2026-10-04, but current manual refreshes of both governed private origins reset. Full Spider DR sync readiness remains pending until reliable GitHub reachability to both the RONSAS control and `resonance-hub` origins is restored and successful fresh remote checks/fetches are recorded.
 
 ## ChatGPT Sites domain capability
 OpenAI Help Center, checked 2026-10-04, documents custom-domain connection for ChatGPT Sites where the feature is available. The Site owner uses **Site settings > Add domain**, enters an apex domain or subdomain, receives provider-issued DNS records, applies them at the DNS provider, then refreshes status. This establishes platform capability but does not establish availability on this specific account/site and does not authorize DNS changes.
@@ -72,7 +72,7 @@ The former Open Nova byte-size/SHA manifest failure is resolved for the reconcil
 
 ## Remaining findings and production gates
 - GitLab account/group/project authority is not yet established or protected; a fresh remote-authority clone and CI reproduction remain required before production promotion.
-- Spider requires a fresh direct workstation audit before the complete Ealiophin/Weed/Spider DR topology can be certified current.
+- Spider fresh workstation audit is complete; reliable Spider GitHub reachability to both the RONSAS control and `resonance-hub` origins is still required before the Spider DR synchronization path can be certified fully ready.
 - Target ChatGPT Site/account must expose the Sites feature and, where used, **Add domain**; provider-issued DNS values and TLS status must be captured as evidence before any cutover.
 - Supabase Auth/OAuth redirect allowlists, CSP/CORS, canonical metadata, robots/sitemap origins and service manifests must be updated as one governed cutover.
 - Hub warns that the Nitro Vite builder expects Vite 8 while the Hub currently pins Vite 7.3.6.
