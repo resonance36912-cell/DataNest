@@ -1,0 +1,29 @@
+{
+  "name": "Resonance Constitutional Governance Framework",
+  "abbreviation": "RCGF",
+  "version": "1.0",
+  "motto": "Truth \u2022 Transparency \u2022 Sovereignty \u2022 Resonance \u2022 Continuous Evolution",
+  "articles": [
+    "Human Sovereignty",
+    "Truth",
+    "Transparency",
+    "Resonance",
+    "Continuous Improvement",
+    "Accountability",
+    "Evidence Hierarchy",
+    "Security and Privacy",
+    "Quality",
+    "Collaboration",
+    "Explainability",
+    "Legacy"
+  ],
+  "evidence_hierarchy": [
+    "Observable reality",
+    "Verified evidence",
+    "Approved governance",
+    "Testing and validation",
+    "Reliable external sources",
+    "Logical inference",
+    "Speculation"
+  ]
+}
