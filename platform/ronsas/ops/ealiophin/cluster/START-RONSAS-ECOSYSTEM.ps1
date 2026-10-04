@@ -52,9 +52,38 @@ function Test-BackendReady {
         return [bool]$h.ready
     } catch { return $false }
 }
-function Get-ListenerPid([int]$Port) {
+function Get-ListenerRecord([int]$Port) {
     $l = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($l) { return [int]$l.OwningProcess }
+    if ($l -and [int]$l.OwningProcess -gt 0) {
+        return [pscustomobject]@{ LocalAddress=[string]$l.LocalAddress; LocalPort=$Port; OwningProcess=[int]$l.OwningProcess; Source='Get-NetTCPConnection' }
+    }
+
+    # Windows can occasionally hide or report PID 0 through Get-NetTCPConnection
+    # while netstat still exposes the actual TCP listener PID. Use netstat only as
+    # a read-only fallback, then apply the same process/endpoint identity checks.
+    $netstat = Join-Path $env:SystemRoot 'System32\netstat.exe'
+    if (Test-Path -LiteralPath $netstat -PathType Leaf) {
+        foreach ($line in @(& $netstat -ano -p tcp 2>$null)) {
+            if ([string]$line -notmatch '^\s*TCP\s+(\S+)\s+\S+\s+LISTENING\s+(\d+)\s*$') { continue }
+            $endpoint = [string]$Matches[1]
+            $pid = [int]$Matches[2]
+            $address = $null; $seenPort = $null
+            if ($endpoint -match '^\[([^\]]+)\]:(\d+)$') { $address=$Matches[1]; $seenPort=[int]$Matches[2] }
+            elseif ($endpoint -match '^(.+):(\d+)$') { $address=$Matches[1]; $seenPort=[int]$Matches[2] }
+            if ($seenPort -eq $Port) {
+                return [pscustomobject]@{ LocalAddress=[string]$address; LocalPort=$Port; OwningProcess=$pid; Source='netstat' }
+            }
+        }
+    }
+
+    if ($l) {
+        return [pscustomobject]@{ LocalAddress=[string]$l.LocalAddress; LocalPort=$Port; OwningProcess=[int]$l.OwningProcess; Source='Get-NetTCPConnection-pid0' }
+    }
+    return $null
+}
+function Get-ListenerPid([int]$Port) {
+    $record = Get-ListenerRecord $Port
+    if ($record) { return [int]$record.OwningProcess }
     return $null
 }
 function Get-CommandLine([int]$ProcessId) {
@@ -71,7 +100,7 @@ function Wait-Http([string]$Name, [string]$Url, [int]$Seconds = 30) {
     throw "$Name did not become healthy at $Url"
 }
 function Assert-KnownPort([string]$Name, [int]$Port, [string]$Expected) {
-    $listener = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
+    $listener = Get-ListenerRecord $Port
     if (-not $listener) { return $null }
     $listenerPid = [int]$listener.OwningProcess
     $cmd = if ($listenerPid -gt 0) { Get-CommandLine $listenerPid } else { '' }
@@ -256,7 +285,8 @@ if (-not (Test-BackendReady)) {
 }
 $backendUrl = 'http://127.0.0.1:8787/v1/backend/health'
 $services += [pscustomobject]@{name='sovereign-backend';port=58600;url=$backendUrl;pid=(Get-ListenerPid 58600);owned=$false;root=$AppDev}
-$opsRuntime = Join-Path (Split-Path $PSScriptRoot -Parent) 'runtime'
+$opsRuntimeCandidate = Join-Path (Split-Path $PSScriptRoot -Parent) 'runtime'
+$opsRuntime = if (Test-Path -LiteralPath $opsRuntimeCandidate -PathType Container) { $opsRuntimeCandidate } else { $Runtime }
 $sttSource = Join-Path $opsRuntime 'syncvision-local-stt.py'
 if (-not (Test-Path -LiteralPath $sttSource -PathType Leaf)) { throw "STT runtime source missing: $sttSource" }
 $sttTarget = Join-Path $Runtime 'syncvision-local-stt.py'
