@@ -8,7 +8,7 @@ export const sovereignCompatibility = {
   database: {
     query: "/v1/db/query",
     procedure: "/v1/db/procedure",
-    allowlistedProcedures: ["transaction_probe", "mirror_user_roles", "read_subscription_mirror", "read_subscription_account", "mirror_subscriptions", "read_account_invoices", "read_admin_invoices", "read_billing_account", "read_billing_admin", "record_payfast_launch"],
+    allowlistedProcedures: ["transaction_probe", "mirror_user_roles", "read_subscription_mirror", "read_subscription_account", "mirror_subscriptions", "read_account_invoices", "read_admin_invoices", "read_billing_account", "read_billing_admin", "record_payfast_launch", "governance_list_participants", "governance_list_proposals", "governance_get_proposal", "governance_create_proposal", "governance_submit_proposal", "governance_add_evidence", "governance_add_review", "governance_record_decision", "governance_register_agent"],
     protectedReads: ["invoices", "credit_wallets", "credit_ledger", "billing_receipts"],
     protectedAudits: ["payfast_launch_logs"],
     stagedProcedures: ["create_admin_bootstrap_challenge", "cancel_admin_bootstrap_challenge", "bootstrap_first_admin"],

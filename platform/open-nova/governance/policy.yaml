@@ -264,7 +264,7 @@ backend_runtime:
   manifest: governance/backend-runtime.yaml
   apps_root: apps
   runtime_root: runtime/backend-runtime
-  secrets_root: runtime/secrets
+  secrets_root: ../runtime/secrets
   require_confirmation: true
   network_downloads_allowed: false
   public_bind_allowed: false
