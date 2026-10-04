@@ -102,6 +102,15 @@ function Wait-Http([string]$Name, [string]$Url, [int]$Seconds = 30) {
 function Assert-KnownPort([string]$Name, [int]$Port, [string]$Expected) {
     $listener = Get-ListenerRecord $Port
     if (-not $listener) {
+        $identityForRetry = $KnownEndpointIdentities[$Name]
+        if ($identityForRetry -and (Test-Http ([string]$identityForRetry.url))) {
+            for ($attempt = 1; $attempt -le 8 -and -not $listener; $attempt++) {
+                Start-Sleep -Milliseconds 250
+                $listener = Get-ListenerRecord $Port
+            }
+        }
+    }
+    if (-not $listener) {
         $identity = $KnownEndpointIdentities[$Name]
         if (-not $identity) { return $null }
         try {
