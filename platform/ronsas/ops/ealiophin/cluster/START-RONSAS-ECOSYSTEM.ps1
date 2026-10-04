@@ -66,12 +66,12 @@ function Get-ListenerRecord([int]$Port) {
         foreach ($line in @(& $netstat -ano -p tcp 2>$null)) {
             if ([string]$line -notmatch '^\s*TCP\s+(\S+)\s+\S+\s+LISTENING\s+(\d+)\s*$') { continue }
             $endpoint = [string]$Matches[1]
-            $pid = [int]$Matches[2]
+            $listenerProcessId = [int]$Matches[2]
             $address = $null; $seenPort = $null
             if ($endpoint -match '^\[([^\]]+)\]:(\d+)$') { $address=$Matches[1]; $seenPort=[int]$Matches[2] }
             elseif ($endpoint -match '^(.+):(\d+)$') { $address=$Matches[1]; $seenPort=[int]$Matches[2] }
             if ($seenPort -eq $Port) {
-                return [pscustomobject]@{ LocalAddress=[string]$address; LocalPort=$Port; OwningProcess=$pid; Source='netstat' }
+                return [pscustomobject]@{ LocalAddress=[string]$address; LocalPort=$Port; OwningProcess=$listenerProcessId; Source='netstat' }
             }
         }
     }
