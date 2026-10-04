@@ -1,0 +1,67 @@
+{
+  "schema": "ronsas.gate5.topology-audit.v1",
+  "capturedAtUtc": "2026-09-17T10:34:15Z",
+  "scope": "Checkpoint-defined Gate 5 topology and audit verification",
+  "result": "pass",
+  "authorities": {
+    "control": {
+      "repo": "resonance36912-cell/RONSAS",
+      "branch": "main",
+      "head": "46e7244200b5010b92ca1584f49398c44653f2eb"
+    },
+    "productionHub": {
+      "repo": "resonance36912-cell/resonance-hub",
+      "branch": "ronsas/ealiophin-production",
+      "head": "65443f2b5c75ad5c789a8b6e8fc0dcfee852c19f"
+    }
+  },
+  "ealiophinTopology": {
+    "status": "mapped",
+    "missingRequiredPaths": 0,
+    "missingRequiredRepositories": 0,
+    "requiredServicesDown": 0,
+    "dirtyRepositoriesObserved": 2,
+    "dirtyRepositoryIds": ["hub-developer", "hub-runtime-stage"],
+    "note": "Both observed dirty repositories are non-production authorities; control and production Hub authorities were clean."
+  },
+  "workers": {
+    "spider": {
+      "status": "ok",
+      "topology": "mapped",
+      "controlHead": "46e7244200b5010b92ca1584f49398c44653f2eb",
+      "hubHead": "65443f2b5c75ad5c789a8b6e8fc0dcfee852c19f",
+      "auditPresent": true,
+      "ealiophinSnapshotPresent": true,
+      "liveGovernedBytesMatchManifest": true,
+      "lastSync": "2026-09-17T12:34:00.7383371+02:00"
+    },
+    "weed": {
+      "status": "ok",
+      "topology": "mapped",
+      "controlHead": "46e7244200b5010b92ca1584f49398c44653f2eb",
+      "hubHead": "65443f2b5c75ad5c789a8b6e8fc0dcfee852c19f",
+      "controlMode": "dropbox-bundle-pinned",
+      "liveGovernedBytesMatchManifest": true,
+      "lastSync": "2026-09-17T12:34:15.1359670+02:00"
+    }
+  },
+  "controlMirror": {
+    "producer": "Spider",
+    "transport": "Dropbox support staging",
+    "branch": "main",    "head": "46e7244200b5010b92ca1584f49398c44653f2eb",
+    "bundleSha256": "3CB8C5D5D904503943843BFD5C799C75667A2675C40BEEBE8B7E586407B62C22",
+    "generatedAt": "2026-09-17T09:47:00.1064767+02:00"
+  },
+  "validation": {
+    "repositoryWorkerManifestCheck": "pass",
+    "spiderVerifier": "pass",
+    "weedVerifier": "pass",
+    "spiderWorkerSync": "pass",
+    "weedWorkerSync": "pass"
+  },
+  "limitations": [
+    "This receipt certifies the checkpoint-defined Gate 5 topology/audit scope only.",
+    "It does not clean or reconcile the non-authority hub-developer or hub-runtime-stage worktrees.",
+    "It does not certify later Gate 6 governance evidence, Gate 7 recovery, or Gate 8 final ledger."
+  ]
+}

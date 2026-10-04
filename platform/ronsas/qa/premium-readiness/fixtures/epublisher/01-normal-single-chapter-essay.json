@@ -1,0 +1,35 @@
+{
+  "schema": "ronsas.premium-fixture.v1",
+  "id": "epublisher-normal-01-single-chapter-essay",
+  "app": "epublisher",
+  "category": "normal",
+  "review_status": "source-derived-reviewed",
+  "review_basis": "Mapped to existing app source/tests and checked against the premium-readiness required_checks manifest on 2026-09-19.",
+  "input": {
+    "title": "Why Small Teams Ship Faster",
+    "content": "A structured 1,200-word essay with an introduction, three subheadings, conclusion, and two source notes.",
+    "format": "markdown"
+  },
+  "expected_checks": [
+    "source-fidelity",
+    "toc-navigation",
+    "narration-fidelity",
+    "export-reopen",
+    "epubcheck-when-epub"
+  ],
+  "provenance": [
+    "src/lib/__tests__/book-structure.test.ts",
+    "src/lib/__tests__/canonical-storyboard.test.ts",
+    "src/lib/__tests__/chapter-source-notes.test.ts",
+    "src/lib/__tests__/publication-readiness.test.ts",
+    "src/lib/__tests__/research-source-quality.test.ts",
+    "tests/e2e/export-matrix.spec.ts",
+    "tests/e2e/narration-gating.spec.ts"
+  ],
+  "critical_failure_classes": [
+    "cross-account-access",
+    "incorrect-billing",
+    "unusable-paid-artifact",
+    "fabricated-source-attribution"
+  ]
+}

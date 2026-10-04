@@ -1,0 +1,36 @@
+{
+  "schema": "ronsas.premium-fixture.v1",
+  "id": "youtube-optimizer-normal-05-low-ctr",
+  "app": "youtube-optimizer",
+  "category": "normal",
+  "review_status": "source-derived-reviewed",
+  "review_basis": "Mapped to existing app source/tests and checked against the premium-readiness required_checks manifest on 2026-09-19.",
+  "input": {
+    "public_metrics": {
+      "impressions": 100000,
+      "ctr": 0.021
+    },
+    "goal": "prioritized public-data recommendations"
+  },
+  "expected_checks": [
+    "channel-attribution",
+    "traceable-statistics",
+    "reproducible-scoring",
+    "prioritized-actions",
+    "no-private-analytics-fabrication"
+  ],
+  "provenance": [
+    "src/lib/channel-audit.functions.ts",
+    "src/components/ChannelInput.tsx",
+    "src/components/VideoScoreAnalyzer.tsx",
+    "src/components/ThumbnailTextEditor.tsx",
+    "scripts/check-public-metric-labels.mjs",
+    "src/test/rons-ai.test.ts"
+  ],
+  "critical_failure_classes": [
+    "cross-account-access",
+    "incorrect-billing",
+    "unusable-paid-artifact",
+    "fabricated-source-attribution"
+  ]
+}

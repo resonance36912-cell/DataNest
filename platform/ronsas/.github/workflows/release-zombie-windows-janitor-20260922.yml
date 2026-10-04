@@ -1,0 +1,84 @@
+name: Release zombie Windows janitor
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/release-zombie-windows-janitor-20260922.yml"
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  release:
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
+    timeout-minutes: 5
+    steps:
+      - name: Prove and release exact stale Windows assignment
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const runId = 35762549487;
+            const jobId = 106863919647;
+            const expectedRunner = "Ealiophin-RONSAS-Windows-1";
+            const expectedName = "CI queue janitor";
+
+            const { data: run } = await github.rest.actions.getWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: runId,
+            });
+            if (run.name !== expectedName) {
+              core.setFailed(`Unexpected run name: ${run.name}`);
+              return;
+            }
+            if (run.status !== "in_progress") {
+              core.info(`Run already left in_progress: ${run.status}; no cancellation required.`);
+              return;
+            }
+
+            const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: runId,
+              filter: "latest",
+              per_page: 100,
+            });
+            const job = jobs.jobs.find((item) => item.id === jobId);
+            if (!job) {
+              core.setFailed("Exact janitor job not found.");
+              return;
+            }
+            if (job.runner_name !== expectedRunner || job.status !== "in_progress") {
+              core.setFailed(`Ownership mismatch: runner=${job.runner_name} status=${job.status}`);
+              return;
+            }
+            if (Array.isArray(job.steps) && job.steps.length !== 0) {
+              core.setFailed(`Refusing cancellation because job has ${job.steps.length} recorded steps.`);
+              return;
+            }
+
+            const started = Date.parse(job.started_at || run.run_started_at || run.created_at);
+            if (!Number.isFinite(started) || Date.now() - started < 5 * 60 * 1000) {
+              core.setFailed("Stale-age proof not satisfied.");
+              return;
+            }
+
+            core.warning(`Force-cancelling exact stale run ${runId}; zero-step assignment on ${expectedRunner} exceeded five minutes.`);
+            await github.request(
+              "POST /repos/{owner}/{repo}/actions/runs/{run_id}/force-cancel",
+              { owner: context.repo.owner, repo: context.repo.repo, run_id: runId },
+            );
+
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+            const { data: after } = await github.rest.actions.getWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: runId,
+            });
+            core.info(`post_cancel_status=${after.status} conclusion=${after.conclusion}`);
+            if (after.status === "in_progress") {
+              core.setFailed("Stale janitor remained in_progress after force-cancel.");
+            }

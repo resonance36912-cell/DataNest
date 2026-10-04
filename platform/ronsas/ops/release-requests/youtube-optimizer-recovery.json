@@ -1,0 +1,25 @@
+{
+  "schema": "ronsas-youtube-recovery/v1",
+  "module": "youtube-optimizer",
+  "listenPort": 3401,
+  "localHealth": "http://127.0.0.1:3401/",
+  "publicUrl": "https://youtube.reson8.life/",
+  "runtimeRelative": "runtime\\youtube-optimizer-stage",
+  "entryRelative": ".output\\server\\index.mjs",
+  "confirmation": "RECOVER RONSAS YOUTUBE OPTIMIZER",
+  "evidence": {
+    "priorHubReleaseRun": 35506949756,
+    "publicFailure": "HTTP 502 while Hub, ePublisher, Creative Studio, and Sync Vision returned HTTP 200"
+  },
+  "constraints": {
+    "changeBilling": false,
+    "changeDomains": false,
+    "createService": false,
+    "cloudflareWorkerMigration": false,
+    "rebuildSource": false,
+    "touchOtherSpokes": false
+  },
+  "retryAttempt": 6,
+  "retryReason": "Retry from current canonical main after PR #177 repaired the PowerShell parser corruption and CI runner recovery was hardened. Execute the same governed target-only repair for the existing youtube.reson8.life ingress, preserving hostname, tunnel identity, DNS/domain attachment, billing policy, dormant Worker state, and all protected constraints.",
+  "repairExistingIngressTarget": true
+}

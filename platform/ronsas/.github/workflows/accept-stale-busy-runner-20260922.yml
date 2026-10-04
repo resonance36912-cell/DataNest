@@ -1,0 +1,410 @@
+name: Accept stale-busy Linux runner proof
+
+on:
+  push:
+    branches:
+      - ronsas/stale-busy-runner-proof-v2-20260922
+    paths:
+      - ".github/workflows/accept-stale-busy-runner-20260922.yml"
+      - "ops/ealiophin/ci/START-RONSAS-ACTIONS-RUNNER.ps1"
+      - "scripts/lib/linux-runner-recycle-readiness.test.ts"
+
+permissions:
+  actions: write
+  contents: read
+  issues: write
+
+concurrency:
+  group: ronsas-stale-busy-live-acceptance
+  cancel-in-progress: true
+
+jobs:
+  accept:
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 30
+    steps:
+      - name: Check out candidate branch
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Pin candidate payload
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $candidate='95dd4f95149c207c0efb6c022c9f8b44994df5ae'
+          git diff --exit-code $candidate HEAD -- ops/ealiophin/ci/START-RONSAS-ACTIONS-RUNNER.ps1 scripts/lib/linux-runner-recycle-readiness.test.ts
+          if ($LASTEXITCODE -ne 0) {
+            throw 'Candidate runner payload changed after the pinned payload head.'
+          }
+          Write-Host "candidate_payload=$candidate"
+
+      - name: Prune superseded acceptance-branch runs
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const expectedBranch = "ronsas/stale-busy-runner-proof-v2-20260922";
+            const currentRun = Number(context.runId);
+            const currentSha = context.sha;
+            const activeStates = new Set(["queued","pending","waiting","requested","in_progress"]);
+            const managedNames = new Set([
+              "Security scan",
+              "Verify prebuild",
+              "Verify checkout links",
+              "Verify ePublisher checkout",
+              "Accept stale-busy Linux runner proof",
+              "Cancel stale stale-busy acceptance run",
+            ]);
+
+            const branch = await github.rest.repos.getBranch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              branch: expectedBranch,
+            });
+            const latestSha = branch.data.commit.sha;
+            core.info(`current_acceptance_sha=${currentSha} latest_branch_sha=${latestSha}`);
+            if (currentSha !== latestSha) {
+              core.setFailed(
+                `Refusing superseded acceptance head ${currentSha}; latest branch head is ${latestSha}.`,
+              );
+              return;
+            }
+
+            const { data } = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+            });
+            const stale = data.workflow_runs.filter((run) =>
+              run.id !== currentRun &&
+              run.head_branch === expectedBranch &&
+              run.head_sha !== latestSha &&
+              managedNames.has(run.name) &&
+              activeStates.has(run.status)
+            );
+
+            core.info(`superseded_acceptance_branch_runs=${stale.length}`);
+            for (const run of stale) {
+              core.warning(`Cancelling superseded run ${run.id}: ${run.name} head=${run.head_sha} status=${run.status}`);
+              try {
+                await github.rest.actions.cancelWorkflowRun({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: run.id,
+                });
+              } catch (error) {
+                core.warning(`Normal cancellation failed for ${run.id}: ${error.status || "error"} ${error.message}`);
+              }
+
+              let latest;
+              for (let settle = 1; settle <= 4; settle += 1) {
+                await new Promise((resolve) => setTimeout(resolve, 500));
+                latest = await github.rest.actions.getWorkflowRun({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: run.id,
+                });
+                if (!activeStates.has(latest.data.status)) break;
+              }
+
+              if (activeStates.has(latest.data.status)) {
+                core.warning(`Force-cancelling superseded run ${run.id}`);
+                try {
+                  await github.request("POST /repos/{owner}/{repo}/actions/runs/{run_id}/force-cancel", {
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    run_id: run.id,
+                  });
+                } catch (error) {
+                  if (error.status !== 409) throw error;
+                  core.info(`Force-cancel raced terminal transition for ${run.id}; rechecking state.`);
+                }
+
+                latest = await github.rest.actions.getWorkflowRun({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: run.id,
+                });
+                if (activeStates.has(latest.data.status)) {
+                  core.warning(
+                    `Superseded run ${run.id} remains in state ${latest.data.status} after cancellation; continuing to the repository-idle gate, which will fail closed while any workflow is still in progress.`,
+                  );
+                }
+              }
+            }
+
+      - name: Quiesce production runner assignment label
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $repo='resonance36912-cell/RONSAS'
+          $name='Ealiophin-RONSAS-Linux-2'
+          $label='ronsas'
+          $payload=((& gh.exe api "repos/$repo/actions/runners") -join [Environment]::NewLine) | ConvertFrom-Json
+          $runner=@($payload.runners | Where-Object { [string]$_.name -eq $name }) | Select-Object -First 1
+          if (-not $runner) { throw "Production runner registration not found before quiesce: $name" }
+          $labels=@($runner.labels | ForEach-Object { [string]$_.name })
+          if ($labels -contains $label) {
+            & gh.exe api -X DELETE "repos/$repo/actions/runners/$($runner.id)/labels/$label" *> $null
+            if ($LASTEXITCODE -ne 0) { throw "Failed to remove temporary assignment label '$label' from $name." }
+          }
+          $verify=((& gh.exe api "repos/$repo/actions/runners") -join [Environment]::NewLine) | ConvertFrom-Json
+          $current=@($verify.runners | Where-Object { [string]$_.name -eq $name }) | Select-Object -First 1
+          if (-not $current) { throw "Production runner registration disappeared during quiesce: $name" }
+          $currentLabels=@($current.labels | ForEach-Object { [string]$_.name })
+          if ($currentLabels -contains $label) { throw "Production runner assignment label '$label' remained after quiesce." }
+          Write-Host "runner_quiesced=true runner_id=$($current.id) removed_label=$label"
+
+      - name: Wait for repository-wide idle
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $repo='resonance36912-cell/RONSAS'
+          $runnerName='Ealiophin-RONSAS-Linux-2'
+          $currentRun=[long]$env:GITHUB_RUN_ID
+          $idle=$false
+          for($attempt=1; $attempt -le 60; $attempt++){
+            $owners=@()
+            $seen=@{}
+            foreach($status in @('in_progress','queued','waiting','pending','requested')){
+              $raw=((& gh.exe api "repos/$repo/actions/runs?status=$status&per_page=100") -join [Environment]::NewLine) | ConvertFrom-Json
+              foreach($run in @($raw.workflow_runs)){
+                if([long]$run.id -eq $currentRun){ continue }
+                if($seen.ContainsKey([string]$run.id)){ continue }
+
+                $jobsRaw=@(& gh.exe api "repos/$repo/actions/runs/$($run.id)/jobs?filter=latest&per_page=100")
+                if($LASTEXITCODE -ne 0){ throw "Unable to inspect jobs for workflow run $($run.id) while proving production-runner ownership." }
+                $jobs=($jobsRaw -join [Environment]::NewLine) | ConvertFrom-Json
+                $owned=@($jobs.jobs | Where-Object {
+                  [string]$_.runner_name -eq $runnerName -and
+                  ([string]$_.status -eq 'queued' -or [string]$_.status -eq 'in_progress')
+                }).Count -gt 0
+
+                if($owned){
+                  $seen[[string]$run.id]=$true
+                  $owners += $run
+                }
+              }
+            }
+
+            if($owners.Count -eq 0){
+              Write-Host "repository_idle=true attempt=$attempt/60"
+              $idle=$true
+              break
+            }
+            $summary=($owners | Select-Object -First 8 | ForEach-Object { "$($_.id):$($_.name):$($_.head_branch):$($_.status)" }) -join ', '
+            Write-Host "repository_idle=false attempt=$attempt/60 active=$summary"
+            Start-Sleep -Seconds 5
+          }
+          if(-not $idle){ throw 'Repository did not become ownership-idle within the bounded acceptance window.' }
+
+      - name: Assert production runner is safely stale busy
+        id: stale_precondition
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $repo='resonance36912-cell/RONSAS'
+          $name='Ealiophin-RONSAS-Linux-2'
+          $container='ronsas-actions-ealiophin'
+          $podman=(Get-Command podman.exe -ErrorAction Stop).Source
+
+          & $podman container exists $container
+          if ($LASTEXITCODE -ne 0) { throw "Production runner container missing: $container" }
+
+          $staleBusyProven=$false
+          $healthyIdleProven=$false
+          $healthyIdleAttempts=0
+          $runner=$null
+          for($attempt=1; $attempt -le 36; $attempt++){
+            $payload=((& gh.exe api "repos/$repo/actions/runners") -join [Environment]::NewLine) | ConvertFrom-Json
+            $runner=@($payload.runners | Where-Object { [string]$_.name -eq $name }) | Select-Object -First 1
+            if (-not $runner) { throw "Production runner registration not found: $name" }
+            if ([string]$runner.status -ne 'online') {
+              throw "Production runner is not online: status=$($runner.status) busy=$($runner.busy)"
+            }
+
+            $top=@(& $podman top $container 2>$null)
+            if ($LASTEXITCODE -ne 0) { throw 'Production runner process state is not observable.' }
+            $joined=$top -join [Environment]::NewLine
+            if ($joined -notmatch 'Runner\.Listener') { throw 'Production Runner.Listener is not active.' }
+
+            if ($joined -match 'Runner\.Worker') {
+              $healthyIdleAttempts=0
+              Write-Host "Production Runner.Worker is active; preserving assignment and resetting healthy-idle proof ($attempt/36)."
+              Start-Sleep -Seconds 5
+              continue
+            }
+
+            if ([bool]$runner.busy) {
+              $staleBusyProven=$true
+              $healthyIdleAttempts=0
+              Write-Host "Production stale-busy precondition proven: status=$($runner.status) busy=$($runner.busy) worker=false attempt=$attempt/36"
+              break
+            }
+
+            $healthyIdleAttempts++
+            Write-Host "Production runner healthy-idle proof $healthyIdleAttempts/18: online, busy=False, worker=false (attempt=$attempt/36)."
+            if($healthyIdleAttempts -ge 18){
+              $healthyIdleProven=$true
+              break
+            }
+            Start-Sleep -Seconds 5
+          }
+
+          if ($staleBusyProven) {
+            "healthy_idle=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          } elseif ($healthyIdleProven) {
+            Write-Host 'Production runner sustained online, observable, worker-free, busy=False state for 18 consecutive observations. Accepting healthy idle state without recycle.' -ForegroundColor Green
+            "healthy_idle=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          } else {
+            throw 'Production runner did not reach a sustained healthy-idle state or a safely proven stale-busy state within the bounded window.'
+          }
+
+      - name: Run guarded stale-busy acceptance on production runner
+        if: steps.stale_precondition.outputs.healthy_idle != 'true'
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $launcher=Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\ci\START-RONSAS-ACTIONS-RUNNER.ps1'
+          $accepted=$false
+          $lastText=''
+          for($attempt=1; $attempt -le 36; $attempt++){
+            $priorErrorActionPreference=$ErrorActionPreference
+            $output=@()
+            $exit=1
+            try {
+              $ErrorActionPreference='Continue'
+              $output=@(& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $launcher -ForceRecycle 2>&1)
+              $exit=[int]$LASTEXITCODE
+            } finally {
+              $ErrorActionPreference=$priorErrorActionPreference
+            }
+            $output | ForEach-Object { Write-Host $_ }
+            $text=$output -join [Environment]::NewLine
+            $lastText=$text
+
+            if ($exit -eq 0 -and $text -match 'Treating the GitHub busy flag as stale and proceeding with guarded recycle') {
+              if ($text -notmatch 'GitHub released the stale assignment after proven-idle disconnect|Runner registration disappeared after proven-idle disconnect') {
+                throw 'Candidate did not prove that the stale production assignment was released after the guarded disconnect.'
+              }
+              $accepted=$true
+              break
+            }
+
+            if ($exit -eq 0 -and $text -match 'Runner busy state self-cleared during stale-busy proof; preserving the healthy online runner without recycle\.') {
+              Write-Host 'Acceptance observed a safely self-cleared stale-busy state; no recycle was required.'
+              $accepted=$true
+              break
+            }
+
+            if (
+              $text -match 'ForceRecycle deferred because GitHub reports [0-9]+ in-progress workflow run\(s\):' -or
+              $text -match 'ForceRecycle deferred during stale-busy proof because new in-progress workflow work appeared:' -or
+              $text -match 'ForceRecycle deferred because local Runner.Worker is active' -or
+              $text -match 'ForceRecycle deferred during stale-busy proof because Runner.Worker became active' -or
+              $text -match 'GitHub did not release the stale assignment within the bounded disconnect window' -or
+              $text -match 'Stale-busy proof cannot transition to disconnect' -or
+              $text -match 'Stale-busy disconnect deferred because workflow work became active' -or
+              $text -match 'ForceRecycle deferred because GitHub reports active job assignment\(s\) on' -or
+              $text -match 'ForceRecycle deferred because GitHub assigned work to' -or
+              $text -match 'ForceRecycle deferred during stale-busy proof because GitHub assigned work to' -or
+              $text -match 'Stale-busy disconnect deferred because GitHub assigned work to' -or
+              $text -match 'Runner deletion retry deferred because workflow work became active' -or
+              $text -match 'Runner deletion retry deferred because GitHub assigned work to' -or
+              $text -match 'ForceRecycle deferred because online runner registration deletion was not proven safe\.' -or
+              $text -match 'GitHub continued to reject runner deletion as assigned'
+            ) {
+              Write-Host "Acceptance retry deferred by guarded ownership change ($attempt/36)."
+              Start-Sleep -Seconds 5
+              continue
+            }
+
+            if ($exit -ne 0) {
+              throw "Guarded production stale-busy acceptance failed with exit code $exit. Output: $text"
+            }
+
+            throw 'Candidate did not exercise the production stale-busy proof path.'
+          }
+
+          if (-not $accepted) {
+            throw "Guarded production stale-busy acceptance never obtained a safe stale-busy window. Last output: $lastText"
+          }
+
+      - name: Verify production replacement health
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $repo='resonance36912-cell/RONSAS'
+          $name='Ealiophin-RONSAS-Linux-2'
+          $container='ronsas-actions-ealiophin'
+          $podman=(Get-Command podman.exe -ErrorAction Stop).Source
+
+          $payload=((& gh.exe api "repos/$repo/actions/runners") -join [Environment]::NewLine) | ConvertFrom-Json
+          $runner=@($payload.runners | Where-Object { [string]$_.name -eq $name }) | Select-Object -First 1
+          if (-not $runner) { throw "Production runner registration missing after acceptance: $name" }
+          if ([string]$runner.status -ne 'online') { throw "Production runner not online after acceptance: status=$($runner.status)" }
+
+          & $podman container exists $container
+          if ($LASTEXITCODE -ne 0) { throw "Production runner container missing after acceptance: $container" }
+          $info=(& $podman inspect $container | ConvertFrom-Json)[0]
+          if (-not $info.State.Running) { throw 'Production runner container is not running after acceptance.' }
+          $top=@(& $podman top $container 2>$null)
+          if ($LASTEXITCODE -ne 0 -or (($top -join [Environment]::NewLine) -notmatch 'Runner\.Listener')) {
+            throw 'Production Runner.Listener is not active after acceptance.'
+          }
+
+          & $podman exec $container podman --remote version *> $null
+          if ($LASTEXITCODE -ne 0) { throw 'Governed Podman connectivity failed after production acceptance.' }
+
+          Write-Host "post_runner_id=$($runner.id) status=$($runner.status) busy=$($runner.busy)"
+
+      - name: Restore production runner assignment label
+        if: always()
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $repo='resonance36912-cell/RONSAS'
+          $name='Ealiophin-RONSAS-Linux-2'
+          $label='ronsas'
+          $payload=((& gh.exe api "repos/$repo/actions/runners") -join [Environment]::NewLine) | ConvertFrom-Json
+          $runner=@($payload.runners | Where-Object { [string]$_.name -eq $name }) | Select-Object -First 1
+          if (-not $runner) { throw "Production runner registration missing during assignment-label restore: $name" }
+          $labels=@($runner.labels | ForEach-Object { [string]$_.name })
+          if ($labels -notcontains $label) {
+            & gh.exe api -X POST "repos/$repo/actions/runners/$($runner.id)/labels" -f "labels[]=$label" *> $null
+            if ($LASTEXITCODE -ne 0) { throw "Failed to restore assignment label '$label' on $name." }
+          }
+          $verify=((& gh.exe api "repos/$repo/actions/runners") -join [Environment]::NewLine) | ConvertFrom-Json
+          $current=@($verify.runners | Where-Object { [string]$_.name -eq $name }) | Select-Object -First 1
+          if (-not $current) { throw "Production runner registration missing after assignment-label restore: $name" }
+          $currentLabels=@($current.labels | ForEach-Object { [string]$_.name })
+          if ($currentLabels -notcontains $label) { throw "Production runner assignment label '$label' was not restored." }
+          Write-Host "runner_assignment_label_restored=true runner_id=$($current.id) label=$label"
+
+      - name: Publish stale-busy acceptance receipt
+        if: always()
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $result='failure'
+          if ('${{ job.status }}' -eq 'success') { $result='success' }
+          $mode='production-stale-busy-proof'
+          if ('${{ steps.stale_precondition.outputs.healthy_idle }}' -eq 'true') { $mode='production-healthy-idle-no-recycle' }
+          $body=@"
+          STALE_BUSY_ACCEPTANCE_RECEIPT
+
+          {"candidate":"95dd4f95149c207c0efb6c022c9f8b44994df5ae","result":"$result","runner":"Ealiophin-RONSAS-Linux-2","mode":"$mode"}
+          "@
+          gh issue comment 288 --repo resonance36912-cell/RONSAS --body $body
+
+# RONSAS acceptance trigger: proven-release guard final rerun.
+
+# RONSAS acceptance trigger: latest-head guarded proven-release rerun.
+
+# RONSAS acceptance trigger: exact-head post-pruner rerun.
+
+# Final acceptance trigger after helper cleanup.
+
+# Acceptance trigger after PowerShell interpolation fix.

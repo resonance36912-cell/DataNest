@@ -1,0 +1,33 @@
+﻿{
+    "schema":  "ronsas-governed-change-receipt/v1",
+    "change":  "unified-module-control",
+    "date":  "2026-09-17",
+    "branch":  "ronsas/unified-module-control-20260917",
+    "base_commit":  "45ee07bafbb25878e7412368ab66236eab3a6ece",
+    "purpose":  "Make all application surfaces and required local runtimes governed modules/services of one RONSAS control plane.",
+    "authority":  {
+                      "control_repository":  "resonance36912-cell/RONSAS",
+                      "module_registry":  "ops/ealiophin/cluster/RONSAS-MODULES.json",
+                      "canonical_start":  "START-RONSAS-ECOSYSTEM.ps1",
+                      "canonical_status":  "STATUS-RONSAS-ECOSYSTEM.ps1",
+                      "canonical_stop":  "STOP-RONSAS-ECOSYSTEM.ps1"
+                  },
+    "gates":  {
+                  "sovereignty_guard":  "pass",
+                  "topology":  "mapped; 0 missing required paths; 0 missing required repositories; 0 required services down",
+                  "powershell_and_python_parse":  "pass",
+                  "control_tests":  "365 passed; 0 failed; 32 files",
+                  "security_invariants":  "pass; no findings",
+                  "registry_health":  "15/15 healthy",
+                  "route_smoke":  "7/7 passed",
+                  "final_acceptance":  "pass",
+                  "supervisor_safe_reuse":  "pass; 15 unified entries; no existing process stopped or replaced"
+              },
+    "observed_local_ai":  {
+                              "stt":  "large-v3; productionReady=true; cuda=true",
+                              "image":  "stabilityai/sd-turbo; model_complete=true; cuda=true",
+                              "llm":  "qwen2.5:0.5b; model_ready=true",
+                              "external_ai_default":  "denied by RONSAS registry/provider governance"
+                          },
+    "evidence_note":  "The pre-fix acceptance failure is retained separately; final acceptance passed after correction."
+}

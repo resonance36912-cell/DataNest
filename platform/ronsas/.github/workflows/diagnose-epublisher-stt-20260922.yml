@@ -1,0 +1,102 @@
+name: Diagnose ePublisher STT source
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  diagnose:
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - name: Capture STT boundary
+        id: probe
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $result = [ordered]@{}
+          try {
+            $health = Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:7869/health' -TimeoutSec 10
+            $result.direct_health = [ordered]@{ status=[int]$health.StatusCode; ok=([int]$health.StatusCode -eq 200) }
+          } catch {
+            $status = $null
+            if ($_.Exception.Response -and $_.Exception.Response.StatusCode) { $status = [int]$_.Exception.Response.StatusCode }
+            $result.direct_health = [ordered]@{ status=$status; ok=$false; detail=$_.Exception.Message }
+          }
+          $body = @{ url='https://www.youtube.com/watch?v=CxKEyVgYBpk'; mode='fast' } | ConvertTo-Json -Compress
+          try {
+            $response = Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:7869/transcribe-url' -Method Post -ContentType 'application/json' -Body $body -TimeoutSec 45
+            $payload = $response.Content | ConvertFrom-Json
+            $result.source = [ordered]@{ status=[int]$response.StatusCode; ok=$true; text_length=([string]$payload.text).Length; video_id=[string]$payload.video_id }
+          } catch {
+            $status = $null
+            $detail = $_.Exception.Message
+            if ($_.Exception.Response) {
+              if ($_.Exception.Response.StatusCode) { $status = [int]$_.Exception.Response.StatusCode }
+              try {
+                $reader = New-Object IO.StreamReader($_.Exception.Response.GetResponseStream())
+                $detail = $reader.ReadToEnd()
+                $reader.Dispose()
+              } catch { }
+            }
+            $result.source = [ordered]@{ status=$status; ok=$false; detail=$detail }
+          }
+          $json = $result | ConvertTo-Json -Depth 8 -Compress
+          "diagnostic_json=$json" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+      - name: Record diagnostic summary
+        if: always()
+        env:
+          DIAGNOSTIC_JSON: ${{ steps.probe.outputs.diagnostic_json }}
+        shell: bash
+        run: |
+          {
+            echo "### ePublisher STT source diagnostic"
+            echo
+            echo "\`\`\`json"
+            echo "${DIAGNOSTIC_JSON:-{}}"
+            echo "\`\`\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Update sticky failure receipt
+        if: always() && steps.probe.outputs.diagnostic_json != '' && !contains(steps.probe.outputs.diagnostic_json, '"source":{"status":200,"ok":true')
+        uses: actions/github-script@v8
+        env:
+          DIAGNOSTIC_JSON: ${{ steps.probe.outputs.diagnostic_json }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const marker = "<!-- epublisher-stt-source-diagnostic -->";
+            const body = [
+              marker,
+              "EPUBLISHER_STT_SOURCE_DIAGNOSTIC_FAILURE",
+              "",
+              "Run: " + context.runId,
+              "SHA: " + context.sha,
+              "",
+              process.env.DIAGNOSTIC_JSON || "{}",
+            ].join("\n");
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: 273,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) => comment.body && comment.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: 273,
+                body,
+              });
+            }

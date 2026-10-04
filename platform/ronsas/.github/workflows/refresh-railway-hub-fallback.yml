@@ -1,0 +1,84 @@
+name: Refresh Railway Hub fallback source
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ops/release-requests/railway-hub-fallback.json"
+      - ".github/workflows/refresh-railway-hub-fallback.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ronsas-railway-hub-fallback-source-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate governed request
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $r=Get-Content -Raw -LiteralPath 'ops/release-requests/railway-hub-fallback.json' | ConvertFrom-Json
+          if([string]$r.schema -ne 'ronsas-railway-hub-source-refresh/v1'){throw 'Unexpected repair schema.'}
+          if([string]$r.confirmation -ne 'REFRESH RAILWAY HUB FALLBACK SOURCE'){throw 'Explicit repair confirmation missing.'}
+          if([string]$r.projectId -ne '70cc7bde-c5ba-4224-9c74-ddb873b27379'){throw 'Unexpected Railway project.'}
+          if([string]$r.environmentId -ne '78627988-2f5f-42a8-a507-ee5e221bf10a'){throw 'Unexpected Railway environment.'}
+          if([string]$r.serviceId -ne '0d511033-eae2-46a5-8d54-6085a0b6166b'){throw 'Unexpected Railway service.'}
+          if([string]$r.repo -ne 'resonance36912-cell/resonance-hub'){throw 'Unexpected GitHub repo.'}
+          if([string]$r.branch -ne 'ronsas/ealiophin-production'){throw 'Unexpected GitHub branch.'}
+          if([string]$r.expectedCommit -ne '211943c95e92a236d754d636651cab18f02ec1f0'){throw 'Unexpected source commit.'}
+          if(-not [bool]$r.recovery.refreshSourceSnapshot -or -not [bool]$r.recovery.disconnectExistingSource -or -not [bool]$r.recovery.reconnectSameGitHubSource){throw 'Fresh snapshot authorization incomplete.'}
+          if([bool]$r.constraints.createService -or [bool]$r.constraints.changeServiceIdentity -or [bool]$r.constraints.changeDomains -or [bool]$r.constraints.changeBilling -or [bool]$r.constraints.changeVariables -or [bool]$r.constraints.changeCloudflare -or [bool]$r.constraints.changeHealthcheck -or [bool]$r.constraints.changeReplicas){throw 'Request violates protected constraints.'}
+
+      - name: Verify exact source head
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $r=Get-Content -Raw -LiteralPath 'ops/release-requests/railway-hub-fallback.json' | ConvertFrom-Json
+          $remote=('https://github.com/' + [string]$r.repo + '.git')
+          $ref=('refs/heads/' + [string]$r.branch)
+          $line=(& git ls-remote $remote $ref | Select-Object -First 1)
+          if([string]::IsNullOrWhiteSpace($line)){throw 'Unable to resolve governed source branch.'}
+          $actual=($line -split '\s+')[0]
+          if($actual -ne [string]$r.expectedCommit){throw ('Source head drift: expected ' + $r.expectedCommit + ' got ' + $actual)}
+          Write-Host ('RONSAS HUB SOURCE HEAD VERIFIED: ' + $actual)
+
+      - name: Refresh Railway source snapshot
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference='Stop'
+          $r=Get-Content -Raw -LiteralPath 'ops/release-requests/railway-hub-fallback.json' | ConvertFrom-Json
+          $Project=[string]$r.projectId
+          $Environment=[string]$r.environmentId
+          $Service=[string]$r.serviceId
+          $Repo=[string]$r.repo
+          $Branch=[string]$r.branch
+
+          $Railway=(Get-Command railway.cmd -ErrorAction SilentlyContinue).Source
+          if(-not $Railway){throw 'railway.cmd is unavailable on the governed Ealiophin runner.'}
+          Write-Host ('Railway CLI: ' + (& $Railway --version))
+
+          $ErrorActionPreference='Continue'
+          $disconnect=& $Railway service source disconnect --service $Service --environment $Environment --project $Project --json 2>&1
+          $disconnectExit=$LASTEXITCODE
+          $ErrorActionPreference='Stop'
+          $disconnectText=(($disconnect | ForEach-Object { $_.ToString() }) -join [Environment]::NewLine).Trim()
+          if($disconnectExit -ne 0){throw ('Railway source disconnect failed: ' + $disconnectText)}
+          if(-not [string]::IsNullOrWhiteSpace($disconnectText)){Write-Host $disconnectText}
+
+          $ErrorActionPreference='Continue'
+          $connect=& $Railway service source connect --repo $Repo --branch $Branch --service $Service --environment $Environment --project $Project --json 2>&1
+          $connectExit=$LASTEXITCODE
+          $ErrorActionPreference='Stop'
+          $connectText=(($connect | ForEach-Object { $_.ToString() }) -join [Environment]::NewLine).Trim()
+          if($connectExit -ne 0){throw ('Railway GitHub reconnect failed: ' + $connectText)}
+          if(-not [string]::IsNullOrWhiteSpace($connectText)){Write-Host $connectText}
+
+          Write-Host ('RONSAS RAILWAY HUB FRESH SNAPSHOT: CONNECTED ' + $Repo + '@' + $Branch)
