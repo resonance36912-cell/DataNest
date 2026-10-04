@@ -1,0 +1,113 @@
+stages:
+  - validate
+  - build
+  - deploy
+
+default:
+  interruptible: true
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH'
+
+variables:
+  CI: "true"
+  DATANEST_STATIC_EXPORT: "true"
+  NEXT_PUBLIC_BASE_PATH: "/DataNest"
+  SUPABASE_URL: "$NEXT_PUBLIC_SUPABASE_URL"
+  SUPABASE_PUBLISHABLE_KEY: "$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
+
+traceability:
+  stage: validate
+  image: mcr.microsoft.com/powershell:7.5-alpine-3.20
+  before_script:
+    - apk add --no-cache git
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
+  script:
+    - pwsh -NoLogo -NoProfile -File ops/validation/Test-ResonanceTraceability.ps1 -RepoRoot "$CI_PROJECT_DIR"
+
+open-nova-manifest:
+  stage: validate
+  image: mcr.microsoft.com/powershell:7.5-alpine-3.20
+  script:
+    - pwsh -NoLogo -NoProfile -File platform/open-nova/scripts/verify-build-manifest.ps1 -RootPath "$CI_PROJECT_DIR/platform/open-nova"
+
+build-datanest:
+  stage: build
+  image: node:24-bookworm-slim
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - apps/datanest/**/*
+        - apps/ronsas/**/*
+        - ops/index/**/*
+        - .gitlab-ci.yml
+  before_script:
+    - test -n "$NEXT_PUBLIC_SUPABASE_URL"
+    - test -n "$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
+    - cd apps/datanest
+    - npm ci --no-audit --no-fund
+  script:
+    - npm test
+    - npm run check
+    - npm run check:contracts
+    - npm audit --omit=dev --audit-level=high
+    - npm run build
+    - node scripts/build-ronsas-pages.mjs
+    - test -s out/index.html
+  artifacts:
+    name: "datanest-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - apps/datanest/out/
+    expire_in: 7 days
+
+build-hub:
+  stage: build
+  image: oven/bun:1.3.14
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - apps/hub/**/*
+        - packages/**/*
+        - .gitlab-ci.yml
+  before_script:
+    - cd apps/hub
+    - bun install --frozen-lockfile
+  script:
+    - bun run verify:pinned-deps
+    - bun run verify:back-to-hub
+    - bun run verify:no-stale-domains
+    - bun run verify:honest-copy
+    - bun run verify:security
+    - bun run verify:public-audit
+    - bun run verify:sovereign-itn
+    - bun run verify:transparency-copy
+    - bun run verify:discernment-usage
+    - bun run build
+    - test -f .output/nitro.json
+  artifacts:
+    name: "hub-nitro-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - apps/hub/.output/
+    expire_in: 7 days
+
+create-pages:
+  stage: deploy
+  image: alpine:3.20
+  needs:
+    - job: build-datanest
+      artifacts: true
+  script:
+    - test -s apps/datanest/out/index.html
+    - printf 'Candidate publication only; production DNS remains governance-gated.\n'
+  pages:
+    publish: apps/datanest/out
+  environment:
+    name: datanest-pages-candidate
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: manual
+  allow_failure: false

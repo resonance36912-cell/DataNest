@@ -4,8 +4,16 @@
   "source": {
     "repositoryRole": "canonical-consolidated-candidate",
     "pathOnWeed": "C:\\Users\\iamas\\Resonance\\DataNest-Supository-CANONICAL-STAGING",
-    "releaseCandidateCommit": "ec75ecef116511f8a1e2d2cacb2e6d53468a726d",
-    "governedMergeCommit": "b9dfb45f80299d7c32b009779fbc32e3dfad742b"
+    "releaseCandidateCommit": "3c6b4bb0889b53f8d25ab2897e453c980c25ab7b",
+    "governedMergeCommit": "b9dfb45f80299d7c32b009779fbc32e3dfad742b",
+    "openNovaRepairCommit": "93803e8e78b430e31c035307c11b48d8e75377cb"
+  },
+  "forge": {
+    "targetProvider": "gitlab",
+    "targetRepositoryName": "DataNest-Supository",
+    "targetNamespace": "Resonance-AppDev",
+    "status": "prepared-pending-account-and-remote-creation",
+    "productionAuthority": "protected-main-only"
   },
   "domains": {
     "canonicalHub": "reson8.life",
@@ -18,6 +26,7 @@
       "sourcePath": "apps/datanest",
       "deploymentClass": "static-public-site",
       "sitesCandidate": true,
+      "gitlabPagesCandidate": true,
       "stateProvider": "supabase",
       "basePathDuringMigration": "/DataNest"
     },
@@ -46,7 +55,8 @@
       "sourcePath": "platform/open-nova",
       "deploymentClass": "development-migration-runtime",
       "sitesCandidate": false,
-      "certificationGate": "open-nova-build-manifest-byte-size-failure"
+      "certificationStatus": "manifest-verified",
+      "verifiedManifestFiles": 261
     }
   ],
   "promotion": {
