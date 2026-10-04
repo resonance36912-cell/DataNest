@@ -1,0 +1,142 @@
+{
+  "schema": "datanest.ronsas.module-registry.v2",
+  "suite": "RONSAS",
+  "fullName": "Resonance Open Nova Sovereign Application Suite",
+  "repository": "DataNest-Supository/DataNest",
+  "authority": {
+    "sourceRoot": ".",
+    "controlRoot": "ops/ronsas/ealiophin",
+    "runtimeRoot": "%LOCALAPPDATA%\\Resonance\\DataNest-RONSAS",
+    "backupHost": {
+      "provider": "Dropbox",
+      "path": "/DataNest-AI-Backups",
+      "role": "artifact-recovery",
+      "servesApplication": false
+    }
+  },
+  "policy": {
+    "singleRepositoryAuthority": true,
+    "localFirst": true,
+    "standaloneRepositories": "evidence-only",
+    "billingState": "free-promotion",
+    "paidCheckoutActive": false,
+    "localPcBackupHosting": false,
+    "backupProvider": "dropbox",
+    "backupPath": "/DataNest-AI-Backups"
+  },
+  "modules": [
+    {
+      "id": "epublisher",
+      "kind": "web-app",
+      "displayName": "RONSAS ePublisher",
+      "source": "apps/ronsas/epublisher",
+      "packageManager": "npm",
+      "port": 3101,
+      "health": "http://127.0.0.1:3101/",
+      "required": true
+    },
+    {
+      "id": "creative-studio",
+      "kind": "web-app",
+      "displayName": "RONSAS Creative Studio",
+      "source": "apps/ronsas/creative-studio",
+      "packageManager": "npm",
+      "port": 3201,
+      "health": "http://127.0.0.1:3201/",
+      "required": true
+    },
+    {
+      "id": "syncvision",
+      "kind": "web-app",
+      "displayName": "RONSAS SyncVision",
+      "source": "apps/ronsas/syncvision",
+      "packageManager": "npm",
+      "port": 3301,
+      "health": "http://127.0.0.1:3301/",
+      "required": true
+    },
+    {
+      "id": "syncvision-musetalk",
+      "kind": "python-service",
+      "displayName": "RONSAS SyncVision MuseTalk Bridge",
+      "source": "apps/ronsas/syncvision/runtime/musetalk/musetalk_bridge.py",
+      "launcher": "ops/ronsas/ealiophin/START-SYNCVISION-MUSETALK.ps1",
+      "state": "r5-local-ai.json",
+      "port": 7863,
+      "health": "http://127.0.0.1:7863/health",
+      "required": false,
+      "runtime": "machine-local MuseTalk 1.5 engine, models, Python and FFmpeg; network runtime offline"
+    },
+    {
+      "id": "youtube-optimizer",
+      "kind": "web-app",
+      "displayName": "RONSAS YouTube Optimizer",
+      "source": "apps/ronsas/youtube-optimizer",
+      "packageManager": "bun",
+      "port": 3401,
+      "health": "http://127.0.0.1:3401/",
+      "required": true
+    },
+    {
+      "id": "sovereign-backend",
+      "kind": "backend-source",
+      "displayName": "RONSAS Sovereign Backend",
+      "source": "apps/ronsas/sovereign-backend",
+      "compose": "apps/ronsas/sovereign-backend/deploy/compose.backend.yml",
+      "health": "http://127.0.0.1:58600/v1/backend/health",
+      "required": false,
+      "runtime": "machine-local containers and secrets"
+    },
+    {
+      "id": "career-compass",
+      "kind": "web-app",
+      "displayName": "RONSAS Career Compass",
+      "source": "apps/ronsas/career-compass",
+      "packageManager": "npm",
+      "port": 3501,
+      "health": "http://127.0.0.1:3501/",
+      "required": true,
+      "runtime": "DataNest-native reconstruction"
+    },
+    {
+      "id": "sovereign-forge",
+      "kind": "web-app",
+      "displayName": "RONSAS SovereignForge",
+      "source": "apps/ronsas/sovereign-forge",
+      "packageManager": "npm",
+      "port": 3601,
+      "health": "http://127.0.0.1:3601/",
+      "required": true,
+      "runtime": "DataNest-native reconstruction"
+    },
+    {
+      "id": "lyricsync-studio",
+      "kind": "web-app",
+      "displayName": "RONSAS LyricSync Studio",
+      "source": "apps/ronsas/lyricsync-studio",
+      "packageManager": "npm",
+      "port": 3701,
+      "health": "http://127.0.0.1:3701/",
+      "required": true,
+      "runtime": "DataNest-native reconstruction"
+    },
+    {
+      "id": "scene-song-spark",
+      "kind": "web-app",
+      "displayName": "RONSAS Scene Song Spark",
+      "source": "apps/ronsas/scene-song-spark",
+      "packageManager": "npm",
+      "port": 3801,
+      "health": "http://127.0.0.1:3801/",
+      "required": true,
+      "runtime": "DataNest-native reconstruction"
+    }
+  ],
+  "sourceRecovery": [],
+  "reconstructedApplications": [
+    "career-compass",
+    "sovereign-forge",
+    "lyricsync-studio",
+    "scene-song-spark"
+  ]
+}

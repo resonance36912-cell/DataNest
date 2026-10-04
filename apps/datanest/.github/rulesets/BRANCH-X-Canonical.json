@@ -1,0 +1,86 @@
+{
+  "name": "BRANCH-X Canonical",
+  "target": "branch",
+  "enforcement": "active",
+  "bypass_actors": [],
+  "conditions": {
+    "ref_name": {
+      "include": [
+        "refs/heads/main",
+        "refs/heads/release/**"
+      ],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {
+      "type": "pull_request",
+      "parameters": {
+        "allowed_merge_methods": [
+          "squash",
+          "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": true,
+        "dismissal_restriction": {
+          "enabled": false,
+          "allowed_actors": []
+        },
+        "require_code_owner_review": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": true
+      }
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "do_not_enforce_on_create": false,
+        "required_status_checks": [
+          {
+            "context": "CI"
+          },
+          {
+            "context": "PR Verification"
+          },
+          {
+            "context": "Security scan"
+          },
+          {
+            "context": "DataNest AI Certification"
+          },
+          {
+            "context": "DataNest Boundaries"
+          },
+          {
+            "context": "ENFORCER Defence Tree"
+          },
+          {
+            "context": "GUARDIAN Health & Healing Tree"
+          },
+          {
+            "context": "CALMER Governance Softening Tree"
+          },
+          {
+            "context": "REGULATOR Harmony Tree"
+          },
+          {
+            "context": "VISIBILITY-UTILITY Market Presence Tree"
+          },
+          {
+            "context": "BRANCH-X Protection Tree"
+          }
+        ],
+        "strict_required_status_checks_policy": true
+      }
+    },
+    {
+      "type": "required_linear_history"
+    },
+    {
+      "type": "non_fast_forward"
+    },
+    {
+      "type": "deletion"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "datanest.ronsas.legal-contract.v1",
+  "legalOperator": "Resonance Sole Proprietorship",
+  "businessBrand": "Resonance App Development",
+  "platform": "Resonance DataNest",
+  "governanceLabel": "RSGP Governed",
+  "policyState": "review-gated",
+  "commercialState": "free-promotion",
+  "paidCheckoutActive": false,
+  "routes": {
+    "legal": "/legal",
+    "governance": "/governance",
+    "privacy": "/privacy",
+    "terms": "/terms",
+    "disclaimers": "/disclaimers",
+    "acceptableUse": "/acceptable-use",
+    "intellectualProperty": "/intellectual-property",
+    "accessibility": "/accessibility"
+  }
+}

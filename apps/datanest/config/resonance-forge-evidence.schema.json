@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Resonance Forge Evidence Envelope",
+  "type": "object",
+  "required": [
+    "schemaVersion", "evidenceId", "candidateId", "repository",
+    "commitSha", "type", "result", "producer"
+  ],
+  "properties": {
+    "schemaVersion": {"type": "integer", "const": 1},
+    "evidenceId": {"type": "string", "minLength": 1},
+    "candidateId": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "minLength": 1},
+    "commitSha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "type": {
+      "type": "string",
+      "enum": [
+        "unit", "type", "dependency", "security", "visual",
+        "browser", "ai-certification", "audit-optimizer", "ronsas",
+        "governance", "backend-attestation", "human-authorization"
+      ]
+    },
+    "result": {"type": "string", "enum": ["pass", "fail", "warning", "pending"]},
+    "producer": {"type": "string", "minLength": 1},
+    "artifactRefs": {"type": "array", "items": {"type": "string"}},
+    "observedAt": {"type": "string", "format": "date-time"},
+    "digest": {"type": ["string", "null"]},
+    "supersedes": {"type": ["string", "null"]}
+  },
+  "additionalProperties": false
+}

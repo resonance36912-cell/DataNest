@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "record_id": "DATANEST-REGULATORY-ASSURANCE-ZA-001",
+  "registered_name": "DataNest Independent Regulatory Assurance & Audit Services",
+  "owner": "Resonance AppDev / DataNest",
+  "jurisdiction": "South Africa",
+  "classification": "private-independent-assessment-and-oversight-service",
+  "statutory_regulator": false,
+  "accredited_certification_body": false,
+  "irba_registered_audit_firm": false,
+  "psira_security_service_provider": false,
+  "public_service_route": "/DataNest/assurance/",
+  "intake": {
+    "channel": "github_issue_form",
+    "template": ".github/ISSUE_TEMPLATE/trade-implementation-interest.yml",
+    "public_non_confidential_only": true
+  },
+  "permitted_market_scope": [
+    "regulatory-readiness assessment",
+    "governance and controls review",
+    "technical audit support",
+    "evidence review",
+    "authorized digital monitoring",
+    "control drift monitoring",
+    "remediation planning",
+    "implementation support"
+  ],
+  "reserved_or_excluded_without_verified_authority": [
+    "statutory audit opinion",
+    "regulated assurance requiring IRBA registration",
+    "accredited ISO certification",
+    "physical or private-security surveillance requiring PSiRA registration",
+    "covert interception",
+    "unauthorized monitoring",
+    "unauthorized access or testing"
+  ],
+  "commercial_status": "review-gated",
+  "effective_after": "human governance approval and production deployment",
+  "recorded_on": "2026-10-01"
+}

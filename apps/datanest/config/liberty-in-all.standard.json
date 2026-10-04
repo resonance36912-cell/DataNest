@@ -1,0 +1,158 @@
+{
+  "schemaVersion": "datanest-liberty-in-all-v1",
+  "authority": "DataNest-Supository/DataNest",
+  "mode": "continuous-indexing-traceability-and-public-assurance",
+  "productionAuthorization": false,
+  "purpose": "Continuously index attributable DataNest records and evidence, preserve source lineage, and publish the maximum safe traceability metadata needed for on-demand public, stakeholder, auditor and regulator visibility without exposing secrets, private authentication material or protected personal data.",
+  "branch": "automation/liberty-in-all",
+  "statePath": "liberty-in-all/state/latest.json",
+  "internalIndexPath": "liberty-in-all/index/traceability.json",
+  "publicIndexPath": "public/transparency/liberty-in-all/latest.json",
+  "canonicalPublicUrl": "https://datanest-supository.github.io/DataNest/",
+  "scope": {
+    "roots": [
+      "docs",
+      "public/transparency",
+      "config",
+      "liberty-in-all",
+      "visibility-utility",
+      "guardian",
+      "regulator",
+      "enforcer",
+      "environment",
+      "knowledge",
+      "botsquad",
+      "conductor",
+      "suggester",
+      "calmer",
+      "infra/reson8-forge"
+    ],
+    "extensions": [
+      ".md",
+      ".txt",
+      ".json",
+      ".yml",
+      ".yaml",
+      ".mjs",
+      ".ts",
+      ".tsx"
+    ],
+    "excludePrefixes": [
+      "node_modules/",
+      ".next/",
+      "artifacts/",
+      "backups/",
+      ".git/"
+    ],
+    "publicIndexRoots": [
+      "docs/",
+      "public/transparency/",
+      "liberty-in-all/"
+    ],
+    "publicConfigAllowlist": [
+      "config/boundaries.policy.json",
+      "config/environment.tree.json",
+      "config/enforcer.tree.json",
+      "config/guardian.blueprint.json",
+      "config/liberty-in-all.standard.json",
+      "config/regulator.tree.json",
+      "config/visibility-utility.tree.json",
+      "config/repository-boundary.json"
+    ],
+    "sensitivePatterns": [
+      "(^|/)\\.env($|\\.)",
+      "secret",
+      "credential",
+      "private[-_]?key",
+      "access[-_]?token",
+      "refresh[-_]?token",
+      "service[-_]?role",
+      "session",
+      "cookie",
+      "password",
+      "auth[-_]?material"
+    ]
+  },
+  "evidenceSources": [
+    "docs/DATANEST_SYSTEM_CHARTER.md",
+    "docs/LIBERTY_IN_ALL_STANDARD.md",
+    "public/transparency/audits/index.json",
+    "config/boundaries.policy.json",
+    "config/environment.tree.json",
+    "config/enforcer.tree.json",
+    "config/guardian.blueprint.json",
+    "config/regulator.tree.json",
+    "config/visibility-utility.tree.json",
+    "infra/reson8-forge/specialized-trees.json"
+  ],
+  "audiences": {
+    "public": "sanitized public records, document digests, dates, source refs and assurance status",
+    "stakeholders": "public assurance plus product/governance evidence references",
+    "auditors": "content digests, source commit, evidence-source lineage and gap status",
+    "regulators": "control mappings, provenance, retention posture, evidence lineage and explicit limitations"
+  },
+  "standardsAlignment": [
+    {
+      "id": "ISO-15489-1:2016",
+      "role": "records creation, capture and management principles",
+      "certificationClaim": false
+    },
+    {
+      "id": "ISO-23081-1:2017",
+      "role": "metadata-for-records principles",
+      "certificationClaim": false
+    },
+    {
+      "id": "W3C-PROV",
+      "role": "provenance entities, activities, agents and derivation concepts",
+      "certificationClaim": false
+    },
+    {
+      "id": "ISO/IEC-27001:2022",
+      "role": "information-security control context",
+      "certificationClaim": false
+    },
+    {
+      "id": "ISO/IEC-27701:2025",
+      "role": "privacy information management context",
+      "certificationClaim": false
+    },
+    {
+      "id": "NIST-CSF-2.0",
+      "role": "cybersecurity governance and assurance context",
+      "certificationClaim": false
+    }
+  ],
+  "freshnessMinutes": 20,
+  "retention": {
+    "workflowArtifactsDays": 90,
+    "gitHistory": "source-controlled-history-retained-by-git",
+    "publicLatest": "current-sanitized-snapshot",
+    "historicalEvidence": "commit-lineage-and-workflow-artifacts"
+  },
+  "controls": {
+    "publicByDefaultForSafeMetadata": true,
+    "hashIndexedRecords": true,
+    "preserveSourceCommit": true,
+    "publishEvidenceGaps": true,
+    "publishRecordContents": false,
+    "publishSecrets": false,
+    "publishPrivateAuthenticationMaterial": false,
+    "publishProtectedPersonalData": false,
+    "rewriteHistoricalEvidence": false,
+    "changeProductionAuthority": false,
+    "approvePullRequests": false,
+    "merge": false,
+    "deployProduction": false,
+    "humanReviewRequiredFor": [
+      "disclosure-policy-change",
+      "retention-policy-change",
+      "sensitivity-classification-change",
+      "new-public-data-category",
+      "privacy-or-legal-interpretation",
+      "production-authority-change"
+    ]
+  },
+  "publicLiveUrl": "https://raw.githubusercontent.com/DataNest-Supository/DataNest/automation/liberty-in-all/public/transparency/liberty-in-all/latest.json",
+  "publicDescriptorPath": "public/transparency/liberty-in-all/index.json"
+}

@@ -1,0 +1,24 @@
+name: ChatGPT Codex Plugin Autopilot Evaluation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Analyze repository for ChatGPT / Codex plugin structure
+        uses: imMamdouhaboammar/chatgpt-codex-plugin-autopilot@a01ba2d048db98726e58dcccc19e56b9590d5c06
+        with:
+          path: .
+          action: analyze
+          fail-on-error: true
+          summary: true
+          create-pr: false

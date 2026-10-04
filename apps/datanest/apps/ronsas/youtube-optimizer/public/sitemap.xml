@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Spoke sitemap for youtubeoptimizer.life (part of The Resonance Hub).
+
+  Only spoke-owned content is advertised here. Hub-owned surfaces
+  (pricing, checkout, credits, docs, updates, support, account) are the
+  authority of https://reson8.life and are listed in the hub's own
+  sitemap: https://reson8.life/sitemap.xml
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://youtubeoptimizer.life/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://youtubeoptimizer.life/features</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://youtubeoptimizer.life/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://youtubeoptimizer.life/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://youtubeoptimizer.life/privacy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://youtubeoptimizer.life/terms</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>

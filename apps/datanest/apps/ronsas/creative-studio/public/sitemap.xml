@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SEO consolidation: Creative Studio is a spoke of The Resonance Hub.
+  Search authority is centralised on https://www.reson8.life — this
+  sitemap advertises the hub's sitemap as the canonical index so crawlers
+  discover routes from there. Per-page canonicals on this spoke also
+  point at the hub (see index.html + src/components/SEO.tsx).
+-->
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://www.reson8.life/sitemap.xml</loc>
+  </sitemap>
+</sitemapindex>

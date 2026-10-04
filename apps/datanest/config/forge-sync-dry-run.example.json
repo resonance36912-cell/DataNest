@@ -1,0 +1,35 @@
+{
+  "candidate": {
+    "candidateId": "forge-sync-dry-run-example",
+    "repository": "DataNest-Supository/DataNest",
+    "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "canonicalBaseSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "environment": "candidate",
+    "manifestDigest": "forge-phase-b-dry-run-v1"
+  },
+  "events": [
+    {
+      "eventName": "push",
+      "observedAt": "2026-09-30T00:00:00.000Z",
+      "payload": {
+        "repository": {
+          "full_name": "DataNest-Supository/DataNest",
+          "updated_at": "2026-09-30T00:00:00.000Z"
+        },
+        "ref": "refs/heads/forge/architecture-v1",
+        "after": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "candidateId": "forge-sync-dry-run-example",
+      "repository": "DataNest-Supository/DataNest",
+      "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "type": "unit",
+      "result": "pass",
+      "producer": "forge-sync-dry-run",
+      "observedAt": "2026-09-30T00:00:00.000Z"
+    }
+  ]
+}

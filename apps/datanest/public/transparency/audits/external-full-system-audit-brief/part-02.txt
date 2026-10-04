@@ -1,0 +1,105 @@
+[ ] UNKNOWN capability state is not execution permission.
+
+[ ] Projects own knowledge; Jobs own work; checkpoints preserve continuity.
+
+[ ] No passwords, MFA recovery codes, reusable browser cookies, PATs, service-role keys, or DB passwords in Git, screenshots, audit reports, or AI prompts.
+
+[ ] Human/AI inputs intended for production knowledge or scoring must follow staging/review/certification paths; no silent self-approval.
+
+[ ] Think Tank decisions and learning require independent confirmation/approval where the workflow requires it.
+
+[ ] Approved reusable knowledge does not auto-score, auto-certify, or auto-mint Sparks.
+
+[ ] Sparks remain internal utility only: no cash purchase/redemption, P2P/external transfer, secondary market, or ownership/royalty effect.
+
+[ ] Governance voting remains one active project member, one vote; Sparks, reputation, contribution share, and capital do not weight formal votes.
+
+[ ] Governance does not amend contracts, create legal ownership, create royalties, grant project roles, or create financial authority.
+
+[ ] Dispute resolutions preserve the challenged source record and create append-only correction/clarification records.
+
+[ ] Project invitation alone does not create access or a vote; membership must become active after matching-account authentication.
+
+[ ] The normal UI must not reintroduce Capacity or Operations Capabilities as general-user surfaces unless explicitly governed for a specialist/admin context.
+
+[ ] Current operating direction is free promotion/no billing; flag any live billing, checkout, stale paid CTA, or pricing path as a release inconsistency.
+
+# 4. Audit Method and Evidence Standard
+
+| Phase | Method | Minimum evidence | Exit condition |
+
+| --- | --- | --- | --- |
+
+| A. Surface map | Map public routes, authenticated routes, primary navigation, roles, components, APIs, edge functions, data domains. | Route inventory + screenshots + component/domain map. | No material user-facing area is unlisted. |
+
+| B. Source/architecture | Review README, architecture, release manifest, migrations, CI/CD, edge functions, component boundaries. | File paths, code references, architecture notes. | Source behavior can be reconciled with live behavior. |
+
+| C. Workflow tests | Execute representative journeys across UI and governed RPCs where authorized. | Steps, expected/actual, traces, timings. | Critical workflows have explicit outcomes. |
+
+| D. Output quality | Inspect generated answers, manifests, audit records, decisions, actions, scores, exports. | Sample outputs + quality assessment. | Results are useful, traceable, reproducible, and understandable. |
+
+| E. Failure/resilience | Test invalid inputs, stale state, retries, unauthorized actions, network/API failure, refresh/reload. | Error screenshots/logs + recovery steps. | Failures are contained, clear, and recoverable. |
+
+| F. Optimization synthesis | Group findings by root cause and propose target-state changes. | Prioritized backlog + architecture/workflow/UI proposals. | Every proposal links to evidence and validation tests. |
+
+| Status vocabulary PASS = fully verified. PARTIAL = works but has measurable defects/friction. FAIL = requirement broken or unsafe. NOT TESTED = access/evidence missing. NOT APPLICABLE = genuinely outside current scope. |
+
+| --- |
+
+# 5. UI / UX / Information Architecture
+
+## 5.1 Navigation, layout, responsive behavior
+
+Audit purpose. Confirm that users can understand where they are, what to do next, and how modules relate without requiring internal knowledge.
+
+[ ] Map all sidebar/top-nav destinations and identify duplicate, hidden, dead, obsolete, or misleading entries.
+
+[ ] Verify Overview, Stakeholder, Sparks, Governance, Think Tanks, DataNest AI, Product Lab, UNIFI, TranScheduler, Runs, Checkpoints, Audit, and Settings surfaces render consistently where present.
+
+[ ] Test desktop widths, narrow laptop widths, tablet, and mobile; record clipping, horizontal scroll, modal/sidebar overlap, fixed-header collisions, and unusable tables.
+
+[ ] Verify the External AI sidebar never blocks critical input/output areas and preserves visibility of Return-to-DataNest workflows.
+
+[ ] Assess loading, empty, success, warning, disabled, partial-data, stale-session, and error states for clarity.
+
+[ ] Check visual hierarchy, spacing, terminology, button prominence, typography, contrast, density, and unnecessary cognitive load.
+
+[ ] Check that technical/admin terminology is not exposed to ordinary users without explanation.
+
+[ ] Verify Reload latest behavior is understandable and does not create state confusion.
+
+[ ] Confirm Capacity and Operations Capabilities are absent from normal user UI unless intentionally scoped to a specialist/admin view.
+
+[ ] Identify opportunities to consolidate pages, reduce clicks, surface context, and remove duplicate status displays.
+
+Evidence to return: Annotated route map, responsive screenshots, UX friction list, proposed navigation simplification, accessibility issues.
+
+# 6. Accessibility and Interaction Quality
+
+## 6.1 Accessibility
+
+Audit purpose. Assess keyboard, semantic, visual, and assistive-technology usability.
+
+[ ] Keyboard-only navigation through sign-in, sidebar, forms, tables, dialogs, dropdowns, and critical actions.
+
+[ ] Visible focus states and logical tab order.
+
+[ ] Form labels, error associations, required indicators, status messages, and accessible names for icon-only controls.
+
+[ ] Color contrast and non-color status cues.
+
+[ ] Heading hierarchy and landmark structure.
+
+[ ] Table readability and responsive alternatives for wide data tables.
+
+[ ] Zoom to 200% and browser text scaling without lost functionality.
+
+[ ] Meaningful loading/error text rather than spinner-only or generic failure states.
+
+[ ] Accessible wording for governance decisions, Sparks, scoring, and status badges.
+
+Evidence to return: Accessibility finding list with WCAG-oriented evidence, severity, and remediation.
+
+# 7. Architecture and System Boundaries
+
+## 7.1 

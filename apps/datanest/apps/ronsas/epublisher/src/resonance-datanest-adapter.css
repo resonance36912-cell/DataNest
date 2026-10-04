@@ -1,0 +1,39 @@
+@import "../../shared/cinematic.css";
+
+:root{
+  --dn-surface-canvas:#070414;
+  --dn-surface-chrome:rgba(12,5,29,.96);
+  --dn-surface-work:rgba(18,10,39,.86);
+  --dn-surface-work-soft:rgba(24,12,52,.72);
+  --dn-surface-elevated:rgba(34,18,65,.96);
+  --dn-text-primary:#f7f5ff;
+  --dn-text-secondary:#aaa7c7;
+  --dn-success:#72e6ae;
+  --dn-warning:#f4c66f;
+  --dn-danger:#ff86ab;
+  --dn-info:#8aa6ff;
+  --rdn-app-accent: #8b5cf6;
+  --dn-app-accent: var(--rdn-app-accent);
+  --dn-focus:#42e7ff;
+  --dn-font-heading:"Inter Tight",ui-sans-serif,system-ui,sans-serif;
+  --dn-font-body:"Inter",ui-sans-serif,system-ui,sans-serif;
+  --dn-font-editorial:"Instrument Serif",Georgia,serif;
+  --dn-font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+html,body{font-family:var(--dn-font-body)}
+h1,h2,h3,h4,h5,h6,nav,button{font-family:var(--dn-font-heading)}
+code,pre,kbd,samp{font-family:var(--dn-font-mono)}
+.dn-editorial{font-family:var(--dn-font-editorial);font-style:italic}
+:focus-visible{outline:2px solid var(--dn-focus);outline-offset:3px}
+@media (prefers-contrast: more){
+  :root{--border:0 0% 100%;--input:0 0% 100%}
+  :focus-visible{outline-width:3px}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    scroll-behavior:auto!important;
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.001ms!important;
+  }
+}

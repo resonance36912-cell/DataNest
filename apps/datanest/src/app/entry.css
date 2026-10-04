@@ -1,0 +1,135 @@
+/* Entry experience: system fonts, CSS artwork, no additional image or chart library. */
+.authLanding { display: flex; flex-direction: column; align-items: stretch; padding: 0 clamp(20px, 5vw, 80px); min-height: 100svh; }
+.landingHeader, .landingFooter { width: 100%; max-width: 1320px; margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.landingHeader { min-height: 100px; border-bottom: 1px solid var(--line); }
+.landingBrand { display: flex; gap: 12px; align-items: center; text-decoration: none; font-size: 10px; letter-spacing: .18em; color: var(--text-secondary); }
+.landingBrand b { display: block; color: var(--text); font-size: 19px; letter-spacing: -.04em; margin-top: 3px; }
+.landingMonogram { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--brand-cyan); border-radius: 14px; color: var(--brand-cyan); font-size: 26px; font-weight: 800; background: linear-gradient(140deg, var(--surface-elevated), var(--surface-work-soft)); }
+.motionControl { display: inline-grid; grid-template-columns: auto minmax(76px, 1fr); align-items: center; gap: 8px; min-height: 44px; padding: 6px 9px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-work); color: var(--text-primary); font-size: 10px; cursor: pointer; }
+.motionControl:focus-within { border-color: var(--brand-cyan); box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand-cyan) 18%, transparent); }
+.motionControl span { font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text-secondary); }
+.motionControl select { min-height: 30px; padding: 5px 24px 5px 7px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface-elevated); color: var(--text-primary); font-size: 10px; font-weight: 700; }
+.landingLayout { width: 100%; max-width: 1320px; margin: auto; padding-block: 52px; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(340px, .85fr); align-items: center; gap: clamp(40px, 6vw, 100px); }
+.landingStory { min-width: 0; }
+.landingStory h2 { font-size: clamp(54px, 6vw, 84px); line-height: 1.02; letter-spacing: -.06em; margin: 0; }
+.landingStory h2 span { background: linear-gradient(110deg, var(--brand-cyan) 10%, var(--brand-violet) 60%, var(--brand-magenta)); background-clip: text; -webkit-background-clip: text; color: transparent; }
+.landingLede { max-width: 51ch; color: var(--text-secondary); font-size: 16px; line-height: 1.75; margin: 24px 0 0; }
+.landingStory .aiICoreStage { min-height: 300px; max-width: 570px; margin: 8px auto 18px; isolation: isolate; }
+.landingStory .orbitOuter { width: 280px; height: 280px; }
+.landingStory .orbitMiddle { width: 220px; height: 220px; }
+.landingStory .humanCore { left: 9%; }
+.landingStory .aiCore { right: 9%; }
+.landingStory .coreNode { width: 126px; height: 126px; }
+.landingSteps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.landingSteps li { padding-top: 16px; border-top: 1px solid var(--line-strong); }
+.landingSteps span { color: var(--brand-violet); font-size: 11px; font-variant-numeric: tabular-nums; }
+.landingSteps b, .landingSteps small { display: block; }
+.landingSteps b { margin: 9px 0 5px; font-size: 14px; }
+.landingSteps small { font-size: 11px; color: var(--text-secondary); }
+.landingSignIn { width: 100%; padding: clamp(24px, 3vw, 42px); border-color: var(--line-strong); background: linear-gradient(150deg, var(--surface-elevated), var(--surface-canvas-deep) 70%); backdrop-filter: none; }
+.landingSignIn h1 { font-size: clamp(26px, 2.5vw, 36px); }
+.landingSignIn .brandMark { width: 44px; height: 44px; font-size: 14px; }
+.landingSignIn .lede { font-size: 14px; color: var(--text-secondary); }
+.landingSignIn .authForm label { font-size: 13px; color: var(--text-primary); }
+.passwordField{position:relative;display:flex;align-items:center}
+.passwordField input{padding-right:64px!important}
+.passwordToggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);min-height:32px;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-work-soft);color:var(--text-subtle);font-size:10px;font-weight:800;cursor:pointer}
+.passwordToggle:hover,.passwordToggle:focus-visible{border-color:rgba(66,231,255,.32);color:var(--text-primary);outline:none}
+.sessionCheckNote.sessionCheckError{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;color:var(--brand-cyan)}
+.sessionCheckRetry{border:0;background:transparent;color:inherit;font:800 10px/1.3 inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:2px 0}
+.sessionCheckRetry:hover,.sessionCheckRetry:focus-visible{color:var(--text-primary);outline:none}
+.landingSignIn input { font-size: 16px; min-height: 48px; }
+.landingSignIn button { min-height: 48px; font-size: 13px; }
+.landingSignIn .securityNote { font-size: 12px; line-height: 1.7; color: var(--text-secondary); }
+.landingSignIn .authMessage { font-size: 13px; }
+.landingFooter { padding-block: 22px; border-top: 1px solid var(--line); font-size: 11px; color: var(--text-secondary); }
+.skipLink { position: fixed; z-index: 100; top: 10px; left: 10px; padding: 12px 18px; border-radius: 8px; color: var(--text-inverse); background: var(--cyan); transform: translateY(-160%); }
+.skipLink:focus { transform: translateY(0); }
+.pulseGridLine { stroke: var(--text-subtle); stroke-opacity: .22; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.pulseAxis { color: var(--text-secondary); grid-template-columns: repeat(7, minmax(0, 1fr)); padding-inline: 1%; }
+.pulseAxis b { display: block; font-size: 12px; color: var(--text-primary); margin-bottom: 5px; }
+.aiIGraphNote { color: var(--text-secondary); font-size: 12px; line-height: 1.6; }
+.aiILiveBadge { color: var(--text-secondary); line-height: 1.7; text-align: right; }
+.aiITextButton { min-height: 44px; font-size: 12px; }
+.aiIStatsGrid strong { font-variant-numeric: tabular-nums; }
+html[data-motion-paused="true"] *, html[data-motion-paused="true"] *::before, html[data-motion-paused="true"] *::after { animation-play-state: paused !important; transition: none !important; scroll-behavior: auto !important; }
+@media (max-width: 900px) {
+  .landingLayout { grid-template-columns: minmax(0, 1fr) minmax(300px, .9fr); gap: 30px; }
+  .landingStory h2 { font-size: 58px; }
+  .landingStory .aiICoreStage { transform: scale(.82); margin-inline: -28px; }
+}
+@media (max-width: 700px) {
+  .landingHeader { min-height: 80px; }
+  .landingBrand { font-size: 8px; gap: 8px; }
+  .landingBrand b { font-size: 17px; }
+  .landingMonogram { width: 36px; height: 36px; font-size: 22px; }
+  .motionControl { font-size: 11px; padding-inline: 9px; }
+  .landingLayout { grid-template-columns: minmax(0, 1fr); padding-block: 30px; gap: 26px; }
+  .landingStory h2 { font-size: clamp(44px, 10vw, 64px); }
+  .landingLede { font-size: 14px; margin-top: 16px; }
+  .landingStory .aiICoreStage { display: none; }
+  .landingSteps { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+  .landingSignIn { max-width: 480px; justify-self: center; }
+  .landingFooter { flex-wrap: wrap; gap: 8px; font-size: 10px; }
+  .aiIStatsGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .aiIStatsGrid article { padding: 15px; }
+  .aiIStatsGrid strong { font-size: 28px; }
+  .aiICardHead { flex-wrap: wrap; gap: 8px; }
+  .aiIGraphCard { padding: 20px 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landingStory *, .landingStory *::before, .landingStory *::after { animation: none !important; }
+}
+
+/* Reson8 ecosystem ingress */
+.landingHeaderActions{display:flex;align-items:center;gap:10px}
+.landingHubLink{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-work);color:var(--text-primary);text-decoration:none;font-size:12px;font-weight:800}
+.landingHubLink:hover,.landingHubLink:focus-visible{border-color:rgba(66,231,255,.38);color:var(--text-primary);background:rgba(66,231,255,.07)}
+@media (max-width:700px){.landingHeaderActions{gap:6px}.landingHubLink{min-height:40px;padding:8px 9px;font-size:10px}}
+@media (max-width:430px){.landingHeaderActions{gap:6px}.landingHubLink{font-size:10px;min-height:38px;padding:7px 9px}.landingHubLink span{font-size:10px}.landingThemeControl{min-width:105px}}
+
+
+/* Shared Resonance identity, governance trust, and operator footer */
+.resonanceBrandLockup{display:inline-flex;align-items:center;gap:11px;min-width:0;color:var(--text-primary)}
+.resonanceBrandLogo{width:48px;height:34px;display:block;overflow:hidden;border:1px solid var(--line-soft);border-radius:var(--radius-sm);background:var(--surface-canvas-deep);box-shadow:0 8px 22px var(--glow-magenta-token)}
+.resonanceBrandLogo img{display:block;width:100%;height:100%;object-fit:cover}
+.resonanceBrandCopy{display:grid;min-width:0}
+.resonanceBrandCopy strong{font-family:var(--font-heading);font-size:17px;line-height:1.05;letter-spacing:-.025em;color:var(--text-primary);white-space:nowrap}
+.resonanceBrandCopy small{margin-top:4px;font-size:9px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--text-secondary)}
+.resonanceBrandLockup.compact .resonanceBrandLogo{width:42px;height:30px}
+.resonanceBrandLockup.compact .resonanceBrandCopy strong{font-size:16px}
+
+.governanceTrustMark{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:8px 10px;border:1px solid var(--line-soft);border-radius:var(--radius-pill);background:color-mix(in srgb,var(--surface-work) 88%,transparent);color:var(--text-primary);text-decoration:none;font-size:10px;line-height:1;white-space:nowrap}
+.governanceTrustMark>span{color:var(--brand-cyan);font-size:9px}
+.governanceTrustMark strong{font-family:var(--font-heading);font-size:10px;letter-spacing:.05em}
+.governanceTrustMark:hover,.governanceTrustMark:focus-visible{border-color:var(--brand-cyan);background:color-mix(in srgb,var(--brand-cyan) 8%,var(--surface-work));color:var(--text-primary)}
+
+.platformFooter{width:100%;max-width:1320px;margin-inline:auto;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,.8fr);gap:26px;align-items:start;padding-block:24px;border-top:1px solid var(--line-soft);color:var(--text-secondary)}
+.platformFooterIdentity strong{display:block;font-family:var(--font-heading);font-size:14px;color:var(--text-primary)}
+.platformFooterIdentity p{max-width:82ch;margin:7px 0 0;font-size:10px;line-height:1.6}
+.platformFooterPromotion{color:var(--semantic-info)}
+.platformFooterLinks{display:flex;justify-content:flex-end;align-items:center;gap:10px;flex-wrap:wrap}
+.platformFooterLinks>a:not(.governanceTrustMark){min-height:40px;display:inline-flex;align-items:center;padding:7px 2px;color:var(--text-secondary);font-size:10px;font-weight:700;text-decoration:none}
+.platformFooterLinks>a:not(.governanceTrustMark):hover,.platformFooterLinks>a:not(.governanceTrustMark):focus-visible{color:var(--brand-cyan)}
+.platformFooter.compact{padding-block:20px}
+
+@media(max-width:900px){
+  .platformFooter{grid-template-columns:1fr}
+  .platformFooterLinks{justify-content:flex-start}
+}
+@media(max-width:700px){
+  .landingHeader{align-items:flex-start;padding-block:14px;flex-wrap:wrap}
+  .landingHeaderActions{width:100%;justify-content:flex-start;flex-wrap:wrap}
+  .resonanceBrandCopy strong{font-size:15px}
+  .governanceTrustMark{min-height:38px}
+  .platformFooter{gap:14px}
+}
+@media(max-width:430px){
+  .resonanceBrandLockup.compact .resonanceBrandCopy strong{white-space:normal}
+  .platformFooterLinks{display:grid;grid-template-columns:1fr 1fr;align-items:stretch}
+  .platformFooterLinks .governanceTrustMark{grid-column:1/-1;justify-self:start}
+}
+
+
+/* UX consolidation: contextual theme, focused auth hierarchy, and visible session progress. */
+.landingThemeControl{flex:0 0 auto}.landingThemeControl .themeControl{min-width:108px}.authMagicLink{background:var(--surface-work-soft)}.authRecoveryButton{min-height:44px;border:0;background:transparent;color:var(--brand-cyan);font-size:12px;font-weight:800;cursor:pointer;text-decoration:underline;text-underline-offset:3px}.authRecoveryButton:hover,.authRecoveryButton:focus-visible{color:var(--text-primary)}.sessionCheckNote{min-height:18px;margin:6px 0 0;color:var(--text-subtle);font-size:10px;line-height:1.45}.topbarMeta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:8px;color:var(--text-subtle);font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}.topbarMeta i{font-style:normal;opacity:.6}@media(max-width:900px){.topbarMeta{font-size:8px}}@media(max-width:620px){.landingHeaderActions{row-gap:6px}.landingThemeControl select{font-size:10px}.authRecoveryButton{justify-self:center}}

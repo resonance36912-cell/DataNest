@@ -1,0 +1,24 @@
+{
+  "candidate": {
+    "candidateId": "forge-phase-a-example",
+    "repository": "DataNest-Supository/DataNest",
+    "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "canonicalBaseSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "environment": "candidate",
+    "evidenceRefs": [
+      "mirror_live_evidence_reference",
+      "datanest_ai_certification_reference",
+      "audit_optimizer_reference",
+      "canonical_pr_verification_reference",
+      "security_scan_reference",
+      "governance_review_reference",
+      "human_production_authorization_reference"
+    ]
+  },
+  "policy": {
+    "canonicalProductionAuthority": true,
+    "forgeProductionAuthority": false,
+    "humanProductionAuthorizationRequired": true,
+    "exactShaPromotionRequired": true
+  }
+}

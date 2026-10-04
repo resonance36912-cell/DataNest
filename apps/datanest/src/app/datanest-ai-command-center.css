@@ -1,0 +1,258 @@
+/* DataNest AI command-center hierarchy and branding refinement.
+   Keeps the animated hero, improves the new Resonance Data Nest wordmark,
+   and makes DataNest AI visually unmistakable as the primary command surface. */
+
+:root{
+  --dn-command-cyan:#7fe8ff;
+  --dn-command-cyan-strong:#42e7ff;
+  --dn-command-violet:#ad95ff;
+  --dn-command-text:#f4fbff;
+  --dn-command-muted:#9bb1c3;
+  --dn-command-surface:rgba(7,12,29,.92);
+  --dn-command-border:rgba(91,229,255,.28);
+}
+
+/* Unified visible brand treatment: readable first, luminous second. */
+.landingBrandText b,
+.authBrandCopy strong,
+.sidebarTop>div:nth-child(2)>b{
+  color:var(--dn-command-text);
+  background:linear-gradient(92deg,#ffffff 0%,#a8f3ff 48%,#bca9ff 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  font-weight:850;
+  letter-spacing:-.018em;
+}
+.sidebarTop>div:nth-child(2){
+  min-width:0;
+  line-height:1.08;
+}
+.sidebarTop>div:nth-child(2)>b{
+  display:block;
+  font-size:14px;
+  white-space:nowrap;
+}
+.landingBrandText b{font-size:13px;letter-spacing:.01em}
+.authBrandCopy strong{font-size:13px;letter-spacing:.005em}
+
+/* Make DataNest AI the clear command-center destination, even when inactive. */
+.navGroup button.aiHeroNav{
+  position:relative;
+  isolation:isolate;
+  min-height:42px;
+  margin:4px 0 7px;
+  border:1px solid rgba(83,225,255,.22);
+  border-radius:11px;
+  background:
+    radial-gradient(circle at 8% 50%,rgba(66,231,255,.12),transparent 34%),
+    linear-gradient(90deg,rgba(21,31,57,.76),rgba(39,20,70,.62));
+  color:#eafaff;
+  font-weight:850;
+  box-shadow:inset 0 1px rgba(255,255,255,.035),0 8px 20px rgba(0,0,0,.12);
+}
+.navGroup button.aiHeroNav::before{
+  content:"";
+  position:absolute;
+  inset:7px auto 7px -1px;
+  width:3px;
+  border-radius:0 3px 3px 0;
+  background:linear-gradient(180deg,var(--dn-command-cyan-strong),var(--dn-command-violet));
+  box-shadow:0 0 12px rgba(66,231,255,.34);
+}
+.navGroup button.aiHeroNav::after{
+  content:"COMMAND";
+  margin-left:auto;
+  padding:3px 5px;
+  border:1px solid rgba(127,232,255,.18);
+  border-radius:999px;
+  background:rgba(66,231,255,.055);
+  color:#a9f2ff;
+  font:800 6.5px/1 ui-monospace,SFMono-Regular,Consolas,monospace;
+  letter-spacing:.08em;
+}
+.navGroup button.aiHeroNav>span{
+  width:26px;
+  height:26px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(127,232,255,.18);
+  border-radius:8px;
+  background:rgba(66,231,255,.06);
+  color:#9bf0ff;
+  text-shadow:0 0 10px rgba(66,231,255,.34);
+}
+.navGroup button.aiHeroNav:hover,
+.navGroup button.aiHeroNav:focus-visible{
+  border-color:rgba(91,229,255,.4);
+  background:
+    radial-gradient(circle at 8% 50%,rgba(66,231,255,.17),transparent 36%),
+    linear-gradient(90deg,rgba(25,39,70,.86),rgba(47,24,84,.76));
+}
+.navGroup button.aiHeroNav.active{
+  border-color:rgba(104,234,255,.5);
+  background:
+    radial-gradient(circle at 10% 50%,rgba(66,231,255,.22),transparent 38%),
+    linear-gradient(90deg,rgba(23,43,75,.95),rgba(58,27,100,.9));
+  box-shadow:inset 0 1px rgba(255,255,255,.055),0 0 26px rgba(66,231,255,.09),0 12px 30px rgba(0,0,0,.2);
+}
+
+/* Preserve the animated hero, but give it a calmer and clearer hierarchy. */
+.datanestAiHeroV2{
+  border-color:rgba(125,104,255,.42);
+  background:
+    radial-gradient(circle at 78% 18%,rgba(71,221,255,.10),transparent 28%),
+    radial-gradient(circle at 18% 92%,rgba(147,84,255,.10),transparent 31%),
+    linear-gradient(140deg,rgba(10,14,34,.97),rgba(12,9,33,.94));
+  box-shadow:0 20px 54px rgba(0,0,0,.24),0 0 30px rgba(83,213,255,.045),inset 0 1px rgba(255,255,255,.04);
+}
+.datanestAiHeroBadge{
+  width:max-content;
+  max-width:100%;
+  padding:6px 8px;
+  border:1px solid rgba(127,232,255,.18);
+  border-radius:999px;
+  background:rgba(66,231,255,.045);
+  color:#b8f4ff;
+}
+.datanestAiHeroBadge::after{
+  content:" · COMMAND CENTER";
+  color:#cabdff;
+}
+.datanestAiHeroV2 h2{color:#f8fcff}
+.datanestAiHeroV2 h2 span{
+  color:#9af0ff;
+  text-shadow:0 0 22px rgba(66,231,255,.18);
+}
+.datanestAiHeroV2 h3{color:#bdccda}
+.datanestAiHeroV2 h3 strong{color:#f6fbff}
+.datanestAiHeroV2 .datanestAiHeroCopy>p{color:#9fb1c2}
+.datanestAiHeroSecondary{
+  border-color:rgba(127,232,255,.22)!important;
+  background:rgba(66,231,255,.045)!important;
+}
+
+/* Turn the existing development console into the strongest working surface. */
+.datanestAiChatPanel{
+  position:relative;
+  border-color:rgba(91,229,255,.36);
+  background:
+    radial-gradient(circle at 96% 4%,rgba(128,87,255,.09),transparent 28%),
+    radial-gradient(circle at 4% 0,rgba(66,231,255,.07),transparent 25%),
+    linear-gradient(180deg,rgba(7,14,32,.98),rgba(5,9,23,.985));
+  box-shadow:0 22px 58px rgba(0,0,0,.26),0 0 34px rgba(66,231,255,.055),inset 0 1px rgba(255,255,255,.045);
+}
+.datanestAiChatPanel::before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto;
+  height:2px;
+  background:linear-gradient(90deg,transparent 0%,var(--dn-command-cyan-strong) 28%,var(--dn-command-violet) 72%,transparent 100%);
+  opacity:.82;
+  pointer-events:none;
+}
+.datanestAiConsoleHead{
+  background:linear-gradient(180deg,rgba(255,255,255,.018),transparent);
+  border-bottom:1px solid rgba(127,232,255,.09);
+}
+.datanestAiConsoleIdentity .eyebrow{color:#8defff}
+.datanestAiConsoleIdentity h3{
+  color:#f7fbff;
+  letter-spacing:.055em;
+  text-shadow:0 0 18px rgba(66,231,255,.10);
+}
+.datanestAiConsoleIdentity small{color:#91a8ba}
+.datanestAiConsoleGlyph{
+  border-color:rgba(104,234,255,.34);
+  background:linear-gradient(145deg,rgba(66,231,255,.12),rgba(139,92,246,.12));
+  color:#d9fbff;
+  box-shadow:0 0 20px rgba(66,231,255,.10),inset 0 1px rgba(255,255,255,.05);
+}
+.datanestAiConsoleStatus>span,
+.datanestAiConsoleCommandJump{
+  border-color:rgba(127,232,255,.14);
+  background:rgba(127,232,255,.035);
+}
+.datanestAiConsoleCommandJump{
+  color:#baf5ff;
+  font-weight:900;
+}
+
+/* Make the command composer the obvious primary interaction. */
+.datanestAiCommandConsole .datanestAiComposer{
+  border-color:rgba(91,229,255,.34);
+  background:
+    radial-gradient(circle at 100% 100%,rgba(164,104,255,.075),transparent 30%),
+    linear-gradient(180deg,rgba(6,16,35,.92),rgba(6,10,25,.94));
+  box-shadow:0 16px 38px rgba(0,0,0,.18),0 0 26px rgba(66,231,255,.04),inset 0 1px rgba(255,255,255,.04);
+}
+.datanestAiComposerLabel b{color:#f5fbff}
+.datanestAiComposerLabel small{color:#8defff}
+.datanestAiCommandConsole .datanestAiComposer textarea{
+  border-color:rgba(126,228,255,.2);
+  background:rgba(2,8,20,.74);
+  color:#f4fbff;
+  caret-color:#7fe8ff;
+}
+.datanestAiCommandConsole .datanestAiComposer textarea::placeholder{color:#647d92}
+.datanestAiCommandConsole .datanestAiComposer textarea:focus{
+  border-color:rgba(91,229,255,.52);
+  box-shadow:0 0 0 3px rgba(66,231,255,.08),0 0 22px rgba(66,231,255,.055);
+  outline:none;
+}
+.datanestAiCommandButton{
+  border-color:rgba(91,229,255,.48)!important;
+  background:linear-gradient(135deg,rgba(39,194,226,.9),rgba(106,83,224,.9))!important;
+  color:#fff!important;
+  box-shadow:0 8px 20px rgba(40,167,217,.16);
+}
+.datanestAiCommandButton:hover:not(:disabled),
+.datanestAiCommandButton:focus-visible:not(:disabled){
+  filter:brightness(1.08);
+  box-shadow:0 10px 24px rgba(40,167,217,.22),0 0 0 3px rgba(127,232,255,.08);
+}
+
+/* Context follows the command surface: visible, compact, intentionally secondary. */
+.datanestAiCommandSummaryCompact{
+  border-color:rgba(127,232,255,.18);
+  background:
+    radial-gradient(circle at 90% 0,rgba(142,91,255,.055),transparent 30%),
+    linear-gradient(145deg,rgba(10,14,31,.86),rgba(7,12,26,.9));
+}
+.datanestAiCommandObjective small,
+.datanestAiCommandContext>label{color:#8fefff}
+.datanestAiCommandObjective strong{color:#f3f9ff}
+.datanestAiCommandObjective p{color:#8fa5b8}
+.datanestAiCommandContext>select:focus-visible{
+  outline:2px solid rgba(127,232,255,.58);
+  outline-offset:2px;
+}
+
+@media(max-width:620px){
+  .sidebarTop>div:nth-child(2)>b{font-size:13px}
+  .navGroup button.aiHeroNav::after{display:none}
+  .datanestAiHeroBadge::after{content:" · COMMAND"}
+  .datanestAiConsoleIdentity h3{letter-spacing:.035em}
+}
+
+@media(forced-colors:active){
+  .landingBrandText b,
+  .authBrandCopy strong,
+  .sidebarTop>div:nth-child(2)>b{
+    background:none;
+    -webkit-text-fill-color:currentColor;
+    color:CanvasText;
+  }
+  .navGroup button.aiHeroNav,
+  .datanestAiHeroV2,
+  .datanestAiChatPanel,
+  .datanestAiCommandConsole .datanestAiComposer{
+    border-color:CanvasText;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .navGroup button.aiHeroNav,
+  .datanestAiChatPanel,
+  .datanestAiCommandConsole .datanestAiComposer{transition:none!important}
+}

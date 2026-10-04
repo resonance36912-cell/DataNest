@@ -1,0 +1,137 @@
+pyramid improvements and fastest high-value regression additions.
+
+Evidence to return: CI/CD map, coverage gaps, flakiness/false-positive risks, rollback recommendations, maintainability backlog.
+
+# 20. Operational Efficiency, Cost, Free-Promotion, and Product Coherence
+
+## 20.1 Operational/product alignment
+
+Audit purpose. Identify unnecessary complexity or costs while preserving sovereignty and current commercial direction.
+
+[ ] Verify there is no active billing/checkout/credit-purchase path contradicting the current free-promotion/no-billing direction.
+
+[ ] Flag stale pricing, buy, subscription, credit, checkout, or payment copy in UI/docs/routes.
+
+[ ] Identify paid third-party dependencies that can be replaced by reliable free/open/local alternatives without degrading quality or maintainability.
+
+[ ] Measure avoidable AI calls, duplicate context, repeated builds, polling, or storage that increase operational cost.
+
+[ ] Check that Vercel remains optional and the primary architecture stays provider-agnostic.
+
+[ ] Assess how easily the system can run in a sovereign/local/self-hosted RONSAS environment.
+
+[ ] Review user-facing product/module overlap and recommend consolidation where multiple screens solve the same problem.
+
+[ ] Identify “internal engineering” concepts exposed to users that should be automated or moved to admin views.
+
+[ ] Propose a simpler operating model for a non-technical project owner without reducing governance rigor.
+
+Evidence to return: Cost/complexity reduction opportunities, stale billing inventory, module consolidation plan, sovereignty improvements.
+
+# 21. Required End-to-End Audit Journeys
+
+Run as many journeys as access safely allows. Use dedicated test data where possible. Do not use real secrets or alter production governance/financial records merely to complete a checklist.
+
+| ID | Journey | What to observe | Result / evidence |
+
+| --- | --- | --- | --- |
+
+| J1 | Sign in -> project load -> Overview -> Reload latest -> module navigation | Session handling, runtime config, navigation consistency, loading/error states. |  |
+
+| J2 | Create/review Job Manifest -> open External AI companion -> handoff -> return result -> checkpoint | Trace continuity, sidebar layout, external session attribution, result import, checkpoint usefulness. |  |
+
+| J3 | Schedule a Job with dependency/capability constraints -> observe queue -> retry/recovery | TranScheduler safety, UNKNOWN handling, status explanations, operator controls. |  |
+
+| J4 | Use DataNest AI on a Job -> inspect trace -> propose/approve reviewed learning where authorized | AI attribution, context isolation, human review, certified memory boundary. |  |
+
+| J5 | Think Tank discussion -> decision/action/learning proposal -> independent review | Separation of proposal vs accepted state; action and memory traceability. |  |
+
+| J6 | Contribution evidence -> review/certification -> reputation/anomaly/ranking view | Scoring explainability, anti-gaming, eligibility, progression, no auto-authority. |  |
+
+| J7 | Certified contribution -> Sparks balance -> service hold -> cancel -> fulfill | Append-only ledger, locked balance, idempotency, no economic side effects. |  |
+
+| J8 | Project-member invite -> invited/non-voter -> sign in -> active voter | Membership/auth separation and formal voter activation. |  |
+
+| J9 | Protocol draft -> proposal -> vote -> close -> ratify -> later draft | Proposal targeting, independent support, stale/new-draft safety, authoritative version clarity. |  |
+
+| J10 | Governance dispute -> independent resolution | Append-only correction, source preservation, reviewer independence. |  |
+
+| J11 | Public deploy -> release manifest -> health marker -> authenticated UI | Source/deploy/runtime consistency and observability. |  |
+
+| J12 | Failure path: stale session/network/API failure during critical action | No duplicate mutation, clear error, safe retry/recovery. |  |
+
+# 22. Audit Scorecard
+
+Score only what was actually tested. Use 0-5 and include confidence. A high score with low test coverage is not a strong result.
+
+| Domain | Score 0-5 | Confidence H/M/L | Evidence coverage | Top gap |
+
+| --- | --- | --- | --- | --- |
+
+| UI / UX |  |  |  |  |
+
+| Accessibility |  |  |  |  |
+
+| Architecture |  |  |  |  |
+
+| Auth / membership |  |  |  |  |
+
+| UNIFI / Jobs |  |  |  |  |
+
+| TranScheduler |  |  |  |  |
+
+| DataNest AI |  |  |  |  |
+
+| Think Tanks |  |  |  |  |
+
+| Contribution Intelligence |  |  |  |  |
+
+| Sparks |  |  |  |  |
+
+| Governance |  |  |  |  |
+
+| Outputs / artifacts |  |  |  |  |
+
+| Security / privacy |  |  |  |  |
+
+| Performance / reliability |  |  |  |  |
+
+| CI/CD / maintainability |  |  |  |  |
+
+| Operational efficiency |  |  |  |  |
+
+| Scoring guide 5 = strong, production-ready and well evidenced; 4 = solid with minor friction; 3 = functional but material gaps; 2 = fragile or confusing; 1 = severe limitations; 0 = broken/unsafe or not fit for purpose. Use NOT TESTED instead of 0 when evidence is unavailable. |
+
+| --- |
+
+# 23. Required Finding Format
+
+Every material issue or optimization opportunity must use a stable Finding ID so it can be imported into a remediation backlog without reinterpretation.
+
+| Field | Required content |
+
+| --- | --- |
+
+| Finding ID | AUD-001, AUD-002, ... |
+
+| Title | One precise sentence describing the issue/opportunity. |
+
+| Domain | UI, Architecture, Workflow, AI, Governance, Security, Output, etc. |
+
+| Severity | BLOCKER / CRITICAL / HIGH / MEDIUM / LOW / OPPORTUNITY. |
+
+| Confidence | HIGH / MEDIUM / LOW. |
+
+| Status | PASS / PARTIAL / FAIL / NOT TESTED / N/A where applicable. |
+
+| Evidence | URL, screen, trace ID, code path, log, output sample, timing, or reproduction steps. |
+
+| Observed behavior | What actually happens. |
+
+| Expected behavior | What should happen and why. |
+
+| Root-cause hypothesis | Likely technical/product cause. Mark hypothesis explicitly if not proven. |
+
+| User impact | Who is affected; frequency; friction/risk. |
+
+| Optimization prop

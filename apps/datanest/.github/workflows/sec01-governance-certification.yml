@@ -1,0 +1,104 @@
+name: SEC-01 Governance Certification
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+      - "tests/sql/datanest_sovereign_governance_acceptance.sql"
+      - "tests/stress/datanest-governance-boundary-acceptance.mjs"
+      - ".github/workflows/sec01-governance-certification.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sec01-governance-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  certify:
+    name: Canonical multi-collaborator authorization
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      DATANEST_CERTIFICATION_TARGET: local-canonical
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: ./.github/actions/node-project-setup
+
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 2.118.0
+
+      - name: Create ephemeral collaborator credential
+        shell: bash
+        run: |
+          PASSWORD="$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))")"
+          echo "::add-mask::$PASSWORD"
+          echo "DATANEST_AI_E2E_PASSWORD=$PASSWORD" >> "$GITHUB_ENV"
+
+      - name: Start isolated canonical Supabase stack
+        shell: bash
+        run: |
+          set -euo pipefail
+          supabase start
+          supabase status -o env > /tmp/sec01-supabase.env
+          set -a
+          source /tmp/sec01-supabase.env
+          set +a
+
+          for name in API_URL ANON_KEY SERVICE_ROLE_KEY DB_URL; do
+            test -n "${!name:-}" || { echo "::error::Supabase local status did not provide $name"; exit 1; }
+          done
+
+          echo "::add-mask::$ANON_KEY"
+          echo "::add-mask::$SERVICE_ROLE_KEY"
+          {
+            echo "DATANEST_CERTIFICATION_URL=$API_URL"
+            echo "DATANEST_CERTIFICATION_PUBLISHABLE_KEY=$ANON_KEY"
+            echo "DATANEST_CERTIFICATION_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+            echo "DATANEST_CERTIFICATION_DB_URL=$DB_URL"
+          } >> "$GITHUB_ENV"
+
+      - name: Assert certification isolation
+        shell: bash
+        run: |
+          test "$DATANEST_CERTIFICATION_TARGET" = "local-canonical"
+          node -e 'const u=new URL(process.env.DATANEST_CERTIFICATION_URL); if(!["127.0.0.1","localhost"].includes(u.hostname)) throw new Error("SEC-01 target must be loopback-local.");'
+
+      - name: Validate governance schema and immutable boundaries
+        run: psql "$DATANEST_CERTIFICATION_DB_URL" -v ON_ERROR_STOP=1 -f tests/sql/datanest_sovereign_governance_acceptance.sql
+
+      - name: Exercise collaborator authorization matrix
+        env:
+          DATANEST_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node tests/stress/datanest-governance-boundary-acceptance.mjs
+
+      - name: Preserve SEC-01 evidence
+        if: always()
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: sec01-governance-boundary-${{ github.event.pull_request.head.sha || github.sha }}
+          path: certification-artifacts/datanest-governance-boundary-acceptance.json
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Local Supabase diagnostics
+        if: failure()
+        run: supabase status || true
+
+      - name: Stop isolated canonical Supabase stack
+        if: always()
+        run: supabase stop --no-backup || true
+
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "sec01-governance-certification"

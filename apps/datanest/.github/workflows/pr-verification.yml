@@ -1,0 +1,147 @@
+name: PR Verification
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/pr-verification.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-verification-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Unit, type, build, and browser verification
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CI: "true"
+      DATANEST_STATIC_EXPORT: "true"
+      NEXT_PUBLIC_BASE_PATH: "/DataNest"
+      NEXT_PUBLIC_SUPABASE_URL: "https://sgqdmfgjbprsoqsmgigi.supabase.co"
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_yIf5HFKNNteed4HdYCS2Vw_4TB-4LvB"
+
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: ./.github/actions/node-project-setup
+
+      - name: Validate Resonance Hub and DataNest authority alignment
+        run: npm run check:hub-alignment
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Run TypeScript check
+        run: npm run check
+
+      - name: Write runtime configuration
+        run: node scripts/write-runtime-config.mjs public/runtime-config.js
+        env:
+          SUPABASE_URL: "https://sgqdmfgjbprsoqsmgigi.supabase.co"
+          SUPABASE_PUBLISHABLE_KEY: "sb_publishable_yIf5HFKNNteed4HdYCS2Vw_4TB-4LvB"
+
+      - name: Write UI governance candidate evidence
+        env:
+          DATANEST_UI_RELEASE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          DATANEST_UI_RELEASE_STATE: candidate
+          DATANEST_UI_PR_VERIFICATION_REF: PR Verification #${{ github.run_number }} / run ${{ github.run_id }}
+        run: node scripts/write-ui-governance-evidence.mjs public/ui-governance-release.json
+
+      - name: Build production static export
+        run: npm run build
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Prepare local Pages-compatible preview
+        run: |
+          rm -rf .preview
+          mkdir -p .preview/DataNest
+          cp -R out/. .preview/DataNest/
+
+      - name: Start preview server
+        run: |
+          python3 -m http.server 4173 --directory .preview > /tmp/datanest-preview.log 2>&1 &
+          echo $! > /tmp/datanest-preview.pid
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/DataNest/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/datanest-preview.log
+          exit 1
+
+      - name: Run browser verification
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
+          DATANEST_APP_PATH: /DataNest/
+        run: >
+          npx playwright test
+          tests/browser/auth.smoke.spec.ts
+          tests/browser/home-optimization.spec.ts
+          tests/browser/products.spec.ts
+          tests/browser/portfolio-registry.spec.ts
+          tests/browser/trust-policy.spec.ts
+          tests/browser/execution-authority.spec.ts
+          tests/browser/external-auditor.spec.ts
+          tests/browser/legal-centre.spec.ts
+          tests/browser/ui-governance-accessibility.spec.ts
+          tests/browser/resource-fabric.spec.ts
+          tests/browser/intelligence-fabric.spec.ts
+          tests/browser/datanest-ai-layout.spec.ts
+          tests/browser/datanest-ai-recovery.spec.ts
+          tests/browser/transcheduler-project-gantt.spec.ts
+
+      - name: Run UI governance visual review
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
+          DATANEST_APP_PATH: /DataNest/
+        run: npx playwright test tests/browser/ui-governance-review.spec.ts
+
+      - name: Upload UI governance visual review evidence
+        if: always()
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: ui-governance-review-${{ github.run_id }}
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Collect preview log on failure
+        if: failure()
+        run: |
+          mkdir -p test-results
+          cp /tmp/datanest-preview.log test-results/preview-server.log || true
+
+      - name: Upload UI governance candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: ui-governance-candidate-${{ github.run_id }}
+          path: public/ui-governance-release.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: playwright-failure-evidence-${{ github.run_id }}
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "pr-verification"

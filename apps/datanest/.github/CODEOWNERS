@@ -1,0 +1,23 @@
+# DataNest canonical governance ownership
+# Canonical control-plane and production-adjacent paths require review by the repository owner.
+* @DataNest-Supository @RESONANCE36912 @RESONANCEAPPDEV @ASHLEYTUYS @ASHLEYUYS
+
+# Governance and authorization boundaries
+/.github/ @DataNest-Supository
+/.github/CODEOWNERS @DataNest-Supository
+/.github/rulesets/ @DataNest-Supository
+/.github/workflows/branch-protection-tree.yml @DataNest-Supository
+/.github/workflows/native-protection-audit.yml @DataNest-Supository
+/config/ @DataNest-Supository
+/schemas/ @DataNest-Supository
+/scripts/ @DataNest-Supository
+/supabase/ @DataNest-Supository
+/infra/ @DataNest-Supository
+/docs/governance/ @DataNest-Supository
+/tests/ @DataNest-Supository
+
+/scripts/canonical-write-watchdog.mjs @DataNest-Supository
+/tests/unit/canonical-write-watchdog.test.mjs @DataNest-Supository
+/evidence/native-protection/ @DataNest-Supository
+
+/tests/unit/native-protection-evidence.test.mjs @DataNest-Supository

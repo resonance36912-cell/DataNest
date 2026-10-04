@@ -1,0 +1,17 @@
+services:
+  resonance-datanest:
+    build:
+      context: .
+    image: resonance-datanest:local
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      SUPABASE_URL: "${SUPABASE_URL:-https://sgqdmfgjbprsoqsmgigi.supabase.co}"
+      SUPABASE_PUBLISHABLE_KEY: "${SUPABASE_PUBLISHABLE_KEY:?Set SUPABASE_PUBLISHABLE_KEY}"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s

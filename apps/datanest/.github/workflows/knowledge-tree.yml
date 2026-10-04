@@ -1,0 +1,82 @@
+name: Knowledge Tree
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "23 */6 * * *"
+      timezone: Africa/Johannesburg
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: datanest-knowledge-tree
+  cancel-in-progress: true
+
+jobs:
+  learn:
+    name: Build provisional repository-learning feeds
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare isolated Knowledge feed branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="automation/knowledge-feed"
+          git fetch origin "$branch" || true
+          git switch -C "$branch"
+
+      - name: Build Knowledge feeds
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/knowledge-tree.mjs
+
+      - name: Validate generated feeds
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.schemaVersion == "datanest-knowledge-index-v1"' knowledge/index.json >/dev/null
+          jq -e '.authority == "provisional_repository_learning" and .productionAuthorization == false and .certifiedMemory == false' knowledge/feeds/datanest.json >/dev/null
+          jq -e '.authority == "provisional_repository_learning" and .productionAuthorization == false and .certifiedMemory == false' knowledge/feeds/mirror-datanest.json >/dev/null
+          jq -e '.authority == "provisional_repository_learning" and .productionAuthorization == false and .certifiedMemory == false' knowledge/feeds/enforcer.json >/dev/null
+
+      - name: Publish isolated Knowledge feed branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="automation/knowledge-feed"
+          git add knowledge/index.json knowledge/feeds
+          if git diff --cached --quiet; then
+            echo "Knowledge feed unchanged."
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "Refresh Knowledge feeds"
+          if git push --force-with-lease origin "HEAD:$branch"; then
+            echo "Knowledge feed branch updated."
+          else
+            echo "::warning::Protected automation/knowledge-feed refused the publication push. The generated feeds remain available in the workflow artifact; no protection bypass is attempted."
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: datanest-knowledge-${{ github.run_id }}
+          path: |
+            knowledge/index.json
+            knowledge/feeds/*.json
+          retention-days: 14
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "knowledge-tree"

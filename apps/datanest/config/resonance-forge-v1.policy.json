@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "name": "resonance-forge-v1",
+  "mode": "governed-mirror",
+  "canonicalRepository": "DataNest-Supository/DataNest",
+  "canonicalProductionAuthority": true,
+  "forgeProductionAuthority": false,
+  "forgeSourceOfTruth": false,
+  "githubInteroperabilityRequired": true,
+  "exactShaPromotionRequired": true,
+  "immutableEvidenceRequired": true,
+  "humanProductionAuthorizationRequired": true,
+  "productionBackendWritesFromRd": false,
+  "directRdToProduction": false,
+  "directForgeToCanonicalMain": false,
+  "requiredEvidence": [
+    "mirror_live_evidence_reference",
+    "datanest_ai_certification_reference",
+    "audit_optimizer_reference",
+    "canonical_pr_verification_reference",
+    "security_scan_reference",
+    "governance_review_reference",
+    "human_production_authorization_reference"
+  ],
+  "failClosedOnMissingEvidence": true,
+  "authorityCutoverApproved": false
+}

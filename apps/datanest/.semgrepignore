@@ -1,0 +1,1 @@
+# Deterministic vendored Emscripten FFmpeg runtime; exclude generated third-party bundle from source SAST.\napps/ronsas/syncvision/public/ffmpeg-core/ffmpeg-core.js\n

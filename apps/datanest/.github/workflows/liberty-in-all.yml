@@ -1,0 +1,103 @@
+name: LIBERTY-IN-ALL Traceability Standard
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "7,17,27,37,47,57 * * * *"
+      timezone: Africa/Johannesburg
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "Knowledge Tree"
+      - "ENFORCER Defence Tree"
+      - "GUARDIAN Health & Healing Tree"
+      - "REGULATOR Harmony Tree"
+      - "VISIBILITY-UTILITY Market Presence Tree"
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  # Coalesce scheduled and dependency-triggered runs that observe the same canonical SHA.
+  group: datanest-liberty-in-all-${{ github.event.workflow_run.head_sha || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  traceability:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event != 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    name: Index records, provenance and public traceability
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && 'main' || '' }}
+          fetch-depth: 0
+
+      - uses: ./.github/actions/node-project-setup
+
+      - name: Validate LIBERTY-IN-ALL contract
+        run: node --test tests/unit/liberty-in-all.test.mjs tests/unit/system-charter.test.mjs tests/unit/visibility-utility.test.mjs
+
+      - name: Verify TypeScript and static export
+        run: |
+          npm run check
+          npm run build
+
+      - name: Build continuous traceability index
+        run: npm run liberty:index
+
+      - name: Verify disclosure and authority boundaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '
+            .productionAuthorization == false and
+            .controls.publishRecordContents == false and
+            .controls.publishSecrets == false and
+            .controls.publishPrivateAuthenticationMaterial == false and
+            .controls.publishProtectedPersonalData == false and
+            .controls.merge == false and
+            .controls.deployProduction == false
+          ' liberty-in-all/state/latest.json >/dev/null
+          jq -e '
+            .productionAuthorization == false and
+            .disclosure.recordContentsPublished == false and
+            .disclosure.secretsPublished == false and
+            .disclosure.privateAuthenticationMaterialPublished == false and
+            .disclosure.protectedPersonalDataPublished == false
+          ' public/transparency/liberty-in-all/latest.json >/dev/null
+
+      - name: Publish LIBERTY-IN-ALL state
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="automation/liberty-in-all"
+          git fetch origin "$branch" || true
+          git switch -C "$branch"
+          git add liberty-in-all/state/latest.json liberty-in-all/index/traceability.json public/transparency/liberty-in-all/latest.json
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name="DataNest LIBERTY-IN-ALL" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "Refresh LIBERTY-IN-ALL traceability index"
+          git push --force-with-lease origin HEAD:"$branch"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: liberty-in-all-${{ github.run_id }}
+          path: |
+            liberty-in-all/state/latest.json
+            liberty-in-all/index/traceability.json
+            public/transparency/liberty-in-all/latest.json
+          retention-days: 90
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "liberty-in-all"

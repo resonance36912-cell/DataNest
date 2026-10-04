@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "datanest-guardian-v1",
+  "authority": "DataNest-Supository/DataNest",
+  "mode": "event-driven-health-and-safe-healing",
+  "productionAuthorization": false,
+  "purpose": "Observe the complete DataNest tree environment from canonical root through specialized branches and source, measure drift from the optimal operating blueprint, preserve snapshots, and perform only reversible/provably-safe healing.",
+  "monitoredTrees": [
+    "datanest",
+    "knowledge",
+    "boundaries",
+    "botsquad",
+    "environment",
+    "enforcer",
+    "guardian",
+    "mirror",
+    "conductor",
+    "suggester",
+    "calmer",
+    "regulator",
+    "visibility-utility"
+  ],
+  "isolatedTrees": [
+    {
+      "id": "freetree",
+      "mode": "observe-contract-only-no-sync-no-heal"
+    }
+  ],
+  "healthModel": {
+    "blueprint": "config/guardian.blueprint.json",
+    "environmentFeed": "environment/feeds/guardian.json",
+    "enforcerState": "enforcer/state/latest.json",
+    "knowledgeFeed": "knowledge/feeds/datanest.json",
+    "botsquadFeed": "botsquad/feeds/datanest.json",
+    "branchCleanerReport": "branch-cleaner-report.json",
+    "workflowReviewerReport": "report.json",
+    "visibilityUtilityFeed": "visibility-utility/feeds/datanest.json"
+  },
+  "snapshot": {
+    "branch": "automation/guardian",
+    "latestPath": "guardian/snapshots/latest.json",
+    "historyArtifactRetentionDays": 30,
+    "compareToPrevious": true
+  },
+  "healing": {
+    "autonomous": [
+      "delete Git branches proven to have zero unique commits and no open PR via existing branch-cleaner live revalidation",
+      "byte-safe text normalization via existing workflow-reviewer",
+      "refresh generated GUARDIAN health snapshots and feeds"
+    ],
+    "pullRequestOnly": [
+      "behavioral source refactoring",
+      "non-trivial duplicate-code removal",
+      "dependency changes",
+      "runtime/provider/backend changes",
+      "tree contract changes",
+      "workflow behavior changes"
+    ],
+    "forbidden": [
+      "delete unique or unresolved Git history",
+      "weaken Boundaries or ENFORCER",
+      "change production authority",
+      "synchronize or heal FREETREE automatically",
+      "publish secrets or private authentication material"
+    ]
+  },
+  "cadence": {
+    "eventDriven": true,
+    "scheduledPulseMinutes": 30,
+    "safeHealingOn": [
+      "push-main",
+      "schedule",
+      "manual"
+    ]
+  },
+  "feeds": [
+    {
+      "target": "datanest",
+      "path": "guardian/feeds/datanest.json"
+    },
+    {
+      "target": "mirror",
+      "path": "guardian/feeds/mirror-datanest.json"
+    }
+  ],
+  "remoteRepositories": [
+    {
+      "repository": "DataNest-Supository/Mirror-DataNest",
+      "mode": "observe-health-delegate-healing",
+      "expectedDefaultBranch": "main",
+      "required": true,
+      "healingAuthority": "Mirror-DataNest local maintenance"
+    },
+    {
+      "repository": "DataNest-Supository/FREETREE",
+      "mode": "isolated-observe-only",
+      "expectedDefaultBranch": "main",
+      "required": false,
+      "healingAuthority": "FREETREE local maintenance only"
+    }
+  ]
+}

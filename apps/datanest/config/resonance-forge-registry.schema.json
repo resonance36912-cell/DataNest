@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Resonance Forge Repository Registry",
+  "type": "object",
+  "required": ["schemaVersion", "repository", "authority", "environments", "policyVersion"],
+  "properties": {
+    "schemaVersion": {"type": "integer", "const": 1},
+    "repository": {
+      "type": "object",
+      "required": ["fullName", "defaultBranch"],
+      "properties": {
+        "fullName": {"type": "string", "minLength": 1},
+        "defaultBranch": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "authority": {
+      "type": "string",
+      "enum": ["canonical", "governed-mirror", "rd-candidate", "archive"]
+    },
+    "environments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "backendMode", "productionWrites"],
+        "properties": {
+          "name": {"type": "string"},
+          "backendMode": {"type": "string"},
+          "backendProjectRef": {"type": ["string", "null"]},
+          "productionWrites": {"type": "boolean"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "policyVersion": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": false
+}

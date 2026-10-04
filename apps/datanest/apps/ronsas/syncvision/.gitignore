@@ -1,0 +1,19 @@
+﻿# RONSAS local/runtime exclusions
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+dist-ssr/
+.output/
+.wrangler/
+.tanstack/
+test-results/
+playwright-report/
+coverage/
+backups/
+*.log
+*.tmp
+*.bak
+public/ffmpeg-core/ffmpeg-core.js
+public/ffmpeg-core/ffmpeg-core.wasm

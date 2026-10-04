@@ -1,0 +1,360 @@
+name: DataNest AI Certification
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: datanest-ai-certification-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  classify:
+    name: Determine DataNest AI applicability
+    runs-on: ubuntu-24.04
+    outputs:
+      applicable: ${{ steps.scope.outputs.applicable }}
+      reason: ${{ steps.scope.outputs.reason }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Classify candidate scope
+        id: scope
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            printf 'applicable=true\nreason=manual_dispatch\n' >> "$GITHUB_OUTPUT"
+            mkdir -p certification-artifacts
+            node -e 'const fs=require("fs"); fs.writeFileSync("certification-artifacts/datanest-ai-classification.json", JSON.stringify({schemaVersion:"datanest-ai-certification-scope-v1", candidateCommit:process.env.HEAD_SHA, applicable:true, reason:"manual_dispatch", changedFiles:[], relevantFiles:[], completedAt:new Date().toISOString()}, null, 2)+"\n");'
+            exit 0
+          fi
+
+          git diff --name-only "$BASE_SHA" "$HEAD_SHA" > /tmp/datanest-ai-changed.txt
+          node <<'NODE'
+          const fs=require("fs");
+          const files=fs.readFileSync("/tmp/datanest-ai-changed.txt","utf8").split(/\r?\n/).filter(Boolean);
+          const patterns=[
+            /^src\//,
+            /^supabase\/functions\//,
+            /^supabase\/migrations\//,
+            /^supabase\/staging-migrations\//,
+            /^tests\/(browser|stress|sql)\/.*datanest.*ai/i,
+            /^scripts\/seed-datanest-ai-e2e\.mjs$/,
+            /^\.github\/workflows\/datanest-ai-certification\.yml$/,
+            /^package(-lock)?\.json$/
+          ];
+          const relevant=files.filter(file=>patterns.some(pattern=>pattern.test(file)));
+          const applicable=relevant.length>0;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,
+            `applicable=${applicable}\nreason=${applicable?"relevant_change":"no_datanest_ai_impact"}\n`);
+          fs.mkdirSync("certification-artifacts",{recursive:true});
+          fs.writeFileSync(
+            "certification-artifacts/datanest-ai-classification.json",
+            JSON.stringify({
+              schemaVersion:"datanest-ai-certification-scope-v1",
+              candidateCommit:process.env.HEAD_SHA,
+              applicable,
+              reason:applicable?"relevant_change":"no_datanest_ai_impact",
+              changedFiles:files,
+              relevantFiles:relevant,
+              completedAt:new Date().toISOString()
+            },null,2)+"\n"
+          );
+          NODE
+
+      - name: Write non-applicability evidence
+        if: steps.scope.outputs.applicable != 'true'
+        shell: bash
+        env:
+          CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          node - <<'NODE'
+          const fs=require("fs");
+          fs.writeFileSync(
+            "certification-artifacts/datanest-ai-certification.json",
+            JSON.stringify({
+              schemaVersion:"datanest-ai-certification-v2",
+              candidateCommit:process.env.CANDIDATE_SHA,
+              status:"not_applicable",
+              reason:"no_datanest_ai_impact",
+              canonicalCollaboratorBoundaryTested:false,
+              mirrorStagingSyntheticSignIn:false,
+              productionMutated:false,
+              completedAt:new Date().toISOString()
+            },null,2)+"\n"
+          );
+          NODE
+
+      - name: Preserve classification evidence
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: datanest-ai-classification-${{ github.event.pull_request.head.sha || github.sha }}
+          path: certification-artifacts/datanest-ai-classification.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Preserve non-applicability evidence
+        if: steps.scope.outputs.applicable != 'true'
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: datanest-ai-certification-${{ github.event.pull_request.head.sha || github.sha }}
+          path: certification-artifacts/datanest-ai-certification.json
+          if-no-files-found: error
+          retention-days: 30
+
+  certify:
+    name: Canonical collaborator + staging data-plane certification
+    needs: classify
+    if: needs.classify.outputs.applicable == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      DATANEST_AI_STAGING_URL: https://qchttpcyqlqnhvahprhz.supabase.co
+      DATANEST_AI_STAGING_SERVICE_ROLE_KEY: ${{ secrets.DATANEST_AI_STAGING_SERVICE_ROLE_KEY }}
+      DATANEST_AI_STAGING_DB_PASSWORD: ${{ secrets.DATANEST_AI_STAGING_DB_PASSWORD }}
+      DATANEST_AI_E2E_EMAIL: datanest-ai-e2e@resonance.invalid
+      PGHOST: aws-0-eu-central-1.pooler.supabase.com
+      PGPORT: "5432"
+      PGDATABASE: postgres
+      PGUSER: postgres.qchttpcyqlqnhvahprhz
+      PGSSLMODE: require
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: ./.github/actions/node-project-setup
+
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 2.118.0
+
+      - name: Create ephemeral governed E2E credentials
+        shell: bash
+        run: |
+          PASSWORD="$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))")"
+          echo "::add-mask::$PASSWORD"
+          echo "DATANEST_AI_E2E_PASSWORD=$PASSWORD" >> "$GITHUB_ENV"
+
+      - name: Start isolated canonical Supabase stack
+        shell: bash
+        run: |
+          set -euo pipefail
+          supabase start
+          supabase status -o env > /tmp/datanest-ai-local.env
+          set -a
+          source /tmp/datanest-ai-local.env
+          set +a
+
+          for name in API_URL ANON_KEY SERVICE_ROLE_KEY DB_URL; do
+            test -n "${!name:-}" || { echo "::error::Local Supabase did not provide $name"; exit 1; }
+          done
+
+          echo "::add-mask::$ANON_KEY"
+          echo "::add-mask::$SERVICE_ROLE_KEY"
+          {
+            echo "DATANEST_CERTIFICATION_URL=$API_URL"
+            echo "DATANEST_CERTIFICATION_PUBLISHABLE_KEY=$ANON_KEY"
+            echo "DATANEST_CERTIFICATION_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+            echo "DATANEST_CERTIFICATION_DB_URL=$DB_URL"
+          } >> "$GITHUB_ENV"
+
+      - name: Assert split certification boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$DATANEST_AI_STAGING_SERVICE_ROLE_KEY"
+          test -n "$DATANEST_AI_STAGING_DB_PASSWORD"
+          node -e 'const u=new URL(process.env.DATANEST_CERTIFICATION_URL); if(!["127.0.0.1","localhost"].includes(u.hostname)) throw new Error("Canonical collaborator auth must remain loopback-local.");'
+          test "$DATANEST_AI_STAGING_URL" = "https://qchttpcyqlqnhvahprhz.supabase.co"
+
+      - name: Validate canonical schema
+        env:
+          PGSSLMODE: disable
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$DATANEST_CERTIFICATION_DB_URL" -v ON_ERROR_STOP=1 -f tests/sql/datanest_ai_production_acceptance.sql
+          psql "$DATANEST_CERTIFICATION_DB_URL" -v ON_ERROR_STOP=1 -f tests/sql/datanest_contribution_intelligence_acceptance.sql
+          psql "$DATANEST_CERTIFICATION_DB_URL" -v ON_ERROR_STOP=1 -f tests/sql/datanest_think_tanks_acceptance.sql
+          psql "$DATANEST_CERTIFICATION_DB_URL" -v ON_ERROR_STOP=1 -f tests/sql/datanest_sparks_economy_acceptance.sql
+          psql "$DATANEST_CERTIFICATION_DB_URL" -v ON_ERROR_STOP=1 -f tests/sql/datanest_sovereign_governance_acceptance.sql
+          psql "$DATANEST_CERTIFICATION_DB_URL" -v ON_ERROR_STOP=1 -f tests/sql/datanest_project_member_invitations_acceptance.sql
+
+      - name: Validate staging data-plane schema read-only
+        env:
+          PGPASSWORD: ${{ env.DATANEST_AI_STAGING_DB_PASSWORD }}
+        run: |
+          psql -v ON_ERROR_STOP=1 -f tests/sql/datanest_ai_staging_acceptance.sql
+          psql -v ON_ERROR_STOP=1 -f tests/sql/datanest_ai_file_ingestion_acceptance.sql
+
+      - name: Seed canonical E2E fixtures
+        run: npm run seed:e2e:datanest-ai
+
+      - name: Serve candidate Edge Functions from canonical stack
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/datanest-ai-function.env <<EOF
+          DATANEST_AI_STAGING_URL=$DATANEST_AI_STAGING_URL
+          DATANEST_AI_STAGING_SERVICE_ROLE_KEY=$DATANEST_AI_STAGING_SERVICE_ROLE_KEY
+          EOF
+          nohup supabase functions serve --env-file /tmp/datanest-ai-function.env >/tmp/datanest-ai-functions.log 2>&1 &
+          echo $! >/tmp/datanest-ai-functions.pid
+
+          ready=false
+          for attempt in {1..45}; do
+            code="$(curl --silent --output /dev/null --write-out '%{http_code}' \
+              --request POST "$DATANEST_CERTIFICATION_URL/functions/v1/datanest-ai-chat" \
+              --header "apikey: $DATANEST_CERTIFICATION_PUBLISHABLE_KEY" \
+              --header "Authorization: Bearer $DATANEST_CERTIFICATION_PUBLISHABLE_KEY" \
+              --header "Content-Type: application/json" \
+              --data '{}' || true)"
+            if [ "$code" != "000" ] && [ "$code" != "404" ] && [ "$code" -lt 500 ]; then
+              ready=true
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" != "true" ]; then
+            echo "::error::Candidate Edge Functions did not become reachable."
+            tail -n 250 /tmp/datanest-ai-functions.log || true
+            exit 1
+          fi
+
+      - name: Run split-boundary backend acceptance
+        env:
+          DATANEST_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node tests/stress/datanest-ai-backend-acceptance.mjs
+
+      - name: Build static DataNest against canonical certification stack
+        env:
+          DATANEST_STATIC_EXPORT: "true"
+          NEXT_PUBLIC_BASE_PATH: ""
+          NEXT_PUBLIC_SUPABASE_URL: ${{ env.DATANEST_CERTIFICATION_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ env.DATANEST_CERTIFICATION_PUBLISHABLE_KEY }}
+          SUPABASE_URL: ${{ env.DATANEST_CERTIFICATION_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ env.DATANEST_CERTIFICATION_PUBLISHABLE_KEY }}
+          DATANEST_RELEASE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          DATANEST_EXTERNAL_AUDIT_DB_RELEASE: datanest-ai-canonical-certification-v2
+          DATANEST_EDGE_AI: datanest-ai-chat@candidate
+          DATANEST_EDGE_INTAKE: datanest-ai-intake@candidate
+          DATANEST_EDGE_CERTIFICATION: datanest-ai-certification@candidate
+          DATANEST_EDGE_PROVIDER: manage-ai-provider-v2@candidate
+          DATANEST_EDGE_INVITES: send-job-invite@candidate
+          DATANEST_EDGE_PROJECT_INVITES: send-project-member-invite@candidate
+        run: |
+          node scripts/write-runtime-config.mjs public/runtime-config.js
+          node scripts/write-release-manifest.mjs public/release-manifest.json
+          npm run build
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run canonical DataNest AI browser acceptance
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
+          DATANEST_APP_PATH: /
+        shell: bash
+        run: |
+          python3 -m http.server 4173 --directory out >/tmp/datanest-ai-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for i in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/ >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null || {
+            cat /tmp/datanest-ai-http.log
+            exit 1
+          }
+          npx playwright test tests/browser/datanest-ai-return-safety.spec.ts --workers=1
+          npx playwright test tests/browser/datanest-ai.spec.ts --workers=1 --grep "human input is traced|AI Companion return"
+
+      - name: Run staging file-worker durability behind canonical identity
+        run: npm run test:stress:datanest-ai-files
+
+      - name: Run canonical DataNest AI stress acceptance
+        run: npm run test:stress:datanest-ai
+
+      - name: Write certification evidence
+        shell: bash
+        env:
+          CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          mkdir -p certification-artifacts
+          node - <<'NODE'
+          const fs=require("fs");
+          fs.writeFileSync(
+            "certification-artifacts/datanest-ai-certification.json",
+            JSON.stringify({
+              schemaVersion:"datanest-ai-certification-v2",
+              candidateCommit:process.env.CANDIDATE_SHA,
+              status:"passed",
+              certificationBoundary:"canonical-collaborator-auth-plus-staging-service-data-plane",
+              canonicalCollaboratorBoundaryTested:true,
+              stagingDataPlane:"qchttpcyqlqnhvahprhz",
+              mirrorStagingSyntheticSignIn:false,
+              productionMutated:false,
+              completedAt:new Date().toISOString()
+            },null,2)+"\n"
+          );
+          NODE
+
+      - name: Preserve DataNest AI certification evidence
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: datanest-ai-certification-${{ github.event.pull_request.head.sha || github.sha }}
+          path: certification-artifacts/datanest-ai-certification.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Preserve backend acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: datanest-ai-backend-acceptance-${{ github.event.pull_request.head.sha || github.sha }}
+          path: certification-artifacts/datanest-ai-backend-acceptance.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Certification diagnostics
+        if: failure()
+        shell: bash
+        run: |
+          echo "### Local candidate Edge Function log"
+          tail -n 300 /tmp/datanest-ai-functions.log || true
+          echo "### Local Supabase status"
+          supabase status || true
+
+      - name: Preserve local Edge Function diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: datanest-ai-function-diagnostics-${{ github.event.pull_request.head.sha || github.sha }}
+          path: /tmp/datanest-ai-functions.log
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Stop isolated canonical Supabase stack
+        if: always()
+        run: supabase stop --no-backup || true
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "datanest-ai-certification"

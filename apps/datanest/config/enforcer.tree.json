@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "datanest-enforcer-v1",
+  "authority": "DataNest-Supository/DataNest",
+  "mode": "continuous-defensive-enforcement",
+  "productionAuthorization": false,
+  "purpose": "Continuously monitor security and defence posture against DataNest Boundaries while preserving complete approved Knowledge access and transparent learning evidence.",
+  "knowledgeAccess": {
+    "corpus": "approved-datanest-knowledge",
+    "includeAllKnowledgeItems": true,
+    "categoryFilters": [],
+    "topicFilters": [],
+    "restrictionMode": "none-on-approved-knowledge-corpus",
+    "sensitiveDataPolicy": "credentials, secret values, private authentication material, and regulated personal data are protected inputs and are never treated as learning knowledge"
+  },
+  "monitors": [
+    "boundaries",
+    "security-workflow-state",
+    "repository-security-invariants",
+    "dependency-security-state",
+    "knowledge-learning",
+    "environment-compatibility",
+    "botsquad-advisory-state",
+    "resonance-forge-tree-registry",
+    "published-transparency-audit-index",
+    "guardian-health-state",
+    "conductor-process-state",
+    "suggester-optimization-state",
+    "calmer-softening-state",
+    "regulator-harmony-state",
+    "visibility-utility-market-state",
+    "liberty-in-all-traceability-state"
+  ],
+  "enforcement": {
+    "mayFailOwnSecurityCheck": true,
+    "mayPublishDefensiveEvidence": true,
+    "mayPublishLearningFeed": true,
+    "mayMutateCanonicalMain": false,
+    "mayApprovePullRequests": false,
+    "mayMerge": false,
+    "mayDeployProduction": false,
+    "mayChangeBoundaries": false,
+    "maySuppressFindings": false,
+    "mayExposeSecrets": false
+  },
+  "transparency": {
+    "branch": "automation/enforcer",
+    "statePath": "enforcer/state/latest.json",
+    "learningPath": "enforcer/feeds/knowledge-learning.json",
+    "transparencyPath": "enforcer/transparency/latest.json",
+    "artifactRetentionDays": 30,
+    "disclosure": "publish status, evidence lineage, categories, counts, and remediation state; never publish secret values or private authentication material",
+    "publicEntrypoint": "/DataNest/transparency/enforcer/index.json"
+  }
+}

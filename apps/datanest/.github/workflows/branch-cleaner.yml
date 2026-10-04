@@ -1,0 +1,70 @@
+name: Branch-Cleaner
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: Delete only branches classified as safe delete candidates
+        required: true
+        default: false
+        type: boolean
+      strict:
+        description: Fail when control-plane blockers are detected
+        required: true
+        default: true
+        type: boolean
+      prune_archived:
+        description: Also prune exact-tag archived merged history after live revalidation
+        required: true
+        default: false
+        type: boolean
+      gate_timeframe_override_hours:
+        description: Optional Owner planning-window override in hours (0.5-72)
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 22
+
+      - name: Verify Branch-Cleaner unit tests
+        run: node --test tests/unit/branch-cleaner.test.mjs
+
+      - name: Run Branch-Cleaner
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          STRICT_INPUT: ${{ inputs.strict }}
+          APPLY_INPUT: ${{ inputs.apply }}
+          PRUNE_ARCHIVED_INPUT: ${{ inputs.prune_archived }}
+        run: |
+          ARGS=""
+          if [ "$STRICT_INPUT" = "true" ]; then ARGS="$ARGS --strict"; fi
+          if [ "$APPLY_INPUT" = "true" ]; then ARGS="$ARGS --apply"; fi
+          if [ "$PRUNE_ARCHIVED_INPUT" = "true" ]; then ARGS="$ARGS --prune-archived"; fi
+          node scripts/branch-cleaner.mjs $ARGS
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v6.0.0
+        with:
+          name: branch-cleaner-report
+          path: artifacts/branch-cleaner/
+          if-no-files-found: warn
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "branch-cleaner"
+      override_hours: ${{ inputs.gate_timeframe_override_hours || '' }}

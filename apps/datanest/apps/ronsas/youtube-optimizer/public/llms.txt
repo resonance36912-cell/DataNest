@@ -1,0 +1,30 @@
+# Resonance YouTube Optimizer
+
+> Resonance YouTube Optimizer provides AI-powered YouTube channel audits, content strategy, thumbnails, and growth analytics as part of The Resonance Hub.
+
+The app is currently available at no charge under the Resonance Free Access Promotion while real AI, thumbnail-generation, infrastructure, and support costs are measured.
+
+## Promotion access
+
+- No payment, checkout, credit pack, or subscription is required during the promotion.
+- Sign-in may still be required so audits and generated assets can persist and usage can be measured.
+- Future pricing has not been established and will require a new governed release after costing is validated.
+
+## Hub
+
+- [The Resonance Hub](https://reson8.life): Ecosystem home, governance, updates, and support.
+- [Free access promotion](https://reson8.life/pricing): Current suite-wide promotion status.
+- [Hub updates](https://reson8.life/updates): Release notes across the ecosystem.
+
+## This app
+
+- [Home](https://youtubeoptimizer.life/): Run a channel audit and see your Resonance score.
+- [Features](https://youtubeoptimizer.life/features): Audit, content ideas, monetization, schedule, trends, and thumbnails.
+- [Free access](https://youtubeoptimizer.life/pricing): Current promotion status.
+- [About](https://youtubeoptimizer.life/about): Team and mission.
+- [Contact](https://youtubeoptimizer.life/contact): Get in touch.
+
+## Optional
+
+- [Privacy](https://youtubeoptimizer.life/privacy)
+- [Terms](https://youtubeoptimizer.life/terms)

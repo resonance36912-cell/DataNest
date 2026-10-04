@@ -1,0 +1,3 @@
+-- Migration-history reconciliation: production applied this release under the canonical version.
+-- The implementation is retained in the repository migration 20260928190000_add_development_command_working_memory.sql.
+-- This no-op preserves Supabase migration history alignment without replaying production DDL.

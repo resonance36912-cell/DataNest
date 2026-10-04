@@ -1,0 +1,4 @@
+-- Remote production history alignment.
+-- The project-shared provider schema/function state for this remote migration is
+-- already represented by 20260928134500_add_project_shared_ai_provider_config.sql.
+-- Keep this timestamped no-op so repository migration history matches production.

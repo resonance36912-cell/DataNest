@@ -1,0 +1,30 @@
+name: Migration Replay Validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+      - "supabase/config.toml"
+      - ".github/workflows/migration-replay-validation.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 2.118.0
+      - name: Replay migrations on a fresh local Supabase database
+        run: supabase db start
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "migration-replay-validation"

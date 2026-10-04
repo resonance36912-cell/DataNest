@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "datanest-regulator-public-transparency-v1",
+  "tree": "REGULATOR",
+  "authority": {
+    "transparentRegulation": true,
+    "productionAuthorization": false,
+    "financialCommitments": false,
+    "securityBypass": false
+  },
+  "botsquad": {
+    "roles": [
+      "regulator-auditor",
+      "regulator-stress-tester",
+      "regulator-acquisition-scout",
+      "regulator-supply-coordinator",
+      "regulator-action-planner"
+    ],
+    "acquisitionMeaning": "free/open/already-authorized resource identification only"
+  },
+  "evidence": {
+    "branch": "automation/regulator",
+    "latestTransparencyUrl": "https://raw.githubusercontent.com/DataNest-Supository/DataNest/automation/regulator/regulator/transparency/latest.json",
+    "latestRequirementsUrl": "https://raw.githubusercontent.com/DataNest-Supository/DataNest/automation/regulator/regulator/requirements/botsquad.json"
+  }
+}

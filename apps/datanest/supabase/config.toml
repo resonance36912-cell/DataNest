@@ -1,0 +1,34 @@
+[functions.datanest-ai-chat]
+verify_jwt = true
+
+[functions.datanest-ai-intake]
+verify_jwt = true
+
+[functions.datanest-ai-certification]
+verify_jwt = true
+
+
+[functions.send-job-invite]
+verify_jwt = true
+
+[functions.send-project-member-invite]
+verify_jwt = true
+
+[functions.manage-user-password]
+verify_jwt = true
+
+[functions.manage-own-password]
+verify_jwt = true
+
+[functions.ronsas-status]
+verify_jwt = true
+
+[functions.datanest-ai-upload]
+verify_jwt = true
+
+
+[functions.manage-ai-provider-v2]
+verify_jwt = true
+
+[functions.external-audit]
+verify_jwt = true

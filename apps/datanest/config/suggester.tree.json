@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "datanest-suggester-v1",
+  "authority": "DataNest-Supository/DataNest",
+  "mode": "continuous-optimization-suggestions",
+  "productionAuthorization": false,
+  "purpose": "Continuously synthesize health, learning, AI advisory, environment, security and orchestration evidence into transparent optimization suggestions and bounded autonomous-update commands.",
+  "branch": "automation/suggester",
+  "feedPath": "suggester/feeds/datanest.json",
+  "sources": [
+    "automation/guardian:guardian/snapshots/latest.json",
+    "automation/knowledge-feed:knowledge/feeds/datanest.json",
+    "automation/environment-feed:environment/feeds/datanest.json",
+    "automation/enforcer:enforcer/state/latest.json",
+    "automation/botsquad/orchestrator:botsquad/feeds/datanest.json",
+    "automation/conductor:conductor/state/latest.json",
+    "automation/calmer:calmer/feeds/datanest.json",
+    "automation/regulator:regulator/state/latest.json",
+    "automation/visibility-utility:visibility-utility/feeds/datanest.json"
+  ],
+  "automationClasses": {
+    "autonomousSafe": [
+      "heal-redundant-branches",
+      "heal-byte-safe-source-noise",
+      "refresh-generated-health-and-learning-feeds"
+    ],
+    "reviewRequired": [
+      "behavioral-code-refactor",
+      "dependency-change",
+      "runtime-or-provider-change",
+      "governance-or-boundaries-change",
+      "product-or-business-change",
+      "ui-or-function-change"
+    ]
+  },
+  "controls": {
+    "maySuggestContinuously": true,
+    "mayQueueOnlyAllowlistedAutonomousCommands": true,
+    "mayMutateCanonicalMain": false,
+    "mayMerge": false,
+    "mayDeployProduction": false,
+    "mayChangeBoundaries": false,
+    "maySuppressEnforcerFindings": false,
+    "deduplicateByFingerprint": true,
+    "preserveEvidenceLineage": true
+  }
+}

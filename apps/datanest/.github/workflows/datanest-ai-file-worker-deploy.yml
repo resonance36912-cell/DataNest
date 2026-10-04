@@ -1,0 +1,124 @@
+name: DataNest File Worker Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_sha:
+        description: Exact 40-character commit SHA reachable from main
+        required: true
+        type: string
+      gate_timeframe_override_hours:
+        description: Optional Owner planning-window override in hours (0.5-72)
+        required: false
+        type: string
+      release_mode:
+        description: Progressive live is the default; protected retains the existing environment
+        required: true
+        default: progressive_live
+        type: choice
+        options:
+          - progressive_live
+          - protected
+
+permissions:
+  contents: read
+
+concurrency:
+  group: datanest-ai-file-worker-production
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ inputs.release_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify exact SHA is reachable from main
+        shell: bash
+        env:
+          DATANEST_RELEASE_SHA: ${{ inputs.release_sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$DATANEST_RELEASE_SHA"
+          git fetch origin main --no-tags --prune
+          git merge-base --is-ancestor "$DATANEST_RELEASE_SHA" origin/main
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.9.7
+      - name: Validate worker bundle source
+        run: deno check --config supabase/functions/datanest-ai-file-worker/deno.json supabase/functions/datanest-ai-file-worker/index.ts
+
+  deploy:
+    needs: [validate]
+    environment:
+      name: ${{ inputs.release_mode == 'progressive_live' && 'github-pages-progressive-live' || 'github-pages' }}
+    runs-on: ubuntu-24.04
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      DATANEST_FILE_WORKER_TOKEN: ${{ secrets.DATANEST_FILE_WORKER_TOKEN }}
+      SUPABASE_PROJECT_ID: sgqdmfgjbprsoqsmgigi
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ inputs.release_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: supabase/setup-cli@3c2f5e2ae34c34e428e8e206e2c4d21fa2d20fbf # v2.1.1
+        with:
+          version: 2.118.0
+      - name: Require Supabase deployment credential
+        shell: bash
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN" || {
+            echo "SUPABASE_ACCESS_TOKEN is required to deploy datanest-ai-file-worker."
+            exit 1
+          }
+      - name: Synchronize dedicated worker authentication secret
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$DATANEST_FILE_WORKER_TOKEN" || {
+            echo "::error::DATANEST_FILE_WORKER_TOKEN is required before file-worker deployment."
+            exit 1
+          }
+
+          secret_file="$(mktemp)"
+          trap 'rm -f "$secret_file"' EXIT
+          umask 077
+          printf 'DATANEST_FILE_WORKER_TOKEN=%s\n' "$DATANEST_FILE_WORKER_TOKEN" > "$secret_file"
+          supabase secrets set --env-file "$secret_file" --project-ref "$SUPABASE_PROJECT_ID"
+          supabase secrets list --project-ref "$SUPABASE_PROJECT_ID" | grep -F "DATANEST_FILE_WORKER_TOKEN" >/dev/null || {
+            echo "::error::Supabase did not report DATANEST_FILE_WORKER_TOKEN after synchronization."
+            exit 1
+          }
+      - name: Deploy locally bundled file worker
+        shell: bash
+        run: |
+          supabase functions deploy datanest-ai-file-worker \
+            --project-ref "$SUPABASE_PROJECT_ID" \
+            --no-verify-jwt \
+            --use-docker
+
+      - name: Write file worker production release attestation
+        shell: bash
+        run: |
+          mkdir -p .datanest
+          node scripts/write-production-file-worker-release-attestation.mjs .datanest/datanest-ai-file-worker-release.json
+
+      - name: Preserve file worker production release evidence
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: datanest-ai-file-worker-release-${{ inputs.release_sha }}
+          path: .datanest/datanest-ai-file-worker-release.json
+          if-no-files-found: error
+          retention-days: 90
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "datanest-ai-file-worker-deploy"
+      override_hours: ${{ inputs.gate_timeframe_override_hours || '' }}

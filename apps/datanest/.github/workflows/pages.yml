@@ -1,0 +1,280 @@
+# Production UI/UX release trigger: 2026-10-02
+# Governed production release for Resonance DataNest GitHub Pages.
+# Production authorization is the protected GitHub environment "github-pages".
+# The workflow deploys the exact current main SHA; no release SHA or evidence IDs
+# are entered manually. A protected-main push triggers the normal path; manual
+# dispatch remains available for deliberate retries.
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  deployments: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-production
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    name: Resolve production release
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    outputs:
+      release_sha: ${{ steps.release.outputs.sha }}
+      should_deploy: ${{ steps.release.outputs.should_deploy }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Resolve exact current main SHA
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --no-tags --prune
+          RELEASE_SHA="$(git rev-parse origin/main)"
+          echo "sha=$RELEASE_SHA" >> "$GITHUB_OUTPUT"
+
+          SHOULD_DEPLOY="true"
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            LAST_DEPLOYED_SHA="$(gh api "repos/$GITHUB_REPOSITORY/deployments?environment=github-pages&per_page=20" --jq '.[0].sha // empty' || true)"
+            if [ "$LAST_DEPLOYED_SHA" = "$RELEASE_SHA" ]; then
+              SHOULD_DEPLOY="false"
+            fi
+          fi
+
+          echo "should_deploy=$SHOULD_DEPLOY" >> "$GITHUB_OUTPUT"
+          echo "Release SHA: $RELEASE_SHA"
+          echo "Deploy required: $SHOULD_DEPLOY"
+
+  build:
+    name: Build and verify production release
+    needs: prepare
+    if: needs.prepare.outputs.should_deploy == 'true'
+    runs-on: ubuntu-24.04
+    env:
+      DATANEST_STATIC_EXPORT: "true"
+      NEXT_PUBLIC_BASE_PATH: "/DataNest"
+      NEXT_PUBLIC_SUPABASE_URL: "https://sgqdmfgjbprsoqsmgigi.supabase.co"
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_yIf5HFKNNteed4HdYCS2Vw_4TB-4LvB"
+    outputs:
+      release_sha: ${{ steps.release.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Resolve exact release SHA
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --no-tags --prune
+          RELEASE_SHA="$(git rev-parse origin/main)"
+          test -n "$RELEASE_SHA"
+          git checkout --detach "$RELEASE_SHA"
+          echo "sha=$RELEASE_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Validate canonical production contract
+        id: production_contract
+        run: node scripts/validate-production-contract.mjs --github-output "$GITHUB_OUTPUT"
+
+      - name: Verify release is exactly the current main SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --no-tags --prune
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+
+      - uses: ./.github/actions/node-project-setup
+
+      - run: npm test
+      - run: npm run check
+      - run: npm audit --omit=dev --audit-level=high
+
+      - name: Verify live production database release attestation
+        env:
+          DATANEST_EXPECTED_DB_MIGRATION_REFERENCE: ${{ steps.production_contract.outputs.database_migration_reference }}
+        run: node scripts/verify-production-release-attestation.mjs .datanest/release-attestation.json
+
+      - name: Publish Supabase connector Edge Function evidence
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: edge-function-release-attestation
+          path: config/production-edge-function-connector-attestation.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Stage Supabase connector Edge Function evidence
+        uses: actions/download-artifact@v5
+        with:
+          name: edge-function-release-attestation
+          path: ${{ runner.temp }}/datanest-edge-function-release
+
+      - name: Normalize staged Edge Function evidence filename
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "${{ runner.temp }}/datanest-edge-function-release/production-edge-function-connector-attestation.json"
+          mv "${{ runner.temp }}/datanest-edge-function-release/production-edge-function-connector-attestation.json"             "${{ runner.temp }}/datanest-edge-function-release/edge-function-release.json"
+
+      - name: Resolve connector Edge Function source reference
+        id: edge_attestation_reference
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_SHA="$(node -e 'const fs=require("fs"); const a=JSON.parse(fs.readFileSync(process.argv[1],"utf8")); process.stdout.write(String(a.sourceCommit||""));' "${{ runner.temp }}/datanest-edge-function-release/edge-function-release.json")"
+          [[ "$SOURCE_SHA" =~ ^[0-9a-fA-F]{40}$ ]]
+          echo "reference=connector:$SOURCE_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Verify connector-attested governed Edge Function release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DATANEST_RELEASE_SHA: ${{ steps.release.outputs.sha }}
+          edge_function_release_reference: ${{ steps.edge_attestation_reference.outputs.reference }}
+          DATANEST_EDGE_FUNCTION_RELEASE_REFERENCE: ${{ steps.edge_attestation_reference.outputs.reference }}
+          DATANEST_SUPABASE_PROJECT: sgqdmfgjbprsoqsmgigi
+        run: node scripts/verify-production-edge-function-release-reference.mjs "${{ runner.temp }}/datanest-edge-function-release/edge-function-release.json"
+
+      - run: node scripts/write-runtime-config.mjs public/runtime-config.js
+        env:
+          SUPABASE_URL: "https://sgqdmfgjbprsoqsmgigi.supabase.co"
+          SUPABASE_PUBLISHABLE_KEY: "sb_publishable_yIf5HFKNNteed4HdYCS2Vw_4TB-4LvB"
+
+      - name: Write release manifest
+        env:
+          DATANEST_RELEASE_SHA: ${{ steps.release.outputs.sha }}
+          DATANEST_EXTERNAL_AUDIT_DB_RELEASE: external-audit-production-v1
+          DATANEST_BASELINE_RELEASE: reload-latest-v1
+          DATANEST_BASELINE_SHA: 592149b0898f6703b28e9fa33e73bd0799cae3fd
+          DATANEST_EDGE_AI: datanest-ai-chat@2
+          DATANEST_EDGE_INTAKE: datanest-ai-intake@1
+          DATANEST_EDGE_CERTIFICATION: datanest-ai-certification@1
+          DATANEST_EDGE_PROVIDER: manage-ai-provider-v2@1
+          DATANEST_EDGE_INVITES: send-job-invite@1
+          DATANEST_EDGE_PROJECT_INVITES: send-project-member-invite@3
+          DATANEST_EDGE_RONSAS_STATUS: ronsas-status@1
+          DATANEST_EDGE_EXTERNAL_AUDIT: external-audit@1
+          DATANEST_DB_ATTESTATION_FILE: .datanest/release-attestation.json
+        run: node scripts/write-release-manifest.mjs public/release-manifest.json
+
+      - run: npm run build
+      - run: node scripts/build-ronsas-pages.mjs
+
+      - uses: actions/upload-pages-artifact@v5.0.0
+        with:
+          path: ./out
+
+  deploy:
+    name: Deploy production Pages
+    needs: [prepare, build]
+    if: needs.prepare.outputs.should_deploy == 'true'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5.0.1
+
+  verify:
+    name: Verify live Pages deployment
+    needs: [prepare, deploy]
+    if: needs.prepare.outputs.should_deploy == 'true'
+    runs-on: ubuntu-24.04
+    env:
+      RELEASE_SHA: ${{ needs.prepare.outputs.release_sha }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ needs.prepare.outputs.release_sha }}
+
+      - name: Verify deployed public routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          for route in "" legal governance accessibility terms privacy disclaimers acceptable-use intellectual-property transparency system-charter architecture stress-test assurance; do
+            suffix=""
+            if [ -n "$route" ]; then suffix="$route/"; fi
+            curl --fail --silent --show-error --location --retry 8 --retry-delay 3 --retry-all-errors "https://datanest-supository.github.io/DataNest/$suffix" -o "/tmp/datanest-${route:-home}.html"
+            grep -qi "<html" "/tmp/datanest-${route:-home}.html"
+          done
+          grep -Eq '<title>DataNest([^<]*)</title>' /tmp/datanest-home.html
+          grep -q 'class="authShell"' /tmp/datanest-home.html
+
+      - name: Verify static health and discovery artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --retry 8 --retry-delay 3 --retry-all-errors https://datanest-supository.github.io/DataNest/health.json -o /tmp/datanest-health.json
+          grep -q '"ok":true' /tmp/datanest-health.json
+          grep -q '"project":"Resonance DataNest"' /tmp/datanest-health.json
+
+          curl --fail --silent --show-error --location --retry 8 --retry-delay 3 --retry-all-errors https://datanest-supository.github.io/DataNest/robots.txt -o /tmp/datanest-robots.txt
+          grep -qi '^User-agent:' /tmp/datanest-robots.txt
+          grep -Fq 'Sitemap: https://datanest-supository.github.io/DataNest/sitemap.xml' /tmp/datanest-robots.txt
+
+          curl --fail --silent --show-error --location --retry 8 --retry-delay 3 --retry-all-errors https://datanest-supository.github.io/DataNest/sitemap.xml -o /tmp/datanest-sitemap.xml
+          grep -q '<urlset' /tmp/datanest-sitemap.xml
+          grep -Fq '<loc>https://datanest-supository.github.io/DataNest/</loc>' /tmp/datanest-sitemap.xml
+          grep -Fq '<loc>https://datanest-supository.github.io/DataNest/assurance/</loc>' /tmp/datanest-sitemap.xml
+
+      - name: Verify runtime configuration
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --retry 8 --retry-delay 3 --retry-all-errors https://datanest-supository.github.io/DataNest/runtime-config.js -o /tmp/runtime-config.js
+          grep -q "https://sgqdmfgjbprsoqsmgigi.supabase.co" /tmp/runtime-config.js
+          grep -q "sb_publishable_" /tmp/runtime-config.js
+          grep -q "authoritative" /tmp/runtime-config.js
+
+      - name: Verify hosted RONSAS applications
+        run: |
+          set -euo pipefail
+          for app in career-compass creative-studio epublisher lyricsync-studio scene-song-spark sovereign-forge syncvision; do
+            curl --fail --silent --show-error --location --retry 8 --retry-delay 3 --retry-all-errors "https://datanest-supository.github.io/DataNest/apps/$app/" -o "/tmp/$app.html"
+            grep -qi "<html" "/tmp/$app.html"
+          done
+
+      - name: Verify external governed target
+        run: |
+          curl --fail --silent --show-error --location --retry 8 --retry-delay 3 --retry-all-errors https://youtubeoptimizer.life/ -o /tmp/youtube-optimizer.html
+          grep -qi "<html" /tmp/youtube-optimizer.html
+
+      - name: Verify release manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --retry 8 --retry-delay 3 --retry-all-errors https://datanest-supository.github.io/DataNest/release-manifest.json -o /tmp/release-manifest.json
+          node <<'NODE'
+          const fs=require("fs");
+          const manifest=JSON.parse(fs.readFileSync("/tmp/release-manifest.json","utf8"));
+          const expected=JSON.parse(fs.readFileSync("config/production-contract.json","utf8")).supabase.expectedMigration;
+          if(manifest.frontendCommit!==process.env.RELEASE_SHA) throw new Error("Release manifest frontendCommit does not match deployed main SHA");
+          if(manifest.databaseMigration?.head!==expected.head || manifest.databaseMigration?.name!==expected.name){
+            throw new Error("Release manifest database migration identity disagrees with the canonical production contract");
+          }
+          if(manifest.databaseRelease!==expected.head+" · "+expected.name){
+            throw new Error("Release manifest databaseRelease is stale");
+          }
+          if(manifest.productionInclusion?.inclusive!==true) throw new Error("Production-inclusive contract is missing");
+          if(manifest.releaseAttestation?.database?.status!=="verified") throw new Error("Live database attestation is not verified");
+          if(manifest.releaseAttestation?.edgeFunctions?.status!=="not_collected" &&
+             manifest.releaseAttestation?.edgeFunctions?.status!=="verified"){
+            throw new Error("Unexpected Edge Function attestation state");
+          }
+          NODE

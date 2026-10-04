@@ -1,0 +1,136 @@
+name: BRANCH-X Canonical Write Watchdog
+
+on:
+  push:
+    branches:
+      - main
+      - "release/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: write
+
+jobs:
+  detect:
+    name: BRANCH-X Canonical Write Watchdog
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out governed watchdog code
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 1
+
+      - name: Inspect canonical push provenance
+        id: provenance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          REF: ${{ github.ref }}
+          BEFORE: ${{ github.event.before }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p canonical-write/state
+
+          if [ "$REF" = "refs/heads/main" ] && [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            cat > canonical-write/state/result.json <<'JSON'
+          {"schemaVersion":"datanest-canonical-write-watchdog-v2","result":"bootstrap","reason":"initial branch creation event"}
+          JSON
+            exit 0
+          fi
+
+          http_code="$(curl -sS -o canonical-write/state/associated-prs.json -w "%{http_code}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$REPO/commits/$SHA/pulls" || true)"
+
+          if [ "$http_code" = "200" ]; then
+            node scripts/canonical-write-watchdog.mjs canonical-write/state/associated-prs.json
+          elif [ "$http_code" = "403" ]; then
+            subject="$(git log -1 --format=%s "$SHA")"
+            cat > canonical-write/state/result.json <<JSON
+            {"schemaVersion":"datanest-canonical-write-watchdog-v3","result":"verification-unavailable","reason":"github-associated-prs-api-returned-403","repository":"$REPO","ref":"$REF","sha":"$SHA","commitSubject":$(printf '%s' "$subject" | python -c 'import json,sys; print(json.dumps(sys.stdin.read()))')}
+          JSON
+            echo "::warning::BRANCH-X could not read commit-associated pull requests (HTTP 403). Recording indeterminate provenance evidence; native branch protection remains authoritative."
+            exit 0
+          else
+            echo "::error::BRANCH-X provenance lookup failed with HTTP $http_code."
+            exit 1
+          fi
+
+      - name: Verify watchdog unit contract
+        run: node --test tests/unit/canonical-write-watchdog.test.mjs
+
+      - name: Open or update governance incident
+        if: steps.provenance.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          REF: ${{ github.ref }}
+          SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          title_prefix="BRANCH-X canonical write anomaly: $REF"
+          body="Detected an unassociated canonical push to $REF at $SHA. This is a detection-only governance alert; native GitHub protection remains the control that prevents direct writes. Review the workflow evidence and enable the BRANCH-X native rulesets if still unresolved."
+
+          curl -fsSL \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/search/issues?q=repo:$REPO+is:issue+is:open+in:title+BRANCH-X+canonical+write+anomaly" \
+            > open-incidents.json
+
+          python - "$title_prefix" <<'PY'
+          import json, sys
+          from pathlib import Path
+          data=json.loads(Path("open-incidents.json").read_text())
+          prefix=sys.argv[1]
+          items=[x for x in data.get("items",[]) if x.get("title","").startswith(prefix)]
+          if items:
+              Path("incident-mode.txt").write_text("update")
+              Path("incident-number.txt").write_text(str(items[0]["number"]))
+          else:
+              Path("incident-mode.txt").write_text("create")
+          PY
+
+          python - "$body" <<'PY' > issue-body.json
+          import json, sys
+          print(json.dumps({"body":sys.argv[1]}))
+          PY
+
+          if [ "$(cat incident-mode.txt)" = "update" ]; then
+            number="$(cat incident-number.txt)"
+            curl -fsSL -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/$REPO/issues/$number/comments" \
+              -d @issue-body.json \
+              || echo "::warning::Unable to update the existing governance incident."
+          else
+            python - "$title_prefix @ $SHA" "$body" <<'PY' > create-issue.json
+            import json, sys
+            print(json.dumps({"title":sys.argv[1],"body":sys.argv[2],"labels":["governance"]}))
+            PY
+            curl -fsSL -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              https://api.github.com/repos/$REPO/issues \
+              -d @create-issue.json \
+              || echo "::warning::Unable to open governance incident automatically."
+          fi
+
+      - name: Upload canonical write evidence
+        if: always()
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: canonical-write-watchdog-${{ github.run_id }}
+          path: canonical-write/state/
+          retention-days: 90

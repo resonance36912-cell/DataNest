@@ -1,0 +1,175 @@
+name: Security scan
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+env:
+  SARIF_RETENTION_DAYS: ${{ vars.SARIF_RETENTION_DAYS || '14' }}
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: security-scan-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  invariants:
+    name: Project security invariants
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Verify project security invariants
+        run: node scripts/verify-security-invariants.mjs
+
+  secret-scan:
+    name: Secret scan (Resonance Secret Integrity)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Verify Resonance execution profile
+        run: node scripts/verify-resonance-security-execution.mjs
+      - name: Run Resonance Secret Integrity self-test
+        run: node scripts/resonance-secret-scan.mjs --self-test
+      - name: Run Resonance Secret Integrity scan
+        run: node scripts/resonance-secret-scan.mjs --output resonance-secret-scan.sarif
+      - name: Upload Resonance secret-scan SARIF artifact
+        if: always() && hashFiles('resonance-secret-scan.sarif') != ''
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: resonance-secret-scan-${{ github.run_id }}-${{ github.sha }}
+          path: resonance-secret-scan.sarif
+          if-no-files-found: error
+          retention-days: ${{ env.SARIF_RETENTION_DAYS }}
+
+  dependency-audit:
+    name: Dependency audit (npm advisories)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: ./.github/actions/node-project-setup
+      - name: Verify exact dependency pins and lockfile alignment
+        run: npm run security:supply-chain
+      - name: npm audit (high+ across production and development dependencies)
+        run: npm audit --audit-level=high
+      - name: Generate SPDX SBOM
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610
+        with:
+          output-file: datanest-sbom.spdx.json
+          upload-artifact: true
+          artifact-name: datanest-sbom-${{ github.run_id }}-${{ github.sha }}
+          upload-artifact-retention: ${{ env.SARIF_RETENTION_DAYS }}
+
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    name: Dependency review (introduced risk)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Review dependency changes
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: false
+
+  sast-semgrep:
+    name: SAST (semgrep)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify Python 3.12
+        run: |
+          python --version
+          python -c 'import sys; assert sys.version_info[:2] == (3, 12), sys.version'
+      - name: Install Semgrep
+        run: |
+          python -m pip install --disable-pip-version-check semgrep
+          semgrep --version
+      - name: Run Semgrep
+        id: semgrep
+        continue-on-error: true
+        run: |
+          semgrep scan             --config p/owasp-top-ten             --config p/javascript             --config p/typescript             --config p/react             --config p/nodejsscan             --config p/secrets             --exclude apps/ronsas/syncvision/public/ffmpeg-core/ffmpeg-core.js             --sarif             --output semgrep.sarif             .
+      - name: Upload Semgrep SARIF artifact
+        if: always() && hashFiles('semgrep.sarif') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-sarif-${{ github.run_id }}-${{ github.sha }}
+          path: semgrep.sarif
+          if-no-files-found: error
+          retention-days: ${{ env.SARIF_RETENTION_DAYS }}
+      - name: Enforce Semgrep error-level gate
+        if: always()
+        env:
+          SCAN_OUTCOME: ${{ steps.semgrep.outcome }}
+        run: |
+          set -euo pipefail
+          if [ "$SCAN_OUTCOME" != "success" ]; then
+            echo "::error::Semgrep scanner/configuration failed. Review the scan log."
+            exit 1
+          fi
+          if [ ! -s semgrep.sarif ]; then
+            echo "::error::Semgrep completed without producing semgrep.sarif."
+            exit 1
+          fi
+          python - <<'PY'
+          import json
+          import sys
+
+          with open("semgrep.sarif", encoding="utf-8") as fh:
+              sarif = json.load(fh)
+
+          offenders = []
+          for run in sarif.get("runs", []):
+              rules = run.get("tool", {}).get("driver", {}).get("rules", [])
+              levels = {
+                  rule.get("id"): (rule.get("defaultConfiguration") or {}).get("level", "warning")
+                  for rule in rules
+              }
+              for result in run.get("results", []):
+                  rule_id = result.get("ruleId", "unknown-rule")
+                  level = result.get("level") or levels.get(rule_id, "warning")
+                  if level != "error":
+                      continue
+                  message = (result.get("message") or {}).get("text", "Semgrep error-level finding")
+                  locations = result.get("locations") or []
+                  uri = ""
+                  line = ""
+                  if locations:
+                      physical = locations[0].get("physicalLocation") or {}
+                      uri = (physical.get("artifactLocation") or {}).get("uri", "")
+                      line = (physical.get("region") or {}).get("startLine", "")
+                  offenders.append((rule_id, uri, line, message))
+
+          if offenders:
+              print(f"::error::Semgrep found {len(offenders)} error-level finding(s).")
+              for rule_id, uri, line, message in offenders:
+                  location = f" file={uri},line={line}" if uri and line else ""
+                  print(f"::error{location}::{rule_id}: {message}")
+              sys.exit(1)
+
+          print("Semgrep: no error-level findings; warning-level findings remain visible in SARIF.")
+          PY
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "security-scan"

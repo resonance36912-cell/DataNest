@@ -1,0 +1,114 @@
+name: resonance-sovereign-backend
+services:
+  postgres:
+    image: postgres:16.6-alpine
+    pull_policy: never
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "127.0.0.1:55432:5432"
+    networks:
+      - sovereign-internal
+    environment:
+      POSTGRES_DB: resonance
+      POSTGRES_USER: resonance
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres-password
+    volumes:
+      - resonance-postgres-data:/var/lib/postgresql/data
+    secrets:
+      - postgres-password
+  auth:
+    image: resonance-service-auth:0.9
+    pull_policy: never
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    ports:
+      - "127.0.0.1:58680:8080"
+    networks:
+      - sovereign-internal
+    environment:
+      DATABASE_URL: postgresql://resonance@postgres:5432/resonance
+      AUTH_SIGNING_KEY_FILE: /run/secrets/auth-signing-key
+      AUTH_EXCHANGE_KEY_FILE: /run/secrets/auth-exchange-key
+      AUTH_DB: /data/auth.db
+    volumes:
+      - resonance-auth-data:/data
+    secrets:
+      - auth-signing-key
+      - auth-exchange-key
+    depends_on:
+      - postgres
+  storage:
+    image: resonance-service-storage:0.9
+    pull_policy: never
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    ports:
+      - "127.0.0.1:59000:9000"
+    networks:
+      - sovereign-internal
+    environment:
+      STORAGE_ROOT: /data
+      STORAGE_ACCESS_KEY_FILE: /run/secrets/storage-access-key
+      STORAGE_SECRET_KEY_FILE: /run/secrets/storage-secret-key
+    volumes:
+      - resonance-object-data:/data
+    secrets:
+      - storage-access-key
+      - storage-secret-key
+  gateway:
+    image: resonance-service-gateway:0.12
+    pull_policy: never
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    ports:
+      - "127.0.0.1:58600:8000"
+    networks:
+      - sovereign-internal
+    environment:
+      DATABASE_URL: postgresql://resonance@postgres:5432/resonance
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres-password
+      AUTH_URL: http://auth:8080
+      STORAGE_URL: http://storage:9000
+      OLLAMA_URL: http://host.containers.internal:11434
+      GATEWAY_PROCEDURE_KEY_FILE: /run/secrets/gateway-procedure-key
+    secrets:
+      - postgres-password
+      - gateway-procedure-key
+    depends_on:
+      - postgres
+      - auth
+      - storage
+networks:
+  sovereign-internal:
+    internal: true
+volumes:
+  resonance-postgres-data:
+  resonance-auth-data:
+  resonance-object-data:
+secrets:
+  postgres-password:
+    file: ../../../runtime/secrets/postgres-password
+  auth-signing-key:
+    file: ../../../runtime/secrets/auth-signing-key
+  auth-exchange-key:
+    file: ../../../runtime/secrets/auth-exchange-key
+  gateway-procedure-key:
+    file: ../../../runtime/secrets/gateway-procedure-key
+  storage-access-key:
+    file: ../../../runtime/secrets/storage-access-key
+  storage-secret-key:
+    file: ../../../runtime/secrets/storage-secret-key

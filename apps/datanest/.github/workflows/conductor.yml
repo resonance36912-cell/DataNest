@@ -1,0 +1,130 @@
+name: CONDUCTOR Process Synchronization Tree
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+      timezone: Africa/Johannesburg
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+  pull-requests: read
+
+concurrency:
+  # Coalesce scheduler/manual automation for the canonical source SHA into one
+  # synchronization pass. CONDUCTOR does not listen to workflow_run events.
+  group: datanest-conductor-${{ github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  coordinate:
+    if: >-
+      github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' ||
+      github.event_name == 'schedule'
+    name: Synchronize tree timing and commands
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: ./.github/actions/automation-x-annotation
+        with:
+          automation_id: conductor
+          automation_class: enforcement
+          automation_action: mutate
+          automation_target: automation dispatch graph
+          automation_effect: bounded_mutation
+          human_review_required: "true"
+
+      - name: Read prior coordination and SUGGESTER state
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/conductor
+          git fetch origin automation/conductor || true
+          git fetch origin automation/suggester || true
+          git show origin/automation/conductor:conductor/state/latest.json > /tmp/conductor/previous.json 2>/dev/null || echo 'null' > /tmp/conductor/previous.json
+          git show origin/automation/suggester:suggester/feeds/datanest.json > /tmp/conductor/suggester.json 2>/dev/null || echo '{}' > /tmp/conductor/suggester.json
+          git switch -C automation/conductor
+
+      - name: Build synchronized process command
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CONDUCTOR_PREVIOUS_PATH: /tmp/conductor/previous.json
+          CONDUCTOR_SUGGESTER_PATH: /tmp/conductor/suggester.json
+        run: node scripts/conductor-orchestrator.mjs
+
+      - name: Publish CONDUCTOR state
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add conductor/state/latest.json conductor/commands/latest.json
+          if ! git diff --cached --quiet; then
+            git -c user.name="DataNest CONDUCTOR"                 -c user.email="41898282+github-actions[bot]@users.noreply.github.com"                 commit -m "Refresh CONDUCTOR process synchronization"
+            git push --force-with-lease origin HEAD:automation/conductor
+          fi
+
+      - name: Dispatch next synchronized command
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          record_dispatch() {
+            code=$?
+            result="submitted"
+            if [ "$code" -ne 0 ]; then result="failed-or-unconfirmed"; fi
+            if [ -z "${workflow:-}" ]; then result="idle"; fi
+            jq --arg result "$result" --arg at "$(date -u +%FT%TZ)" --argjson code "$code" \
+              '{recordedAt:$at, outcome:$result, exitCode:$code, command:.nextCommand, productionAuthorization:false}' \
+              conductor/commands/latest.json > conductor/commands/dispatch.json
+          }
+          trap record_dispatch EXIT
+          workflow="$(jq -r '.nextCommand.workflow // empty' conductor/commands/latest.json)"
+          type="$(jq -r '.nextCommand.type // empty' conductor/commands/latest.json)"
+          if [ -z "$workflow" ]; then
+            echo "No CONDUCTOR dispatch selected."
+            exit 0
+          fi
+
+          echo "CONDUCTOR dispatch: $type -> $workflow"
+          case "$workflow" in
+            maintenance.yml)
+              task="$(jq -r '.nextCommand.inputs.task // "branch-cleaner"' conductor/commands/latest.json)"
+              case "$task" in branch-cleaner|streamliner) ;; *) exit 1 ;; esac
+              gh workflow run "$workflow" --ref main -f task="$task"
+              ;;
+            suggester.yml)
+              gh workflow run "$workflow" --ref main -f conductor_run_id="$GITHUB_RUN_ID"
+              ;;
+            knowledge-tree.yml|environment-tree.yml|boundaries-assessment.yml|security-scan.yml|enforcer.yml|botsquad.yml|guardian.yml|calmer.yml|regulator.yml|visibility-utility.yml)
+              gh workflow run "$workflow" --ref main
+              ;;
+            *)
+              echo "::error::CONDUCTOR refused a workflow outside its dispatch allowlist."
+              exit 1
+              ;;
+          esac
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conductor-state-${{ github.run_id }}
+          path: |
+            conductor/state/latest.json
+            conductor/commands/latest.json
+            conductor/commands/dispatch.json
+          retention-days: 30
+
+  gate-timeframe:
+    if: >-
+      github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' ||
+      github.event_name == 'schedule'
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "conductor"

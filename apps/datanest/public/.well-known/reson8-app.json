@@ -1,0 +1,50 @@
+{
+  "contract": "reson8-app@1",
+  "key": "datanest",
+  "name": "DataNest",
+  "publicUrl": "https://datanest-supository.github.io/DataNest/",
+  "hubUrl": "https://reson8.life/",
+  "sourceRepository": "DataNest-Supository/DataNest",
+  "sourceBranch": "main",
+  "authority": "DataNest",
+  "access": "invitation",
+  "status": "live",
+  "billing": "none",
+  "runtimeConfigAuthority": "https://datanest-supository.github.io/DataNest/runtime-config.js",
+  "operationalUrl": "https://datanest-supository.github.io/DataNest/",
+  "hubRegistration": {
+    "state": "pending",
+    "issue": "https://github.com/Resonance-AppDev/resonance-hub/issues/136",
+    "statusEndpoint": "https://reson8.life/api/public/app-status/health"
+  },
+  "readiness": {
+    "contract": "ronsas-status@1",
+    "authenticated": true
+  },
+  "backupHost": {
+    "provider": "Dropbox",
+    "path": "/DataNest-AI-Backups",
+    "role": "artifact-recovery",
+    "status": "active",
+    "servesApplication": false,
+    "localPcBackupHosting": false
+  },
+  "delivery": {
+    "provider": "GitHub Pages",
+    "status": "live",
+    "url": "https://datanest-supository.github.io/DataNest/",
+    "healthUrl": "https://datanest-supository.github.io/DataNest/health.json",
+    "railwayRequired": false
+  },
+  "displayName": "DataNest",
+  "canonicalHost": "datanest-supository.github.io",
+  "brandedUrl": "https://datanest-supository.github.io/DataNest/",
+  "brandedState": "live",
+  "wire": {
+    "source": "https://datanest-supository.github.io/DataNest/",
+    "target": "https://datanest-supository.github.io/DataNest/",
+    "mode": "direct",
+    "applicationLayer": "not-required",
+    "networkState": "not-applicable"
+  }
+}

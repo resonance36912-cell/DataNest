@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datanest-supository.github.io/DataNest/schemas/release-evidence-envelope-v1.schema.json",
+  "title": "Resonance DataNest Release Evidence Envelope",
+  "description": "Versioned provenance and governance envelope shared by DataNest, Mirror-DataNest and Resonance Forge.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion","repository","commitSha","releaseId","environment","backend","workflow","artifact","verification","governance","authority"],
+  "properties": {
+    "schemaVersion": {"const": "release-evidence-envelope-v1"},
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fullName","role"],
+      "properties": {
+        "fullName": {"type":"string","minLength":1},
+        "role": {"enum":["canonical","mirror-rd","forge-replica"]}
+      }
+    },
+    "commitSha": {"type":"string","pattern":"^[0-9a-f]{40}$"},
+    "releaseId": {"type":"string","minLength":1},
+    "environment": {"enum":["development","staging","production","recovery"]},
+    "backend": {
+      "type":"object",
+      "additionalProperties": false,
+      "required":["provider","projectId","environment"],
+      "properties":{
+        "provider":{"enum":["supabase","none","other"]},
+        "projectId":{"type":"string","minLength":1},
+        "environment":{"type":"string","minLength":1}
+      }
+    },
+    "workflow": {
+      "type":"object",
+      "additionalProperties": false,
+      "required":["provider","name","runId"],
+      "properties":{
+        "provider":{"const":"github-actions"},
+        "name":{"type":"string","minLength":1},
+        "runId":{"type":"string","minLength":1}
+      }
+    },
+    "artifact": {
+      "type":"object",
+      "additionalProperties": false,
+      "required":["type","identity"],
+      "properties":{
+        "type":{"type":"string","minLength":1},
+        "identity":{"type":"string","minLength":1},
+        "digest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "verification": {
+      "type":"object",
+      "additionalProperties": false,
+      "required":["tests","typecheck","security","live"],
+      "properties":{
+        "tests":{"enum":["pass","fail","not_run"]},
+        "typecheck":{"enum":["pass","fail","not_run"]},
+        "security":{"enum":["pass","fail","not_run"]},
+        "live":{"enum":["pass","fail","not_run"]}
+      }
+    },
+    "certification": {
+      "type":"object",
+      "additionalProperties": false,
+      "properties":{
+        "status":{"enum":["pass","fail","not_run"]},
+        "reference":{"type":"string","minLength":1}
+      }
+    },
+    "auditOptimizer": {
+      "type":"object",
+      "additionalProperties": false,
+      "properties":{
+        "status":{"enum":["pass","fail","not_run"]},
+        "reference":{"type":"string","minLength":1}
+      }
+    },
+    "governance": {
+      "type":"object",
+      "additionalProperties": false,
+      "required":["reviewed","humanAuthorized"],
+      "properties":{
+        "reviewed":{"type":"boolean"},
+        "humanAuthorized":{"type":"boolean"},
+        "reference":{"type":"string","minLength":1}
+      }
+    },
+    "authority": {
+      "type":"object",
+      "additionalProperties": false,
+      "required":["productionAuthority","productionDeploymentAllowed"],
+      "properties":{
+        "productionAuthority":{"type":"boolean"},
+        "productionDeploymentAllowed":{"type":"boolean"}
+      }
+    }
+  }
+}

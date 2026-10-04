@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "datanest-visibility-utility-public-v1",
+  "tree": "VISIBILITY-UTILITY",
+  "authority": {
+    "marketIntelligence": true,
+    "productionAuthorization": false,
+    "marketingSpend": false,
+    "bindingSales": false
+  },
+  "evidence": {
+    "branch": "automation/visibility-utility",
+    "latestStateUrl": "https://raw.githubusercontent.com/DataNest-Supository/DataNest/automation/visibility-utility/visibility-utility/state/latest.json",
+    "latestRouteToMarketUrl": "https://raw.githubusercontent.com/DataNest-Supository/DataNest/automation/visibility-utility/visibility-utility/projections/route-to-market.json"
+  },
+  "projectionNotice": "Route-to-market outputs are evidence-labelled scenarios, not guaranteed outcomes."
+}

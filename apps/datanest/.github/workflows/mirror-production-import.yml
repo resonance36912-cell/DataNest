@@ -1,0 +1,320 @@
+name: Import Mirror Production Candidate
+
+on:
+  repository_dispatch:
+    types: [mirror-production-candidate]
+  workflow_dispatch:
+    inputs:
+      mirror_sha:
+        description: Exact Mirror-DataNest production-candidate SHA
+        required: true
+        type: string
+      mirror_sync_sha:
+        description: Exact Mirror post-sync anchor SHA recorded by the latest canonical selective sync
+        required: true
+        type: string
+      canonical_base_sha:
+        description: Exact DataNest SHA the Mirror candidate was synchronized from
+        required: true
+        type: string
+      candidate_name:
+        description: Short production-candidate name
+        required: true
+        type: string
+      candidate_run:
+        description: Mirror production-candidate workflow/artifact reference
+        required: true
+        type: string
+      mirror_live_evidence_reference:
+        description: Successful live Mirror visual/functional verification reference
+        required: true
+        type: string
+      candidate_artifact_name:
+        description: Immutable Mirror production-candidate artifact name
+        required: true
+        type: string
+      candidate_patch_digest:
+        description: SHA-256 digest of the candidate patch
+        required: true
+        type: string
+      summary:
+        description: Candidate purpose and optimization summary
+        required: true
+        type: string
+      gate_timeframe_override_hours:
+        description: Optional Owner planning-window override in hours (0.5-72)
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: mirror-production-import
+  cancel-in-progress: false
+
+jobs:
+  import:
+    name: Import candidate into governed DataNest branch
+    runs-on: ubuntu-24.04
+    env:
+      MIRROR_SHA: ${{ github.event.client_payload.mirror_sha || inputs.mirror_sha }}
+      MIRROR_SYNC_SHA: ${{ github.event.client_payload.mirror_sync_sha || inputs.mirror_sync_sha }}
+      BASE_SHA: ${{ github.event.client_payload.canonical_base_sha || inputs.canonical_base_sha }}
+      CANDIDATE_NAME: ${{ github.event.client_payload.candidate_name || inputs.candidate_name }}
+      CANDIDATE_RUN: ${{ github.event.client_payload.candidate_run || inputs.candidate_run }}
+      MIRROR_LIVE_EVIDENCE: ${{ github.event.client_payload.mirror_live_evidence || inputs.mirror_live_evidence_reference }}
+      CANDIDATE_ARTIFACT: ${{ github.event.client_payload.candidate_artifact_name || inputs.candidate_artifact_name }}
+      CANDIDATE_PATCH_DIGEST: ${{ github.event.client_payload.candidate_patch_digest || inputs.candidate_patch_digest }}
+      CANDIDATE_SUMMARY: ${{ github.event.client_payload.summary || inputs.summary }}
+    steps:
+      - name: Validate handoff payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          for pair in "MIRROR_SHA:$MIRROR_SHA" "MIRROR_SYNC_SHA:$MIRROR_SYNC_SHA" "BASE_SHA:$BASE_SHA"; do
+            key="${pair%%:*}"
+            value="${pair#*:}"
+            if ! [[ "$value" =~ ^[0-9a-fA-F]{40}$ ]]; then
+              echo "::error::$key must be an exact 40-character Git SHA"
+              exit 1
+            fi
+          done
+          test -n "$CANDIDATE_NAME"
+          if ! [[ "$CANDIDATE_RUN" =~ ^https://github.com/DataNest-Supository/Mirror-DataNest/actions/runs/[0-9]+$ ]]; then
+            echo "::error::candidate_run must be an exact Mirror workflow-run URL."
+            exit 1
+          fi
+          if ! [[ "$MIRROR_LIVE_EVIDENCE" =~ ^https://github.com/DataNest-Supository/Mirror-DataNest/actions/runs/[0-9]+$ ]]; then
+            echo "::error::mirror_live_evidence_reference must be an exact Mirror workflow-run URL."
+            exit 1
+          fi
+          test "$CANDIDATE_ARTIFACT" = "mirror-production-candidate-${MIRROR_SHA:0:12}"
+          if ! [[ "$CANDIDATE_PATCH_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "::error::candidate_patch_digest must be sha256:<64 lowercase hex characters>"
+            exit 1
+          fi
+          test -n "$CANDIDATE_SUMMARY"
+
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Fetch Mirror candidate and validate selective-sync lineage
+        shell: bash
+        run: |
+          set -euo pipefail
+          git remote add mirror https://github.com/DataNest-Supository/Mirror-DataNest.git
+          git fetch mirror "$MIRROR_SHA" --no-tags
+          git fetch mirror "$MIRROR_SYNC_SHA" --no-tags
+          git cat-file -e "$MIRROR_SHA^{commit}"
+          git cat-file -e "$MIRROR_SYNC_SHA^{commit}"
+          git cat-file -e "$BASE_SHA^{commit}"
+          if ! git merge-base --is-ancestor "$MIRROR_SYNC_SHA" "$MIRROR_SHA"; then
+            echo "::error::Mirror candidate does not descend from the declared post-sync Mirror anchor."
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "$BASE_SHA" origin/main; then
+            echo "::error::Declared canonical base is not in current DataNest/main history."
+            exit 1
+          fi
+
+      - name: Verify Mirror workflow evidence identities
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          candidate_run_id="${CANDIDATE_RUN##*/}"
+          live_run_id="${MIRROR_LIVE_EVIDENCE##*/}"
+          candidate_json="$(curl -fsSL -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/DataNest-Supository/Mirror-DataNest/actions/runs/$candidate_run_id")"
+          live_json="$(curl -fsSL -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/DataNest-Supository/Mirror-DataNest/actions/runs/$live_run_id")"
+
+          if [ "$(printf '%s' "$candidate_json" | jq -r '.head_sha')" != "$MIRROR_SHA" ] || \
+             [ "$(printf '%s' "$candidate_json" | jq -r '.path')" != ".github/workflows/production-candidate.yml" ]; then
+            echo "::error::Candidate workflow identity is not bound to the declared Mirror SHA."
+            exit 1
+          fi
+
+          if [ "$(printf '%s' "$live_json" | jq -r '.status')" != "completed" ] || \
+             [ "$(printf '%s' "$live_json" | jq -r '.conclusion')" != "success" ] || \
+             [ "$(printf '%s' "$live_json" | jq -r '.head_sha')" != "$MIRROR_SHA" ] || \
+             [ "$(printf '%s' "$live_json" | jq -r '.path')" != ".github/workflows/pages.yml" ] || \
+             [ "$(printf '%s' "$live_json" | jq -r '.event')" != "push" ]; then
+            echo "::error::Live Mirror evidence is not a successful pushed Pages run for the declared Mirror SHA."
+            exit 1
+          fi
+
+      - name: Verify candidate boundary contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/mirror-promotion
+          git show "$BASE_SHA:config/repository-boundary.json" > /tmp/mirror-promotion/boundary-canonical.json
+          git show "$MIRROR_SHA:config/repository-boundary.json" > /tmp/mirror-promotion/boundary-mirror.json
+          canonical_boundary_sha="$(sha256sum /tmp/mirror-promotion/boundary-canonical.json | cut -d' ' -f1)"
+          mirror_boundary_sha="$(sha256sum /tmp/mirror-promotion/boundary-mirror.json | cut -d' ' -f1)"
+          if [ "$canonical_boundary_sha" != "$mirror_boundary_sha" ]; then
+            echo "::error::Mirror boundary contract does not match the exact canonical base contract."
+            exit 1
+          fi
+
+          git diff --name-only "$MIRROR_SYNC_SHA" "$MIRROR_SHA" | sort -u > /tmp/mirror-promotion/changed-paths-since-sync.txt
+          node scripts/validate-mirror-candidate-boundary.mjs \
+            --paths-file /tmp/mirror-promotion/changed-paths-since-sync.txt \
+            --contract /tmp/mirror-promotion/boundary-canonical.json \
+            --output /tmp/mirror-promotion/boundary-classification.json
+
+      - name: Create curated production patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from "node:fs";
+          const report = JSON.parse(readFileSync("/tmp/mirror-promotion/boundary-classification.json", "utf8"));
+          writeFileSync("/tmp/mirror-promotion/candidate-paths.txt", report.promotablePaths.join("\n") + (report.promotablePaths.length ? "\n" : ""));
+          NODE
+          if [ ! -s /tmp/mirror-promotion/candidate-paths.txt ]; then
+            echo "::error::Mirror candidate contains no promotable changes since its recorded post-sync anchor."
+            exit 1
+          fi
+          mapfile -t candidate_paths < /tmp/mirror-promotion/candidate-paths.txt
+          git diff --binary "$BASE_SHA" "$MIRROR_SHA" -- "${candidate_paths[@]}" > /tmp/mirror-promotion/candidate.patch
+          if [ ! -s /tmp/mirror-promotion/candidate.patch ]; then
+            echo "::error::Candidate patch is empty after boundary enforcement."
+            exit 1
+          fi
+          patch_sha256="$(sha256sum /tmp/mirror-promotion/candidate.patch | cut -d' ' -f1)"
+          if [ "sha256:$patch_sha256" != "$CANDIDATE_PATCH_DIGEST" ]; then
+            echo "::error::Candidate patch digest does not match the Mirror production-candidate handoff."
+            exit 1
+          fi
+          git diff --name-status "$BASE_SHA" "$MIRROR_SHA" -- "${candidate_paths[@]}" > /tmp/mirror-promotion/changed-files.txt
+          git diff --stat "$BASE_SHA" "$MIRROR_SHA" -- "${candidate_paths[@]}" > /tmp/mirror-promotion/diff-stat.txt
+
+      - name: Apply candidate to isolated promotion branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          short_sha="${MIRROR_SHA:0:12}"
+          branch_name="mirror-promotion/${GITHUB_RUN_ID}-$short_sha"
+          git switch -c "$branch_name" origin/main
+
+          if ! git apply --3way /tmp/mirror-promotion/candidate.patch; then
+            echo "::error::Candidate conflicts with current DataNest/main. Resolve through a curated human import; nothing was pushed."
+            exit 1
+          fi
+
+          mkdir -p governance/mirror-promotions
+          jq -n \
+            --arg schemaVersion "datanest-mirror-promotion-v2" \
+            --arg mirrorRepository "DataNest-Supository/Mirror-DataNest" \
+            --arg mirrorSha "$MIRROR_SHA" \
+            --arg mirrorSyncSha "$MIRROR_SYNC_SHA" \
+            --arg canonicalBaseSha "$BASE_SHA" \
+            --arg candidateName "$CANDIDATE_NAME" \
+            --arg candidateRun "$CANDIDATE_RUN" \
+            --arg candidateArtifact "$CANDIDATE_ARTIFACT" \
+            --arg candidatePatchDigest "$CANDIDATE_PATCH_DIGEST" \
+            --arg mirrorLiveEvidence "$MIRROR_LIVE_EVIDENCE" \
+            --arg summary "$CANDIDATE_SUMMARY" \
+            --arg importedBy "$GITHUB_ACTOR" \
+            --arg importedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            '{schemaVersion:$schemaVersion,mirrorRepository:$mirrorRepository,mirrorSha:$mirrorSha,mirrorSyncSha:$mirrorSyncSha,canonicalBaseSha:$canonicalBaseSha,candidateName:$candidateName,candidateRun:$candidateRun,candidateArtifact:$candidateArtifact,candidatePatchDigest:$candidatePatchDigest,mirrorLiveEvidence:$mirrorLiveEvidence,summary:$summary,importedBy:$importedBy,importedAt:$importedAt,auditOptimizer:{status:"pending",reference:null},governance:{status:"pending",reference:null},productionAuthorization:{status:"pending",reference:null},productionDeploymentAllowed:false}' \
+            > "governance/mirror-promotions/$short_sha.json"
+
+          git config user.name "DataNest Promotion Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Import Mirror production candidate: $CANDIDATE_NAME"
+          git push origin "$branch_name"
+          echo "PROMOTION_BRANCH=$branch_name" >> "$GITHUB_ENV"
+          echo "PROMOTION_MANIFEST=governance/mirror-promotions/$short_sha.json" >> "$GITHUB_ENV"
+
+      - name: Open canonical governance pull request
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          body_file=/tmp/mirror-promotion/pr-body.md
+          cat > "$body_file" <<EOF
+          ## Mirror production candidate
+
+          This change was imported from the ungated R&D repository and has **no production authority** until canonical audit and governance are complete.
+
+          - Mirror repository: \`DataNest-Supository/Mirror-DataNest\`
+          - Mirror source SHA: \`$MIRROR_SHA\`
+          - Mirror sync anchor SHA: \`$MIRROR_SYNC_SHA\`
+          - Canonical base SHA: \`$BASE_SHA\`
+          - Candidate run/evidence: $CANDIDATE_RUN
+          - Candidate artifact: $CANDIDATE_ARTIFACT
+          - Candidate patch digest: $CANDIDATE_PATCH_DIGEST
+          - Live Mirror visual/functional evidence: $MIRROR_LIVE_EVIDENCE
+          - Promotion manifest: \`$PROMOTION_MANIFEST\`
+
+          ### Candidate summary
+
+          $CANDIDATE_SUMMARY
+
+          ### Required canonical gates
+
+          - [ ] Live Mirror visual/functional evidence verified
+          - [ ] DataNest AI Certification recorded for the governed staging backend
+          - [ ] Canonical PR Verification
+          - [ ] Canonical Security Scan
+          - [ ] RONSAS validation where applicable
+          - [ ] **DataNest Audit Optimizer review recorded**
+          - [ ] Governance-impact review recorded
+          - [ ] Human reviewer approval recorded
+          - [ ] Production authorization recorded
+          - [ ] Live deployment initiated only from \`DataNest-Supository/DataNest\`
+
+          **Audit-Optimizer-Reference:** PENDING
+
+          **Governance-Review-Reference:** PENDING
+
+          **Production-Authorization-Reference:** PENDING
+
+          The Mirror repository cannot deploy this candidate live.
+          EOF
+
+          set +e
+          pr_url="$(gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$PROMOTION_BRANCH" --title "Promote Mirror candidate: $CANDIDATE_NAME" --body-file "$body_file" 2>/tmp/pr-error)"
+          rc=$?
+          set -e
+
+          if [ "$rc" -eq 0 ]; then
+            echo "PR_URL=$pr_url" >> "$GITHUB_ENV"
+            echo "Created $pr_url"
+          else
+            echo "::warning::Promotion branch was pushed, but GitHub Actions could not open the PR automatically."
+            cat /tmp/pr-error
+            echo "Open a pull request manually from $PROMOTION_BRANCH to main."
+          fi
+
+      - name: Promotion handoff summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Canonical Mirror promotion handoff"
+            echo
+            echo "- Mirror SHA: \`$MIRROR_SHA\`"
+            echo "- Mirror sync anchor SHA: \`$MIRROR_SYNC_SHA\`"
+            echo "- Promotion branch: \`${PROMOTION_BRANCH:-not-created}\`"
+            echo "- Pull request: ${PR_URL:-manual PR required}"
+            echo
+            echo "Live deployment remains blocked until Audit Optimizer evidence and governance/human approval are supplied to the canonical production release gate."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "mirror-production-import"
+      override_hours: ${{ inputs.gate_timeframe_override_hours || '' }}

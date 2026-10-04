@@ -1,0 +1,142 @@
+name: One-shot Windows runner bootstrap via RONS supervisor
+
+# follow-up inspection
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/triggercmd-inspect-20260920.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  bootstrap:
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin, sovereign]
+    timeout-minutes: 5
+    steps:
+      - name: Arm self-restoring supervisor bootstrap hook
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/arm-windows-runner-bootstrap.sh <<'SH'
+          set -eu
+          control=/control
+          current="$control/RONS-Ensure-Public-Edge.ps1"
+          installer="$control/INSTALL-RONSAS-WINDOWS-RUNNER.ps1"
+          test -f "$current"
+          test -f "$installer"
+
+          if grep -Fq 'RONSAS_WINDOWS_RUNNER_BOOTSTRAP_ONCE' "$current"; then
+            echo "bootstrap_hook=already_armed"
+            exit 0
+          fi
+
+          stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+          backup="$control/RONS-Ensure-Public-Edge.pre-windows-runner-$stamp.ps1"
+          cp "$current" "$backup"
+          before="$(sha256sum "$backup" | awk '{print $1}')"
+
+          cat > "$current" <<'PS1'
+          # RONSAS_WINDOWS_RUNNER_BOOTSTRAP_ONCE
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Continue'
+          $Base = Split-Path -Parent $MyInvocation.MyCommand.Path
+          $BackupItem = Get-ChildItem -LiteralPath $Base -File -Filter 'RONS-Ensure-Public-Edge.pre-windows-runner-*.ps1' -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTimeUtc -Descending |
+            Select-Object -First 1
+          $Backup = if ($BackupItem) { $BackupItem.FullName } else { '' }
+          $Installer = Join-Path $Base 'INSTALL-RONSAS-WINDOWS-RUNNER.ps1'
+          $LogDir = Join-Path $Base 'logs'
+          New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
+          $Log = Join-Path $LogDir 'windows-runner-bootstrap.log'
+          function Write-BootstrapLog([string]$Message) {
+            Add-Content -LiteralPath $Log -Value ((Get-Date -Format 'yyyy-MM-dd HH:mm:ss') + ' ' + $Message) -Encoding UTF8
+          }
+          $InstallExit = 125
+          try {
+            Write-BootstrapLog 'One-shot Windows runner bootstrap started.'
+            if (-not $Backup -or -not (Test-Path -LiteralPath $Backup -PathType Leaf)) { throw 'Public-edge backup missing.' }
+            if (-not (Test-Path -LiteralPath $Installer -PathType Leaf)) { throw 'Installer missing.' }
+            $Args = @('-NoProfile','-ExecutionPolicy','Bypass','-File',$Installer)
+            $Out = Join-Path $LogDir 'windows-runner-installer.out.log'
+            $Err = Join-Path $LogDir 'windows-runner-installer.err.log'
+            $P = Start-Process -FilePath 'powershell.exe' -ArgumentList $Args -PassThru -WindowStyle Hidden -RedirectStandardOutput $Out -RedirectStandardError $Err
+            if (-not $P.WaitForExit(180000)) {
+              Write-BootstrapLog ('Installer timed out; terminating PID ' + $P.Id)
+              & taskkill.exe /PID $P.Id /T /F | Out-Null
+              $InstallExit = 124
+            } else {
+              $P.Refresh()
+              $InstallExit = [int]$P.ExitCode
+            }
+            Write-BootstrapLog ('Installer exit=' + $InstallExit)
+          } catch {
+            Write-BootstrapLog ('Installer exception: ' + $_.Exception.Message)
+            $InstallExit = 126
+          } finally {
+            try {
+              if ($Backup -and (Test-Path -LiteralPath $Backup -PathType Leaf)) {
+                Copy-Item -LiteralPath $Backup -Destination (Join-Path $Base 'RONS-Ensure-Public-Edge.ps1') -Force
+                Write-BootstrapLog 'Original public-edge script restored.'
+              } else {
+                Write-BootstrapLog 'CRITICAL restore skipped because backup was unavailable.'
+              }
+            } catch {
+              Write-BootstrapLog ('CRITICAL restore failure: ' + $_.Exception.Message)
+            }
+          }
+          try {
+            if ($Backup -and (Test-Path -LiteralPath $Backup -PathType Leaf)) {
+              & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $Backup
+              Write-BootstrapLog ('Original public-edge continuation exit=' + $LASTEXITCODE)
+            }
+          } catch {
+            Write-BootstrapLog ('Original public-edge continuation exception: ' + $_.Exception.Message)
+          }
+          exit 0
+          PS1
+
+          echo "bootstrap_hook=armed"
+          echo "edge_backup=$backup"
+          echo "edge_backup_sha256=$before"
+          SH
+
+          podman --remote run --rm -i --entrypoint sh \
+            -v /mnt/c/Users/Ashley/AppData/Local/Resonance/RONS-ControlCenter:/control:rw \
+            localhost/ronsas-actions-runner:2.337.0-r2 -s < /tmp/arm-windows-runner-bootstrap.sh
+
+      - name: Allow normal supervisor cycle and inspect outcome
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 75
+          podman --remote run --rm --entrypoint sh \
+            -v /mnt/c/Users/Ashley/AppData/Local/Resonance/RONS-ControlCenter:/control:ro \
+            -v /mnt/c/Users/Ashley/AppData/Local/Resonance/RONS-GitHubRunner-Windows:/winrunner:ro \
+            localhost/ronsas-actions-runner:2.337.0-r2 -lc '
+              if grep -Fq "RONSAS_WINDOWS_RUNNER_BOOTSTRAP_ONCE" /control/RONS-Ensure-Public-Edge.ps1; then
+                echo "edge_script_restored=false"
+              else
+                echo "edge_script_restored=true"
+              fi
+              if [ -f /winrunner/.runner ] && [ -f /winrunner/bin/Runner.Listener.exe ]; then
+                echo "windows_runner_files=present"
+              else
+                echo "windows_runner_files=missing"
+              fi
+              echo "bootstrap_log_begin"
+              tail -n 20 /control/logs/windows-runner-bootstrap.log 2>/dev/null || true
+              echo "bootstrap_log_end"
+              echo "installer_out_tail_begin"
+              tail -n 20 /control/logs/windows-runner-installer.out.log 2>/dev/null || true
+              echo "installer_out_tail_end"
+              echo "installer_err_tail_begin"
+              tail -n 20 /control/logs/windows-runner-installer.err.log 2>/dev/null || true
+              echo "installer_err_tail_end"
+              echo "runner_diag_tail_begin"
+              latest=$(ls -1t /winrunner/_diag/Runner_*.log 2>/dev/null | head -n 1 || true)
+              if [ -n "$latest" ]; then tail -n 30 "$latest"; fi
+              echo "runner_diag_tail_end"
+            '

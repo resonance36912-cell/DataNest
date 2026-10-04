@@ -1,0 +1,94 @@
+RESONANCE
+
+# DataNest / RONSAS
+External Full-System Audit Brief
+
+UI • Architecture • Workflow • AI • Governance • Output Quality • Reliability • Optimization
+
+Purpose
+
+Use this document to conduct an independent, evidence-based audit of the complete Resonance DataNest operating environment. Return the completed findings and optimization proposals so they can be reviewed, validated, prioritized, and converted into governed implementation work.
+
+| Audit target | Resonance DataNest / RONSAS control plane |
+
+| --- | --- |
+
+| Production UI | https://datanest-supository.github.io/DataNest/ |
+
+| Source authority | GitHub: DataNest-Supository/DataNest |
+
+| Data/control-plane authority | Supabase production project: sgqdmfgjbprsoqsmgigi |
+
+| Baseline source commit | ac93d51828707d398dfa9c5a471d8a6ed4c9059f |
+
+| Baseline DB release | datanest-project-member-invitations-v1 |
+
+| Important audit rule Treat production as read-only unless the system owner explicitly authorizes a specific write test. Never request, expose, copy, or paste passwords, service-role keys, MFA recovery codes, reusable browser cookies, PATs, or database passwords. |
+
+| --- |
+
+Version 1.0  |  Prepared for external technical / AI audit
+
+# 1. How to Use This Audit Brief
+
+This is both an audit specification and a return template. The external auditor should inspect the live system, source architecture, workflows, and observable outputs; record evidence; identify defects, friction, duplication, risk, and missing controls; and propose optimizations that preserve the system’s governance and security boundaries.
+
+| Evidence rule Do not infer a pass from design intent. Mark each item PASS, PARTIAL, FAIL, NOT TESTED, or NOT APPLICABLE. Every PARTIAL/FAIL finding must include concrete evidence: URL, screen, trace, code path, log excerpt, reproduction steps, or observed output. |
+
+| --- |
+
+1. Review the system baseline and invariants in Sections 2-3 before testing.
+
+2. Audit every domain in Sections 5-20. If access is unavailable, record NOT TESTED and explain what is required.
+
+3. Execute the end-to-end journeys in Section 21 using non-destructive test data wherever possible.
+
+4. Assess output quality, not only whether a button or API call technically completes.
+
+5. Record every material finding using the finding schema in Section 23.
+
+6. Produce the executive summary, prioritized optimization backlog, target-state proposal, and regression plan in Sections 22-26.
+
+7. Return the completed report in a form that can be pasted back into ChatGPT without losing IDs, severity, evidence, or dependencies.
+
+| Optimization posture Prefer simplification, fewer duplicated states, clearer ownership, lower operational cost, higher observability, stronger traceability, and faster user completion. Do not “optimize” by removing independent review, audit history, authorization checks, append-only records, or certification gates. |
+
+| --- |
+
+# 2. Current System Baseline
+
+The external auditor should validate the baseline rather than assume it is correct. Differences between this baseline and observed reality are findings.
+
+| Area | Current baseline | Audit implication |
+
+| --- | --- | --- |
+
+| Authority chain | GitHub is source authority; Supabase is application/control-plane data authority. | Check for authority drift, duplicate sources of truth, stale local copies, and direct production changes not represented in source/migrations. |
+
+| Hosting | Primary free public host is GitHub Pages; architecture is provider-agnostic; Vercel is optional. | Verify runtime configuration, health markers, portability, and absence of hard Vercel coupling. |
+
+| UNIFI | Planning, project context, Job Manifests, checkpoints, artifacts, audit, human controls. | Audit manifest completeness, traceability, checkpoint continuity, handoff quality, and operator clarity. |
+
+| TranScheduler | Capability-aware queueing, dependencies, reservations, retry/backoff, fairness, timing. | Verify UNKNOWN capability is never treated as execution permission; test retries, dependencies, controls, and recovery. |
+
+| DataNest AI | Governed AI workflow with job/trace linkage, external AI intake, certification, reviewed memory. | Audit AI request attribution, context correctness, result import, memory governance, trend learning, and failure boundaries. |
+
+| Think Tanks | Project channels for discussion, decisions, actions, and reviewed learning. | Verify independent confirmation, action extraction, memory approval, and no automatic authority/points. |
+
+| Contribution Intelligence | Evidence, scoring, reputation, anomaly signals, progression, N0nymous Squad. | Audit fairness, anti-gaming, explainability, eligibility, opt-ins, reviewer separation, and no capital/Sparks weighting. |
+
+| Sparks | Internal utility ledger; project spend via holds/releases/service-spend. | Verify append-only ledger, no overspend, no cash/P2P/secondary market, and no ownership/royalty effect. |
+
+| Sovereign Governance | Versioned protocol, proposals, votes, decisions, disputes, ratification. Protocol v1 is ratified. | Verify one-active-member/one-vote, independent support, protocol targeting, source preservation, and authority separation. |
+
+| Formal membership | Project-member invitation/acceptance separate from Job collaboration. | Verify invited != active, matching authenticated account required, expiry/revocation, and correct voter eligibility. |
+
+| Release baseline | DB release: datanest-project-member-invitations-v1. Main source baseline commit: ac93d518... | Verify live release manifest matches deployed source, DB migrations, and edge-function versions. |
+
+# 3. Non-Negotiable Invariants
+
+Any optimization that violates these boundaries should be rejected or redesigned.
+
+[ ] GitHub remains source authority; production database/function changes should be reproducible from controlled source/migrations.
+
+[ ] Supabase remains the application/control-plane data authority unless a governed migration changes that architecture.

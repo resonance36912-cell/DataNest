@@ -1,0 +1,31 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://datanest-supository.github.io/DataNest/schemas/automation-x-annotation-v1.schema.json",
+  "title":"DataNest Automation X Annotation",
+  "description":"Non-authorizing provenance annotation for automated repository and governance activity.",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schemaVersion","annotationId","repository","workflow","run","automation","authority","humanReview","evidence","generatedAt"],
+  "properties":{
+    "schemaVersion":{"const":"automation-x-annotation-v1"},
+    "annotationId":{"type":"string","minLength":8,"maxLength":256,"pattern":"^ax-[A-Za-z0-9._:-]+$"},
+    "repository":{"type":"string","pattern":"^[^/]+/[^/]+$"},
+    "workflow":{"type":"string","minLength":1,"maxLength":200},
+    "run":{"type":"object","additionalProperties":false,"required":["id","attempt","event","ref","sha","url"],"properties":{
+      "id":{"type":"string","minLength":1},"attempt":{"type":"string","minLength":1},"event":{"type":"string","minLength":1},"ref":{"type":"string","minLength":1},
+      "sha":{"type":"string","pattern":"^[0-9a-f]{40}$"},"url":{"type":"string","format":"uri"}}},
+    "automation":{"type":"object","additionalProperties":false,"required":["id","class","action","target","effect"],"properties":{
+      "id":{"type":"string","minLength":1,"maxLength":128},
+      "class":{"type":"string","enum":["analysis","validation","evidence","enforcement","mutation","deployment"]},
+      "action":{"type":"string","enum":["observe","validate","recommend","heal","mutate","deploy"]},
+      "target":{"type":"string","minLength":1,"maxLength":256},
+      "effect":{"type":"string","enum":["read_only","proposal","bounded_mutation","deployment"]}}},
+    "authority":{"type":"object","additionalProperties":false,"required":["productionSource","canonicalChange","merge","productionDeployment"],"properties":{
+      "productionSource":{"const":false},"canonicalChange":{"const":false},"merge":{"const":false},"productionDeployment":{"const":false}}},
+    "humanReview":{"type":"object","additionalProperties":false,"required":["required","reason"],"properties":{
+      "required":{"type":"boolean"},"reason":{"type":"string","minLength":1,"maxLength":512}}},
+    "evidence":{"type":"object","additionalProperties":false,"required":["runUrl","artifactPath"],"properties":{
+      "runUrl":{"type":"string","format":"uri"},"artifactPath":{"type":"string","minLength":1,"maxLength":512}}},
+    "generatedAt":{"type":"string","format":"date-time"}
+  }
+}

@@ -1,0 +1,84 @@
+/* Supository entry and navigation. Colors inherit the Resonance design system. */
+.landingStartActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+.landingStartActions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 48px;
+  text-decoration: none;
+  font-size: 14px;
+}
+.landingPublicNote { margin: 12px 0 0; font-size: 12px; line-height: 1.5; color: var(--text-secondary); }
+.sidebarIdentity { display: block; margin-top: 6px; font-size: 10px; letter-spacing: .06em; color: var(--text-secondary); }
+.sidebarTop > div:nth-child(2) > b { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; }
+.navWorkspaceSearch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 10px;
+  margin: 0 2px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface-work);
+  color: var(--text-primary);
+  text-align: left;
+  font-size: 12px;
+  cursor: pointer;
+}
+.navWorkspaceSearch kbd { font-size: 9px; color: var(--text-secondary); white-space: nowrap; }
+.navWorkspaceSearch:hover { border-color: var(--brand-cyan); }
+.navWorkspaceSearch:focus-visible,
+.landingStartActions a:focus-visible,
+.closeMenu:focus-visible,
+.menuButton:focus-visible { outline: 2px solid var(--brand-cyan); outline-offset: 3px; }
+.navDisclosure > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 48px;
+  list-style: none;
+}
+.navDisclosure > summary::-webkit-details-marker { display: none; }
+.navGroupCopy { display: grid; gap: 3px; }
+.navGroupCopy b { font-size: 10px; letter-spacing: .1em; color: var(--text-primary); }
+.navGroupCopy small { font-size: 11px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--text-secondary); }
+.navGroupIndicator { color: var(--text-secondary); font-size: 16px; transform: rotate(-90deg); }
+.navDisclosure[open] .navGroupIndicator { transform: none; }
+
+/* A tall admin panel must not squeeze the navigation to zero height. */
+.sidebar { height: 100dvh; overflow-y: auto; scrollbar-width: thin; }
+.sidebar .navStack { flex: 1 0 auto; overflow-y: visible; }
+.sidebarTop, .projectPill, .navLegalSection, .ronsasNavLaunch, .sidebarFooter { flex-shrink: 0; }
+
+@media (max-width: 1100px) {
+  .landingHeader { flex-wrap: wrap; padding-block: 18px; gap: 16px; }
+  .landingHeaderActions { width: 100%; min-width: 0; flex-wrap: wrap; }
+}
+@media (max-width: 900px) {
+  .datanextExperience .sidebar { width: min(340px, calc(100vw - 24px)); overscroll-behavior: contain; background: var(--surface-canvas-raised); }
+  .closeMenu, .menuButton { min-width: 44px; min-height: 44px; }
+  .sidebar .navGroup button { min-height: 44px; }
+}
+@media (max-width: 700px) {
+  .landingHeaderActions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; gap: 8px; }
+  .landingHeaderActions > * { min-width: 0; max-width: 100%; margin: 0; }
+  .landingHeaderActions .motionControl { grid-column: 1 / -1; width: 100%; min-height: 44px; padding: 6px 9px; }
+  .landingHeaderActions .motionControl span { font-size: 9px; }
+  .landingStartActions { gap: 10px; margin-top: 20px; }
+  .landingStartActions a { flex: 1 1 150px; }
+  .landingPublicNote { margin-bottom: 24px; }
+  .landingStory .aiIEyebrow { line-height: 1.7; }
+}
+@media (forced-colors: active) {
+  .navWorkspaceSearch:focus-visible, .landingStartActions a:focus-visible { outline-color: Highlight; }
+}

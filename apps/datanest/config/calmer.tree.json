@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "datanest-calmer-v1",
+  "authority": "DataNest-Supository/DataNest",
+  "mode": "continuous-minimum-friction-governance",
+  "productionAuthorization": false,
+  "purpose": "Continuously minimize avoidable governance friction while preserving every non-negotiable DataNest safety, security, authority, privacy, lineage and human-approval invariant.",
+  "pressure": "maximum-softening-within-hard-pass-floor",
+  "nonNegotiable": [
+    "Boundaries hard rules",
+    "ENFORCER security blockers",
+    "production authorization separation",
+    "mandatory human approval for consequential production/governance changes",
+    "secret and private-authentication protection",
+    "FREETREE isolation",
+    "unique-history preservation",
+    "required reproducible verification"
+  ],
+  "softeningDimensions": [
+    "human response planning windows",
+    "duplicated evidence requests",
+    "redundant review handoffs",
+    "stale evidence refresh cadence",
+    "non-authorizing workflow timing",
+    "low-risk process queue priority"
+  ],
+  "domainFloorsHours": {
+    "ownerOperator": 1,
+    "engineeringReview": 4,
+    "securityReview": 8,
+    "visualReview": 4,
+    "governanceReview": 8,
+    "legalReview": 12,
+    "externalReview": 12,
+    "operationsReview": 4
+  },
+  "evidenceReuseMinutes": {
+    "stone": 60,
+    "gold": 180,
+    "diamond": 360
+  },
+  "tiers": {
+    "stone": {
+      "label": "STONE",
+      "minimums": {
+        "accuracy": 0.8,
+        "performance": 0.7,
+        "security": 0.9,
+        "contribution": 0.5
+      },
+      "benefits": [
+        "baseline minimum-pass review routing",
+        "reuse current evidence within STONE freshness window",
+        "avoid duplicated non-authorizing evidence collection"
+      ]
+    },
+    "gold": {
+      "label": "GOLD",
+      "minimums": {
+        "accuracy": 0.9,
+        "performance": 0.85,
+        "security": 0.95,
+        "contribution": 0.7
+      },
+      "benefits": [
+        "accelerated low-risk review routing",
+        "longer evidence reuse window",
+        "priority CONDUCTOR scheduling after mandatory gates"
+      ]
+    },
+    "diamond": {
+      "label": "DIAMOND",
+      "minimums": {
+        "accuracy": 0.97,
+        "performance": 0.95,
+        "security": 1,
+        "contribution": 0.9
+      },
+      "benefits": [
+        "maximum softening of non-mandatory friction",
+        "maximum evidence reuse within approved freshness",
+        "fast-lane routing for low-risk non-authorizing functions/processes/builds"
+      ]
+    }
+  },
+  "tierScopes": [
+    "functions",
+    "processes",
+    "builds"
+  ],
+  "controls": {
+    "mayRecommendMinimumPassWindows": true,
+    "mayPublishTierPackages": true,
+    "mayRemoveHardGate": false,
+    "mayLowerSecurityThreshold": false,
+    "mayOverrideBoundaries": false,
+    "mayApproveProduction": false,
+    "mayMerge": false,
+    "mayExposeSecrets": false,
+    "mayWeakenHumanAuthority": false
+  },
+  "branch": "automation/calmer",
+  "statePath": "calmer/state/latest.json",
+  "feedPath": "calmer/feeds/datanest.json"
+}

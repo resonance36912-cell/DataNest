@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "datanest-branch-protection-v1",
+  "authority": "DataNest-Supository/DataNest",
+  "tree": "BRANCH-X",
+  "purpose": "Repository-native branch governance that defines canonical branch classes, required evidence gates, review floors, destructive-operation bans and protection verification.",
+  "enforcementModel": "github-native-when-admin-protection-is-available-plus-repository-native-preflight",
+  "failClosed": true,
+  "canonicalBranches": {
+    "exact": [
+      "main"
+    ],
+    "patterns": [
+      "release/**"
+    ]
+  },
+  "protectedAutomationBranches": [
+    "automation/**",
+    "audit/**",
+    "ci/**"
+  ],
+  "branchClasses": {
+    "canonical": {
+      "patterns": [
+        "main",
+        "release/**"
+      ],
+      "pullRequestRequired": true,
+      "requiredApprovingReviews": 1,
+      "dismissStaleReviews": true,
+      "requireConversationResolution": true,
+      "requireLinearHistory": true,
+      "allowForcePushes": false,
+      "allowDeletions": false,
+      "enforceAdmins": true,
+      "requiredStatusChecks": [
+        "CI",
+        "PR Verification",
+        "Security scan",
+        "DataNest AI Certification",
+        "DataNest Boundaries",
+        "ENFORCER Defence Tree",
+        "GUARDIAN Health & Healing Tree",
+        "CALMER Governance Softening Tree",
+        "REGULATOR Harmony Tree",
+        "VISIBILITY-UTILITY Market Presence Tree",
+        "BRANCH-X Protection Tree"
+      ]
+    },
+    "protected_automation": {
+      "patterns": [
+        "automation/**",
+        "audit/**",
+        "ci/**"
+      ],
+      "pullRequestRequired": false,
+      "requiredApprovingReviews": 0,
+      "dismissStaleReviews": false,
+      "requireConversationResolution": false,
+      "requireLinearHistory": false,
+      "allowForcePushes": false,
+      "allowDeletions": false,
+      "enforceAdmins": true,
+      "requiredStatusChecks": [
+        "CI",
+        "BRANCH-X Protection Tree"
+      ]
+    },
+    "ordinary": {
+      "patterns": [
+        "**"
+      ],
+      "pullRequestRequired": false,
+      "requiredApprovingReviews": 0,
+      "dismissStaleReviews": false,
+      "requireConversationResolution": false,
+      "requireLinearHistory": false,
+      "allowForcePushes": true,
+      "allowDeletions": true,
+      "enforceAdmins": false,
+      "requiredStatusChecks": []
+    }
+  },
+  "invariants": [
+    "main is always canonical",
+    "canonical branches cannot be force-pushed",
+    "canonical branches cannot be deleted",
+    "canonical changes enter through pull requests",
+    "canonical branches require at least one approving review; automated status checks remain required",
+    "stale approvals are dismissed after new commits",
+    "unresolved review conversations block canonical adoption",
+    "canonical history remains linear",
+    "required status checks are fail-closed",
+    "automation cannot self-authorize a canonical merge",
+    "automation cannot weaken this tree",
+    "branch policy changes are surfaced as explicit assurance work with a proposed remediation deadline",
+    "protection gaps are published as explicit evidence rather than treated as compliant"
+  ],
+  "protectedPathFamilies": [
+    ".github/**",
+    "config/**",
+    "schemas/**",
+    "supabase/**",
+    "infra/**",
+    "scripts/**",
+    "src/**",
+    "tests/**",
+    "docs/governance/**"
+  ],
+  "destructiveOperations": {
+    "forbiddenOnCanonical": [
+      "force_push",
+      "delete_branch",
+      "direct_push"
+    ],
+    "exception": "none",
+    "evidenceRequiredForAnyPolicyChange": true
+  },
+  "documentation": {
+    "canonicalProtectionRequiresGithubNativeAdministration": true,
+    "repositoryNativeVerification": ".github/workflows/branch-protection-tree.yml",
+    "policySource": "config/branch-protection.tree.json",
+    "governanceDoc": "docs/governance/BRANCH_X_PROTECTION.md"
+  }
+}

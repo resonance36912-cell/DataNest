@@ -1,0 +1,13 @@
+{
+  "events": [
+    {
+      "eventName": "push",
+      "observedAt": "2026-09-30T00:00:00.000Z",
+      "payload": {
+        "repository": {"full_name": "DataNest-Supository/DataNest", "updated_at": "2026-09-30T00:00:00.000Z"},
+        "ref": "refs/heads/forge/architecture-v1",
+        "after": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    }
+  ]
+}

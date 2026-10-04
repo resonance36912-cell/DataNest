@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Resonance DataNest Transparency</title>
+  <meta name="description" content="Transparency and audit source documents for Resonance DataNest / RONSAS.">
+  <style>
+    :root{color-scheme:dark;background:#07101b;color:#d8e7f2;font-family:Arial,Helvetica,sans-serif}
+    body{margin:0;background:#07101b;color:#d8e7f2}
+    main{max-width:980px;margin:0 auto;padding:48px 24px 80px}
+    h1{font-size:2rem;margin:.25rem 0 1rem} h2{margin-top:2.2rem;font-size:1.25rem}
+    p,li,dd{line-height:1.65;color:#b8cbd9}
+    a{color:#7edbfa}
+    .eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:#7edbfa;font-weight:700}
+    .card{border:1px solid #26394b;border-radius:14px;padding:20px;margin:18px 0;background:#0b1725}
+    dl{display:grid;grid-template-columns:180px 1fr;gap:8px 14px}
+    dt{font-weight:700;color:#e5f2fa}
+    code{overflow-wrap:anywhere}
+    .status{display:inline-block;padding:4px 8px;border:1px solid #2d7656;border-radius:999px;color:#bff1d8;font-size:.75rem;font-weight:700}
+    .links{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+    .links a{display:inline-block;padding:10px 12px;border:1px solid #315268;border-radius:9px;text-decoration:none}
+    .parts{columns:2;column-gap:32px}
+    footer{margin-top:48px;padding-top:18px;border-top:1px solid #26394b;color:#8fa7b8;font-size:.85rem}
+    @media(max-width:680px){main{padding:28px 16px 60px}.parts{columns:1}dl{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Resonance DataNest / RONSAS</p>
+  <h1>Transparency and Audit Library</h1>
+  <p>
+    This public page exposes audit methodology and accessible source transcriptions separately from the operational DataNest audit log.
+    Publishing an audit brief or external return does not mean findings are validated or that production is certified. DataNest publishes source evidence, reported findings, validation state, and later remediation evidence separately.
+  </p>
+
+  <section class="card" aria-labelledby="system-charter-title">
+    <span class="status">PUBLIC SYSTEM CHARTER</span>
+    <h2 id="system-charter-title">DataNest Scope, Mission, Governance, Architecture &amp; Assurance</h2>
+    <p>
+      The public System Charter describes DataNest scope, mission, vision, value proposition, governance, specialized-tree architecture,
+      infrastructure, products/services, projection rules and standards alignment. Standards references are alignment mappings and do not claim ISO certification.
+    </p>
+    <dl>
+      <dt>Version</dt><dd>1.0 · 1 Oct 2026</dd>
+      <dt>Assurance</dt><dd>ISO/NIST/WCAG mapped · not externally certified by this publication</dd>
+      <dt>Market intelligence</dt><dd>VISIBILITY-UTILITY scenarios are evidence-labelled and do not guarantee outcomes or authorize spend.</dd>
+    </dl>
+    <div class="links">
+      <a href="../system-charter/">Open public System Charter</a>
+      <a href="system-charter/index.json">System Charter registry (JSON)</a>
+      <a href="visibility-utility/index.json">VISIBILITY-UTILITY transparency (JSON)</a>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="liberty-in-all-title">
+    <span class="status">LIBERTY-IN-ALL · CONTINUOUS TRACEABILITY</span>
+    <h2 id="liberty-in-all-title">On-demand indexing, provenance &amp; public assurance</h2>
+    <p>
+      LIBERTY-IN-ALL publishes sanitized traceability metadata from a dedicated automation branch using event-driven refresh plus a ten-minute pulse.
+      Public evidence exposes SHA-256 digests, source-commit lineage and evidence gaps, never arbitrary record contents, secrets, private authentication material or protected personal data.
+    </p>
+    <dl>
+      <dt>Operating rule</dt><dd>Maximum legitimate visibility · minimum necessary restriction</dd>
+      <dt>Live evidence</dt><dd>Runtime/on-demand sanitized automation snapshot</dd>
+      <dt>Authority</dt><dd>Indexing and assurance only · no merge, deployment or production authority</dd>
+    </dl>
+    <div class="links">
+      <a href="liberty-in-all/index.json">LIBERTY-IN-ALL descriptor (JSON)</a>
+      <a href="https://raw.githubusercontent.com/DataNest-Supository/DataNest/automation/liberty-in-all/public/transparency/liberty-in-all/latest.json">Current traceability snapshot (JSON)</a>
+      <a href="https://github.com/DataNest-Supository/DataNest/blob/main/docs/LIBERTY_IN_ALL_STANDARD.md">LIBERTY-IN-ALL standard</a>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="audit-brief-title">
+    <span class="status">PUBLISHED METHODOLOGY</span>
+    <h2 id="audit-brief-title">External Full-System Audit Brief · Version 1.0</h2>
+    <p>
+      Evidence-based audit specification covering UI, accessibility, architecture, workflows, AI, governance, outputs,
+      security, performance, reliability, CI/CD and optimization.
+    </p>
+    <dl>
+      <dt>Published</dt><dd>25 Sep 2026</dd>
+      <dt>Audit result</dt><dd>External audit return received 25 Sep 2026</dd>
+      <dt>Baseline source</dt><dd><code>ac93d51828707d398dfa9c5a471d8a6ed4c9059f</code></dd>
+      <dt>Baseline DB release</dt><dd><code>datanest-project-member-invitations-v1</code></dd>
+      <dt>Source format</dt><dd>DOCX</dd>
+      <dt>Accessible publication</dt><dd>Complete source-controlled text transcription</dd>
+    </dl>
+    <div class="links">
+      <a href="audits/index.json">Audit document registry (JSON)</a>
+      <a href="../">Open DataNest</a>
+      <a href="https://github.com/DataNest-Supository/DataNest">Source repository</a>
+    </div>
+  </section>
+
+
+
+  <section class="card" aria-labelledby="audit-return-title">
+    <span class="status">EXTERNAL AUDIT RETURN PUBLISHED</span>
+    <h2 id="audit-return-title">Read-only public + commit-pinned source review · 25 Sep 2026</h2>
+    <p>
+      The external return reports 14 findings against source baseline
+      <code>ac93d51828707d398dfa9c5a471d8a6ed4c9059f</code>. It explicitly states that authenticated UI behavior,
+      deployed database controls, production mutations and runtime output quality were not verified, so this publication is not a full production certification.
+    </p>
+    <dl>
+      <dt>Published findings</dt><dd>14</dd>
+      <dt>High / verification priority</dt><dd>9</dd>
+      <dt>Medium</dt><dd>5</dd>
+      <dt>DataNest-validated / closed</dt><dd>0</dd>
+      <dt>Validation state</dt><dd>Pending current-release reproduction and evidence review</dd>
+    </dl>
+    <div class="links">
+      <a href="audits/external-full-system-audit-return-2026-09-25/report.md">Exact uploaded audit return (Markdown)</a>
+      <a href="audits/external-full-system-audit-return-2026-09-25/findings.json">Structured findings (JSON)</a>
+      <a href="audits/external-full-system-audit-return-2026-09-25/remediation-backlog.json">Reported remediation backlog (JSON)</a>
+    </div>
+  </section>
+
+  <section aria-labelledby="transcript-heading">
+    <h2 id="transcript-heading">Complete accessible transcription</h2>
+    <p>
+      The transcription is split into static source-controlled parts for reliable GitHub Pages delivery.
+      The authenticated DataNest Transparency workspace assembles these parts into one continuous readable document and can download it as accessible text.
+    </p>
+    <ol class="parts">
+      <li><a href="audits/external-full-system-audit-brief/part-01.txt">Transcript part 1</a></li>
+      <li><a href="audits/external-full-system-audit-brief/part-02.txt">Transcript part 2</a></li>
+      <li><a href="audits/external-full-system-audit-brief/part-03.txt">Transcript part 3</a></li>
+      <li><a href="audits/external-full-system-audit-brief/part-04.txt">Transcript part 4</a></li>
+      <li><a href="audits/external-full-system-audit-brief/part-05.txt">Transcript part 5</a></li>
+      <li><a href="audits/external-full-system-audit-brief/part-06.txt">Transcript part 6</a></li>
+      <li><a href="audits/external-full-system-audit-brief/part-07.txt">Transcript part 7</a></li>
+      <li><a href="audits/external-full-system-audit-brief/part-08.txt">Transcript part 8</a></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="boundary-heading">
+    <h2 id="boundary-heading">Transparency boundary</h2>
+    <ul>
+      <li>Audit documents are informational evidence and do not grant governance, financial, ownership or role authority.</li>
+      <li>External findings will be identified with stable AUD-xxx IDs and distinguished from the audit methodology.</li>
+      <li>Remediation evidence should link findings to governed work, source changes, migrations, tests, releases and post-release verification.</li>
+      <li>Secrets, reusable credentials, protected session material and private personal data must not be published in transparency artifacts.</li>
+    </ul>
+  </section>
+
+  <footer>
+    Resonance DataNest Transparency · Source-controlled and provider-agnostic.
+  </footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,104 @@
+name: ENFORCER Defence Tree
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: "47 */3 * * *"
+      timezone: Africa/Johannesburg
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Security scan", "Knowledge Tree", "ENVIRONMENT Tree"]
+    types: [completed]
+
+permissions:
+  contents: write
+  actions: read
+  pull-requests: read
+
+concurrency:
+  group: datanest-enforcer-${{ github.ref || github.event.workflow_run.head_branch || 'scheduled' }}
+  cancel-in-progress: true
+
+jobs:
+  monitor:
+    name: Monitor Boundaries, security and continuous learning
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/automation-x-annotation
+        with:
+          automation_id: enforcer
+          automation_class: enforcement
+          automation_action: heal
+          automation_target: enforcer/state/
+          automation_effect: bounded_mutation
+          human_review_required: "true"
+
+      - name: Prepare ENFORCER evidence branch
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin automation/enforcer || true
+          git switch -C automation/enforcer
+
+      - name: Read complete approved Knowledge and ENVIRONMENT feeds
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/enforcer
+          git fetch origin automation/knowledge-feed || true
+          git fetch origin automation/environment-feed || true
+          git show origin/automation/knowledge-feed:knowledge/feeds/enforcer.json > /tmp/enforcer/knowledge.json 2>/dev/null || echo '{"items":[]}' > /tmp/enforcer/knowledge.json
+          git show origin/automation/environment-feed:environment/feeds/enforcer.json > /tmp/enforcer/environment.json 2>/dev/null || echo '{}' > /tmp/enforcer/environment.json
+
+      - name: Assess defensive posture
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ENFORCER_SECURITY_TARGET_SHA: ${{ github.event.pull_request.head.sha || github.event.workflow_run.head_sha || github.sha }}
+          ENFORCER_SECURITY_TARGET_BRANCH: ${{ github.event.pull_request.head.ref || github.event.workflow_run.head_branch || github.ref_name }}
+        run: node scripts/enforcer-monitor.mjs
+
+      - name: Publish transparent defensive evidence
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add enforcer/state/latest.json enforcer/feeds/knowledge-learning.json enforcer/transparency/latest.json
+          if ! git diff --cached --quiet; then
+            git -c user.name="DataNest ENFORCER" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Refresh ENFORCER defensive evidence"
+            if git push --force-with-lease origin HEAD:automation/enforcer; then
+              echo "ENFORCER evidence branch updated."
+            else
+              echo "::warning::Protected automation/enforcer refused the evidence publication push. The generated evidence remains available in the workflow artifact; no protection bypass is attempted."
+            fi
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: enforcer-defence-${{ github.run_id }}
+          path: |
+            enforcer/state/latest.json
+            enforcer/feeds/knowledge-learning.json
+            enforcer/transparency/latest.json
+          retention-days: 30
+
+      - name: Enforce defensive blockers
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.status != "block"' enforcer/state/latest.json >/dev/null
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "enforcer"

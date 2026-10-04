@@ -1,0 +1,69 @@
+name: ENVIRONMENT Tree
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "7 */6 * * *"
+      timezone: Africa/Johannesburg
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: datanest-environment-tree
+  cancel-in-progress: true
+
+jobs:
+  assess-and-adapt:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/automation-x-annotation
+        with:
+          automation_id: environment-tree
+          automation_class: enforcement
+          automation_action: heal
+          automation_target: environment/feeds/
+          automation_effect: bounded_mutation
+          human_review_required: "true"
+          human_review_reason: "ENVIRONMENT feed adaptation is a bounded mutation; Automation X records the requirement for human review and does not grant merge or production authority."
+
+      - name: Prepare isolated ENVIRONMENT feed branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin automation/environment-feed || true
+          git switch -C automation/environment-feed
+
+      - name: Assess compatibility and apply safe generated adaptations
+        run: node scripts/environment-assessor.mjs
+
+      - name: Publish environment state and feeds
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add environment/state/latest.json environment/feeds/
+          if git diff --cached --quiet; then
+            echo "ENVIRONMENT state unchanged."
+            exit 0
+          fi
+          git -c user.name="DataNest ENVIRONMENT" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Refresh DataNest ENVIRONMENT assessment"
+          git push --force-with-lease origin HEAD:automation/environment-feed
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: environment-assessment-${{ github.run_id }}
+          path: environment/state/latest.json
+          retention-days: 30
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "environment-tree"

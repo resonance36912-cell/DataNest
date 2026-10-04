@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "datanest-system-charter-public-v1",
+  "title": "DataNest System Charter",
+  "version": "1.0",
+  "publishedAt": "2026-10-01",
+  "publicUrl": "https://datanest-supository.github.io/DataNest/system-charter/",
+  "source": "docs/DATANEST_SYSTEM_CHARTER.md",
+  "assurance": {
+    "standardsAligned": true,
+    "isoCertified": false,
+    "accreditationClaimed": false,
+    "guaranteedBusinessOutcomes": false
+  },
+  "standards": [
+    "ISO 9001:2026",
+    "ISO/IEC 27001:2022",
+    "ISO/IEC 42001:2023",
+    "ISO 31000:2018",
+    "ISO 22301:2019 + Amd 1:2024",
+    "ISO/IEC 25010:2023",
+    "ISO 9241-210:2019",
+    "WCAG 2.2",
+    "NIST CSF 2.0",
+    "NIST AI RMF 1.0",
+    "ISO/IEC 27701:2025",
+    "ISO 37000:2021",
+    "ISO 37301:2021",
+    "CIS Controls v8.1"
+  ]
+}

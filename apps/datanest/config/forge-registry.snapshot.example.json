@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-30T00:00:00.000Z",
+  "authority": "read-only-projection",
+  "repositories": {
+    "DataNest-Supository/DataNest": {
+      "fullName": "DataNest-Supository/DataNest",
+      "defaultBranch": "main",
+      "authority": "canonical"
+    }
+  },
+  "candidates": {},
+  "evidence": {}
+}

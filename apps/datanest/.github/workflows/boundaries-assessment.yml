@@ -1,0 +1,52 @@
+name: DataNest Boundaries
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  assess:
+    name: Assess tolerance and acceptance boundaries
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch pull-request base
+        if: github.event_name == 'pull_request'
+        env:
+          BOUNDARIES_BASE_REF: ${{ github.base_ref }}
+        run: git fetch origin "$BOUNDARIES_BASE_REF"
+
+      - name: Run Boundaries assessor
+        env:
+          BOUNDARIES_EVENT_NAME: ${{ github.event_name }}
+          BOUNDARIES_BASE_REF_NAME: ${{ github.base_ref }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$BOUNDARIES_EVENT_NAME" = "pull_request" ]; then
+            export BOUNDARIES_BASE_REF="origin/$BOUNDARIES_BASE_REF_NAME"
+          else
+            export BOUNDARIES_BASE_REF="HEAD^"
+          fi
+          node scripts/boundaries-assessor.mjs
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: datanest-boundaries-${{ github.run_id }}
+          path: artifacts/boundaries/
+          retention-days: 30
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "boundaries-assessment"

@@ -1,0 +1,152 @@
+name: BOTSQUAD AI Tree
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+      timezone: Africa/Johannesburg
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Knowledge Tree", "ENVIRONMENT Tree"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: botsquad-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  specialists:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    strategy:
+      fail-fast: false
+      matrix:
+        bot:
+          - optimizer
+          - product-expansion
+          - business-growth
+          - ux-ease
+          - ui-evolution
+          - function-evolution
+          - integration-scout
+          - quality-observer
+          - environment-liaison
+          - regulator-auditor
+          - regulator-stress-tester
+          - regulator-acquisition-scout
+          - regulator-supply-coordinator
+          - regulator-action-planner
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/automation-x-annotation
+        with:
+          automation_id: botsquad/${{ matrix.bot }}
+          automation_class: analysis
+          automation_action: recommend
+          automation_target: botsquad/feeds/specialists/${{ matrix.bot }}.json
+          automation_effect: proposal
+          human_review_required: "true"
+
+      - name: Prepare specialist branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="automation/botsquad/${{ matrix.bot }}"
+          git fetch origin "$branch" || true
+          git switch -C "$branch"
+
+      - name: Read latest Knowledge and ENVIRONMENT inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/botsquad
+          git fetch origin automation/knowledge-feed || true
+          git fetch origin automation/environment-feed || true
+          git fetch origin automation/regulator || true
+          git show origin/automation/knowledge-feed:knowledge/feeds/datanest.json > /tmp/botsquad/knowledge.json 2>/dev/null || echo '{}' > /tmp/botsquad/knowledge.json
+          git show origin/automation/environment-feed:environment/feeds/botsquad.json > /tmp/botsquad/environment.json 2>/dev/null || echo '{}' > /tmp/botsquad/environment.json
+          git show origin/automation/regulator:regulator/requirements/botsquad.json > /tmp/botsquad/regulator.json 2>/dev/null || echo '{}' > /tmp/botsquad/regulator.json
+
+      - name: Run scoped AI specialist
+        env:
+          BOTSQUAD_AI_ENDPOINT: ${{ secrets.BOTSQUAD_AI_ENDPOINT }}
+          BOTSQUAD_AI_API_KEY: ${{ secrets.BOTSQUAD_AI_API_KEY }}
+          BOTSQUAD_AI_MODEL: ${{ vars.BOTSQUAD_AI_MODEL }}
+        run: node scripts/botsquad-orchestrator.mjs --bot "${{ matrix.bot }}" --knowledge /tmp/botsquad/knowledge.json --environment /tmp/botsquad/environment.json --regulator /tmp/botsquad/regulator.json --out "botsquad/feeds/specialists/${{ matrix.bot }}.json"
+
+      - name: Publish bot feed branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          file="botsquad/feeds/specialists/${{ matrix.bot }}.json"
+          git add "$file"
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name="DataNest BOTSQUAD" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Refresh BOTSQUAD ${{ matrix.bot }} feed"
+          git push --force-with-lease origin "HEAD:automation/botsquad/${{ matrix.bot }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: botsquad-${{ matrix.bot }}-${{ github.run_id }}
+          path: botsquad/feeds/specialists/${{ matrix.bot }}.json
+          retention-days: 14
+
+  orchestrator:
+    needs: specialists
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/automation-x-annotation
+        with:
+          automation_id: botsquad/orchestrator
+          automation_class: analysis
+          automation_action: recommend
+          automation_target: botsquad/feeds/datanest.json
+          automation_effect: proposal
+          human_review_required: "true"
+
+      - name: Prepare orchestrator branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin automation/botsquad/orchestrator || true
+          git switch -C automation/botsquad/orchestrator
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: botsquad-*-${{ github.run_id }}
+          path: /tmp/botsquad-artifacts
+          merge-multiple: true
+
+      - name: Consolidate UX, function, optimization and growth feeds
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p botsquad/feeds/specialists
+          find /tmp/botsquad-artifacts -type f -name "*.json" -exec cp {} botsquad/feeds/specialists/ ';'
+          node scripts/botsquad-orchestrator.mjs --consolidate --dir botsquad/feeds/specialists --target datanest --out botsquad/feeds/datanest.json
+          node scripts/botsquad-orchestrator.mjs --consolidate --dir botsquad/feeds/specialists --target mirror --out botsquad/feeds/mirror-datanest.json
+
+      - name: Publish orchestrator branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add botsquad/feeds/
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name="DataNest BOTSQUAD" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Refresh consolidated BOTSQUAD feeds"
+          git push --force-with-lease origin HEAD:automation/botsquad/orchestrator
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "botsquad"

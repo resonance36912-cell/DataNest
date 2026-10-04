@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://www.reson8.life/apps/sync-vision</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en-ZA" href="https://www.reson8.life/apps/sync-vision" />
+    <xhtml:link rel="alternate" hreflang="en-GB" href="https://www.reson8.life/apps/sync-vision" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://www.reson8.life/apps/sync-vision" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.reson8.life/apps/sync-vision" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.reson8.life/apps/sync-vision" />
+  </url>
+  <url>
+    <loc>https://www.reson8.life/apps/sync-vision/ecosystem</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en-ZA" href="https://www.reson8.life/apps/sync-vision/ecosystem" />
+    <xhtml:link rel="alternate" hreflang="en-GB" href="https://www.reson8.life/apps/sync-vision/ecosystem" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://www.reson8.life/apps/sync-vision/ecosystem" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.reson8.life/apps/sync-vision/ecosystem" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.reson8.life/apps/sync-vision/ecosystem" />
+  </url>
+  <url>
+    <loc>https://www.reson8.life/apps/sync-vision/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en-ZA" href="https://www.reson8.life/apps/sync-vision/about" />
+    <xhtml:link rel="alternate" hreflang="en-GB" href="https://www.reson8.life/apps/sync-vision/about" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://www.reson8.life/apps/sync-vision/about" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.reson8.life/apps/sync-vision/about" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.reson8.life/apps/sync-vision/about" />
+  </url>
+  <url>
+    <loc>https://www.reson8.life/apps/sync-vision/login</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="en-ZA" href="https://www.reson8.life/apps/sync-vision/login" />
+    <xhtml:link rel="alternate" hreflang="en-GB" href="https://www.reson8.life/apps/sync-vision/login" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://www.reson8.life/apps/sync-vision/login" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.reson8.life/apps/sync-vision/login" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.reson8.life/apps/sync-vision/login" />
+  </url>
+  <url>
+    <loc>https://www.reson8.life/apps/sync-vision/credits</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en-ZA" href="https://www.reson8.life/apps/sync-vision/credits" />
+    <xhtml:link rel="alternate" hreflang="en-GB" href="https://www.reson8.life/apps/sync-vision/credits" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://www.reson8.life/apps/sync-vision/credits" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.reson8.life/apps/sync-vision/credits" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.reson8.life/apps/sync-vision/credits" />
+  </url>
+  <url>
+    <loc>https://www.reson8.life/apps/sync-vision/unsubscribe</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en-ZA" href="https://www.reson8.life/apps/sync-vision/unsubscribe" />
+    <xhtml:link rel="alternate" hreflang="en-GB" href="https://www.reson8.life/apps/sync-vision/unsubscribe" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://www.reson8.life/apps/sync-vision/unsubscribe" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.reson8.life/apps/sync-vision/unsubscribe" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.reson8.life/apps/sync-vision/unsubscribe" />
+  </url>
+</urlset>

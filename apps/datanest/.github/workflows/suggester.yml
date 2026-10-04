@@ -1,0 +1,105 @@
+name: SUGGESTER Optimization Tree
+
+on:
+  schedule:
+    - cron: "2,17,32,47 * * * *"
+      timezone: Africa/Johannesburg
+  workflow_dispatch:
+    inputs:
+      conductor_run_id:
+        description: Optional CONDUCTOR run that triggered this optimization cycle
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: datanest-suggester
+  cancel-in-progress: true
+
+jobs:
+  suggest:
+    if: github.ref == 'refs/heads/main'
+    name: Generate continuous optimization suggestions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: ./.github/actions/automation-x-annotation
+        with:
+          automation_id: suggester
+          automation_class: analysis
+          automation_action: recommend
+          automation_target: suggester/feeds/datanest.json
+          automation_effect: proposal
+          human_review_required: "true"
+
+      - name: Read latest tree health, learning and coordination state
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/suggester
+          for branch in automation/guardian automation/knowledge-feed automation/environment-feed automation/enforcer automation/botsquad/orchestrator automation/conductor automation/calmer automation/regulator automation/visibility-utility automation/suggester; do
+            git fetch origin "$branch" || true
+          done
+          git show origin/automation/guardian:guardian/snapshots/latest.json > /tmp/suggester/guardian.json 2>/dev/null || echo '{}' > /tmp/suggester/guardian.json
+          git show origin/automation/knowledge-feed:knowledge/feeds/datanest.json > /tmp/suggester/knowledge.json 2>/dev/null || echo '{}' > /tmp/suggester/knowledge.json
+          git show origin/automation/environment-feed:environment/feeds/datanest.json > /tmp/suggester/environment.json 2>/dev/null || echo '{}' > /tmp/suggester/environment.json
+          git show origin/automation/enforcer:enforcer/state/latest.json > /tmp/suggester/enforcer.json 2>/dev/null || echo '{}' > /tmp/suggester/enforcer.json
+          git show origin/automation/botsquad/orchestrator:botsquad/feeds/datanest.json > /tmp/suggester/botsquad.json 2>/dev/null || echo '{}' > /tmp/suggester/botsquad.json
+          git show origin/automation/conductor:conductor/state/latest.json > /tmp/suggester/conductor.json 2>/dev/null || echo '{}' > /tmp/suggester/conductor.json
+          git show origin/automation/calmer:calmer/feeds/datanest.json > /tmp/suggester/calmer.json 2>/dev/null || echo '{}' > /tmp/suggester/calmer.json
+          git show origin/automation/regulator:regulator/state/latest.json > /tmp/suggester/regulator.json 2>/dev/null || echo '{}' > /tmp/suggester/regulator.json
+          git show origin/automation/visibility-utility:visibility-utility/feeds/datanest.json > /tmp/suggester/visibility.json 2>/dev/null || echo '{}' > /tmp/suggester/visibility.json
+          git show origin/automation/suggester:suggester/feeds/datanest.json > /tmp/suggester/previous.json 2>/dev/null || echo '{}' > /tmp/suggester/previous.json
+          git switch -C automation/suggester
+
+      - name: Generate optimization feed and automation queue
+        env:
+          SUGGESTER_CONDUCTOR_RUN_ID: ${{ inputs.conductor_run_id }}
+          SUGGESTER_GUARDIAN_PATH: /tmp/suggester/guardian.json
+          SUGGESTER_KNOWLEDGE_PATH: /tmp/suggester/knowledge.json
+          SUGGESTER_ENVIRONMENT_PATH: /tmp/suggester/environment.json
+          SUGGESTER_ENFORCER_PATH: /tmp/suggester/enforcer.json
+          SUGGESTER_BOTSQUAD_PATH: /tmp/suggester/botsquad.json
+          SUGGESTER_CONDUCTOR_PATH: /tmp/suggester/conductor.json
+          SUGGESTER_CALMER_PATH: /tmp/suggester/calmer.json
+          SUGGESTER_REGULATOR_PATH: /tmp/suggester/regulator.json
+          SUGGESTER_VISIBILITY_PATH: /tmp/suggester/visibility.json
+          SUGGESTER_PREVIOUS_PATH: /tmp/suggester/previous.json
+        run: node scripts/suggester-engine.mjs
+
+      - name: Publish SUGGESTER feed
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add suggester/feeds/datanest.json
+          if git diff --cached --quiet; then
+            echo "SUGGESTER feed unchanged."
+            exit 0
+          fi
+          git -c user.name="DataNest SUGGESTER" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "Refresh SUGGESTER optimization feed"
+          if git push --force-with-lease origin HEAD:automation/suggester; then
+            echo "SUGGESTER feed branch updated."
+          else
+            echo "::warning::Protected automation/suggester refused the feed publication push. The generated feed remains available in the workflow artifact; no protection bypass is attempted."
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: suggester-feed-${{ github.run_id }}
+          path: suggester/feeds/datanest.json
+          retention-days: 30
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "suggester"

@@ -1,0 +1,256 @@
+openapi: 3.1.0
+info:
+  title: Resonance AiPI
+  version: 0.1.0
+  description: Governed AI API boundary for Resonance DataNest.
+servers:
+  - url: https://{host}/api/aipi/v1
+    variables:
+      host:
+        default: datanest.example.com
+paths:
+  /health:
+    get:
+      operationId: getAipiHealth
+      summary: Read AiPI service health
+      responses:
+        '200':
+          description: Service is available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /models:
+    get:
+      operationId: listAipiModels
+      summary: List models allowed by AiPI policy for a project
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectHeader'
+      responses:
+        '200':
+          description: Allowed model registry.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /ai/chat:
+    post:
+      operationId: createAipiChatCompletion
+      summary: Execute a governed project-scoped chat completion
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: Governed completion.
+          headers:
+            X-AiPI-Request-Id:
+              schema:
+                type: string
+                format: uuid
+              description: Correlation ID for governance evidence.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Model or policy denied the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request exceeds the AiPI size limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '502':
+          description: Upstream provider failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: AiPI model/provider configuration is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: AiPI-Key
+  parameters:
+    ProjectHeader:
+      in: header
+      name: x-resonance-project
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
+      description: Resonance project governance boundary bound to the presented AiPI key.
+  responses:
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Missing, invalid, or wrong-project AiPI bearer token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    HealthResponse:
+      type: object
+      required: [ok, service, version, policy_version, deployment]
+      properties:
+        ok:
+          type: boolean
+          const: true
+        service:
+          type: string
+          const: Resonance AiPI
+        version:
+          type: string
+        policy_version:
+          type: string
+        deployment:
+          type: string
+    Model:
+      type: object
+      required: [id, object, enabled]
+      properties:
+        id:
+          type: string
+        object:
+          type: string
+          const: aipi.model
+        enabled:
+          type: boolean
+    ModelList:
+      type: object
+      required: [object, policy_version, project, data]
+      properties:
+        object:
+          type: string
+          const: list
+        policy_version:
+          type: string
+        project:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Model'
+    ChatMessage:
+      type: object
+      additionalProperties: false
+      required: [role, content]
+      properties:
+        role:
+          type: string
+          enum: [system, user, assistant]
+        content:
+          type: string
+          minLength: 1
+          maxLength: 32000
+    ChatRequest:
+      type: object
+      additionalProperties: false
+      required: [messages]
+      properties:
+        model:
+          type: string
+          description: Must be present in the server-side AiPI model allowlist.
+        messages:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+        temperature:
+          type: number
+          minimum: 0
+          maximum: 2
+        max_output_tokens:
+          type: integer
+          minimum: 1
+          maximum: 16384
+    ChatResponse:
+      type: object
+      required: [id, object, status, model, output, usage, governance]
+      properties:
+        id:
+          type: string
+          format: uuid
+        object:
+          type: string
+          const: aipi.chat.completion
+        status:
+          type: string
+          const: completed
+        model:
+          type: string
+        output:
+          type: object
+          required: [role, content]
+          properties:
+            role:
+              type: string
+              const: assistant
+            content:
+              type: string
+        usage:
+          type: object
+          required: [input_tokens, output_tokens]
+          properties:
+            input_tokens:
+              type: number
+            output_tokens:
+              type: number
+        governance:
+          type: object
+          required: [policy, approved, project]
+          properties:
+            policy:
+              type: string
+            approved:
+              type: boolean
+            project:
+              type: string
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string

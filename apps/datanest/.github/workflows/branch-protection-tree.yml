@@ -1,0 +1,111 @@
+name: BRANCH-X Protection Tree
+
+on:
+  pull_request:
+    branches:
+      - main
+      - "release/**"
+      - "audit/**"
+  push:
+    branches:
+      - main
+      - "release/**"
+      - "automation/**"
+      - "audit/**"
+      - "ci/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: branch-protection-tree-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: BRANCH-X Protection Tree
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Verify branch policy
+        run: node scripts/branch-protection-tree.mjs
+      - name: Verify native ruleset import contract
+        run: node scripts/branch-protection-ruleset-contract.mjs
+
+      - name: Verify native ruleset contract unit test
+        run: node --test tests/unit/branch-protection-ruleset-contract.test.mjs
+
+      - name: Verify native protection evidence contract
+        run: node --test tests/unit/native-protection-evidence.test.mjs
+
+      - name: Verify ownership registry integrity
+        run: node --test tests/unit/ownership-registry.test.mjs
+
+      - name: Verify canonical write watchdog contract
+        run: node --test tests/unit/canonical-write-watchdog.test.mjs
+
+      - name: Verify canonical push semantics
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          set -euo pipefail
+          parent="$(git rev-list --parents -n 1 "$GITHUB_SHA")"
+          count="$(printf '%s\n' "$parent" | awk '{print NF-1}')"
+          message="$(git log -1 --format=%s "$GITHUB_SHA")"
+          if [ "$count" -eq 0 ]; then
+            echo "::error::BRANCH-X detected an initial/rewritten main history state."
+            exit 1
+          fi
+          if [ "$count" -eq 1 ] && [[ "$message" != Merge* ]] && [[ "$message" != Add* ]] && [[ "$message" != "Revert "* ]]; then
+            echo "::notice::Main push is not a merge commit; GitHub-native protection remains authoritative for direct-push prevention."
+          fi
+
+      - name: Verify required workflow definitions exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            ".github/workflows/ci.yml"
+            ".github/workflows/pr-verification.yml"
+            ".github/workflows/security-scan.yml"
+            ".github/workflows/datanest-ai-certification.yml"
+            ".github/workflows/boundaries-assessment.yml"
+            ".github/workflows/enforcer.yml"
+            ".github/workflows/guardian.yml"
+            ".github/workflows/calmer.yml"
+            ".github/workflows/regulator.yml"
+            ".github/workflows/visibility-utility.yml"
+          )
+          for file in "${required[@]}"; do
+            test -f "$file" || {
+              echo "::error::Missing required gate workflow: $file"
+              exit 1
+            }
+          done
+
+      - name: Publish BRANCH-X evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p branch-protection/state
+          node scripts/branch-protection-tree.mjs > branch-protection/state/latest.json
+          cat branch-protection/state/latest.json
+
+      - uses: actions/upload-artifact@v4.6.2
+        if: always()
+        with:
+          name: branch-protection-${{ github.run_id }}
+          path: branch-protection/state/latest.json
+          retention-days: 90
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "branch-protection-tree"

@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "datanest-visibility-utility-v1",
+  "authority": "DataNest-Supository/DataNest",
+  "mode": "continuous-visibility-market-intelligence-and-route-to-market",
+  "productionAuthorization": false,
+  "purpose": "Continuously improve DataNest discoverability, SEO, brand/platform presence and acquisition readiness; monitor configured global/local market signals; and model evidence-labelled routes to market for consideration and governed implementation.",
+  "branch": "automation/visibility-utility",
+  "statePath": "visibility-utility/state/latest.json",
+  "feedPath": "visibility-utility/feeds/datanest.json",
+  "routeToMarketPath": "visibility-utility/projections/route-to-market.json",
+  "transparencyPath": "public/transparency/visibility-utility/latest.json",
+  "canonicalPublicUrl": "https://datanest-supository.github.io/DataNest/",
+  "discoveryArtifacts": [
+    "src/app/layout.tsx",
+    "public/robots.txt",
+    "public/sitemap.xml",
+    "public/site.webmanifest",
+    "public/.well-known/reson8-app.json",
+    "src/app/transparency/page.tsx",
+    "src/app/system-charter/page.tsx",
+    "docs/DATANEST_SYSTEM_CHARTER.md",
+    "docs/LIBERTY_IN_ALL_STANDARD.md",
+    "public/transparency/liberty-in-all/index.json"
+  ],
+  "monitorDomains": [
+    "technical-seo",
+    "search-discoverability",
+    "public-evidence",
+    "brand-consistency",
+    "platform-application-coverage",
+    "user-acquisition",
+    "stakeholder-acquisition",
+    "resource-and-service-discovery",
+    "sales-readiness",
+    "global-trends",
+    "local-trends",
+    "route-to-market",
+    "traceability-discoverability"
+  ],
+  "trendInputs": {
+    "global": {
+      "path": "/tmp/visibility-utility/global-trends.json",
+      "required": false
+    },
+    "local": {
+      "path": "/tmp/visibility-utility/local-trends.json",
+      "required": false
+    },
+    "analytics": {
+      "path": "/tmp/visibility-utility/analytics.json",
+      "required": false
+    },
+    "commercial": {
+      "path": "/tmp/visibility-utility/commercial.json",
+      "required": false
+    }
+  },
+  "routeToMarketChannels": [
+    {
+      "id": "owned-search-content",
+      "label": "Owned search + public evidence",
+      "baseOpportunity": 78,
+      "costClass": "low",
+      "speed": "medium",
+      "requiresSpendApproval": false
+    },
+    {
+      "id": "ecosystem-cross-promotion",
+      "label": "Reson8/RONSAS ecosystem cross-promotion",
+      "baseOpportunity": 82,
+      "costClass": "low",
+      "speed": "fast",
+      "requiresSpendApproval": false
+    },
+    {
+      "id": "product-led-public-proof",
+      "label": "Product-led public proof + demos",
+      "baseOpportunity": 80,
+      "costClass": "low-medium",
+      "speed": "medium",
+      "requiresSpendApproval": false
+    },
+    {
+      "id": "partnership-referral",
+      "label": "Partnership + referral channels",
+      "baseOpportunity": 72,
+      "costClass": "medium",
+      "speed": "medium",
+      "requiresSpendApproval": false
+    },
+    {
+      "id": "community-education",
+      "label": "Community + educational content",
+      "baseOpportunity": 70,
+      "costClass": "low-medium",
+      "speed": "medium",
+      "requiresSpendApproval": false
+    },
+    {
+      "id": "marketplace-integration",
+      "label": "Marketplace/integration distribution",
+      "baseOpportunity": 68,
+      "costClass": "medium",
+      "speed": "medium",
+      "requiresSpendApproval": false
+    },
+    {
+      "id": "human-led-outbound",
+      "label": "Human-led stakeholder/service outreach",
+      "baseOpportunity": 65,
+      "costClass": "medium",
+      "speed": "fast",
+      "requiresSpendApproval": false
+    },
+    {
+      "id": "paid-acquisition",
+      "label": "Paid search/social acquisition",
+      "baseOpportunity": 60,
+      "costClass": "variable",
+      "speed": "fast",
+      "requiresSpendApproval": true
+    }
+  ],
+  "projectionPolicy": {
+    "requireHistoricalBaselineForRevenueProjection": true,
+    "noBaselineProjection": "relative-index-only",
+    "confidenceByInputCoverage": {
+      "high": 0.8,
+      "medium": 0.5,
+      "low": 0
+    },
+    "scenarioRanges": {
+      "low": [
+        0.85,
+        1.05
+      ],
+      "medium": [
+        0.95,
+        1.2
+      ],
+      "high": [
+        1.05,
+        1.35
+      ]
+    }
+  },
+  "controls": {
+    "mayGenerateSeoEvidence": true,
+    "mayGenerateRouteToMarketScenarios": true,
+    "mayRecommendBrandPlatformChanges": true,
+    "mayPublishSanitizedTransparency": true,
+    "mayAutoNormalizeGeneratedMetadata": true,
+    "mayPurchaseAdvertising": false,
+    "mayCommitMarketingSpend": false,
+    "mayChangePricing": false,
+    "mayMakeBindingSalesCommitments": false,
+    "mayPublishUnverifiedClaims": false,
+    "mayChangeProductionAuthority": false,
+    "mayMerge": false,
+    "mayDeployProduction": false,
+    "humanReviewRequiredFor": [
+      "campaign-launch",
+      "paid-spend",
+      "pricing",
+      "sales-commitment",
+      "brand-claim",
+      "public-copy",
+      "user-facing-function-change",
+      "new-provider-or-platform"
+    ]
+  }
+}

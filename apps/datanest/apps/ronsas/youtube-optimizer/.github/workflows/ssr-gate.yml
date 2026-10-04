@@ -1,0 +1,534 @@
+name: SSR crawler gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    # Escalation knobs — tune a run without touching code. Precedence:
+    # dispatch input > repo/org variable > default below.
+    inputs:
+      fail_streak_threshold:
+        description: "Consecutive failed runs before a triage issue is opened (min 2)"
+        required: false
+        type: string
+      issue_labels:
+        description: "Comma-separated labels applied to the triage issue"
+        required: false
+        type: string
+      issue_assignees:
+        description: "Comma-separated GitHub usernames to assign to the triage issue"
+        required: false
+        type: string
+      escalation_enabled:
+        description: "Open/update triage issues on repeated failures"
+        required: false
+        default: true
+        type: boolean
+      backoff_minutes:
+        description: "Base retry window in minutes before the triage issue is updated again"
+        required: false
+        type: string
+      history_limit:
+        description: "How many past runs to fetch/keep as retry history (1-100, default 25)"
+        required: false
+        type: string
+      history_store:
+        description: "How many runs the stored history ledger keeps (0 = same as history_limit, max 500)"
+        required: false
+        type: string
+      history_filter:
+        description: "Which outcomes the Metrics history lists: all | failures | successes"
+        required: false
+        type: string
+      history_rows:
+        description: "How many runs the Metrics streak history shows (0 hides it, default 10)"
+        required: false
+        type: string
+      history_days:
+        description: "Age-based retention: drop history older than N days (0 = no age limit)"
+        required: false
+        type: string
+      escalation_dry_run:
+        description: "Simulate issue creation/updates (no GitHub changes) but still notify Slack/Teams"
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: ssr-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+# Artifact retention (expire-days). Long enough to debug a red run after the
+# fact, short enough that storage is reclaimed automatically. Bump per lane
+# rather than globally so heavy video/trace payloads expire first.
+env:
+  # One-stop bundle — the thing people actually download weeks later.
+  RETENTION_BUNDLE: 30
+  # Report + traces/screenshots: primary triage surfaces, kept two weeks.
+  RETENTION_REPORT: 14
+  RETENTION_RESULTS: 14
+  # Small text logs — cheap to keep for a full month.
+  RETENTION_LOGS: 30
+  # Screen recordings are the largest payload; one week is enough.
+  RETENTION_VIDEOS: 7
+  # Lighthouse diffs are tiny and tracked over time.
+  RETENTION_LIGHTHOUSE: 90
+  # Optional off-platform archive of diagnostics.zip (S3/GCS) for post-mortems
+  # that outlive the Actions window. Enforced by a bucket lifecycle rule on the
+  # `ttl-<n>d/` key prefix, not by GitHub. Skipped when no storage connection.
+  ARCHIVE_TTL_DAYS: 180
+
+  # --- Repeated-failure escalation (resolved once, used by every job) ---------
+  # Override per run via workflow_dispatch inputs, or repo/org Actions variables
+  # FAIL_STREAK_THRESHOLD / CI_ISSUE_LABELS / CI_ISSUE_ASSIGNEES / CI_ESCALATION_ENABLED.
+  FAIL_STREAK_THRESHOLD: ${{ inputs.fail_streak_threshold || vars.FAIL_STREAK_THRESHOLD || '3' }}
+  ISSUE_LABELS: ${{ inputs.issue_labels || vars.CI_ISSUE_LABELS || 'ci-failure' }}
+  ISSUE_ASSIGNEES: ${{ inputs.issue_assignees || vars.CI_ISSUE_ASSIGNEES || '' }}
+  ESCALATION_ENABLED: ${{ inputs.escalation_enabled == false && 'false' || vars.CI_ESCALATION_ENABLED || 'true' }}
+  # Backoff/jitter: hold off updating the triage issue until base × factor^(n-1)
+  # minutes (capped, ±jitter) have passed since the last update. Per-branch
+  # overrides live in .github/escalation-rules.json.
+  BACKOFF_MINUTES: ${{ inputs.backoff_minutes || vars.CI_BACKOFF_MINUTES || '10' }}
+  BACKOFF_FACTOR: ${{ vars.CI_BACKOFF_FACTOR || '2' }}
+  BACKOFF_MAX_MINUTES: ${{ vars.CI_BACKOFF_MAX_MINUTES || '240' }}
+  BACKOFF_JITTER_PCT: ${{ vars.CI_BACKOFF_JITTER_PCT || '20' }}
+  # Historical retry data: how many past runs we fetch/keep, and how many of them
+  # the triage Metrics streak history renders (HISTORY_ROWS=0 hides the history).
+  HISTORY_LIMIT: ${{ inputs.history_limit || vars.CI_HISTORY_LIMIT || '25' }}
+  HISTORY_STORE: ${{ inputs.history_store || vars.CI_HISTORY_STORE || '0' }}
+  HISTORY_FILTER: ${{ inputs.history_filter || vars.CI_HISTORY_FILTER || 'all' }}
+  HISTORY_ROWS: ${{ inputs.history_rows || vars.CI_HISTORY_ROWS || '10' }}
+  HISTORY_DAYS: ${{ inputs.history_days || vars.CI_HISTORY_DAYS || '0' }}
+  # Dry run: log the planned issue create/update/assign calls and still post the
+  # chat notification (marked [DRY RUN]) without touching GitHub.
+  DRY_RUN: ${{ inputs.escalation_dry_run == true && 'true' || vars.CI_ESCALATION_DRY_RUN || 'false' }}
+  # Assign the CODEOWNERS of the failing specs (or the PR's changed files) to the
+  # triage issue. Set repo variable CI_CODEOWNERS_ASSIGN=false to opt out.
+  CODEOWNERS_ASSIGN: ${{ vars.CI_CODEOWNERS_ASSIGN || 'true' }}
+  CODEOWNERS_EXCLUDE: ${{ vars.CI_CODEOWNERS_EXCLUDE || '' }}
+
+
+jobs:
+  ssr-gate:
+    name: Production build · SSR serve + meta/redirect assertions
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    env:
+      CI: "true"
+      # Public (publishable) values — required by scripts/check-env.mjs at build time.
+      VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate config keys
+        run: bun run check:config
+
+      # Prints the resolved expire-days for every diagnostic artifact lane and
+      # fails if an upload step drifts from the retention policy.
+      - name: Artifact retention policy (resolved expire-days)
+        run: bun run check:retention
+
+      - name: Validate escalation config
+        run: bun run check:escalation
+
+      - name: Typecheck (fail fast on config/type errors)
+        run: bun run typecheck
+
+      # Vitest unit specs (src/**/*.{test,spec}.{ts,tsx}) — any failure fails the build.
+      - name: Unit tests (Vitest)
+        run: bun run test:unit
+
+      # Playwright e2e specs (tests/e2e/ssr-*.spec.ts) run against the production
+      # SSR production server started by scripts/ci-ssr-gate.mjs. HTTP-only, so no browser
+      # download is needed. A failing assertion fails the build.
+      - name: E2E specs (Playwright · SSR production build)
+        run: bun run test:e2e
+
+      # HTML report for the e2e run (kept on failure so regressions are inspectable).
+      - name: Upload Playwright HTML report on failure
+        id: artifact-playwright-report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          if-no-files-found: ignore
+          retention-days: ${{ env.RETENTION_REPORT }}
+
+      # Console output of both test steps: Vitest run log plus the SSR gate log,
+      # production build log, Nitro server stdout/stderr and the Playwright
+      # runner output. Uploaded whenever a test step fails.
+      - name: Upload test run logs on failure
+        id: artifact-test-logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: test-results/logs/
+          if-no-files-found: ignore
+          retention-days: ${{ env.RETENTION_LOGS }}
+
+      # Screen recordings of failed e2e specs (retain-on-failure), uploaded on
+      # their own so they can be downloaded without the full results bundle.
+      - name: Upload Playwright videos on failure
+        id: artifact-playwright-videos
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-videos
+          path: |
+            test-results/playwright/**/*.webm
+            playwright-report/data/**/*.webm
+          if-no-files-found: ignore
+          retention-days: ${{ env.RETENTION_VIDEOS }}
+
+      # Traces, screenshots, videos and attachments produced by failed e2e specs,
+      # plus the Vitest junit/json reports from the unit-test step.
+      - name: Upload test artifacts (traces, screenshots, videos, Vitest reports) on failure
+        id: artifact-test-results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            test-results/
+            playwright-report/data/
+          if-no-files-found: ignore
+          retention-days: ${{ env.RETENTION_RESULTS }}
+
+      # One-stop bundle: report + traces/screenshots/videos + run logs in a
+      # single archive so triage needs one download instead of four.
+      - name: Bundle all diagnostics into diagnostics.zip
+        if: failure()
+        run: |
+          mkdir -p diagnostics-bundle
+          for src in playwright-report test-results; do
+            [ -e "$src" ] && cp -R "$src" diagnostics-bundle/ || true
+          done
+          # Commit SHA, Playwright/browser/device info, toolchain and non-secret
+          # env (secrets recorded as set/unset only) -> README.txt + environment.json
+          node scripts/diagnostics-manifest.mjs diagnostics-bundle
+          (cd diagnostics-bundle && zip -qr ../diagnostics.zip .)
+          ls -lh diagnostics.zip
+
+      - name: Upload diagnostics bundle on failure
+        id: artifact-diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostics
+          path: diagnostics.zip
+          if-no-files-found: ignore
+          retention-days: ${{ env.RETENTION_BUNDLE }}
+
+      # Optional long-term copy to object storage with its own TTL. Skips
+      # silently when no storage connection is linked; Actions artifacts keep
+      # their tiered retention either way.
+      - name: Archive diagnostics.zip to object storage (optional)
+        id: archive-diagnostics
+        if: failure()
+        env:
+          LOVABLE_API_KEY: ${{ secrets.LOVABLE_API_KEY }}
+          AWS_S3_API_KEY: ${{ secrets.AWS_S3_API_KEY }}
+          GOOGLE_CLOUD_STORAGE_API_KEY: ${{ secrets.GOOGLE_CLOUD_STORAGE_API_KEY }}
+          ARCHIVE_PROVIDER: ${{ vars.ARCHIVE_PROVIDER || 'aws_s3' }}
+          ARCHIVE_TTL_DAYS: ${{ vars.ARCHIVE_TTL_DAYS || env.ARCHIVE_TTL_DAYS }}
+          ARCHIVE_PREFIX: ${{ vars.ARCHIVE_PREFIX || 'ci-diagnostics' }}
+          DIAGNOSTICS_ARCHIVE: ${{ vars.DIAGNOSTICS_ARCHIVE || 'auto' }}
+        run: node scripts/archive-diagnostics.mjs diagnostics.zip
+
+      # After the uploads: confirm each artifact type actually landed and reports
+      # the expected expire-days (artifact-url outputs prove the upload ran).
+      - name: Confirm uploaded artifact retention
+        if: always()
+        env:
+          UPLOADED_PLAYWRIGHT_REPORT: ${{ steps.artifact-playwright-report.outputs.artifact-url }}
+          UPLOADED_TEST_RESULTS: ${{ steps.artifact-test-results.outputs.artifact-url }}
+          UPLOADED_TEST_LOGS: ${{ steps.artifact-test-logs.outputs.artifact-url }}
+          UPLOADED_PLAYWRIGHT_VIDEOS: ${{ steps.artifact-playwright-videos.outputs.artifact-url }}
+          UPLOADED_DIAGNOSTICS: ${{ steps.artifact-diagnostics.outputs.artifact-url }}
+          VERIFY_LANES: playwright-report,test-results,test-logs,playwright-videos,diagnostics
+        run: node scripts/check-artifact-retention.mjs --verify-uploads
+
+      # Failure triage: one job summary block with direct download links to each
+      # artifact uploaded above (upload-artifact@v4 exposes `artifact-url`), so a
+      # red run does not require digging through the Artifacts section.
+      - name: Failure artifact summary
+        if: failure()
+        env:
+          REPORT_URL: ${{ steps.artifact-playwright-report.outputs.artifact-url }}
+          LOGS_URL: ${{ steps.artifact-test-logs.outputs.artifact-url }}
+          VIDEOS_URL: ${{ steps.artifact-playwright-videos.outputs.artifact-url }}
+          RESULTS_URL: ${{ steps.artifact-test-results.outputs.artifact-url }}
+          BUNDLE_URL: ${{ steps.artifact-diagnostics.outputs.artifact-url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          {
+            echo "## ❌ Test run failed — diagnostics"
+            echo
+            echo "| Artifact | Contents | Download |"
+            echo "| --- | --- | --- |"
+            row() { # name | contents | url
+              if [ -n "$3" ]; then echo "| \`$1\` | $2 | [download]($3) |";
+              else echo "| \`$1\` | $2 | _not produced_ |"; fi
+            }
+            row "diagnostics" "**Everything below in one \`diagnostics.zip\`**" "$BUNDLE_URL"
+            row "playwright-report" "Playwright HTML report (\`playwright-report/index.html\`)" "$REPORT_URL"
+            row "test-results" "Traces, screenshots, Vitest junit/json reports" "$RESULTS_URL"
+            row "playwright-videos" "Screen recordings (\`*.webm\`) of failed specs" "$VIDEOS_URL"
+            row "test-logs" "Console output: vitest.log, ssr-gate.log, build.log, ssr-server.log, playwright.log" "$LOGS_URL"
+
+            echo
+            echo "All artifacts: [$RUN_URL#artifacts]($RUN_URL#artifacts) · retained 7 days."
+            echo
+            echo "<details><summary>Inspect a Playwright trace locally</summary>"
+            echo
+            echo '```sh'
+            echo "unzip test-results.zip -d test-results && bunx playwright show-trace test-results/playwright/**/trace.zip"
+            echo '```'
+            echo
+            echo "</details>"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Slack alert on red runs. Requires the repo/org secret SLACK_WEBHOOK_URL
+      # (an Incoming Webhook URL). Skipped silently when the secret is absent.
+      - name: Notify Slack on failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          BUNDLE_URL: ${{ steps.artifact-diagnostics.outputs.artifact-url }}
+          REPORT_URL: ${{ steps.artifact-playwright-report.outputs.artifact-url }}
+
+          LOGS_URL: ${{ steps.artifact-test-logs.outputs.artifact-url }}
+          VIDEOS_URL: ${{ steps.artifact-playwright-videos.outputs.artifact-url }}
+          RESULTS_URL: ${{ steps.artifact-test-results.outputs.artifact-url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          JOB_NAME: SSR crawler gate
+        run: bun run scripts/notify-slack-failure.mjs
+
+      # Sticky PR comment mirroring the failure diagnostics table, so the links
+      # are visible on the pull request itself and not only in the job summary.
+      - name: Comment test failure diagnostics on PR
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          REPORT_URL: ${{ steps.artifact-playwright-report.outputs.artifact-url }}
+          LOGS_URL: ${{ steps.artifact-test-logs.outputs.artifact-url }}
+          VIDEOS_URL: ${{ steps.artifact-playwright-videos.outputs.artifact-url }}
+          RESULTS_URL: ${{ steps.artifact-test-results.outputs.artifact-url }}
+          BUNDLE_URL: ${{ steps.artifact-diagnostics.outputs.artifact-url }}
+        with:
+          script: |
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const rows = [
+              ['diagnostics', '**Everything below in one `diagnostics.zip`**', process.env.BUNDLE_URL],
+              ['playwright-report', 'Playwright HTML report (`index.html`)', process.env.REPORT_URL],
+
+              ['test-results', 'Traces, screenshots, Vitest junit/json reports', process.env.RESULTS_URL],
+              ['playwright-videos', 'Screen recordings (`*.webm`) of failed specs', process.env.VIDEOS_URL],
+              ['test-logs', 'vitest.log, ssr-gate.log, build.log, ssr-server.log, playwright.log', process.env.LOGS_URL],
+            ];
+            const marker = '<!-- ssr-gate-failure-diagnostics -->';
+            const body = [
+              marker,
+              '## ❌ SSR crawler gate failed — diagnostics',
+              '',
+              '| Artifact | Contents | Download |',
+              '| --- | --- | --- |',
+              ...rows.map(([name, contents, url]) =>
+                `| \`${name}\` | ${contents} | ${url ? `[download](${url})` : '_not produced_'} |`),
+              '',
+              `Workflow run: [#${context.runId}](${runUrl}) · artifacts retained 7 days.`,
+              '',
+              '<details><summary>Inspect a Playwright trace locally</summary>',
+              '',
+              '```sh',
+              'unzip test-results.zip -d test-results && bunx playwright show-trace test-results/playwright/**/trace.zip',
+              '```',
+              '',
+              '</details>',
+            ].join('\n');
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number, per_page: 100,
+            });
+            const existing = comments.find(
+              (c) => c.user?.type === 'Bot' && c.body?.includes(marker),
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
+
+      # Repeated red runs on the same PR branch escalate from a comment to a
+      # tracked issue, carrying the diagnostics.zip + Playwright report links.
+      - name: Open triage issue on repeated failures
+        if: failure() && github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          # Resolved at workflow level (dispatch input > repo variable > default).
+          FAIL_STREAK_THRESHOLD: ${{ env.FAIL_STREAK_THRESHOLD }}
+          ISSUE_LABELS: ${{ env.ISSUE_LABELS }}
+          ISSUE_ASSIGNEES: ${{ env.ISSUE_ASSIGNEES }}
+          ESCALATION_ENABLED: ${{ env.ESCALATION_ENABLED }}
+          CODEOWNERS_ASSIGN: ${{ env.CODEOWNERS_ASSIGN }}
+          CODEOWNERS_EXCLUDE: ${{ env.CODEOWNERS_EXCLUDE }}
+          JOB_NAME: SSR crawler gate
+          BUNDLE_URL: ${{ steps.artifact-diagnostics.outputs.artifact-url }}
+          REPORT_URL: ${{ steps.artifact-playwright-report.outputs.artifact-url }}
+          RESULTS_URL: ${{ steps.artifact-test-results.outputs.artifact-url }}
+          VIDEOS_URL: ${{ steps.artifact-playwright-videos.outputs.artifact-url }}
+          LOGS_URL: ${{ steps.artifact-test-logs.outputs.artifact-url }}
+          ARCHIVE_OBJECT_KEY: ${{ steps.archive-diagnostics.outputs.object-key }}
+          ARCHIVE_TTL_DAYS: ${{ vars.ARCHIVE_TTL_DAYS || env.ARCHIVE_TTL_DAYS }}
+        run: node scripts/open-flaky-pr-issue.mjs
+
+
+
+
+
+
+  lighthouse-gate:
+    name: Production build · Lighthouse performance/SEO/best-practices
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    env:
+      CI: "true"
+      VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      # Baseline track: CI always compares against the `ci` lane
+      # (.lighthouse/baseline.json); local refreshes use the `local` lane.
+      LH_TRACK: ci
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Config typing errors (vite.config.ts / vitest.config.ts) would otherwise
+      # only surface deep inside the production build the gate performs.
+      - name: Validate config keys
+        run: bun run check:config
+
+      - name: Typecheck (fail fast before Lighthouse gate)
+        run: bun run typecheck
+
+      - name: Install Chrome for Lighthouse
+        run: bunx playwright install --with-deps chromium
+
+      # Fails the PR before the gate/comment step when .lighthouse/baseline.json
+      # was moved without recorded __meta provenance and a refresh reason.
+      - name: Validate Lighthouse baseline provenance
+        env:
+          BASE_REF: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.event.pull_request.base.ref) || '' }}
+        run: bun run check:lh-baseline
+
+      - name: Lighthouse gate (floors + regression vs baseline)
+        id: lighthouse
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: bun run gate:lighthouse
+
+      # The gate always writes .lighthouse/summary.md (before/after category
+      # scores, Core Web Vitals deltas and the audits that changed) and appends
+      # it to the job summary. Mirror it into the PR as a single sticky comment.
+      - name: Comment Lighthouse summary on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = '.lighthouse/summary.md';
+            if (!fs.existsSync(path)) {
+              core.info('No Lighthouse summary produced — skipping comment.');
+              return;
+            }
+            let body = fs.readFileSync(path, 'utf8');
+            // Point reviewers at the machine-readable diff uploaded with this run.
+            if (fs.existsSync('.lighthouse/diff.json')) {
+              const runUrl = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+              body += `\n\n_Machine-readable diff: [\`lighthouse-diff\` artifact](${runUrl}#artifacts) (\`.lighthouse/diff.json\` + \`summary.md\`, schema v1)._\n`;
+            }
+            const marker = '<!-- lighthouse-gate-summary -->';
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number, per_page: 100,
+            });
+            const existing = comments.find(
+              (c) => c.user?.type === 'Bot' && c.body?.includes(marker),
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
+
+      # Machine-readable diff (+ markdown) so Lighthouse changes can be tracked
+      # over time from the run artifacts.
+      - name: Upload Lighthouse diff artifact
+        id: artifact-lighthouse-diff
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-diff
+          path: |
+            .lighthouse/diff.json
+            .lighthouse/summary.md
+          retention-days: ${{ env.RETENTION_LIGHTHOUSE }}
+
+      - name: Confirm uploaded artifact retention (Lighthouse)
+        if: always()
+        env:
+          UPLOADED_LIGHTHOUSE_DIFF: ${{ steps.artifact-lighthouse-diff.outputs.artifact-url }}
+          VERIFY_LANES: lighthouse-diff
+        run: node scripts/check-artifact-retention.mjs --verify-uploads
+
+      # Slack alert on red Lighthouse runs (same webhook secret as the SSR gate).
+      - name: Notify Slack on failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          LH_DIFF_URL: ${{ steps.artifact-lighthouse-diff.outputs.artifact-url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          JOB_NAME: Lighthouse gate
+        run: bun run scripts/notify-slack-failure.mjs

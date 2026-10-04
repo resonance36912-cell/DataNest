@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "resonance-forge-specialized-trees-v1",
+  "authority": "read-only-projection",
+  "canonicalRepository": "DataNest-Supository/DataNest",
+  "trees": {
+    "knowledge": {
+      "role": "repository-learning",
+      "ref": "automation/knowledge-feed",
+      "productionAuthority": false,
+      "forgeMode": "observe-and-index"
+    },
+    "boundaries": {
+      "role": "acceptance-and-tolerance",
+      "ref": "main",
+      "productionAuthority": false,
+      "forgeMode": "observe-and-index"
+    },
+    "botsquad": {
+      "role": "ai-only-advisory",
+      "refPrefix": "automation/botsquad/",
+      "productionAuthority": false,
+      "forgeMode": "scoped-agent-identities",
+      "identities": [
+        "orchestrator",
+        "optimizer",
+        "product-expansion",
+        "business-growth",
+        "ux-ease",
+        "ui-evolution",
+        "function-evolution",
+        "integration-scout",
+        "quality-observer",
+        "environment-liaison",
+        "regulator-auditor",
+        "regulator-stress-tester",
+        "regulator-acquisition-scout",
+        "regulator-supply-coordinator",
+        "regulator-action-planner"
+      ]
+    },
+    "environment": {
+      "role": "environment-assessment-and-adaptation",
+      "ref": "automation/environment-feed",
+      "productionAuthority": false,
+      "forgeMode": "observe-compatibility"
+    },
+    "freetree": {
+      "role": "isolated-open-development",
+      "productionAuthority": false,
+      "forgeMode": "no-automatic-replication"
+    },
+    "enforcer": {
+      "role": "continuous-defensive-enforcement",
+      "ref": "automation/enforcer",
+      "productionAuthority": false,
+      "forgeMode": "observe-defensive-evidence",
+      "knowledgeAccess": "all-approved-knowledge-no-category-filter"
+    },
+    "guardian": {
+      "role": "health-monitor-and-safe-healer",
+      "ref": "automation/guardian",
+      "productionAuthority": false,
+      "forgeMode": "observe-health-drift-and-healing-evidence",
+      "blueprint": "config/guardian.blueprint.json"
+    },
+    "conductor": {
+      "role": "process-timing-and-command-synchronization",
+      "ref": "automation/conductor",
+      "productionAuthority": false,
+      "forgeMode": "observe-orchestration-lineage"
+    },
+    "suggester": {
+      "role": "continuous-optimization-suggestions",
+      "ref": "automation/suggester",
+      "productionAuthority": false,
+      "forgeMode": "observe-suggestions-and-bounded-command-queue"
+    },
+    "calmer": {
+      "role": "minimum-friction-governance",
+      "ref": "automation/calmer",
+      "productionAuthority": false,
+      "forgeMode": "observe-softening-and-tier-evidence"
+    },
+    "regulator": {
+      "role": "transparent-system-regulation",
+      "ref": "automation/regulator",
+      "productionAuthority": false,
+      "forgeMode": "observe-requirements-and-harmony"
+    },
+    "visibility-utility": {
+      "role": "visibility-market-intelligence-and-route-to-market",
+      "ref": "automation/visibility-utility",
+      "productionAuthority": false,
+      "forgeMode": "observe-seo-market-and-projection-evidence"
+    },
+    "liberty-in-all": {
+      "role": "continuous-indexing-traceability-and-public-assurance",
+      "ref": "automation/liberty-in-all",
+      "productionAuthority": false,
+      "forgeMode": "observe-provenance-and-sanitized-traceability"
+    }
+  },
+  "rules": [
+    "AI identities are scoped to their BOTSQUAD branch namespace.",
+    "Forge projections cannot assert production authorization.",
+    "ENVIRONMENT findings are compatibility evidence, not authority migration.",
+    "FREETREE is not automatically replicated, synchronized, or governed by specialized trees.",
+    "ENFORCER may fail defensive checks but cannot acquire production authority or rewrite Boundaries.",
+    "GUARDIAN may heal only proven redundant branches and byte-safe source noise; behavioral repair remains reviewed.",
+    "CONDUCTOR coordinates workflow timing and dispatch but cannot merge, deploy production, rewrite Boundaries, or synchronize FREETREE.",
+    "SUGGESTER may emit only allowlisted reversible autonomous commands; all other optimizations remain review-required.",
+    "CALMER may soften planning friction only above non-negotiable Boundaries, ENFORCER, security and human-authority floors.",
+    "REGULATOR may use BOTSQUAD to audit, stress-test and plan approved/free/open requirements but cannot spend, acquire credentials or gain production authority.",
+    "VISIBILITY-UTILITY may model SEO, market presence and routes to market but cannot spend, change pricing, make binding sales commitments or publish unverified claims.",
+    "LIBERTY-IN-ALL may index and publish sanitized provenance metadata but cannot expose secrets/private data, rewrite history, approve, merge, or deploy production."
+  ]
+}

@@ -1,0 +1,457 @@
+{
+  "schemaVersion": "datanest-boundaries-v1",
+  "authority": "DataNest-Supository/DataNest",
+  "principles": [
+    "human-agency",
+    "traceable-evidence",
+    "least-authority",
+    "privacy-by-default",
+    "reversible-automation",
+    "fail-closed-on-uncertainty",
+    "separate-evidence-from-authorization"
+  ],
+  "scopes": [
+    {
+      "id": "production_authority",
+      "tolerance": "zero-implicit-authority",
+      "patterns": [
+        ".github/workflows/pages.yml",
+        ".github/workflows/mirror-production-import.yml",
+        "scripts/write-release-manifest.mjs",
+        "scripts/write-ui-governance-evidence.mjs"
+      ],
+      "acceptance": [
+        "Exact release identity is preserved",
+        "Human production authorization remains separate from technical verification",
+        "Mirror cannot deploy canonical production"
+      ]
+    },
+    {
+      "id": "destructive_maintenance",
+      "tolerance": "only-proven-redundant-history",
+      "patterns": [
+        "scripts/branch-cleaner.mjs",
+        "branch-cleaner.config.json",
+        ".github/workflows/maintenance.yml"
+      ],
+      "acceptance": [
+        "Protected/default/open-PR branches are never deleted",
+        "Unknown or unique history is retained",
+        "Destructive apply is revalidated against live Git state"
+      ]
+    },
+    {
+      "id": "knowledge_learning",
+      "tolerance": "provisional-until-reviewed",
+      "patterns": [
+        "knowledge/**",
+        "scripts/knowledge-tree.mjs",
+        "config/knowledge-tree.json"
+      ],
+      "acceptance": [
+        "Repository evidence retains provenance",
+        "Learning does not self-promote to Certified Memory",
+        "Optimization candidates require review before canonical adoption"
+      ]
+    },
+    {
+      "id": "ai_provider",
+      "tolerance": "review-before-canonical-provider-change",
+      "patterns": [
+        "supabase/functions/**",
+        "src/**"
+      ],
+      "acceptance": [
+        "No credentials are committed",
+        "Provider endpoints remain explicitly configured",
+        "Hosted or local inference never becomes DataNest identity authority"
+      ]
+    },
+    {
+      "id": "data_change",
+      "tolerance": "migration-and-rls-evidence-required",
+      "patterns": [
+        "supabase/migrations/**",
+        "supabase/functions/**"
+      ],
+      "acceptance": [
+        "Migration lineage is preserved",
+        "RLS/authorization impact is reviewed",
+        "Rollback or recovery implications are documented"
+      ]
+    },
+    {
+      "id": "repository_sync",
+      "tolerance": "exact-lineage-only",
+      "patterns": [
+        "config/repository-boundary.json",
+        ".github/workflows/sync-canonical.yml",
+        ".github/workflows/notify-mirror-canonical.yml",
+        "scripts/lib/repository-boundary.mjs"
+      ],
+      "acceptance": [
+        "Canonical and Mirror authority remain distinct",
+        "Unclassified paths fail closed",
+        "FREETREE remains outside all synchronization paths"
+      ]
+    },
+    {
+      "id": "verification",
+      "tolerance": "evidence-required",
+      "patterns": [
+        "tests/**",
+        ".github/workflows/**"
+      ],
+      "acceptance": [
+        "Relevant tests remain reproducible",
+        "Advisory evidence is not mislabeled as certification"
+      ]
+    },
+    {
+      "id": "functional_change",
+      "tolerance": "evidence-before-adoption",
+      "patterns": [
+        "src/**",
+        "scripts/**",
+        "apps/**",
+        "infra/**",
+        "ops/**",
+        "config/**",
+        ".github/**",
+        "supabase/**",
+        "package.json"
+      ],
+      "acceptance": [
+        "Purpose and affected behavior are identifiable",
+        "Relevant tests or an explicit evidence rationale accompany the change",
+        "The change does not silently escalate production, data, synchronization, or AI authority",
+        "Human override and review paths remain available where the change is consequential"
+      ]
+    },
+    {
+      "id": "botsquad_ai_advisory",
+      "tolerance": "ai-only-proposal-no-canonical-authority",
+      "patterns": [
+        "botsquad/**",
+        "config/botsquad.tree.json",
+        "scripts/botsquad-orchestrator.mjs",
+        ".github/workflows/botsquad.yml"
+      ],
+      "acceptance": [
+        "BOTSQUAD output remains advisory and traceable to inputs",
+        "AI agents cannot approve, merge, deploy production, weaken governance, or make binding commercial commitments",
+        "Canonical source adoption remains human-reviewed"
+      ]
+    },
+    {
+      "id": "environment_adaptation",
+      "tolerance": "safe-generated-adaptation-only",
+      "patterns": [
+        "environment/**",
+        "config/environment.tree.json",
+        "scripts/environment-assessor.mjs",
+        ".github/workflows/environment-tree.yml"
+      ],
+      "acceptance": [
+        "Automatic adaptation is limited to generated compatibility state and non-authorizing feeds",
+        "Runtime, provider, backend, permission, production-workflow, Forge-authority, and credential changes require human review",
+        "FREETREE remains isolated from automatic synchronization"
+      ]
+    },
+    {
+      "id": "enforcer_defence",
+      "tolerance": "continuous-defence-without-authority-escalation",
+      "patterns": [
+        "enforcer/**",
+        "config/enforcer.tree.json",
+        "scripts/enforcer-monitor.mjs",
+        ".github/workflows/enforcer.yml",
+        "public/transparency/enforcer/**",
+        "public/transparency/audits/index.json"
+      ],
+      "acceptance": [
+        "ENFORCER consumes the complete approved Knowledge corpus without category or topic filtering",
+        "ENFORCER may fail its own defensive check but cannot approve, merge, deploy production, or rewrite Boundaries",
+        "Security findings remain attributable and are not silently suppressed",
+        "Secrets, private authentication material, and protected personal data are not published as transparency content"
+      ]
+    },
+    {
+      "id": "guardian_health_healing",
+      "tolerance": "safe-healing-without-authority-escalation",
+      "patterns": [
+        "guardian/**",
+        "config/guardian.tree.json",
+        "config/guardian.blueprint.json",
+        "scripts/guardian-health.mjs",
+        ".github/workflows/guardian.yml",
+        "scripts/tree-evidence.mjs"
+      ],
+      "acceptance": [
+        "GUARDIAN snapshots preserve blueprint, observed-state, and prior-snapshot lineage",
+        "Autonomous branch deletion is limited to branches proven to have zero unique commits with live revalidation",
+        "Automatic source changes are limited to byte-safe normalization",
+        "Behavioral deduplication and refactoring are review-only",
+        "GUARDIAN cannot weaken Boundaries/ENFORCER, change production authority, expose secrets, or synchronize FREETREE"
+      ]
+    },
+    {
+      "id": "conductor_synchronization",
+      "tolerance": "timing-and-dispatch-without-authority-escalation",
+      "patterns": [
+        "conductor/**",
+        "config/conductor.tree.json",
+        "scripts/conductor-orchestrator.mjs",
+        ".github/workflows/conductor.yml"
+      ],
+      "acceptance": [
+        "CONDUCTOR coordinates timing and dependencies but never merges or deploys production directly",
+        "At most one coordinated workflow dispatch is selected per cycle",
+        "Dependent processes are not dispatched while required dependencies are stale or active",
+        "Only allowlisted SUGGESTER autonomous commands may be dispatched",
+        "FREETREE remains outside automatic orchestration"
+      ]
+    },
+    {
+      "id": "suggester_optimization",
+      "tolerance": "continuous-suggestions-bounded-autonomy",
+      "patterns": [
+        "suggester/**",
+        "config/suggester.tree.json",
+        "scripts/suggester-engine.mjs",
+        ".github/workflows/suggester.yml"
+      ],
+      "acceptance": [
+        "Suggestions remain attributable to evidence sources and deduplicated",
+        "Autonomous commands are limited to predefined reversible maintenance actions",
+        "Behavioral, dependency, provider, governance, UI, function, product and business changes remain review-required",
+        "SUGGESTER cannot merge, deploy production, change Boundaries, or suppress ENFORCER findings"
+      ]
+    },
+    {
+      "id": "calmer_governance_softening",
+      "tolerance": "maximum-softening-above-non-negotiable-floor",
+      "patterns": [
+        "calmer/**",
+        "config/calmer.tree.json",
+        "scripts/calmer-governance.mjs",
+        ".github/workflows/calmer.yml",
+        "scripts/propose-worktree-gate-timeframe.mjs"
+      ],
+      "acceptance": [
+        "CALMER minimizes planning/evidence friction but does not remove automated checks or mandatory approvals",
+        "CALMER cannot soften Boundaries hard rules, ENFORCER blockers, security thresholds, production authority or secret protection",
+        "Owner overrides cannot go below the computed minimum-pass floor",
+        "STONE/GOLD/DIAMOND packages are evidence-based incentives, not authorization credentials"
+      ]
+    },
+    {
+      "id": "regulator_harmony",
+      "tolerance": "transparent-requirement-regulation-with-bounded-action",
+      "patterns": [
+        "regulator/**",
+        "config/regulator.tree.json",
+        "scripts/regulator-engine.mjs",
+        ".github/workflows/regulator.yml",
+        "public/transparency/regulator/**",
+        "public/transparency/audits/index.json"
+      ],
+      "acceptance": [
+        "REGULATOR requirement state is transparent and attributable to source evidence",
+        "BOTSQUAD audit/stress/acquisition/supply/action roles remain advisory and non-authorizing",
+        "Acquisition means identifying free/open/already-authorized resources and never purchasing, committing funds or acquiring credentials",
+        "REGULATOR cannot bypass security, rewrite Boundaries, merge or deploy production"
+      ]
+    },
+    {
+      "id": "visibility_market_intelligence",
+      "tolerance": "evidence-labelled-growth-without-commercial-authority",
+      "patterns": [
+        "visibility-utility/**",
+        "config/visibility-utility.tree.json",
+        "scripts/visibility-utility.mjs",
+        ".github/workflows/visibility-utility.yml",
+        "public/transparency/visibility-utility/**",
+        "docs/DATANEST_SYSTEM_CHARTER.md",
+        "src/app/system-charter/**",
+        "public/transparency/system-charter/**"
+      ],
+      "acceptance": [
+        "SEO, trend and route-to-market outputs retain evidence/assumption lineage",
+        "Missing global/local trend or analytics data remains visible and is not fabricated",
+        "Revenue projections require explicit commercial baseline and conversion evidence",
+        "Paid acquisition, pricing, binding sales commitments and public claims require human review",
+        "VISIBILITY-UTILITY cannot merge, deploy, spend, rewrite Boundaries or claim certification"
+      ]
+    },
+    {
+      "id": "liberty_in_all_traceability",
+      "tolerance": "maximum-safe-visibility-with-minimum-necessary-restriction",
+      "patterns": [
+        "liberty-in-all/**",
+        "config/liberty-in-all.standard.json",
+        "scripts/liberty-in-all-indexer.mjs",
+        ".github/workflows/liberty-in-all.yml",
+        "public/transparency/liberty-in-all/**",
+        "docs/LIBERTY_IN_ALL_STANDARD.md"
+      ],
+      "acceptance": [
+        "Every public record entry is attributable to a source ref and SHA-256 digest",
+        "Sensitive records and record contents are not published through the public index",
+        "Missing evidence is explicit rather than inferred or fabricated",
+        "Disclosure, retention and sensitivity-policy changes require human review",
+        "LIBERTY-IN-ALL cannot approve, merge, deploy production, rewrite history or change production authority"
+      ]
+    }
+  ],
+  "hardRules": [
+    {
+      "id": "no_freetree_sync",
+      "files": [
+        ".github/workflows/sync-canonical.yml",
+        ".github/workflows/notify-mirror-canonical.yml",
+        ".github/workflows/mirror-production-import.yml",
+        "scripts/lib/sync-canonical-files.mjs"
+      ],
+      "forbiddenText": [
+        "FREETREE",
+        "Mirror-DataNest-Empty"
+      ],
+      "message": "FREETREE must remain isolated from canonical and Mirror synchronization."
+    },
+    {
+      "id": "no_autonomous_archived_prune",
+      "files": [
+        ".github/workflows/maintenance.yml"
+      ],
+      "forbiddenText": [
+        "--prune-archived"
+      ],
+      "message": "Scheduled maintenance may delete only branches proven to have no unique commits; archived unique history requires separate explicit authorization."
+    },
+    {
+      "id": "no_vercel_dependency_metadata",
+      "files": [
+        "README.md",
+        "docs/DEPLOYMENT.md"
+      ],
+      "forbiddenText": [
+        "data-nest-alpha.vercel.app"
+      ],
+      "message": "Vercel is not a required DataNest delivery dependency."
+    },
+    {
+      "id": "no_specialized_tree_authority_escalation",
+      "files": [
+        "config/botsquad.tree.json",
+        "infra/reson8-forge/specialized-trees.json"
+      ],
+      "forbiddenText": [
+        "\"productionAuthorization\": true",
+        "\"productionAuthority\": true"
+      ],
+      "message": "BOTSQUAD and Forge specialized-tree projections cannot assert production authority."
+    },
+    {
+      "id": "no_enforcer_authority_escalation",
+      "files": [
+        "config/enforcer.tree.json",
+        "infra/reson8-forge/specialized-trees.json"
+      ],
+      "forbiddenText": [
+        "\"productionAuthorization\": true",
+        "\"productionAuthority\": true",
+        "\"mayDeployProduction\": true",
+        "\"mayChangeBoundaries\": true",
+        "\"maySuppressFindings\": true"
+      ],
+      "message": "ENFORCER may enforce checks but cannot acquire production authority, rewrite Boundaries, or suppress findings."
+    },
+    {
+      "id": "no_guardian_authority_escalation",
+      "files": [
+        "config/guardian.tree.json",
+        "infra/reson8-forge/specialized-trees.json"
+      ],
+      "forbiddenText": [
+        "\"productionAuthorization\": true",
+        "\"productionAuthority\": true",
+        "\"autonomousDeletion\": \"unique-history\"",
+        "\"synchronizeFreetree\": true"
+      ],
+      "message": "GUARDIAN may heal proven redundancy but cannot gain production authority, delete unique history, or synchronize FREETREE."
+    },
+    {
+      "id": "no_conductor_suggester_authority_escalation",
+      "files": [
+        "config/conductor.tree.json",
+        "config/suggester.tree.json",
+        "infra/reson8-forge/specialized-trees.json"
+      ],
+      "forbiddenText": [
+        "\"productionAuthorization\": true",
+        "\"productionAuthority\": true",
+        "\"mayMerge\": true",
+        "\"mayDeployProduction\": true",
+        "\"mayChangeBoundaries\": true",
+        "\"neverSynchronizeFreetree\": false"
+      ],
+      "message": "CONDUCTOR and SUGGESTER may coordinate and suggest but cannot acquire production/governance authority or synchronize FREETREE."
+    },
+    {
+      "id": "no_calmer_guardrail_removal",
+      "files": [
+        "config/calmer.tree.json",
+        "scripts/propose-worktree-gate-timeframe.mjs",
+        "infra/reson8-forge/specialized-trees.json"
+      ],
+      "forbiddenText": [
+        "\"mayRemoveHardGate\": true",
+        "\"mayLowerSecurityThreshold\": true",
+        "\"mayOverrideBoundaries\": true",
+        "\"mayApproveProduction\": true",
+        "\"mayWeakenHumanAuthority\": true",
+        "\"productionAuthority\": true"
+      ],
+      "message": "CALMER may reduce avoidable friction only above non-negotiable DataNest governance/security floors."
+    },
+    {
+      "id": "no_regulator_external_authority",
+      "files": [
+        "config/regulator.tree.json",
+        "infra/reson8-forge/specialized-trees.json"
+      ],
+      "forbiddenText": [
+        "\"mayPurchase\": true",
+        "\"mayCommitFunds\": true",
+        "\"mayAcquireCredentials\": true",
+        "\"mayBypassSecurity\": true",
+        "\"mayChangeBoundaries\": true",
+        "\"mayDeployProduction\": true",
+        "\"productionAuthority\": true"
+      ],
+      "message": "REGULATOR may coordinate requirements but cannot spend, acquire credentials, bypass security or gain production authority."
+    },
+    {
+      "id": "no_visibility_commercial_authority",
+      "files": [
+        "config/visibility-utility.tree.json",
+        "infra/reson8-forge/specialized-trees.json"
+      ],
+      "forbiddenText": [
+        "\"mayPurchaseAdvertising\": true",
+        "\"mayCommitMarketingSpend\": true",
+        "\"mayChangePricing\": true",
+        "\"mayMakeBindingSalesCommitments\": true",
+        "\"mayPublishUnverifiedClaims\": true",
+        "\"productionAuthority\": true"
+      ],
+      "message": "VISIBILITY-UTILITY may model market routes but cannot acquire spend, pricing, sales, claim or production authority."
+    }
+  ],
+  "resultSemantics": {
+    "pass": "No hard boundary violation detected; required human/evidence acceptance still applies.",
+    "review": "A change touches a governed scope and requires the listed acceptance evidence.",
+    "block": "A machine-verifiable DataNest invariant was violated."
+  }
+}

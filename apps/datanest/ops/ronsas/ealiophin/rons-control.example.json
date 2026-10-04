@@ -1,0 +1,17 @@
+{
+  "schema": "datanest.ronsas.control-config.v1",
+  "repository": "DataNest-Supository/DataNest",
+  "runtimeRoot": "%LOCALAPPDATA%\\Resonance\\DataNest-RONSAS",
+  "registry": "ops/ronsas/ealiophin/RONSAS-MODULES.json",
+  "start": "ops/ronsas/ealiophin/START-RONSAS-DATANEST.ps1",
+  "status": "ops/ronsas/ealiophin/STATUS-RONSAS-DATANEST.ps1",
+  "stop": "ops/ronsas/ealiophin/STOP-RONSAS-DATANEST.ps1",
+  "policy": {
+    "sourceAuthority": "DataNest-Supository/DataNest",
+    "billingState": "free-promotion",
+    "paidCheckoutActive": false,
+    "runtimeStateTrackedInGit": false
+  },
+  "supervisor": "ops/ronsas/ealiophin/RONSAS-SUPERVISOR.ps1",
+  "installSupervisor": "ops/ronsas/ealiophin/INSTALL-RONSAS-SUPERVISOR.ps1"
+}

@@ -1,0 +1,544 @@
+{
+  "schemaVersion": 2,
+  "catalogId": "resonance-appdev-supository",
+  "name": "DataNest Portfolio Registry",
+  "canonicalRepository": "DataNest-Supository/DataNest",
+  "canonicalPublicUrl": "https://datanest-supository.github.io/DataNest/",
+  "authority": {
+    "appdevControlPlane": "DataNest",
+    "sourceCiEvidence": "GitHub:DataNest-Supository/DataNest",
+    "publicDelivery": "GitHub Pages",
+    "backend": "Supabase:sgqdmfgjbprsoqsmgigi",
+    "backupArtifacts": "Dropbox:/DataNest-AI-Backups",
+    "sovereignForge": {
+      "target": "https://git.reson8.life/DataNest-Supository/DataNest",
+      "mode": "governed-mirror",
+      "authorityCutoverApproved": false
+    }
+  },
+  "entries": [
+    {
+      "id": "datanest",
+      "name": "DataNest",
+      "type": "product-platform",
+      "sourcePath": ".",
+      "deliveryPath": "/DataNest/",
+      "lifecycle": "production",
+      "productionInclusion": "public"
+    },
+    {
+      "id": "datanest-assurance",
+      "name": "Resonance AppDev Assurance Services",
+      "type": "service-surface",
+      "sourcePath": "src/app/assurance",
+      "deliveryPath": "/DataNest/assurance/",
+      "lifecycle": "production",
+      "productionInclusion": "public"
+    },
+    {
+      "id": "ronsas-career-compass",
+      "name": "Resonance Career Compass",
+      "type": "app",
+      "portfolio": "Resonance",
+      "sourcePath": "apps/ronsas/career-compass",
+      "deliveryPath": "/DataNest/apps/career-compass/",
+      "lifecycle": "production",
+      "productionInclusion": "public",
+      "commercial": {
+        "family": "career",
+        "surfaceRole": "primary-product",
+        "commercialVisibility": "primary",
+        "customerJourney": "independent-acquisition-and-subscription"
+      }
+    },
+    {
+      "id": "ronsas-creative-studio",
+      "name": "Resonance Creator Studio",
+      "type": "app",
+      "portfolio": "Resonance",
+      "sourcePath": "apps/ronsas/creative-studio",
+      "deliveryPath": "/DataNest/apps/creative-studio/",
+      "lifecycle": "production",
+      "productionInclusion": "public",
+      "commercial": {
+        "family": "create",
+        "surfaceRole": "primary-product",
+        "commercialVisibility": "primary",
+        "customerJourney": "creator-acquisition-to-paid-workspace"
+      }
+    },
+    {
+      "id": "ronsas-epublisher",
+      "name": "Resonance Publish",
+      "type": "app",
+      "portfolio": "Resonance",
+      "sourcePath": "apps/ronsas/epublisher",
+      "deliveryPath": "/DataNest/apps/epublisher/",
+      "lifecycle": "production",
+      "productionInclusion": "public",
+      "commercial": {
+        "family": "create",
+        "surfaceRole": "module",
+        "commercialVisibility": "module",
+        "parentSurface": "ronsas-creative-studio",
+        "moduleFunction": "publishing-and-distribution"
+      }
+    },
+    {
+      "id": "ronsas-lyricsync-studio",
+      "name": "Resonance Lyrics & Sync",
+      "type": "app",
+      "portfolio": "Resonance",
+      "sourcePath": "apps/ronsas/lyricsync-studio",
+      "deliveryPath": "/DataNest/apps/lyricsync-studio/",
+      "lifecycle": "production",
+      "productionInclusion": "public",
+      "commercial": {
+        "family": "create",
+        "surfaceRole": "module",
+        "commercialVisibility": "module",
+        "parentSurface": "ronsas-creative-studio",
+        "moduleFunction": "lyrics-and-synchronization"
+      }
+    },
+    {
+      "id": "ronsas-scene-song-spark",
+      "name": "SongSpark",
+      "type": "app",
+      "portfolio": "Resonance",
+      "sourcePath": "apps/ronsas/scene-song-spark",
+      "deliveryPath": "/DataNest/apps/scene-song-spark/",
+      "lifecycle": "production",
+      "productionInclusion": "public",
+      "commercial": {
+        "family": "grow",
+        "surfaceRole": "acquisition-tool",
+        "commercialVisibility": "acquisition",
+        "acquisitionFunction": "free-or-low-friction-entry-to-creator-funnel"
+      }
+    },
+    {
+      "id": "ronsas-sovereign-forge",
+      "name": "Sovereign Forge",
+      "type": "app",
+      "portfolio": "Resonance",
+      "sourcePath": "apps/ronsas/sovereign-forge",
+      "deliveryPath": "/DataNest/apps/sovereign-forge/",
+      "lifecycle": "production",
+      "productionInclusion": "public",
+      "commercial": {
+        "family": "professional",
+        "surfaceRole": "primary-product",
+        "commercialVisibility": "primary",
+        "customerJourney": "professional-and-b2b",
+        "businessLine": "Resonance AppDev Professional",
+        "parentSuite": null
+      },
+      "technicalPortfolio": "Resonance"
+    },
+    {
+      "id": "ronsas-syncvision",
+      "name": "Resonance Media Sync",
+      "type": "app",
+      "portfolio": "Resonance",
+      "sourcePath": "apps/ronsas/syncvision",
+      "deliveryPath": "/DataNest/apps/syncvision/",
+      "lifecycle": "production",
+      "productionInclusion": "public",
+      "commercial": {
+        "family": "create",
+        "surfaceRole": "module",
+        "commercialVisibility": "module",
+        "parentSurface": "ronsas-creative-studio",
+        "moduleFunction": "media-synchronization"
+      }
+    },
+    {
+      "id": "ronsas-youtube-optimizer",
+      "name": "Resonance Creator Growth",
+      "type": "app",
+      "portfolio": "Resonance",
+      "sourcePath": "apps/ronsas/youtube-optimizer",
+      "deliveryUrl": "https://youtubeoptimizer.life/",
+      "lifecycle": "production",
+      "productionInclusion": "external-production",
+      "commercial": {
+        "family": "grow",
+        "surfaceRole": "module",
+        "commercialVisibility": "module",
+        "parentSurface": "ronsas-creative-studio",
+        "moduleFunction": "creator-growth-and-channel-optimization"
+      }
+    },
+    {
+      "id": "ronsas-sovereign-backend",
+      "name": "Sovereign Backend",
+      "type": "service",
+      "portfolio": "Resonance",
+      "sourcePath": "apps/ronsas/sovereign-backend",
+      "lifecycle": "governed",
+      "productionInclusion": "production-support",
+      "commercial": {
+        "family": "internal",
+        "surfaceRole": "infrastructure",
+        "commercialVisibility": "internal",
+        "infrastructureRole": "shared-backend-authority"
+      }
+    },
+    {
+      "id": "ronsas-shared",
+      "name": "Resonance Core (RONSAS Shared)",
+      "type": "package-set",
+      "portfolio": "Resonance",
+      "sourcePath": "apps/ronsas/shared",
+      "lifecycle": "governed",
+      "productionInclusion": "production-support",
+      "commercial": {
+        "family": "internal",
+        "surfaceRole": "infrastructure",
+        "commercialVisibility": "internal",
+        "infrastructureRole": "shared-ronsas-packages"
+      }
+    }
+  ],
+  "rdMirror": {
+    "repository": "DataNest-Supository/Mirror-DataNest",
+    "mode": "peer-production-rd",
+    "sourceOfTruth": false,
+    "productionAuthority": true,
+    "mirrorProductionDeploymentAuthority": true,
+    "mirrorProductionBackendAuthority": true,
+    "canonicalProductionAuthority": false,
+    "mirrorCandidateDeploymentAuthority": true,
+    "canonicalLiveDeploymentAuthority": false,
+    "previewUrl": "https://datanest-supository.github.io/Mirror-DataNest/",
+    "backend": {
+      "project": "Supabase:qchttpcyqlqnhvahprhz",
+      "name": "Mirror DataNest isolated production",
+      "mode": "isolated-production"
+    },
+    "adminAccess": {
+      "canonicalUiToggle": true,
+      "allowedRoles": [
+        "owner",
+        "admin"
+      ],
+      "opensLiveMirrorUi": true,
+      "synchronizesExactBuildEvidence": true,
+      "changesCanonicalProductionAuthority": false,
+      "networkAccessControl": false
+    },
+    "updateManagement": {
+      "reuseExistingDatabaseModels": true,
+      "models": [
+        "product_surfaces",
+        "product_test_cases",
+        "product_test_runs",
+        "governance_observations",
+        "optimizer_runs",
+        "optimizer_suggestions",
+        "governance_improvement_candidates",
+        "security_acceptance_runs",
+        "portfolio_lifecycle_events",
+        "ai_development_updates",
+        "artifacts",
+        "events"
+      ],
+      "surfaceName": "Mirror-DataNest Production Surface",
+      "releaseManifest": "/Mirror-DataNest/mirror-release.json",
+      "liveVerificationArtifact": "mirror-live-evidence-<run>-<sha>",
+      "certificationWorkflow": ".github/workflows/datanest-ai-certification.yml",
+      "stagingSchemaPolicy": "Certification workflow validates governed staging schema and backend acceptance before canonical release."
+    },
+    "productionPromotion": {
+      "allProductionCandidatesMustReturnToCanonical": false,
+      "canonicalHandoffRequiredOnlyFor": "/DataNest/",
+      "mirrorLiveWorkflow": "Mirror-DataNest/.github/workflows/pages.yml",
+      "candidateWorkflow": "Mirror-DataNest/.github/workflows/production-candidate.yml",
+      "canonicalImportWorkflow": ".github/workflows/mirror-production-import.yml",
+      "canonicalBranchPrefix": "mirror-promotion/",
+      "requiredBeforeLive": [
+        "mirror promotion reference",
+        "live Mirror visual/functional evidence reference",
+        "DataNest AI Certification reference",
+        "Audit Optimizer reference",
+        "canonical PR verification",
+        "security scan",
+        "RONSAS validation where applicable",
+        "governance review",
+        "human reviewer approval",
+        "production authorization"
+      ],
+      "liveDeploymentAuthority": {
+        "mirrorSurface": "DataNest-Supository/Mirror-DataNest",
+        "canonicalSurface": "DataNest-Supository/DataNest"
+      }
+    }
+  },
+  "specializedTrees": {
+    "knowledge": {
+      "path": "knowledge/",
+      "mode": "repository-learning",
+      "productionAuthority": false,
+      "feedBranch": "automation/knowledge-feed"
+    },
+    "boundaries": {
+      "path": "boundaries/",
+      "mode": "acceptance-and-tolerance",
+      "productionAuthority": false,
+      "assessmentWorkflow": ".github/workflows/boundaries-assessment.yml"
+    },
+    "botsquad": {
+      "path": "botsquad/",
+      "mode": "ai-only-advisory",
+      "productionAuthority": false,
+      "branchPrefix": "automation/botsquad/",
+      "purposes": [
+        "optimization",
+        "expansion",
+        "business-growth",
+        "ux-ease",
+        "ui-evolution",
+        "function-evolution",
+        "integration-scouting",
+        "quality-observation"
+      ]
+    },
+    "environment": {
+      "path": "environment/",
+      "mode": "environment-assessment-and-adaptation",
+      "productionAuthority": false,
+      "feedBranch": "automation/environment-feed",
+      "forgeAlignment": true
+    },
+    "freetree": {
+      "repository": "DataNest-Supository/FREETREE",
+      "mode": "isolated-no-sync",
+      "productionAuthority": false,
+      "forgeReplication": "disabled-by-default"
+    },
+    "enforcer": {
+      "path": "enforcer/",
+      "mode": "continuous-defensive-enforcement",
+      "productionAuthority": false,
+      "branch": "automation/enforcer",
+      "knowledgeAccess": "all-approved-knowledge-no-category-filter",
+      "transparencyEvidence": true
+    },
+    "guardian": {
+      "path": "guardian/",
+      "mode": "event-driven-health-and-safe-healing",
+      "productionAuthority": false,
+      "branch": "automation/guardian",
+      "blueprint": "config/guardian.blueprint.json",
+      "heals": "proven-branch-redundancy-and-byte-safe-source-noise",
+      "mirrorFeed": true
+    },
+    "conductor": {
+      "path": "conductor/",
+      "mode": "event-driven-process-synchronization",
+      "productionAuthority": false,
+      "branch": "automation/conductor",
+      "purpose": "timing-dependency-and-pull-push-coordination"
+    },
+    "suggester": {
+      "path": "suggester/",
+      "mode": "continuous-optimization-suggestions",
+      "productionAuthority": false,
+      "branch": "automation/suggester",
+      "purpose": "continuous-optimization-and-bounded-autonomous-update-queue"
+    },
+    "calmer": {
+      "path": "calmer/",
+      "mode": "continuous-minimum-friction-governance",
+      "productionAuthority": false,
+      "branch": "automation/calmer",
+      "tiers": [
+        "STONE",
+        "GOLD",
+        "DIAMOND"
+      ],
+      "hardFloorPreserved": true
+    },
+    "regulator": {
+      "path": "regulator/",
+      "mode": "transparent-system-regulation-and-harmony",
+      "productionAuthority": false,
+      "branch": "automation/regulator",
+      "botsquadRequirementFeed": true
+    },
+    "visibility-utility": {
+      "path": "visibility-utility/",
+      "mode": "continuous-visibility-market-intelligence-and-route-to-market",
+      "productionAuthority": false,
+      "branch": "automation/visibility-utility",
+      "transparencyEvidence": true,
+      "routeToMarketProjections": true
+    }
+  },
+  "publicSystemCharter": {
+    "path": "docs/DATANEST_SYSTEM_CHARTER.md",
+    "publicUrl": "https://datanest-supository.github.io/DataNest/system-charter/",
+    "standardsAlignment": "mapped-not-certified"
+  },
+  "productionInclusion": {
+    "schemaVersion": "production-inclusion-v1",
+    "inclusive": true,
+    "authority": "DataNest-Supository/DataNest:main",
+    "delivery": "GitHub Pages + Supabase",
+    "publicSurfaces": [
+      "datanest",
+      "datanest-assurance",
+      "ronsas-career-compass",
+      "ronsas-creative-studio",
+      "ronsas-epublisher",
+      "ronsas-lyricsync-studio",
+      "ronsas-scene-song-spark",
+      "ronsas-sovereign-forge",
+      "ronsas-syncvision"
+    ],
+    "externalProductionSurfaces": [
+      "ronsas-youtube-optimizer"
+    ],
+    "productionSupportComponents": [
+      "ronsas-sovereign-backend",
+      "ronsas-shared"
+    ],
+    "excludedFromProductionAuthority": [
+      "DataNest-Supository/Mirror-DataNest",
+      "DataNest AI Staging",
+      "DataNest-Supository/FREETREE",
+      "automation/*",
+      "mirror-promotion/*"
+    ],
+    "rule": "Every approved production-capable surface must be represented in the release manifest and verified by the canonical production release. Staging/R&D surfaces never gain canonical production authority by inclusion."
+  },
+  "commercialArchitecture": {
+    "version": "2026-10-03-scope-v3",
+    "strategy": "business-line-and-suite-boundaries",
+    "businessLines": [
+      {
+        "id": "resonance",
+        "name": "Resonance",
+        "positioning": "Customer digital products across Career, Create and Grow",
+        "products": [
+          "ronsas-career-compass",
+          "ronsas-creative-studio"
+        ]
+      },
+      {
+        "id": "professional",
+        "name": "Sovereign Forge",
+        "positioning": "Professional and B2B engineering capability under Resonance AppDev",
+        "products": [
+          "ronsas-sovereign-forge"
+        ]
+      },
+      {
+        "id": "assurance",
+        "name": "Resonance AppDev Assurance Services",
+        "positioning": "Readiness, assurance, evidence and authorized professional services delivered through DataNest",
+        "products": [
+          "datanest-assurance"
+        ]
+      }
+    ],
+    "suiteBoundary": "Resonance commercially covers Career, Create and Grow. Sovereign Forge is a sibling Resonance AppDev professional offer. DataNest is the operating platform.",
+    "transitionRule": "Preserve implemented capabilities and technical routes while separating customer journeys and business ownership. Commercial reclassification does not itself change lifecycle or production authority.",
+    "publicInformationArchitecture": {
+      "masterBrand": "resonance-appdev",
+      "operatingPlatform": "datanest",
+      "topLevelBusinessLines": [
+        "resonance",
+        "professional",
+        "assurance"
+      ],
+      "resonanceFamilies": [
+        "career",
+        "create",
+        "grow"
+      ],
+      "creatorJourney": [
+        "create",
+        "lyrics-and-sync",
+        "media-sync",
+        "publish",
+        "grow"
+      ],
+      "rule": "Lead with Resonance AppDev and customer intent/outcome; expose DataNest as the operating platform and technical modules after the customer journey is clear."
+    },
+    "commercialPackaging": {
+      "resonancePrimaryProducts": [
+        "ronsas-career-compass",
+        "ronsas-creative-studio"
+      ],
+      "resonanceModules": [
+        "ronsas-lyricsync-studio",
+        "ronsas-syncvision",
+        "ronsas-epublisher",
+        "ronsas-youtube-optimizer"
+      ],
+      "resonanceAcquisitionTools": [
+        "ronsas-scene-song-spark"
+      ],
+      "professionalProducts": [
+        "ronsas-sovereign-forge"
+      ],
+      "internalInfrastructure": [
+        "ronsas-sovereign-backend",
+        "ronsas-shared"
+      ]
+    },
+    "pricingArchitecture": {
+      "principle": "Price customer journeys and business lines, not every implementation surface.",
+      "families": {
+        "career": {
+          "primaryProduct": "ronsas-career-compass",
+          "model": "independent-subscription",
+          "priceBaselineRequired": true
+        },
+        "create": {
+          "primaryProduct": "ronsas-creative-studio",
+          "model": "creator-workspace-subscription",
+          "priceBaselineRequired": true
+        },
+        "grow": {
+          "primaryProduct": "ronsas-creative-studio",
+          "model": "growth-add-on-or-included-tier",
+          "priceBaselineRequired": true
+        },
+        "professional": {
+          "primaryProduct": "ronsas-sovereign-forge",
+          "model": "professional-or-b2b",
+          "priceBaselineRequired": true
+        }
+      },
+      "numericPrices": "not_asserted_without_explicit_commercial_baseline_and_conversion_evidence"
+    },
+    "businessIdentity": {
+      "legalBusiness": "Resonance Sole Proprietorship",
+      "masterBrand": "Resonance AppDev",
+      "operatingPlatform": "DataNest",
+      "portfolioRegistry": "DataNest Portfolio Registry"
+    }
+  },
+  "portfolioBranding": {
+    "businessEntity": "Resonance Sole Proprietorship",
+    "masterBrand": "Resonance AppDev",
+    "systemName": "DataNest",
+    "registryName": "DataNest Portfolio Registry",
+    "customerFacingName": "Resonance",
+    "technicalIdentifier": "RONSAS",
+    "legacyAlias": "Supository",
+    "namingRule": "Use Resonance Sole Proprietorship for business/legal identity, Resonance AppDev as the master brand, DataNest as the operating/control platform, DataNest Portfolio Registry for catalog functions, Resonance for the customer application suite, Sovereign Forge for the sibling professional/B2B line, and RONSAS only as the stable technical identifier."
+  },
+  "publicIdentity": {
+    "businessEntity": "Resonance Sole Proprietorship",
+    "masterBrand": "Resonance AppDev",
+    "operatingPlatform": "DataNest",
+    "registryName": "DataNest Portfolio Registry",
+    "customerSuite": "Resonance",
+    "technicalIdentifier": "RONSAS",
+    "legacyTechnicalAlias": "Supository"
+  }
+}

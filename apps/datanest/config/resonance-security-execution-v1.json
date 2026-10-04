@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "resonance-security-execution-v1",
+  "profileId": "resonance-secret-integrity",
+  "owner": "DataNest-Supository/DataNest",
+  "mode": "repository-owned",
+  "externalLicensing": { "required": false, "provider": null, "requiredSecrets": [] },
+  "runtime": { "nodeMajor": 22, "gitRequired": true, "networkRequired": false },
+  "guarantees": { "deterministic": true, "failClosed": true, "sarif21": true, "historyCapable": true, "secretRedaction": true },
+  "authority": { "productionSource": false, "canonicalChange": false, "merge": false, "productionDeployment": false }
+}

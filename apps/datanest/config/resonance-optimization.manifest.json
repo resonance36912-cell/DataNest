@@ -1,0 +1,281 @@
+{
+  "version": "2026-10-03-optimization-v1",
+  "authority": "DataNest Portfolio Registry",
+  "business": "Resonance Sole Proprietorship",
+  "masterBrand": "Resonance AppDev",
+  "operatingPlatform": "DataNest",
+  "customerSuite": "Resonance",
+  "technicalIdentifier": "RONSAS",
+  "optimizationPrinciples": [
+    "Lead with customer outcome, not implementation surface.",
+    "Package modules into primary journeys instead of selling implementation fragments.",
+    "Keep one canonical identity, entitlement, evidence, telemetry and security boundary per shared capability.",
+    "Prefer reuse of DataNest-controlled services over app-local duplication.",
+    "Preserve stable routes, slugs, repositories and technical identifiers unless a migration is explicitly approved.",
+    "Keep acquisition surfaces friction-light and route qualified users into primary products.",
+    "Keep professional services separate from consumer creator journeys.",
+    "Treat internal infrastructure as capability, never as a competing customer product."
+  ],
+  "journeys": {
+    "career": {
+      "entry": [
+        "ronsas-career-compass"
+      ],
+      "value": [
+        "career-discovery",
+        "assessment",
+        "action-planning"
+      ],
+      "conversion": [
+        "registration",
+        "subscription"
+      ]
+    },
+    "create": {
+      "entry": [
+        "ronsas-scene-song-spark"
+      ],
+      "primary": [
+        "ronsas-creative-studio"
+      ],
+      "modules": [
+        "ronsas-lyricsync-studio",
+        "ronsas-syncvision",
+        "ronsas-epublisher"
+      ],
+      "growth": [
+        "ronsas-youtube-optimizer"
+      ],
+      "conversion": [
+        "registration",
+        "activation",
+        "workspace-subscription",
+        "module-expansion",
+        "repeat-use"
+      ]
+    },
+    "professional": {
+      "entry": [
+        "ronsas-sovereign-forge"
+      ],
+      "delivery": [
+        "datanest-assurance"
+      ],
+      "conversion": [
+        "qualified-intake",
+        "scoping",
+        "engagement",
+        "delivery",
+        "renewal-or-expansion"
+      ]
+    }
+  },
+  "apps": {
+    "datanest": {
+      "role": "operating-control-platform",
+      "functions": [
+        "governance",
+        "orchestration",
+        "evidence",
+        "security",
+        "continuity",
+        "delivery",
+        "portfolio-authority"
+      ],
+      "customerRole": "trust-and-control-layer"
+    },
+    "datanest-assurance": {
+      "role": "professional-assurance-service",
+      "functions": [
+        "readiness",
+        "assurance",
+        "evidence-review",
+        "audit-support",
+        "release-readiness"
+      ],
+      "customerRole": "professional-service"
+    },
+    "ronsas-career-compass": {
+      "role": "primary-product",
+      "family": "career",
+      "functions": [
+        "career-discovery",
+        "career-assessment",
+        "career-guidance",
+        "action-planning",
+        "subscription-entry"
+      ],
+      "primaryKpi": "activated-career-user"
+    },
+    "ronsas-creative-studio": {
+      "role": "primary-product",
+      "family": "create",
+      "functions": [
+        "creative-workspace",
+        "project-management",
+        "creative-generation",
+        "asset-management",
+        "preview",
+        "export",
+        "entitlement"
+      ],
+      "primaryKpi": "activated-creator-workspace"
+    },
+    "ronsas-lyricsync-studio": {
+      "role": "module",
+      "parent": "ronsas-creative-studio",
+      "functions": [
+        "lyrics-authoring",
+        "timing",
+        "synchronization",
+        "preview",
+        "export"
+      ],
+      "optimizationRule": "Do not compete with Creator Studio for identity, billing or primary navigation."
+    },
+    "ronsas-syncvision": {
+      "role": "module",
+      "parent": "ronsas-creative-studio",
+      "functions": [
+        "media-synchronization",
+        "timeline-preview",
+        "media-export"
+      ],
+      "optimizationRule": "Use Creator Studio identity and entitlement context."
+    },
+    "ronsas-epublisher": {
+      "role": "module",
+      "parent": "ronsas-creative-studio",
+      "functions": [
+        "publishing",
+        "metadata-packaging",
+        "distribution-preparation",
+        "export"
+      ],
+      "optimizationRule": "Position as the publish step of the creator journey, not a disconnected product."
+    },
+    "ronsas-scene-song-spark": {
+      "role": "acquisition-tool",
+      "family": "grow",
+      "functions": [
+        "creative-spark",
+        "discovery",
+        "lead-capture",
+        "creator-studio-routing"
+      ],
+      "primaryKpi": "qualified-creator-entry"
+    },
+    "ronsas-youtube-optimizer": {
+      "role": "growth-module",
+      "parent": "ronsas-creative-studio",
+      "functions": [
+        "channel-audit",
+        "content-insights",
+        "optimization",
+        "thumbnail-analysis",
+        "scheduling",
+        "growth-guidance"
+      ],
+      "optimizationRule": "Share creator identity, entitlement and analytics contracts with Creator Studio."
+    },
+    "ronsas-sovereign-forge": {
+      "role": "professional-product",
+      "family": "professional",
+      "functions": [
+        "professional-intake",
+        "engineering-scoping",
+        "delivery",
+        "evidence",
+        "client-readiness"
+      ],
+      "optimizationRule": "Remain a separate B2B journey under Resonance AppDev."
+    }
+  },
+  "sharedCapabilities": {
+    "identity": {
+      "owner": "DataNest",
+      "functions": [
+        "authentication",
+        "session",
+        "role",
+        "account-linking"
+      ]
+    },
+    "entitlement": {
+      "owner": "DataNest",
+      "functions": [
+        "plan",
+        "access",
+        "upgrade",
+        "renewal",
+        "module-entitlement"
+      ]
+    },
+    "evidence": {
+      "owner": "DataNest",
+      "functions": [
+        "release-evidence",
+        "audit-evidence",
+        "traceability",
+        "attestation"
+      ]
+    },
+    "security": {
+      "owner": "DataNest",
+      "functions": [
+        "secret-scanning",
+        "policy-enforcement",
+        "provider-sovereignty",
+        "security-invariants"
+      ]
+    },
+    "telemetry": {
+      "owner": "DataNest",
+      "functions": [
+        "product-events",
+        "conversion-events",
+        "errors",
+        "performance",
+        "usage"
+      ]
+    },
+    "content": {
+      "owner": "DataNest",
+      "functions": [
+        "brand",
+        "seo",
+        "metadata",
+        "legal-disclosures"
+      ]
+    },
+    "storage": {
+      "owner": "DataNest",
+      "functions": [
+        "asset-storage",
+        "artifact-retention",
+        "backup",
+        "recovery"
+      ]
+    },
+    "ai": {
+      "owner": "DataNest",
+      "functions": [
+        "provider-abstraction",
+        "policy",
+        "model-routing",
+        "cost-observation",
+        "safety"
+      ]
+    }
+  },
+  "optimizationGates": [
+    "No app may introduce a second customer identity system when DataNest identity is available.",
+    "No module may create an independent billing or entitlement model without an approved business reason.",
+    "No app-local evidence store may replace DataNest release/evidence authority.",
+    "Acquisition tools must have a measurable route into a primary product.",
+    "Modules must expose their capability through the parent journey.",
+    "Professional/B2B capabilities must not be mixed into consumer creator navigation.",
+    "Shared functions should move toward canonical DataNest contracts before code duplication is removed.",
+    "Every production-capable app must retain build, health, security and user-value verification."
+  ]
+}

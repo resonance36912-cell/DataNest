@@ -1,0 +1,119 @@
+t uncertainty, and avoidance of fabricated system actions.
+
+[ ] Verify certified memory retrieval is project-scoped, permission-scoped, versioned, and traceable to sources/certification.
+
+[ ] Test correction, supersession, revocation/deactivation, and stale-memory behavior.
+
+[ ] Verify learning candidates require human review and are not autonomous retraining.
+
+[ ] Check trend-analysis inputs for traceability and anti-noise/anti-gaming controls.
+
+[ ] Verify AI cannot silently change permissions, finance, governance, progression, Sparks, or royalty records.
+
+[ ] Assess prompt/context efficiency and opportunities to reduce token/context duplication without losing traceability.
+
+Evidence to return: AI trace samples, context-leak tests, output-quality rubric, memory lifecycle diagram, optimization proposals.
+
+# 12. Think Tanks, Decisions, Actions, and Reviewed Learning
+
+## 12.1 Collaboration to institutional knowledge
+
+Audit purpose. Verify discussion can become decisions/actions/learning without skipping review boundaries.
+
+[ ] Create/review project-wide and Job-linked channels and verify scoping.
+
+[ ] Test @DataNest answer, summarize, record-decision, extract-actions, and propose-learning commands where available.
+
+[ ] Verify AI responses remain tied to the authorized Job/usage request.
+
+[ ] Confirm proposed decisions require independent owner/admin confirmation and cannot be self-confirmed.
+
+[ ] Confirm learning candidates require independent review and cannot be self-approved.
+
+[ ] Verify approved learning enters certified memory as reviewed retrieval knowledge, not autonomous training.
+
+[ ] Verify reusable knowledge enters contribution pipeline as submitted/unscored/uncertified and does not mint Sparks automatically.
+
+[ ] Audit action-item assignment, state changes, closure, and traceability.
+
+[ ] Assess discoverability of past decisions and approved learning.
+
+Evidence to return: Think Tank lifecycle evidence, decision/action/memory traces, review-boundary findings, collaboration UX recommendations.
+
+# 13. Stakeholder, Contribution Intelligence, Reputation, and Progression
+
+## 13.1 Recognition and anti-gaming
+
+Audit purpose. Assess whether recognition is explainable, evidence-based, hard to game, and clearly separate from authority/ownership.
+
+[ ] Audit stakeholder profile and contribution submission UX in Simple and Detailed modes.
+
+[ ] Verify evidence hashing/reuse detection, self-review detection, burst-certification signals, and open-vs-confirmed anomaly behavior.
+
+[ ] Validate rolling-90 and lifetime scoring calculations against stored evidence for sample users.
+
+[ ] Confirm ranking excludes investment and Sparks balance and respects opt-in and confirmed high/critical anomaly exclusion.
+
+[ ] Check N0nymous Squad pseudonymization, top-10 logic, opt-in, and absence of admin/reviewer/ownership/financial authority.
+
+[ ] Verify progression recommendations require human approval and do not directly grant project roles.
+
+[ ] Assess explainability: users should understand score dimensions, weights, trust, anomaly state, eligibility, and next progression condition.
+
+[ ] Check reviewer independence and stale/superseded recommendation handling.
+
+[ ] Identify UI duplication or metrics that create false precision or status anxiety.
+
+Evidence to return: Sample calculation checks, anomaly tests, ranking/progression evidence, fairness/explainability findings, UI simplification proposals.
+
+# 14. Sparks Internal-Utility Economy
+
+## 14.1 Wallet, reservations, and service redemption
+
+Audit purpose. Verify Sparks behave as a closed internal utility with accurate append-only accounting.
+
+Do not break. Do not propose cash conversion or transferable-token behavior as an optimization to the current v1 economy.
+
+[ ] Reconcile project, locked, and platform balances against ledger entries for sample accounts.
+
+[ ] Test service catalog publish/pause/retire permissions.
+
+[ ] Test service redemption hold, duplicate idempotency, insufficient balance, cancel/release, fulfill/service-spend.
+
+[ ] Confirm account locking/serialization prevents overspend under concurrent requests.
+
+[ ] Verify historical award entries remain unchanged when Sparks are spent.
+
+[ ] Confirm cash purchase/redemption, P2P, external transfer, secondary market, and platform spending remain disabled.
+
+[ ] Verify spending cannot alter contribution history, reputation, legal ownership, royalties, or project authority.
+
+[ ] Assess whether the UI clearly communicates spendable vs locked balances and pending service state.
+
+[ ] Identify reconciliation/observability features needed for operators.
+
+Evidence to return: Ledger reconciliation sample, concurrency/overspend test results, UI findings, proposed operator reconciliation view.
+
+# 15. Sovereign Governance Protocol and Formal Decision-Making
+
+## 15.1 Protocol, proposals, votes, decisions, disputes
+
+Audit purpose. Verify governance state is explicit, versioned, independently reviewable, and separate from legal/economic authority.
+
+Do not break. Do not ratify stale or unintended drafts merely because a newer draft exists; proposal target and vote evidence must match.
+
+[ ] Confirm the ratified protocol version, content hash, effective date, proposal, decision, and vote trace are internally consistent.
+
+[ ] Identify later draft protocol versions and verify they do not override the ratified version without an accepted proposal + ratification.
+
+[ ] Test protocol draft creation, protocol-change proposal, member voting, proposal close, and ratification using authorized non-production or controlled data where possible.
+
+[ ] Verify one active member/one vote and latest-vote semantics.
+
+[ ] Verify simple majority, configured quorum, and independent support from someone other than proposer.
+
+[ ] Confirm Sparks/reputation/contribution share/capital do not weight votes.
+
+[ ] Test dispute filing/resolution and confirm the source protocol/proposal/decision is not rewritten.
+
+[ ] Verify filer cannot resolve own 

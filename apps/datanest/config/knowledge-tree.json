@@ -1,0 +1,157 @@
+{
+  "schemaVersion": "datanest-knowledge-tree-v1",
+  "authority": "DataNest-Supository/DataNest",
+  "sources": [
+    {
+      "repository": "DataNest-Supository/DataNest",
+      "role": "canonical"
+    },
+    {
+      "repository": "DataNest-Supository/Mirror-DataNest",
+      "role": "rnd"
+    }
+  ],
+  "excludedRepositories": [
+    "DataNest-Supository/FREETREE",
+    "DataNest-Supository/Mirror-DataNest-Empty"
+  ],
+  "maxCommitsPerRepository": 50,
+  "maxPullRequestsPerRepository": 50,
+  "feedBranch": "automation/knowledge-feed",
+  "categories": {
+    "security": [
+      "security",
+      "auth",
+      "permission",
+      "secret",
+      "vulnerability",
+      "audit"
+    ],
+    "governance": [
+      "governance",
+      "approval",
+      "certification",
+      "boundary",
+      "policy",
+      "authority"
+    ],
+    "reliability": [
+      "fix",
+      "stability",
+      "recovery",
+      "health",
+      "retry",
+      "resilience"
+    ],
+    "testing": [
+      "test",
+      "playwright",
+      "validation",
+      "verify",
+      "evidence",
+      "acceptance"
+    ],
+    "deployment": [
+      "deploy",
+      "pages",
+      "release",
+      "promotion",
+      "runtime",
+      "hosting"
+    ],
+    "ai": [
+      "ai",
+      "model",
+      "provider",
+      "inference",
+      "memory",
+      "learning",
+      "ilm"
+    ],
+    "data": [
+      "supabase",
+      "database",
+      "migration",
+      "schema",
+      "storage",
+      "rls"
+    ],
+    "ux": [
+      "ui",
+      "ux",
+      "design",
+      "navigation",
+      "accessibility",
+      "responsive"
+    ],
+    "maintenance": [
+      "cleanup",
+      "cleaner",
+      "declutter",
+      "refactor",
+      "streamline",
+      "maintenance"
+    ],
+    "architecture": [
+      "architecture",
+      "repository",
+      "sync",
+      "mirror",
+      "canonical",
+      "integration"
+    ]
+  },
+  "feeds": {
+    "datanest": {
+      "file": "knowledge/feeds/datanest.json",
+      "categories": [
+        "security",
+        "governance",
+        "reliability",
+        "testing",
+        "deployment",
+        "ai",
+        "data",
+        "ux",
+        "maintenance",
+        "architecture"
+      ]
+    },
+    "mirror": {
+      "file": "knowledge/feeds/mirror-datanest.json",
+      "categories": [
+        "reliability",
+        "testing",
+        "deployment",
+        "ai",
+        "data",
+        "ux",
+        "maintenance",
+        "architecture"
+      ]
+    },
+    "enforcer": {
+      "file": "knowledge/feeds/enforcer.json",
+      "categories": [
+        "security",
+        "governance",
+        "reliability",
+        "testing",
+        "deployment",
+        "ai",
+        "data",
+        "ux",
+        "maintenance",
+        "architecture",
+        "other"
+      ]
+    }
+  },
+  "controls": {
+    "provisionalOnly": true,
+    "certifiedMemoryPromotion": false,
+    "productionAuthorization": false,
+    "humanReviewForCanonicalAdoption": true,
+    "boundariesAssessmentRequired": true
+  }
+}

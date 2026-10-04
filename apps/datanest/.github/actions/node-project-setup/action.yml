@@ -1,0 +1,28 @@
+name: Node project setup
+description: Set up Node.js with npm caching and install locked dependencies.
+inputs:
+  node-version:
+    description: Node.js version to install.
+    required: false
+    default: "22"
+  working-directory:
+    description: Directory containing the package-lock.json used by npm ci.
+    required: false
+    default: "."
+  cache-dependency-path:
+    description: Lockfile path used to key the npm cache.
+    required: false
+    default: "package-lock.json"
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v7.0.0
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+        cache-dependency-path: ${{ inputs.cache-dependency-path }}
+    - name: Install locked dependencies
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: npm ci

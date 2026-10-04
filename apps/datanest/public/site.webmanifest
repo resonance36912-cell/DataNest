@@ -1,0 +1,16 @@
+{
+  "name": "DataNest",
+  "short_name": "DataNest",
+  "description": "Governed Resonance AppDev planning, AI collaboration, execution, evidence and transparency platform.",
+  "start_url": "/DataNest/",
+  "scope": "/DataNest/",
+  "display": "standalone",
+  "background_color": "#070414",
+  "theme_color": "#070414",
+  "categories": [
+    "business",
+    "productivity",
+    "developer",
+    "utilities"
+  ]
+}

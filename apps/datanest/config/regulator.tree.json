@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "datanest-regulator-v1",
+  "authority": "DataNest-Supository/DataNest",
+  "mode": "transparent-system-regulation-and-harmony",
+  "productionAuthorization": false,
+  "purpose": "Continuously regulate DataNest for transparency, balance and operational harmony by converting system requirements into auditable BOTSQUAD audit, stress-test, acquisition, supply and action work.",
+  "branch": "automation/regulator",
+  "requirementsPath": "regulator/requirements/botsquad.json",
+  "statePath": "regulator/state/latest.json",
+  "transparencyPath": "regulator/transparency/latest.json",
+  "sources": [
+    "Boundaries",
+    "ENFORCER",
+    "GUARDIAN",
+    "CALMER",
+    "ENVIRONMENT",
+    "CONDUCTOR",
+    "SUGGESTER",
+    "Knowledge",
+    "BOTSQUAD",
+    "VISIBILITY-UTILITY"
+  ],
+  "botsquadRoles": [
+    {
+      "id": "regulator-auditor",
+      "purpose": "Audit requirements, evidence completeness, control consistency, transparency and unresolved obligations."
+    },
+    {
+      "id": "regulator-stress-tester",
+      "purpose": "Stress-test requirements, failure modes, limits, recovery paths and operational assumptions."
+    },
+    {
+      "id": "regulator-acquisition-scout",
+      "purpose": "Identify free/open or already-authorized resources, dependencies, tools and evidence needed to satisfy requirements; never purchase or commit funds."
+    },
+    {
+      "id": "regulator-supply-coordinator",
+      "purpose": "Assess availability and supply readiness of approved internal/free/open resources, evidence, capabilities and dependencies."
+    },
+    {
+      "id": "regulator-action-planner",
+      "purpose": "Translate validated requirements into bounded action plans for SUGGESTER/CONDUCTOR or human review."
+    }
+  ],
+  "requirementClasses": [
+    "security",
+    "governance",
+    "health",
+    "environment",
+    "timing",
+    "optimization",
+    "resource",
+    "transparency",
+    "market-visibility"
+  ],
+  "controls": {
+    "mayRequestBotsquadWork": true,
+    "mayPublishTransparentRequirementState": true,
+    "mayQueueAllowlistedInternalActions": true,
+    "mayPurchase": false,
+    "mayCommitFunds": false,
+    "mayAcquireCredentials": false,
+    "mayBypassSecurity": false,
+    "mayChangeBoundaries": false,
+    "mayMerge": false,
+    "mayDeployProduction": false,
+    "freetreeMode": "observe-contract-only"
+  }
+}

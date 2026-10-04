@@ -1,0 +1,456 @@
+.productsHeroVisual{
+  isolation:isolate;
+  min-height:430px;
+}
+.portfolioOrbitShell{
+  position:absolute;
+  inset:4%;
+  display:grid;
+  place-items:center;
+  pointer-events:none;
+}
+.portfolioOrbitRing{
+  position:absolute;
+  border-radius:50%;
+  border:1px solid rgba(86,231,255,.18);
+  box-shadow:0 0 34px rgba(86,231,255,.035),inset 0 0 34px rgba(150,117,255,.025);
+}
+.portfolioRingOuter{
+  width:88%;
+  aspect-ratio:1;
+  border-style:solid;
+  animation:portfolioOrbitSpin 28s linear infinite;
+}
+.portfolioRingInner{
+  width:61%;
+  aspect-ratio:1;
+  border-style:dashed;
+  border-color:rgba(255,67,218,.18);
+  animation:portfolioOrbitSpin 20s linear infinite reverse;
+}
+.portfolioSignalSweep{
+  position:absolute;
+  width:82%;
+  aspect-ratio:1;
+  border-radius:50%;
+  background:conic-gradient(from 0deg,transparent 0 78%,rgba(86,231,255,.18) 86%,rgba(255,67,218,.34) 91%,transparent 97%);
+  filter:blur(.3px);
+  -webkit-mask:radial-gradient(circle,transparent 0 72%,#000 73% 75%,transparent 76%);
+  mask:radial-gradient(circle,transparent 0 72%,#000 73% 75%,transparent 76%);
+  animation:portfolioSweep 8s linear infinite;
+}
+.portfolioSignalDot{
+  position:absolute;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#75edff;
+  box-shadow:0 0 8px #75edff,0 0 24px rgba(117,237,255,.72);
+}
+.portfolioSignalDot.dotOne{left:13%;top:31%;animation:portfolioDot 2.7s ease-in-out infinite}
+.portfolioSignalDot.dotTwo{right:10%;top:44%;background:#ff68df;box-shadow:0 0 8px #ff68df,0 0 24px rgba(255,104,223,.65);animation:portfolioDot 3.1s ease-in-out -.9s infinite}
+.portfolioSignalDot.dotThree{left:51%;bottom:3%;background:#9e8cff;box-shadow:0 0 8px #9e8cff,0 0 24px rgba(158,140,255,.62);animation:portfolioDot 2.9s ease-in-out -1.6s infinite}
+.portfolioProductSlot{
+  position:absolute;
+  width:0;
+  height:0;
+  z-index:3;
+}
+.portfolioProductCard{
+  width:clamp(112px,10vw,142px);
+  min-height:88px;
+  padding:10px 11px;
+  transform:translate(-50%,-50%);
+  display:grid;
+  align-content:center;
+  gap:3px;
+  appearance:none;
+  text-align:left;
+  font:inherit;
+  cursor:pointer;
+  border:1px solid rgba(86,231,255,.20);
+  border-radius:13px;
+  background:
+    radial-gradient(circle at 18% 12%,rgba(86,231,255,.09),transparent 34%),
+    linear-gradient(145deg,rgba(21,11,46,.92),rgba(6,7,24,.95));
+  box-shadow:0 14px 34px rgba(0,0,0,.24),0 0 24px rgba(86,231,255,.035);
+  backdrop-filter:blur(12px);
+  animation:portfolioCardFloat 4.8s ease-in-out infinite;
+}
+.portfolioProductCard:hover,
+.portfolioProductCard:focus-visible{
+  border-color:rgba(86,231,255,.52);
+  background:
+    radial-gradient(circle at 18% 12%,rgba(86,231,255,.14),transparent 36%),
+    linear-gradient(145deg,rgba(27,15,58,.96),rgba(7,10,30,.98));
+  box-shadow:0 18px 42px rgba(0,0,0,.32),0 0 30px rgba(86,231,255,.08);
+}
+.portfolioProductTopline{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+}
+.portfolioProductIndex{
+  color:#6ceaff;
+  font-size:7px;
+  font-style:normal;
+  font-weight:950;
+  letter-spacing:.13em;
+}
+.portfolioProductDomain{
+  overflow:hidden;
+  max-width:70px;
+  color:#b9a7ff;
+  font-size:6px;
+  font-style:normal;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-overflow:ellipsis;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.portfolioProductCard b{
+  overflow-wrap:anywhere;
+  color:#f8f6ff;
+  font-size:10px;
+  line-height:1.18;
+}
+.portfolioProductCard small{
+  overflow:hidden;
+  color:#8d88a8;
+  font-size:7px;
+  line-height:1.25;
+  text-overflow:ellipsis;
+  white-space:normal;
+}
+.portfolioProductApplication{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:5px;
+  align-items:center;
+  min-width:0;
+}
+.portfolioProductApplication>span{
+  overflow:hidden;
+  color:#86dfea;
+  font-size:6px;
+  font-weight:800;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.portfolioProductApplication>em{
+  color:#7fcfae;
+  font-size:5.5px;
+  font-style:normal;
+  font-weight:900;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+}
+.portfolioCore{
+  position:relative;
+  z-index:5;
+  width:176px;
+  min-height:176px;
+  padding:23px 19px 18px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  border:1px solid rgba(86,231,255,.38);
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 32% 22%,rgba(255,255,255,.14),transparent 16%),
+    radial-gradient(circle,rgba(33,68,118,.84),rgba(22,11,56,.94) 56%,rgba(5,4,18,.98) 76%);
+  box-shadow:
+    0 0 0 14px rgba(86,231,255,.025),
+    0 0 52px rgba(86,231,255,.14),
+    0 0 82px rgba(255,67,218,.08);
+}
+.portfolioCore::before{
+  content:"";
+  position:absolute;
+  inset:-8px;
+  z-index:-1;
+  border-radius:50%;
+  border:1px solid rgba(255,67,218,.14);
+  animation:portfolioCoreBreath 4s ease-in-out infinite;
+}
+.portfolioCore small{
+  color:#71eaff;
+  font-size:7px;
+  font-weight:950;
+  letter-spacing:.14em;
+}
+.portfolioCore strong{
+  margin:6px 0 5px;
+  max-width:138px;
+  color:#fff;
+  font-size:21px;
+  line-height:1;
+  letter-spacing:-.045em;
+}
+.portfolioCore>span{
+  max-width:132px;
+  color:#aaa3c3;
+  font-size:7px;
+  line-height:1.35;
+}
+.portfolioCore button{
+  min-height:29px;
+  margin-top:10px;
+  padding:0 10px;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  border:1px solid rgba(86,231,255,.25);
+  border-radius:999px;
+  color:#eafbff;
+  background:linear-gradient(90deg,rgba(86,231,255,.10),rgba(255,67,218,.08));
+  cursor:pointer;
+  font-size:8px;
+  font-weight:850;
+}
+.portfolioCore button:hover{
+  border-color:rgba(86,231,255,.52);
+  transform:translateY(-1px);
+}
+.portfolioCore.loading strong{
+  font-size:15px;
+  letter-spacing:-.02em;
+}
+.portfolioCaption{
+  position:absolute;
+  bottom:2px;
+  z-index:6;
+  color:#78728f;
+  font-size:8px;
+  font-weight:850;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+@keyframes portfolioOrbitSpin{to{transform:rotate(360deg)}}
+@keyframes portfolioSweep{to{transform:rotate(360deg)}}
+@keyframes portfolioDot{0%,100%{opacity:.38;transform:scale(.8)}50%{opacity:1;transform:scale(1.28)}}
+@keyframes portfolioCardFloat{0%,100%{margin-top:0}50%{margin-top:-6px}}
+@keyframes portfolioCoreBreath{
+  0%,100%{transform:scale(.97);box-shadow:0 0 0 14px rgba(86,231,255,.02),0 0 45px rgba(86,231,255,.11),0 0 72px rgba(255,67,218,.06)}
+  50%{transform:scale(1.02);box-shadow:0 0 0 19px rgba(86,231,255,.03),0 0 66px rgba(86,231,255,.18),0 0 96px rgba(255,67,218,.10)}
+}
+@container datanest-main (max-width:620px){
+  .productsHeroVisual{min-height:340px!important}
+  .portfolioProductCard{width:116px;min-height:78px;padding:9px}
+  .portfolioCore{width:154px;min-height:154px}
+  .portfolioCore strong{font-size:18px}
+}
+@media(max-width:470px){
+  .productsHeroVisual{min-height:310px!important}
+  .portfolioProductCard{width:108px}
+  .portfolioProductCard b{font-size:9px}
+  .portfolioProductApplication{display:none}
+  .portfolioProductDomain{max-width:60px}
+  .portfolioCore{width:144px;min-height:144px}
+}
+
+/* Shared DataNest capability network. Governed products remain the outer product nodes. */
+.valueNetwork{
+  --network-x:125px;
+  --network-y:118px;
+  position:absolute;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+}
+.aiCorePulse{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:196px;
+  height:196px;
+  border:1px solid rgba(106,232,255,.30);
+  border-radius:50%;
+  opacity:0;
+  transform:translate(-50%,-50%) scale(.78);
+  background:radial-gradient(circle,rgba(94,226,255,.08),transparent 58%);
+  box-shadow:0 0 34px rgba(86,231,255,.10),inset 0 0 28px rgba(181,144,255,.06);
+  animation:portfolioAiPulse 9.6s ease-out infinite;
+}
+.ecosystemPulse{
+  position:absolute;
+  width:96%;
+  aspect-ratio:1;
+  border-radius:50%;
+  opacity:0;
+  background:conic-gradient(from 235deg,transparent 0 69%,rgba(117,237,255,.10) 75%,rgba(166,145,255,.40) 82%,rgba(255,104,223,.28) 88%,transparent 94%);
+  -webkit-mask:radial-gradient(circle,transparent 0 81%,#000 82% 84%,transparent 85%);
+  mask:radial-gradient(circle,transparent 0 81%,#000 82% 84%,transparent 85%);
+  filter:drop-shadow(0 0 10px rgba(122,226,255,.20));
+  animation:portfolioEcosystemPulse 9.6s ease-in-out infinite;
+}
+.intelligenceHalo{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:238px;
+  height:238px;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:conic-gradient(from 30deg,transparent 0 18%,rgba(100,231,255,.24) 25%,transparent 32% 55%,rgba(182,145,255,.22) 63%,transparent 72%);
+  -webkit-mask:radial-gradient(circle,transparent 0 71%,#000 72% 74%,transparent 75%);
+  mask:radial-gradient(circle,transparent 0 71%,#000 72% 74%,transparent 75%);
+  opacity:.8;
+  animation:valueHaloSweep 13s linear infinite;
+}
+.valueNode{
+  position:absolute;
+  width:112px;
+  min-height:50px;
+  padding:8px 10px;
+  display:grid;
+  align-content:center;
+  gap:1px;
+  border:1px solid rgba(105,220,255,.2);
+  border-radius:12px;
+  background:linear-gradient(145deg,rgba(11,27,49,.9),rgba(10,8,32,.93));
+  box-shadow:0 12px 30px rgba(0,0,0,.2),0 0 24px rgba(90,220,255,.035);
+  backdrop-filter:blur(10px);
+  animation:valueNodePulse 6.8s ease-in-out infinite;
+}
+.valueNode small{
+  color:#78e9ff;
+  font-size:6px;
+  font-weight:950;
+  letter-spacing:.14em;
+}
+.valueNode b{
+  color:#f6fbff;
+  font-size:9px;
+  line-height:1.15;
+}
+.valueNode span{
+  color:#858fa8;
+  font-size:6px;
+  line-height:1.25;
+}
+.aiValueNode{
+  left:calc(50% - var(--network-x));
+  top:calc(50% - var(--network-y));
+  transform:translate(-50%,-50%);
+  animation-delay:0s;
+}
+.memoryValueNode{
+  left:calc(50% + var(--network-x));
+  top:calc(50% - var(--network-y));
+  transform:translate(-50%,-50%);
+  animation-delay:-1.7s;
+}
+.collaborationValueNode{
+  left:calc(50% + var(--network-x));
+  top:calc(50% + var(--network-y));
+  transform:translate(-50%,-50%);
+  animation-delay:-3.4s;
+}
+.ronsasValueNode{
+  width:146px;
+  left:calc(50% - var(--network-x));
+  top:calc(50% + var(--network-y));
+  transform:translate(-50%,-50%);
+  animation-delay:-5.1s;
+}
+.ronsasValueNode small{color:#d39cff}
+.memoryValueNode small{color:#a9a0ff}
+.collaborationValueNode small{color:#77efc7}
+.valueSignal{
+  position:absolute;
+  left:calc(50% - 3px);
+  top:calc(50% - 3px);
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  opacity:0;
+  background:#83ecff;
+  box-shadow:0 0 10px #83ecff,0 0 22px rgba(131,236,255,.7);
+  will-change:transform,opacity;
+}
+.aiSignal{animation:valueSignalAI 9.6s 1.15s ease-in-out infinite}
+.memorySignal{
+  background:#aaa2ff;
+  box-shadow:0 0 10px #aaa2ff,0 0 22px rgba(170,162,255,.66);
+  animation:valueSignalMemory 9.6s 2.45s ease-in-out infinite;
+}
+.collaborationSignal{
+  background:#78ecc7;
+  box-shadow:0 0 10px #78ecc7,0 0 22px rgba(120,236,199,.62);
+  animation:valueSignalCollaboration 9.6s 3.75s ease-in-out infinite;
+}
+.ronsasSignal{
+  background:#e292ff;
+  box-shadow:0 0 10px #e292ff,0 0 25px rgba(226,146,255,.68);
+  animation:valueSignalRonsas 9.6s 5.05s ease-in-out infinite;
+}
+@keyframes portfolioAiPulse{
+  0%,100%{opacity:0;transform:translate(-50%,-50%) scale(.78)}
+  5%{opacity:.28}
+  11%{opacity:.72;transform:translate(-50%,-50%) scale(1)}
+  20%{opacity:0;transform:translate(-50%,-50%) scale(1.34)}
+  21%,100%{opacity:0;transform:translate(-50%,-50%) scale(1.34)}
+}
+@keyframes portfolioEcosystemPulse{
+  0%,67%{opacity:0;transform:rotate(-12deg) scale(.96)}
+  74%{opacity:.38}
+  86%{opacity:.82;transform:rotate(22deg) scale(1)}
+  97%,100%{opacity:0;transform:rotate(42deg) scale(1.03)}
+}
+@keyframes valueHaloSweep{to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes valueNodePulse{
+  0%,70%,100%{border-color:rgba(105,220,255,.18);filter:brightness(.96)}
+  78%,88%{border-color:rgba(134,229,255,.42);filter:brightness(1.12)}
+}
+@keyframes valueSignalAI{
+  0%,6%,32%,100%{opacity:0;transform:translate3d(0,0,0) scale(.75)}
+  10%{opacity:1}
+  25%{opacity:1;transform:translate3d(calc(var(--network-x) * -1),calc(var(--network-y) * -1),0) scale(1.1)}
+  31%{opacity:0;transform:translate3d(calc(var(--network-x) * -1),calc(var(--network-y) * -1),0) scale(.8)}
+}
+@keyframes valueSignalMemory{
+  0%,6%,32%,100%{opacity:0;transform:translate3d(0,0,0) scale(.75)}
+  10%{opacity:1}
+  25%{opacity:1;transform:translate3d(var(--network-x),calc(var(--network-y) * -1),0) scale(1.1)}
+  31%{opacity:0;transform:translate3d(var(--network-x),calc(var(--network-y) * -1),0) scale(.8)}
+}
+@keyframes valueSignalCollaboration{
+  0%,6%,32%,100%{opacity:0;transform:translate3d(0,0,0) scale(.75)}
+  10%{opacity:1}
+  25%{opacity:1;transform:translate3d(var(--network-x),var(--network-y),0) scale(1.1)}
+  31%{opacity:0;transform:translate3d(var(--network-x),var(--network-y),0) scale(.8)}
+}
+@keyframes valueSignalRonsas{
+  0%,6%,32%,100%{opacity:0;transform:translate3d(0,0,0) scale(.75)}
+  10%{opacity:1}
+  25%{opacity:1;transform:translate3d(calc(var(--network-x) * -1),var(--network-y),0) scale(1.1)}
+  31%{opacity:0;transform:translate3d(calc(var(--network-x) * -1),var(--network-y),0) scale(.8)}
+}
+@container datanest-main (max-width:620px){
+  .valueNetwork{--network-x:102px;--network-y:96px}
+  .valueNode{width:96px;min-height:44px;padding:7px 8px}
+  .ronsasValueNode{width:104px}
+  .valueNode b{font-size:8px}
+  .valueNode span{display:none}
+  .intelligenceHalo{width:190px;height:190px}
+}
+@media(max-width:470px){
+  .valueNetwork{--network-x:86px;--network-y:82px}
+  .valueNode{width:82px;min-height:40px;padding:6px 7px}
+  .ronsasValueNode{width:88px}
+  .valueNode b{font-size:7px}
+  .valueNode small{font-size:5px}
+  .intelligenceHalo{width:170px;height:170px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .portfolioRingOuter,.portfolioRingInner,.portfolioSignalSweep,.portfolioSignalDot,.portfolioProductCard,.portfolioCore,.portfolioCore::before,
+  .intelligenceHalo,.valueNode,.valueSignal,.aiCorePulse,.ecosystemPulse{
+    animation:none!important;
+  }
+}

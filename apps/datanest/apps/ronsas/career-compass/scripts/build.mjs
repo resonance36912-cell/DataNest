@@ -1,0 +1,7 @@
+import{rm,mkdir,copyFile,readdir}from"node:fs/promises";import path from"node:path";import{fileURLToPath}from"node:url";
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),".."),out=path.join(root,"dist"),fontOut=path.join(out,"fonts");
+await rm(out,{recursive:true,force:true});await mkdir(out,{recursive:true});for(const f of["index.html","styles.css","app.js","logic.mjs"])await copyFile(path.join(root,f),path.join(out,f));
+await mkdir(fontOut,{recursive:true});const specs=[["Inter Tight","@fontsource-variable/inter-tight",/latin-wght-normal\.woff2$/],["Inter","@fontsource-variable/inter",/latin-wght-normal\.woff2$/],["Instrument Serif","@fontsource/instrument-serif",/latin-400-italic\.woff2$/],["JetBrains Mono","@fontsource-variable/jetbrains-mono",/latin-wght-normal\.woff2$/]];let fontCss="";
+for(const[family,pkg,pattern]of specs){const dir=path.join(root,"node_modules",...pkg.split("/"),"files"),files=await readdir(dir),name=files.find(f=>pattern.test(f));if(!name)throw new Error("Missing required woff2 for "+pkg);const target=family.toLowerCase().replace(/[^a-z0-9]+/g,"-")+".woff2";await copyFile(path.join(dir,name),path.join(fontOut,target));fontCss+='@font-face{font-family:"'+family+'";src:url("./'+target+'") format("woff2");font-display:swap;}\n';}
+await import("node:fs/promises").then(({writeFile})=>writeFile(path.join(fontOut,"fonts.css"),fontCss));console.log("Career Compass build complete.");
+await copyFile(path.resolve(root,"../shared/cinematic.css"),path.join(out,"cinematic.css"));

@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "audit_id": "external-full-system-audit-return-2026-09-25",
+  "status": "reported_proposals_pending_datanest_validation",
+  "items": [
+    {
+      "priority": "P1",
+      "finding_ids": [
+        "AUD-002",
+        "AUD-012"
+      ],
+      "optimization": "Explicit, privacy-preserving handoff/capture",
+      "impact": "Privacy and trust",
+      "effort": "M",
+      "risk": "Low",
+      "dependencies": "Sharing policy",
+      "validation": "No context in URLs; no unsolicited draft replacement"
+    },
+    {
+      "priority": "P1",
+      "finding_ids": [
+        "AUD-003"
+      ],
+      "optimization": "Content-bound intake replay",
+      "impact": "Evidence integrity",
+      "effort": "M",
+      "risk": "Medium",
+      "dependencies": "Hash contract",
+      "validation": "A/A/B replay test"
+    },
+    {
+      "priority": "P1",
+      "finding_ids": [
+        "AUD-004"
+      ],
+      "optimization": "Recent context plus traceable summary",
+      "impact": "AI usefulness",
+      "effort": "M",
+      "risk": "Medium",
+      "dependencies": "Context budget",
+      "validation": "130-event continuity test"
+    },
+    {
+      "priority": "P1",
+      "finding_ids": [
+        "AUD-005"
+      ],
+      "optimization": "Durable intent IDs for redemption",
+      "impact": "Retry safety",
+      "effort": "M",
+      "risk": "Medium",
+      "dependencies": "Status API",
+      "validation": "Lost-response test"
+    },
+    {
+      "priority": "P1",
+      "finding_ids": [
+        "AUD-006"
+      ],
+      "optimization": "Recoverable invitation operation",
+      "impact": "Membership reliability",
+      "effort": "L",
+      "risk": "Medium",
+      "dependencies": "Migration/delivery design",
+      "validation": "Boundary failure injection"
+    },
+    {
+      "priority": "P1",
+      "finding_ids": [
+        "AUD-008"
+      ],
+      "optimization": "Context-keyed async loading",
+      "impact": "Wrong-context prevention",
+      "effort": "M",
+      "risk": "Low–medium",
+      "dependencies": "Query conventions",
+      "validation": "A/B delayed-response test"
+    },
+    {
+      "priority": "P1",
+      "finding_ids": [
+        "AUD-010"
+      ],
+      "optimization": "Behavioral invariant suite",
+      "impact": "Assurance",
+      "effort": "L",
+      "risk": "Low in isolated testing",
+      "dependencies": "Fixtures/identities",
+      "validation": "Mutated-control tests fail"
+    },
+    {
+      "priority": "P1 verify",
+      "finding_ids": [
+        "AUD-013"
+      ],
+      "optimization": "Prove environment isolation",
+      "impact": "Integrity risk reduction",
+      "effort": "S/L",
+      "risk": "Depends on topology",
+      "dependencies": "Sanitized environment map",
+      "validation": "CI cannot reach production review data"
+    },
+    {
+      "priority": "P1",
+      "finding_ids": [
+        "AUD-001"
+      ],
+      "optimization": "Deployment attestation",
+      "impact": "Release trust",
+      "effort": "M–L",
+      "risk": "Medium",
+      "dependencies": "Inventory and CI evidence",
+      "validation": "Deliberate digest mismatch rejected"
+    },
+    {
+      "priority": "P2",
+      "finding_ids": [
+        "AUD-007"
+      ],
+      "optimization": "Scoped refresh and server filtering",
+      "impact": "Workflow clarity",
+      "effort": "M",
+      "risk": "Low",
+      "dependencies": "Domain clients",
+      "validation": "Current-view refresh/filter tests"
+    },
+    {
+      "priority": "P2",
+      "finding_ids": [
+        "AUD-009"
+      ],
+      "optimization": "Build-specific result views",
+      "impact": "Output accuracy",
+      "effort": "M",
+      "risk": "Low",
+      "dependencies": "Evidence identity",
+      "validation": "Untested build remains NOT TESTED"
+    },
+    {
+      "priority": "P2",
+      "finding_ids": [
+        "AUD-011"
+      ],
+      "optimization": "Environment-specific redirects",
+      "impact": "Portability",
+      "effort": "S–M",
+      "risk": "Medium",
+      "dependencies": "Auth allowlists",
+      "validation": "Controlled staging invitation"
+    },
+    {
+      "priority": "P2",
+      "finding_ids": [
+        "AUD-014"
+      ],
+      "optimization": "Keyboard resize alternative",
+      "impact": "Accessibility",
+      "effort": "S",
+      "risk": "Low",
+      "dependencies": "Layout review",
+      "validation": "Keyboard/zoom journey"
+    }
+  ]
+}

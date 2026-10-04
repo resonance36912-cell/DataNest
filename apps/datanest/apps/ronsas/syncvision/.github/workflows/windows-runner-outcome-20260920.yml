@@ -1,0 +1,78 @@
+name: One-shot Windows runner outcome inspection
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/windows-runner-outcome-20260920.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin, sovereign]
+    timeout-minutes: 5
+    steps:
+      - name: Inspect Windows runner bootstrap outcome read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          podman --remote run --rm --entrypoint sh \
+            -v /mnt/c/Users/Ashley/AppData/Local/Resonance/RONS-ControlCenter:/control:ro \
+            -v /mnt/c/Users/Ashley/AppData/Local/Resonance/RONS-GitHubRunner-Windows:/winrunner:ro \
+            localhost/ronsas-actions-runner:2.337.0-r2 -lc '
+              if grep -Fq "RONSAS_WINDOWS_RUNNER_BOOTSTRAP_ONCE" /control/RONS-Ensure-Public-Edge.ps1 2>/dev/null; then
+                echo "edge_script_restored=false"
+              else
+                echo "edge_script_restored=true"
+              fi
+              if [ -f /winrunner/.runner ] && [ -f /winrunner/bin/Runner.Listener.exe ]; then
+                echo "windows_runner_files=present"
+              else
+                echo "windows_runner_files=missing"
+              fi
+              echo "bootstrap_log_begin"
+              tail -n 40 /control/logs/windows-runner-bootstrap.log 2>/dev/null || true
+              echo "bootstrap_log_end"
+              echo "installer_out_begin"
+              tail -n 60 /control/logs/windows-runner-installer.out.log 2>/dev/null || true
+              echo "installer_out_end"
+              echo "installer_err_begin"
+              tail -n 60 /control/logs/windows-runner-installer.err.log 2>/dev/null || true
+              echo "installer_err_end"
+              echo "runner_diag_begin"
+              latest=$(ls -1t /winrunner/_diag/Runner_*.log 2>/dev/null | head -n 1 || true)
+              if [ -n "$latest" ]; then tail -n 60 "$latest"; fi
+              echo "runner_diag_end"
+            '
+
+      - name: Inspect failed Hub worktree read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          podman --remote run --rm --entrypoint sh \
+            -v /mnt/c/Resonance/Sources/release-worktrees:/worktrees:ro \
+            -v /mnt/c/Users/Ashley/Resonance/OpenNova/runtime/release-receipts:/receipts:ro \
+            localhost/ronsas-actions-runner:2.337.0-r2 -lc '
+              echo "worktree_listing_begin"
+              find /worktrees -maxdepth 2 -type d -print 2>/dev/null | head -n 80 || true
+              echo "worktree_listing_end"
+              WT=$(find /worktrees -maxdepth 1 -type d -name "hub-174cf6f*" | head -n 1 || true)
+              if [ -n "$WT" ]; then
+                echo "worktree=$WT"
+                [ -d "$WT/node_modules" ] && echo "node_modules=present" || echo "node_modules=missing"
+                [ -d "$WT/.output-candidate-local" ] && echo "candidate_output=present" || echo "candidate_output=missing"
+                [ -f "$WT/.output-candidate-local/server/index.mjs" ] && echo "candidate_entry=present" || echo "candidate_entry=missing"
+                [ -f "$WT/public/sitemap.xml" ] && echo "sitemap=present" || echo "sitemap=missing"
+                [ -f "$WT/.env.local" ] && echo "env_link=present" || echo "env_link=missing"
+              fi
+              echo "release_receipts_begin"
+              ls -lt /receipts 2>/dev/null | head -n 20 || true
+              latest=$(ls -1t /receipts/github-hub-release-*.json 2>/dev/null | head -n 1 || true)
+              if [ -n "$latest" ]; then
+                echo "latest_receipt=$latest"
+                cat "$latest"
+              fi
+              echo "release_receipts_end"
+            '

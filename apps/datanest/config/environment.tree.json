@@ -1,0 +1,185 @@
+{
+  "schemaVersion": "datanest-environment-tree-v1",
+  "authority": "DataNest-Supository/DataNest",
+  "purpose": "Assess and adapt the shared operating environment so DataNest trees can function, remain compatible, and grow without implicit authority changes.",
+  "trees": [
+    {
+      "id": "datanest",
+      "repository": "DataNest-Supository/DataNest",
+      "mode": "canonical"
+    },
+    {
+      "id": "mirror",
+      "repository": "DataNest-Supository/Mirror-DataNest",
+      "mode": "rnd"
+    },
+    {
+      "id": "knowledge",
+      "repository": "DataNest-Supository/DataNest",
+      "mode": "specialized"
+    },
+    {
+      "id": "boundaries",
+      "repository": "DataNest-Supository/DataNest",
+      "mode": "specialized"
+    },
+    {
+      "id": "botsquad",
+      "repository": "DataNest-Supository/DataNest",
+      "mode": "specialized"
+    },
+    {
+      "id": "environment",
+      "repository": "DataNest-Supository/DataNest",
+      "mode": "specialized"
+    },
+    {
+      "id": "freetree",
+      "repository": "DataNest-Supository/FREETREE",
+      "mode": "isolated-no-sync",
+      "writeAccess": false
+    },
+    {
+      "id": "enforcer",
+      "repository": "DataNest-Supository/DataNest",
+      "mode": "specialized-defensive"
+    },
+    {
+      "id": "guardian",
+      "repository": "DataNest-Supository/DataNest",
+      "mode": "specialized-health-and-safe-healing"
+    },
+    {
+      "id": "conductor",
+      "repository": "DataNest-Supository/DataNest",
+      "mode": "specialized-process-synchronization"
+    },
+    {
+      "id": "suggester",
+      "repository": "DataNest-Supository/DataNest",
+      "mode": "specialized-continuous-optimization"
+    },
+    {
+      "id": "calmer",
+      "repository": "DataNest-Supository/DataNest",
+      "mode": "specialized-minimum-friction-governance"
+    },
+    {
+      "id": "regulator",
+      "repository": "DataNest-Supository/DataNest",
+      "mode": "specialized-transparent-harmony-regulation"
+    },
+    {
+      "id": "visibility-utility",
+      "repository": "DataNest-Supository/DataNest",
+      "mode": "specialized-visibility-market-intelligence"
+    },
+    {
+      "id": "liberty-in-all",
+      "repository": "DataNest-Supository/DataNest",
+      "mode": "specialized-continuous-indexing-traceability"
+    }
+  ],
+  "dimensions": [
+    "source-control",
+    "runtime",
+    "ci-runner",
+    "delivery",
+    "backend",
+    "ai-inference",
+    "registry",
+    "backup-recovery",
+    "dependency-posture",
+    "branch-hygiene",
+    "evidence-observability"
+  ],
+  "expected": {
+    "nodeMajor": 22,
+    "ciRunner": "ubuntu-24.04",
+    "canonicalDelivery": "GitHub Pages",
+    "backendAuthority": "Supabase",
+    "canonicalRepository": "DataNest-Supository/DataNest",
+    "forgeMode": "governed-mirror"
+  },
+  "adaptationPolicy": {
+    "safeAuto": [
+      "generated environment state and compatibility feeds",
+      "non-authorizing automation-branch refresh",
+      "deterministic metadata normalization"
+    ],
+    "humanReviewRequired": [
+      "runtime major changes",
+      "dependency upgrades",
+      "hosting/provider changes",
+      "backend changes",
+      "repository permission changes",
+      "production workflow changes",
+      "Forge authority changes",
+      "secret or credential changes"
+    ],
+    "forbidden": [
+      "implicit production authority transfer",
+      "automatic governance weakening",
+      "automatic secret disclosure",
+      "automatic FREETREE synchronization"
+    ]
+  },
+  "feeds": [
+    {
+      "target": "datanest",
+      "path": "environment/feeds/datanest.json"
+    },
+    {
+      "target": "mirror",
+      "path": "environment/feeds/mirror-datanest.json"
+    },
+    {
+      "target": "knowledge",
+      "path": "environment/feeds/knowledge.json"
+    },
+    {
+      "target": "boundaries",
+      "path": "environment/feeds/boundaries.json"
+    },
+    {
+      "target": "botsquad",
+      "path": "environment/feeds/botsquad.json"
+    },
+    {
+      "target": "forge",
+      "path": "environment/feeds/resonance-forge.json"
+    },
+    {
+      "target": "enforcer",
+      "path": "environment/feeds/enforcer.json"
+    },
+    {
+      "target": "guardian",
+      "path": "environment/feeds/guardian.json"
+    },
+    {
+      "target": "conductor",
+      "path": "environment/feeds/conductor.json"
+    },
+    {
+      "target": "suggester",
+      "path": "environment/feeds/suggester.json"
+    },
+    {
+      "target": "calmer",
+      "path": "environment/feeds/calmer.json"
+    },
+    {
+      "target": "regulator",
+      "path": "environment/feeds/regulator.json"
+    },
+    {
+      "target": "visibility-utility",
+      "path": "environment/feeds/visibility-utility.json"
+    },
+    {
+      "target": "liberty-in-all",
+      "path": "environment/feeds/liberty-in-all.json"
+    }
+  ]
+}

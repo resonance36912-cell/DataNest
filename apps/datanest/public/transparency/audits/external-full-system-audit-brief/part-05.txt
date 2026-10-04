@@ -1,0 +1,119 @@
+dispute where independence is required.
+
+[ ] Check wording so users do not mistake project governance for contract amendment, ownership, royalty, role, or financial authority.
+
+[ ] Assess handling of obsolete draft versions, withdrawn proposals, supersession, and governance clutter.
+
+Evidence to return: Governance trace chain, protocol-version map, vote/decision validation, dispute evidence, cleanup/UX recommendations.
+
+# 16. Product Lab, Output Results, Artifacts, and User Value
+
+## 16.1 Result quality and downstream usability
+
+Audit purpose. Audit whether the system produces outputs that are not only valid but genuinely usable outside DataNest.
+
+[ ] Inventory all major output types: Job Manifests, AI answers, external AI handoffs/results, checkpoints, artifacts, decisions, actions, memory, contribution evidence, scores, Sparks records, governance records, exports.
+
+[ ] For each output type, assess correctness, completeness, clarity, provenance, traceability, reproducibility, audience fit, and next-action usefulness.
+
+[ ] Verify IDs/traces survive copy/paste/export/import boundaries.
+
+[ ] Check whether outputs are easy to locate later by project/job/user/date/status/trace.
+
+[ ] Test malformed/partial/large external AI outputs and ensure DataNest does not silently accept ambiguous attribution.
+
+[ ] Assess whether output summaries hide important evidence or whether raw details overwhelm users.
+
+[ ] Review naming/versioning/file conventions for artifacts and generated downloads.
+
+[ ] Check whether results can be independently verified without relying on hidden model reasoning.
+
+[ ] Identify opportunities for structured export (JSON/Markdown/DOCX/CSV) where that materially improves downstream use.
+
+[ ] Assess Product Lab outputs for clear linkage between concept, requirement, experiment, validation, and accepted result.
+
+Evidence to return: Output inventory, representative samples, quality scores, traceability gaps, export/format recommendations.
+
+# 17. Security, Privacy, Data Integrity, and Abuse Resistance
+
+## 17.1 Security and privacy
+
+Audit purpose. Assess practical security posture without requesting secrets or destructive testing.
+
+Do not break. Do not exfiltrate, print, or request secrets. No penetration testing beyond non-destructive authorization checks without explicit approval.
+
+[ ] Review RLS coverage, SECURITY DEFINER functions, execute grants, service-role gateways, and direct table write privileges.
+
+[ ] Check Auth settings and outstanding security configuration warnings, including leaked-password protection if still disabled.
+
+[ ] Review CORS/origin policy and JWT enforcement on Edge Functions.
+
+[ ] Check rate limits, replay/idempotency, brute-force/abuse paths, invitation spam controls, and user enumeration leakage.
+
+[ ] Review secret handling in source, runtime config, logs, screenshots, audit events, AI prompts, and exported artifacts.
+
+[ ] Check project isolation and cross-project access for data, memory, Think Tanks, contributions, governance, and artifacts.
+
+[ ] Review audit log completeness and tamper resistance for high-value actions.
+
+[ ] Test unauthorized role transitions and direct RPC/table access from lower-privilege users.
+
+[ ] Assess privacy/retention controls for user-submitted data and AI-derived reusable knowledge.
+
+[ ] Flag any security recommendation that requires destructive or intrusive testing as PROPOSED ONLY unless explicitly authorized.
+
+Evidence to return: Security finding register, privilege matrix, RLS/RPC observations, abuse cases, remediation plan.
+
+# 18. Performance, Reliability, Observability, and Recovery
+
+## 18.1 Runtime quality
+
+Audit purpose. Measure whether the system remains understandable and recoverable under latency, errors, stale state, and partial outages.
+
+[ ] Record page-load and interaction timings for key routes on normal desktop/network conditions.
+
+[ ] Identify N+1 queries, excessive RPCs, repeated polling, oversized payloads, unnecessary reloads, or redundant refetching.
+
+[ ] Test Supabase latency/unavailability and Edge Function errors for graceful UI fallback.
+
+[ ] Check stale cache/runtime-config/release-manifest behavior after deployment.
+
+[ ] Audit loading-state duration and whether slow operations show progress or actionable status.
+
+[ ] Review retries/backoff and duplicate submission risk for write actions.
+
+[ ] Assess observability: logs, traces, events, health checks, release metadata, operator diagnosis.
+
+[ ] Test refresh/browser restart/session expiry/relogin recovery.
+
+[ ] Identify single points of failure and high-coupling dependencies.
+
+[ ] Propose SLOs/SLIs for availability, job execution, AI response, and critical workflows.
+
+Evidence to return: Timing table, failure screenshots, observability gap list, proposed SLOs, performance quick wins.
+
+# 19. CI/CD, Release Governance, Test Coverage, and Maintainability
+
+## 19.1 Delivery system
+
+Audit purpose. Determine whether changes can be safely reproduced, certified, deployed, and rolled back.
+
+[ ] Review CI, DataNest AI Certification, Pages deployment, browser smoke, stress tests, Docker build, release-manifest validation, and migration gates.
+
+[ ] Confirm exact-head semantics: certification evidence must correspond to the merge candidate actually promoted.
+
+[ ] Check staging-first migrations and whether production promotion occurs only after gates pass.
+
+[ ] Review rollback strategy for database migrations, Edge Functions, and frontend deploys.
+
+[ ] Map untested critical business rules and weak source-only tests that should become functional tests.
+
+[ ] Assess fixture quality: avoid tests that “prove” behavior only because privileged harness actions bypass real user paths.
+
+[ ] Review dependency freshness, vulnerability audit, lockfile integrity, and build reproducibility.
+
+[ ] Check code organization, naming consistency, unused legacy modules, duplicated types, and oversized components.
+
+[ ] Assess documentation accuracy against live behavior.
+
+[ ] Propose test 

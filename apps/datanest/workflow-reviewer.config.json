@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "reportDir": "artifacts/workflow-reviewer",
+  "workflowDir": ".github/workflows",
+  "scanRoots": [
+    "src",
+    "scripts",
+    ".github/workflows",
+    "docs",
+    "knowledge",
+    "boundaries",
+    "botsquad",
+    "environment",
+    "enforcer",
+    "guardian",
+    "conductor",
+    "suggester",
+    "calmer",
+    "regulator",
+    "visibility-utility",
+    "liberty-in-all"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "artifacts",
+    "backups",
+    "package-lock.json",
+    "public/transparency",
+    "supabase/migrations"
+  ],
+  "sourceExtensions": [
+    ".js",
+    ".jsx",
+    ".mjs",
+    ".cjs",
+    ".ts",
+    ".tsx"
+  ],
+  "textExtensions": [
+    ".js",
+    ".jsx",
+    ".mjs",
+    ".cjs",
+    ".ts",
+    ".tsx",
+    ".json",
+    ".yml",
+    ".yaml",
+    ".toml",
+    ".css",
+    ".scss",
+    ".md",
+    ".txt"
+  ],
+  "maxFileLines": 900,
+  "maxFunctionLines": 90,
+  "maxWorkflowSteps": 24,
+  "reusableStepMinWorkflows": 3
+}

@@ -1,0 +1,103 @@
+name: Publish Railway fallback image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/publish-railway-fallback-image.yml"
+      - "Dockerfile.railway-colocated-stt"
+      - "scripts/start-railway-colocated-stt.sh"
+      - "vendor/ronsas-stt/**"
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - "vite.config.ts"
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: epublisher-railway-fallback-image
+  cancel-in-progress: false
+
+env:
+  IMAGE: ghcr.io/resonance36912-cell/rons-epublisher-sovereign-source
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out exact governed source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Set exact source SHA
+        shell: bash
+        run: echo "SOURCE_SHA=${GITHUB_SHA}" >> "$GITHUB_ENV"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR for publish
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push exact governed colocated image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.railway-colocated-stt
+          platforms: linux/amd64
+          push: true
+          provenance: false
+          sbom: false
+          tags: ${{ env.IMAGE }}:${{ env.SOURCE_SHA }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/resonance36912-cell/rons-epublisher-sovereign-source
+            org.opencontainers.image.revision=${{ env.SOURCE_SHA }}
+            org.opencontainers.image.description=RONSAS governed Railway fallback image with colocated hosted STT
+
+      - name: Verify anonymous pull
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker logout ghcr.io || true
+          docker image rm "${IMAGE}:${SOURCE_SHA}" >/dev/null 2>&1 || true
+          docker pull "${IMAGE}:${SOURCE_SHA}"
+          DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' "${IMAGE}:${SOURCE_SHA}")"
+          test -n "${DIGEST}"
+          echo "Anonymous GHCR pull verified: ${DIGEST}"
+
+      - name: Smoke-test pulled colocated image
+        shell: bash
+        run: |
+          set -euo pipefail
+          NAME="epublisher-fallback-smoke"
+          cleanup() {
+            docker logs "${NAME}" 2>/dev/null || true
+            docker rm -f "${NAME}" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          docker run -d --name "${NAME}" -e PORT=3000 -p 127.0.0.1:3100:3000 "${IMAGE}:${SOURCE_SHA}"
+
+          for attempt in $(seq 1 120); do
+            if curl -fsS http://127.0.0.1:3100/ -o /tmp/epublisher-index.html \
+              && curl -fsS http://127.0.0.1:3100/open-nova-stt/health/ready -o /tmp/stt-ready.json; then
+              grep -qi '<!doctype html' /tmp/epublisher-index.html
+              grep -Eq '"ok"[[:space:]]*:[[:space:]]*true' /tmp/stt-ready.json
+              grep -Eq '"service"[[:space:]]*:[[:space:]]*"epublisher-cloud-stt-colocated"' /tmp/stt-ready.json
+              echo "Runtime web + hosted STT smoke test passed on attempt ${attempt}"
+              exit 0
+            fi
+            sleep 2
+          done
+
+          echo "Runtime colocated fallback smoke test failed" >&2
+          exit 1

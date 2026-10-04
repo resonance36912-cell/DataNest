@@ -1,0 +1,82 @@
+name: Workflow Reviewer & Code Cleaner
+
+on:
+  workflow_run:
+    workflows: ["Branch-Cleaner"]
+    types: [completed]
+  pull_request:
+    paths:
+      - "src/**"
+      - "scripts/**"
+      - ".github/workflows/**"
+      - "docs/**"
+      - "workflow-reviewer.config.json"
+      - "config/worktree-gate-timeframes.json"
+      - "scripts/propose-worktree-gate-timeframe.mjs"
+      - ".github/workflows/worktree-gate-timeframe.yml"
+      - "package.json"
+  workflow_dispatch:
+    inputs:
+      apply_safe_refinements:
+        description: Apply byte-safe text normalization in the runner before reporting
+        required: true
+        default: false
+        type: boolean
+      strict:
+        description: Fail when high-severity workflow findings are detected
+        required: true
+        default: false
+        type: boolean
+  schedule:
+    - cron: "17 4 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: workflow-reviewer-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 22
+
+      - name: Verify reviewer unit tests
+        run: npm run test:workflow-reviewer
+
+      - name: Review workflows and code
+        env:
+          APPLY_SAFE_REFINEMENTS: ${{ inputs.apply_safe_refinements || 'false' }}
+          STRICT_REVIEW: ${{ inputs.strict || 'false' }}
+        run: |
+          ARGS=""
+          if [ "$APPLY_SAFE_REFINEMENTS" = "true" ]; then ARGS="$ARGS --apply"; fi
+          if [ "$STRICT_REVIEW" = "true" ]; then ARGS="$ARGS --strict"; fi
+          npm run workflow-review -- $ARGS
+
+      - name: Show safe refinement diff
+        if: always()
+        run: git diff --check && git diff --stat
+
+      - name: Upload reviewer report
+        if: always()
+        uses: actions/upload-artifact@v6.0.0
+        with:
+          name: workflow-reviewer-report
+          path: artifacts/workflow-reviewer/
+          if-no-files-found: error
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "workflow-reviewer"

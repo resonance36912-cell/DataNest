@@ -1,0 +1,244 @@
+name: DataNest UI Test Mode
+
+# Test Mode deliberately omits human governance/legal/authorization inputs.
+# It never deploys to GitHub Pages and never marks a release authorized.
+# Its artifacts are evidence that human reviewers may cite during production review.
+on:
+  workflow_dispatch:
+    inputs:
+      release_sha:
+        description: Exact 40-character commit SHA reachable from main to test
+        required: true
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/ui-test-mode.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ui-test-mode-${{ inputs.release_sha || github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Build, browser-test, and collect review evidence
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      CI: "true"
+      DATANEST_TEST_MODE: "true"
+      DATANEST_STATIC_EXPORT: "true"
+      NEXT_PUBLIC_BASE_PATH: "/DataNest"
+      DATANEST_UI_RELEASE_SHA: ${{ inputs.release_sha || github.sha }}
+      DATANEST_UI_RELEASE_STATE: candidate
+
+    steps:
+      - name: Checkout exact test SHA
+        uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ env.DATANEST_UI_RELEASE_SHA }}
+          fetch-depth: 0
+
+      - name: Verify exact SHA is reachable from main
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD)" = "$DATANEST_UI_RELEASE_SHA"
+          printf '%s' "$DATANEST_UI_RELEASE_SHA" | grep -Eq '^[0-9a-fA-F]{40}$'
+          git fetch origin main --no-tags --prune
+          git merge-base --is-ancestor "$DATANEST_UI_RELEASE_SHA" origin/main
+
+      - name: Assert Test Mode cannot authorize production
+        shell: bash
+        run: |
+          test "$DATANEST_TEST_MODE" = "true"
+          test "$DATANEST_UI_RELEASE_STATE" = "candidate"
+          test -z "${DATANEST_UI_PRODUCTION_CONFIRMATION:-}"
+          test -z "${DATANEST_UI_AUTHORIZATION_REF:-}"
+          test -z "${DATANEST_UI_GOVERNANCE_REVIEW_REF:-}"
+          test -z "${DATANEST_UI_LEGAL_REVIEW_REF:-}"
+          test -z "${DATANEST_UI_EXTERNAL_REVIEW_REF:-}"
+
+      - name: Load canonical public client configuration
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require("fs");
+          const source=fs.readFileSync(".github/workflows/pages.yml","utf8");
+          const values=[
+            ["NEXT_PUBLIC_SUPABASE_URL",/NEXT_PUBLIC_SUPABASE_URL:\s*"([^"]+)"/],
+            ["NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",/NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:\s*"([^"]+)"/]
+          ];
+          for (const [name,pattern] of values) {
+            const match=source.match(pattern);
+            if (!match) throw new Error(`Unable to resolve canonical ${name}`);
+            fs.appendFileSync(process.env.GITHUB_ENV,`${name}=${match[1]}\n`);
+            const runtimeName=name.replace(/^NEXT_PUBLIC_/,"");
+            fs.appendFileSync(process.env.GITHUB_ENV,`${runtimeName}=${match[1]}\n`);
+          }
+          NODE
+
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Run TypeScript check
+        run: npm run check
+
+      - name: Write runtime configuration
+        run: node scripts/write-runtime-config.mjs public/runtime-config.js
+
+      - name: Write candidate-only governance marker
+        run: |
+          node scripts/write-ui-governance-evidence.mjs public/ui-governance-release.json
+          node scripts/write-release-manifest.mjs public/release-manifest.json
+        env:
+          DATANEST_RELEASE_SHA: ${{ env.DATANEST_UI_RELEASE_SHA }}
+          DATANEST_DB_RELEASE: link-transcheduler-job-requirements-user-interests
+          DATANEST_EXTERNAL_AUDIT_DB_RELEASE: external-audit-production-v1
+          DATANEST_BASELINE_RELEASE: reload-latest-v1
+          DATANEST_BASELINE_SHA: 592149b0898f6703b28e9fa33e73bd0799cae3fd
+          DATANEST_EDGE_AI: datanest-ai-chat@2
+          DATANEST_EDGE_INTAKE: datanest-ai-intake@1
+          DATANEST_EDGE_CERTIFICATION: datanest-ai-certification@1
+          DATANEST_EDGE_PROVIDER: manage-ai-provider-v2@1
+          DATANEST_EDGE_INVITES: send-job-invite@1
+          DATANEST_EDGE_PROJECT_INVITES: send-project-member-invite@3
+          DATANEST_EDGE_RONSAS_STATUS: ronsas-status@1
+          DATANEST_EDGE_EXTERNAL_AUDIT: external-audit@1
+
+      - name: Build static DataNest
+        run: npm run build
+
+      - name: Build DataNest-hosted RONSAS apps
+        run: node scripts/build-ronsas-pages.mjs
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Prepare local Pages-compatible preview
+        run: |
+          rm -rf .preview
+          mkdir -p .preview/DataNest
+          cp -R out/. .preview/DataNest/
+
+      - name: Start local Test Mode preview
+        run: |
+          python3 -m http.server 4173 --directory .preview > /tmp/datanest-test-mode-preview.log 2>&1 &
+          echo $! > /tmp/datanest-test-mode-preview.pid
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/DataNest/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/datanest-test-mode-preview.log
+          exit 1
+
+      - name: Run browser verification
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
+          DATANEST_APP_PATH: /DataNest/
+        run: >
+          npx playwright test
+          tests/browser/auth.smoke.spec.ts
+          tests/browser/home-optimization.spec.ts
+          tests/browser/products.spec.ts
+          tests/browser/portfolio-registry.spec.ts
+          tests/browser/trust-policy.spec.ts
+          tests/browser/execution-authority.spec.ts
+          tests/browser/external-auditor.spec.ts
+          tests/browser/legal-centre.spec.ts
+          tests/browser/ui-governance-accessibility.spec.ts
+          tests/browser/resource-fabric.spec.ts
+          tests/browser/intelligence-fabric.spec.ts
+          tests/browser/datanest-ai-layout.spec.ts
+          tests/browser/datanest-ai-recovery.spec.ts
+          tests/browser/transcheduler-project-gantt.spec.ts
+
+      - name: Run UI governance visual review
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
+          DATANEST_APP_PATH: /DataNest/
+        run: npx playwright test tests/browser/ui-governance-review.spec.ts
+
+      - name: Finalize candidate evidence for human review
+        env:
+          DATANEST_UI_VISUAL_REVIEW_REF: DataNest UI Test Mode run ${{ github.run_id }} / artifact ui-test-mode-evidence-${{ github.run_id }}
+          DATANEST_RELEASE_SHA: ${{ env.DATANEST_UI_RELEASE_SHA }}
+          DATANEST_DB_RELEASE: link-transcheduler-job-requirements-user-interests
+          DATANEST_EXTERNAL_AUDIT_DB_RELEASE: external-audit-production-v1
+          DATANEST_BASELINE_RELEASE: reload-latest-v1
+          DATANEST_BASELINE_SHA: 592149b0898f6703b28e9fa33e73bd0799cae3fd
+          DATANEST_EDGE_AI: datanest-ai-chat@2
+          DATANEST_EDGE_INTAKE: datanest-ai-intake@1
+          DATANEST_EDGE_CERTIFICATION: datanest-ai-certification@1
+          DATANEST_EDGE_PROVIDER: manage-ai-provider-v2@1
+          DATANEST_EDGE_INVITES: send-job-invite@1
+          DATANEST_EDGE_PROJECT_INVITES: send-project-member-invite@3
+          DATANEST_EDGE_RONSAS_STATUS: ronsas-status@1
+          DATANEST_EDGE_EXTERNAL_AUDIT: external-audit@1
+        shell: bash
+        run: |
+          node scripts/write-ui-governance-evidence.mjs public/ui-governance-release.json
+          node scripts/write-release-manifest.mjs public/release-manifest.json
+          mkdir -p test-mode-evidence
+          cp public/ui-governance-release.json test-mode-evidence/ui-governance-candidate.json
+          cp public/release-manifest.json test-mode-evidence/release-manifest.json
+          node <<'NODE'
+          const fs=require("fs");
+          const report={
+            schemaVersion:"datanest-ui-test-mode-v1",
+            project:"Resonance DataNest",
+            mode:"test",
+            releaseSha:process.env.DATANEST_UI_RELEASE_SHA,
+            runId:process.env.GITHUB_RUN_ID,
+            runUrl:`${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
+            result:"passed",
+            authorized:false,
+            productionDeployment:false,
+            humanGovernanceInputsRequiredForTest:false,
+            productionGovernanceGateChanged:false,
+            reviewUse:"This test evidence may be cited inside human governance, legal, independent/external, and production-authorization reviews. It does not itself satisfy or replace those human approvals.",
+            generatedAt:new Date().toISOString()
+          };
+          fs.writeFileSync("test-mode-evidence/test-mode-report.json",JSON.stringify(report,null,2)+"\n");
+          fs.writeFileSync(
+            "test-mode-evidence/HUMAN_REVIEW_EVIDENCE.md",
+            `# DataNest UI Test Mode evidence\n\n- Candidate SHA: \`${report.releaseSha}\`\n- Test run: ${report.runUrl}\n- Result: passed\n- Production deployed: no\n- Production authorized: no\n- Human governance inputs required to run Test Mode: no\n\nThis evidence is intended to be embedded or cited by the subsequent human governance, legal, independent/external, and production-authorization reviews. Those human decisions remain separate requirements for production.\n`
+          );
+          NODE
+
+      - name: Collect preview log
+        if: always()
+        run: |
+          mkdir -p test-mode-evidence
+          cp /tmp/datanest-test-mode-preview.log test-mode-evidence/preview-server.log || true
+
+      - name: Upload Test Mode evidence bundle
+        if: always()
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: ui-test-mode-evidence-${{ github.run_id }}
+          path: |
+            test-mode-evidence/
+            test-results/
+            public/ui-governance-release.json
+            public/release-manifest.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "ui-test-mode"

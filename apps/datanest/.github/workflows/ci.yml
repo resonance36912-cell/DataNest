@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main, feature/datanest-ai-governed-memory, "sync/**"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: ./.github/actions/node-project-setup
+      - run: npm run check:contracts
+      - run: npm test
+      - name: Governance control effectiveness contract
+        run: node --test tests/unit/governance-control-effectiveness-monitoring.test.mjs
+      - run: npm run check
+      - name: Guard retired Copilot and scoring source
+        run: |
+          if grep -R --line-number --exclude-dir=node_modules --exclude-dir=docs \
+            -E 'UNIFI Copilot|submit_external_ai_credit|suggested_product_stake' src supabase/functions; then
+            echo "Retired Copilot/contribution-scoring source remains active."
+            exit 1
+          fi
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Write release manifest
+        env:
+          DATANEST_RELEASE_SHA: \${{ github.sha }}
+          DATANEST_BASELINE_RELEASE: reload-latest-v1
+          DATANEST_BASELINE_SHA: 592149b0898f6703b28e9fa33e73bd0799cae3fd
+          DATANEST_EDGE_AI: datanest-ai-chat@2
+          DATANEST_EDGE_INTAKE: datanest-ai-intake@1
+          DATANEST_EDGE_CERTIFICATION: datanest-ai-certification@1
+          DATANEST_EDGE_PROVIDER: manage-ai-provider-v2@1
+          DATANEST_EDGE_INVITES: send-job-invite@1
+          DATANEST_EDGE_PROJECT_INVITES: send-project-member-invite@3
+          DATANEST_EDGE_RONSAS_STATUS: ronsas-status@1
+        run: node scripts/write-release-manifest.mjs public/release-manifest.json
+      - run: npm run build
+      - name: Build provider-agnostic container
+        run: docker build -t resonance-datanest:ci .
+
+  ronsas-import-contracts:
+    name: RONSAS import contracts
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 22
+      - name: Validate imported application boundaries and critical assets
+        run: node scripts/validate-ronsas-imports.mjs
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "ci"

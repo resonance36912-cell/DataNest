@@ -1,0 +1,114 @@
+name: BRANCH-X Native Protection Reconcile
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reconcile:
+    name: Reconcile GitHub-native BRANCH-X rulesets
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      REPO: ${{ github.repository }}
+      GITHUB_ADMIN_TOKEN: ${{ secrets.DATANEST_GITHUB_ADMIN_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Require repository rules administration credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${GITHUB_ADMIN_TOKEN:-}" ]; then
+            echo "::error::DATANEST_GITHUB_ADMIN_TOKEN is required. It must be authorized to edit repository rulesets."
+            exit 1
+          fi
+
+      - name: Reconcile BRANCH-X Canonical and Automation rulesets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p native-protection/reconcile
+          headers=(
+            -H "Accept: application/vnd.github+json"
+            -H "Authorization: Bearer ${GITHUB_ADMIN_TOKEN}"
+            -H "X-GitHub-Api-Version: 2026-03-10"
+          )
+          api="https://api.github.com/repos/${REPO}"
+
+          reconcile_ruleset() {
+            local file="$1"
+            local name="$2"
+            local key="$3"
+            local id
+
+            id="$(curl -fsSL "${headers[@]}" "${api}/rulesets?includes_parents=false" |
+              jq -r --arg name "$name" '.[]? | select(.name == $name) | .id' | head -n1 || true)"
+
+            if [ -n "$id" ] && [ "$id" != "null" ]; then
+              curl -fsSL -X PUT "${headers[@]}"                 -H "Content-Type: application/json"                 "${api}/rulesets/${id}"                 --data-binary "@${file}"                 > "native-protection/reconcile/${key}-ruleset.json"
+            else
+              curl -fsSL -X POST "${headers[@]}"                 -H "Content-Type: application/json"                 "${api}/rulesets"                 --data-binary "@${file}"                 > "native-protection/reconcile/${key}-ruleset.json"
+            fi
+          }
+
+          reconcile_ruleset ".github/rulesets/BRANCH-X-Canonical.json" "BRANCH-X Canonical" "canonical"
+          reconcile_ruleset ".github/rulesets/BRANCH-X-Automation.json" "BRANCH-X Automation" "automation"
+
+          curl -fsSL "${headers[@]}" "${api}/rules"             > native-protection/reconcile/active-rules-main.json
+          curl -fsSL "${headers[@]}" "${api}/rulesets?includes_parents=false"             > native-protection/reconcile/rulesets-index.json
+
+      - name: Verify reconciled native protection
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          canonical = json.loads(Path("native-protection/reconcile/canonical-ruleset.json").read_text())
+          automation = json.loads(Path("native-protection/reconcile/automation-ruleset.json").read_text())
+          active_rules = json.loads(Path("native-protection/reconcile/active-rules-main.json").read_text())
+
+          assert canonical.get("name") == "BRANCH-X Canonical"
+          assert canonical.get("enforcement") == "active"
+          assert canonical.get("target") == "branch"
+          assert not canonical.get("bypass_actors")
+          assert automation.get("name") == "BRANCH-X Automation"
+          assert automation.get("enforcement") == "active"
+          assert automation.get("target") == "branch"
+          assert not automation.get("bypass_actors")
+          assert isinstance(active_rules, list)
+
+          print(json.dumps({
+            "schemaVersion":"datanest-native-protection-reconcile-v1",
+            "canonicalRulesetId":canonical.get("id"),
+            "automationRulesetId":automation.get("id"),
+            "canonicalEnforcement":canonical.get("enforcement"),
+            "automationEnforcement":automation.get("enforcement"),
+            "activeMainRuleCount":len(active_rules),
+            "verified":True
+          }, indent=2))
+          PY
+
+      - name: Upload native protection reconciliation evidence
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: native-protection-reconcile-${{ github.run_id }}
+          path: native-protection/reconcile/
+          retention-days: 90
+
+      - name: Publish native protection reconciliation summary
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "### BRANCH-X native protection reconciliation" >> "$GITHUB_STEP_SUMMARY"
+          if test -f native-protection/reconcile/canonical-ruleset.json; then
+            jq '{name,id,target,enforcement,bypass_actors,conditions,rules}' native-protection/reconcile/canonical-ruleset.json >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if test -f native-protection/reconcile/automation-ruleset.json; then
+            jq '{name,id,target,enforcement,bypass_actors,conditions,rules}' native-protection/reconcile/automation-ruleset.json >> "$GITHUB_STEP_SUMMARY"
+          fi

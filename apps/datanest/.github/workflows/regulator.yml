@@ -1,0 +1,111 @@
+name: REGULATOR Harmony Tree
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: "11,41 * * * *"
+      timezone: Africa/Johannesburg
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "CALMER Governance Softening Tree"
+      - "GUARDIAN Health & Healing Tree"
+      - "ENFORCER Defence Tree"
+    types: [completed]
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  # Coalesce scheduled and dependency-triggered runs that observe the same canonical SHA.
+  group: datanest-regulator-${{ github.event.workflow_run.head_sha || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  regulate:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event != 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    name: Regulate requirements, transparency and harmony
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && 'main' || '' }}
+          fetch-depth: 0
+
+      - uses: ./.github/actions/automation-x-annotation
+        with:
+          automation_id: regulator
+          automation_class: analysis
+          automation_action: recommend
+          automation_target: regulator/state/latest.json
+          automation_effect: proposal
+          human_review_required: "true"
+
+      - name: Read current specialized-tree state
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/regulator
+          for branch in automation/guardian automation/enforcer automation/calmer automation/environment-feed automation/conductor automation/suggester automation/botsquad/orchestrator automation/visibility-utility; do
+            git fetch origin "$branch" || true
+          done
+          git show origin/automation/guardian:guardian/snapshots/latest.json > /tmp/regulator/guardian.json 2>/dev/null || echo '{}' > /tmp/regulator/guardian.json
+          git show origin/automation/enforcer:enforcer/state/latest.json > /tmp/regulator/enforcer.json 2>/dev/null || echo '{}' > /tmp/regulator/enforcer.json
+          git show origin/automation/calmer:calmer/state/latest.json > /tmp/regulator/calmer.json 2>/dev/null || echo '{}' > /tmp/regulator/calmer.json
+          git show origin/automation/environment-feed:environment/feeds/datanest.json > /tmp/regulator/environment.json 2>/dev/null || echo '{}' > /tmp/regulator/environment.json
+          git show origin/automation/conductor:conductor/state/latest.json > /tmp/regulator/conductor.json 2>/dev/null || echo '{}' > /tmp/regulator/conductor.json
+          git show origin/automation/suggester:suggester/feeds/datanest.json > /tmp/regulator/suggester.json 2>/dev/null || echo '{}' > /tmp/regulator/suggester.json
+          git show origin/automation/botsquad/orchestrator:botsquad/feeds/datanest.json > /tmp/regulator/botsquad.json 2>/dev/null || echo '{}' > /tmp/regulator/botsquad.json
+          git show origin/automation/visibility-utility:visibility-utility/state/latest.json > /tmp/regulator/visibility.json 2>/dev/null || echo '{}' > /tmp/regulator/visibility.json
+
+      - name: Build transparent harmony and BOTSQUAD requirement packet
+        env:
+          REGULATOR_GUARDIAN_PATH: /tmp/regulator/guardian.json
+          REGULATOR_ENFORCER_PATH: /tmp/regulator/enforcer.json
+          REGULATOR_CALMER_PATH: /tmp/regulator/calmer.json
+          REGULATOR_ENVIRONMENT_PATH: /tmp/regulator/environment.json
+          REGULATOR_CONDUCTOR_PATH: /tmp/regulator/conductor.json
+          REGULATOR_SUGGESTER_PATH: /tmp/regulator/suggester.json
+          REGULATOR_BOTSQUAD_PATH: /tmp/regulator/botsquad.json
+          REGULATOR_VISIBILITY_PATH: /tmp/regulator/visibility.json
+        run: node scripts/regulator-engine.mjs
+
+      - name: Verify non-authorizing regulation
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.productionAuthorization == false and .transparency.financialCommitmentsAuthorized == false' regulator/state/latest.json >/dev/null
+
+      - name: Publish REGULATOR state
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="automation/regulator"
+          git fetch origin "$branch" || true
+          git switch -C "$branch"
+          git add regulator/state/latest.json regulator/requirements/botsquad.json regulator/transparency/latest.json
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name="DataNest REGULATOR"               -c user.email="41898282+github-actions[bot]@users.noreply.github.com"               commit -m "Refresh REGULATOR harmony requirements"
+          git push --force-with-lease origin HEAD:"$branch"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: regulator-state-${{ github.run_id }}
+          path: |
+            regulator/state/latest.json
+            regulator/requirements/botsquad.json
+            regulator/transparency/latest.json
+          retention-days: 30
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "regulator"

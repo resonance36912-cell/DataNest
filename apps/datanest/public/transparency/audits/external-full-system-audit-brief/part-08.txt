@@ -1,0 +1,51 @@
+ules:
+
+1. Do not claim a test passed unless you actually observed or verified it.
+
+2. Mark inaccessible areas NOT TESTED; do not guess.
+
+3. Treat production as read-only unless explicitly authorized for a specific non-destructive write test.
+
+4. Never request or expose secrets, service-role keys, passwords, cookies, PATs, MFA recovery codes, or database passwords.
+
+5. Preserve the system invariants in Section 3. Do not recommend removing governance, review, audit, authorization, append-only history, or certification gates merely to simplify the system.
+
+6. Distinguish proven root causes from hypotheses.
+
+7. Evaluate output usefulness and traceability, not only technical completion.
+
+8. Prefer optimizations that reduce duplicate state, manual copying, clicks, operational cost, ambiguity, and maintenance burden while improving user clarity, reliability, sovereignty, and observability.
+
+9. Return the report in the exact structure in Section 27 with stable AUD-xxx finding IDs.
+
+10. Include evidence, severity, effort, dependencies, validation tests, and a 30/60/90-day implementation sequence.
+
+Start by mapping the live UI, current source/release baseline, architecture/data boundaries, and available audit access. Then execute the checklist and end-to-end journeys.
+
+# 29. Baseline Reference Sources
+
+Use these only to establish expected design intent; the live audit must still verify actual behavior.
+
+• GitHub repository: https://github.com/DataNest-Supository/DataNest
+
+• Current source baseline: main @ ac93d51828707d398dfa9c5a471d8a6ed4c9059f
+
+• Architecture reference: docs/ARCHITECTURE.md
+
+• System overview: README.md
+
+• Release manifest generator: scripts/write-release-manifest.mjs
+
+• Production UI: https://datanest-supository.github.io/DataNest/
+
+• Static health marker: https://datanest-supository.github.io/DataNest/health.json
+
+• Production Supabase project: sgqdmfgjbprsoqsmgigi
+
+• Current database release baseline: datanest-project-member-invitations-v1
+
+| Return instruction After the external audit is complete, paste the report back into ChatGPT exactly as returned (including finding IDs, evidence, scorecard, backlog, and unverified areas). That will allow each proposal to be validated against the live system and converted into governed implementation work. |
+
+| --- |
+
+END OF EXTERNAL AUDIT BRIEF

@@ -1,0 +1,94 @@
+name: DataNest Maintenance
+
+on:
+  schedule:
+    - cron: "37 3 * * *"
+      timezone: Africa/Johannesburg
+    - cron: "17 4 * * 0"
+      timezone: Africa/Johannesburg
+  workflow_dispatch:
+    inputs:
+      task:
+        description: Maintenance task
+        type: choice
+        required: true
+        default: all
+        options: [all, branch-cleaner, streamliner]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: datanest-maintenance
+  cancel-in-progress: false
+
+jobs:
+  branch-cleaner:
+    concurrency:
+      group: datanest-safe-healing
+      cancel-in-progress: false
+    if: github.event_name == 'schedule' && github.event.schedule == '37 3 * * *' || github.event_name == 'workflow_dispatch' && (inputs.task == 'all' || inputs.task == 'branch-cleaner')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Safe autonomous branch cleanup
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: node scripts/branch-cleaner.mjs --git-only-safe-apply
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: branch-cleaner-${{ github.run_id }}
+          path: artifacts/branch-cleaner/
+          retention-days: 30
+
+  streamliner:
+    concurrency:
+      group: datanest-safe-healing
+      cancel-in-progress: false
+    if: github.event_name == 'schedule' && github.event.schedule == '17 4 * * 0' || github.event_name == 'workflow_dispatch' && (inputs.task == 'all' || inputs.task == 'streamliner')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply safe deterministic refinements
+        run: node scripts/workflow-reviewer.mjs --apply
+      - name: Open maintenance pull request when tracked files changed
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$(gh pr list --state open --json headRefName --jq 'any(.[]; (.headRefName | startswith("guardian/heal-") or startswith("maintenance/streamline-")))')" = "true" ]; then
+            echo "A source-healing PR already awaits review."
+            exit 0
+          fi
+          git add -u
+          if git diff --cached --quiet; then
+            echo "No tracked safe refinements."
+            exit 0
+          fi
+          branch="maintenance/streamline-${GITHUB_RUN_ID}"
+          git switch -c "$branch"
+          git -c user.name="github-actions[bot]"               -c user.email="41898282+github-actions[bot]@users.noreply.github.com"               commit -m "chore: scheduled safe streamlining"
+          git push origin "$branch"
+          gh pr create             --base main             --head "$branch"             --title "Scheduled safe repository streamlining"             --body "Automated byte-safe text normalization only. Behavioral findings remain report-only and require review."
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: streamliner-${{ github.run_id }}
+          path: artifacts/workflow-reviewer/
+          retention-days: 30
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "maintenance"

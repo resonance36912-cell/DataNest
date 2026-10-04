@@ -1,0 +1,41 @@
+version: "0.12"
+name: Resonance Provider-Neutral Application Contract
+network_scope: loopback-only
+external_ai_required: false
+routes:
+  database:
+    query: POST /v1/db/query
+    supported_operations: [select, insert, update, upsert, delete]
+    supported_filters: [eq, neq, gt, gte, lt, lte, in, text_search]
+    supported_select_options: [order, limit, single, count_exact, head]
+    upsert_requires_on_conflict: true
+    procedure: POST /v1/db/procedure
+    allowlisted_procedures: [transaction_probe, mirror_user_roles, read_subscription_mirror, read_subscription_account, mirror_subscriptions, read_account_invoices, read_admin_invoices, read_billing_account, read_billing_admin, record_payfast_launch, record_payfast_itn_attempt, settle_payfast_itn, record_cost_usage, read_cost_usage_summary, nova_transition_job, datanest_approve_memory, datanest_supersede_memory, governance_list_participants, governance_list_proposals, governance_get_proposal, governance_create_proposal, governance_submit_proposal, governance_add_evidence, governance_add_review, governance_record_decision, governance_register_agent]
+    protected_reads: [invoices, credit_wallets, credit_ledger, billing_receipts]
+    protected_audits: [payfast_launch_logs, payfast_itn_logs, webhook_events, plan_changes, subscription_email_sends, email_suppression_list, cost_usage_events]
+    staged_procedures: [create_admin_bootstrap_challenge, cancel_admin_bootstrap_challenge, bootstrap_first_admin]
+    staged_bootstrap_enable_env: RONS_BOOTSTRAP_PROCEDURES_ENABLED
+    staged_bootstrap_default: false
+    protected_writes: [user_roles, subscriptions, invoices, billing_receipts, payfast_itn_logs, webhook_events, plan_changes, subscription_email_sends, email_suppression_list, cost_usage_events]
+    subscription_entitlement_columns: [app, tier, status, current_period_end]
+    subscription_entitlement_filter: user_id eq UUID
+    subscription_entitlement_limit_max: 100
+    procedure_auth_header: X-RONS-Procedure-Key
+    procedure_secret_ref: runtime/secrets/gateway-procedure-key
+    arbitrary_sql: false
+  auth:
+    session: GET /v1/auth/session
+    user: GET /v1/auth/user
+    sign_in: POST /v1/auth/sign-in
+    sign_up: POST /v1/auth/sign-up
+    sign_out: POST /v1/auth/sign-out
+  storage:
+    object: /v1/storage/{bucket}/{path}
+    public_object: /v1/storage/public/{bucket}/{path}
+  ai:
+    chat: POST /v1/ai/chat
+governance:
+  ambiguous_provider_operations_are_blockers: true
+  destructive_schema_changes_require_human_approval: true
+  source_rewrites_require_confirmation: true
+  rollback_must_preserve_post_migration_user_changes: true

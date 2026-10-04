@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "datanest-native-protection-evidence-v1",
+  "repository": "DataNest-Supository/DataNest",
+  "observedAt": "YYYY-MM-DDTHH:MM:SSZ",
+  "refs": [
+    "main",
+    "release/**"
+  ],
+  "rulesets": [
+    {
+      "name": "BRANCH-X Canonical",
+      "enforcement": "active",
+      "targetPatterns": [
+        "refs/heads/main",
+        "refs/heads/release/**"
+      ],
+      "ruleTypes": [
+        "pull_request",
+        "required_status_checks",
+        "required_linear_history",
+        "non_fast_forward",
+        "deletion"
+      ],
+      "requiredStatusChecks": []
+    },
+    {
+      "name": "BRANCH-X Automation",
+      "enforcement": "active",
+      "targetPatterns": [
+        "refs/heads/automation/**",
+        "refs/heads/audit/**",
+        "refs/heads/ci/**"
+      ],
+      "ruleTypes": [
+        "required_status_checks",
+        "non_fast_forward",
+        "deletion"
+      ],
+      "requiredStatusChecks": []
+    }
+  ],
+  "apiAccess": {
+    "branchEndpointHttp": "200",
+    "rulesetsEndpointHttp": "200"
+  },
+  "result": "protected",
+  "evidenceSource": "GitHub-native ruleset observation"
+}

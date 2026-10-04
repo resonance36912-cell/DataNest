@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "project": "Resonance DataNest",
+  "repository": "DataNest-Supository/DataNest",
+  "branch": "main",
+  "authority": {
+    "sourceControl": "GitHub",
+    "publicDelivery": "GitHub Pages",
+    "backend": "Supabase",
+    "railwayRequired": false,
+    "vercelRequired": false
+  },
+  "publicDelivery": {
+    "origin": "https://datanest-supository.github.io",
+    "basePath": "/DataNest/",
+    "provider": "GitHub Pages"
+  },
+  "supabase": {
+    "project": "sgqdmfgjbprsoqsmgigi",
+    "region": "eu-central-1",
+    "expectedMigration": {
+      "head": "20261002101955",
+      "name": "harden_provider_sync_secret_boundary",
+      "sourceFile": "supabase/migrations/20261002101955_harden_provider_sync_secret_boundary.sql"
+    },
+    "migrationLineage": [
+      {
+        "databaseHead": "20261001142117",
+        "databaseName": "certification_business_bank_settlement_launch",
+        "repositoryEquivalentMigration": "20261001170000_certification_business_bank_settlement_launch.sql",
+        "note": "Production recorded the certification settlement migration under the 20261001142117 timestamp; repository source carries the same named migration content under 20261001170000."
+      }
+    ]
+  },
+  "productionCatalog": "config/supository.catalog.json",
+  "deployment": {
+    "defaultMode": "authorized",
+    "exceptionModes": [
+      "progressive_live",
+      "owner_test_mode"
+    ]
+  }
+}

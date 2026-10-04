@@ -1,0 +1,65 @@
+name: Worktree Gate Timeframe Proposal
+
+on:
+  workflow_call:
+    inputs:
+      gate_id:
+        description: Configured worktree gate identifier
+        required: true
+        type: string
+      override_hours:
+        description: Optional bounded Owner override for manual mutation gates
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  propose:
+    name: DataNest AI timeframe proposal
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 22
+      - name: Measure change scope
+        id: scope
+        shell: bash
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          changed=0
+          if [ -n "$BASE_REF" ]; then
+            git fetch origin "$BASE_REF" --no-tags --prune
+            changed="$(git diff --name-only "origin/$BASE_REF"...HEAD | sed '/^$/d' | wc -l | tr -d ' ')"
+          elif printf '%s' "$BEFORE_SHA" | grep -Eq '^[0-9a-fA-F]{40}$' && ! printf '%s' "$BEFORE_SHA" | grep -Eq '^0{40}$'; then
+            if git cat-file -e "$BEFORE_SHA^{commit}" 2>/dev/null; then
+              changed="$(git diff --name-only "$BEFORE_SHA" HEAD | sed '/^$/d' | wc -l | tr -d ' ')"
+            fi
+          fi
+          echo "changed_files=$changed" >> "$GITHUB_OUTPUT"
+      - name: Propose worktree gate timeframe
+        env:
+          GATE_ID: ${{ inputs.gate_id }}
+          CHANGED_FILES: ${{ steps.scope.outputs.changed_files }}
+          OVERRIDE_HOURS: ${{ inputs.override_hours }}
+        shell: bash
+        run: |
+          mkdir -p artifacts/worktree-gate-timeframes
+          ARGS=(--gate "$GATE_ID" --changed-files "$CHANGED_FILES" --output "artifacts/worktree-gate-timeframes/$GATE_ID.json")
+          if [ -n "$OVERRIDE_HOURS" ]; then ARGS+=(--override-hours "$OVERRIDE_HOURS"); fi
+          node scripts/propose-worktree-gate-timeframe.mjs "${ARGS[@]}"
+      - name: Upload gate timeframe evidence
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: worktree-gate-timeframe-${{ inputs.gate_id }}-${{ github.run_id }}
+          path: artifacts/worktree-gate-timeframes/${{ inputs.gate_id }}.json
+          if-no-files-found: error
+          retention-days: 30

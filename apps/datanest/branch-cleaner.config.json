@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "baseBranch": "main",
+  "staleDays": 14,
+  "protectedPatterns": [
+    "^main$",
+    "^production$",
+    "^release/",
+    "^automation/knowledge-feed$",
+    "^automation/botsquad/",
+    "^automation/environment-feed$",
+    "^automation/enforcer$",
+    "^automation/guardian$",
+    "^automation/conductor$",
+    "^automation/suggester$",
+    "^automation/calmer$",
+    "^automation/regulator$",
+    "^automation/visibility-utility$",
+    "^automation/liberty-in-all$",
+    "^automation/",
+    "^audit/",
+    "^ci/"
+  ],
+  "supabaseProjects": [
+    {
+      "ref": "sgqdmfgjbprsoqsmgigi",
+      "role": "application_authority",
+      "expectedGitBranch": "main",
+      "migrationSourceDir": "supabase/migrations",
+      "enforceMigrationParity": true
+    },
+    {
+      "ref": "qchttpcyqlqnhvahprhz",
+      "role": "ai_staging_audit"
+    }
+  ],
+  "auditSources": [
+    "public/transparency/audits/index.json",
+    "public/transparency/audits/external-full-system-audit-return-2026-09-25/findings.json",
+    "public/transparency/audits/external-full-system-audit-return-2026-09-25/remediation-backlog.json",
+    "docs/reviews/2026-09-25-live-review.md",
+    "docs/ARCHITECTURE.md",
+    "supabase/config.toml"
+  ],
+  "guardrails": [
+    "release-evidence-is-not-backend-attestation",
+    "reported-audit-findings-remain-pending-until-reproduced",
+    "never-delete-default-protected-or-open-pr-branches",
+    "never-delete-unique-history-without-live-verified-exact-archive-preservation",
+    "supabase-performance-advice-is-review-evidence-not-auto-remediation",
+    "keep-production-and-ai-staging-authority-distinct",
+    "do-not-export-secrets-or-raw-ai-memory",
+    "prefer-project-scoped-authenticated-controls-and-explicit-grants",
+    "preserve-audit-and-certification-lineage"
+  ],
+  "supabaseEvidenceFile": ".github/branch-cleaner/supabase-verified-snapshot.json",
+  "supabaseEvidenceMaxAgeMinutes": 90,
+  "archiveTagPrefix": "branch-archive/",
+  "allowArchivedPrune": false
+}

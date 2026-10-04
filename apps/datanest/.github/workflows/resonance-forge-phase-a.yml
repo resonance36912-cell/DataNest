@@ -1,0 +1,52 @@
+name: Resonance Forge Phase A
+
+on:
+  push:
+    branches:
+      - "forge/**"
+  pull_request:
+    paths:
+      - "config/resonance-forge-*.json"
+      - "config/forge-phase-a.example.json"
+      - "config/forge-registry.snapshot.example.json"
+      - "docs/RESONANCE_FORGE_*.md"
+      - "lib/resonance-forge-*.mjs"
+      - "scripts/forge-*.mjs"
+      - "tests/unit/forge-phase-a-cli.test.mjs"
+      - "tests/unit/resonance-forge-*.test.mjs"
+      - "package.json"
+      - "package-lock.json"
+
+permissions:
+  contents: read
+
+jobs:
+  phase-a:
+    name: Phase A contracts
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: ./.github/actions/node-project-setup
+      - name: Run Forge Phase A test suite
+        run: npm run test:forge
+      - name: Validate example release contract
+        run: node scripts/forge-phase-a.mjs validate-release config/forge-phase-a.example.json
+      - name: Validate registry snapshot example
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from "node:fs";
+          import { validateRegistrySnapshot } from "./lib/resonance-forge-registry.mjs";
+          const snapshot = JSON.parse(fs.readFileSync("config/forge-registry.snapshot.example.json", "utf8"));
+          const result = validateRegistrySnapshot(snapshot);
+          if (!result.valid) {
+            console.error(result.errors.join("\n"));
+            process.exit(1);
+          }
+          console.log("Registry snapshot valid.");
+          NODE
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "resonance-forge-phase-a"

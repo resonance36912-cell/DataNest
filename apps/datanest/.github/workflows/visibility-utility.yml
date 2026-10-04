@@ -1,0 +1,141 @@
+name: VISIBILITY-UTILITY Market Presence Tree
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "23 */3 * * *"
+      timezone: Africa/Johannesburg
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "Knowledge Tree"
+      - "BOTSQUAD AI Tree"
+      - "REGULATOR Harmony Tree"
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  # Coalesce scheduled and dependency-triggered runs that observe the same canonical SHA.
+  group: datanest-visibility-utility-${{ github.event.workflow_run.head_sha || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  visibility:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event != 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    name: Assess visibility, trends and route-to-market
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && 'main' || '' }}
+          fetch-depth: 0
+
+      - uses: ./.github/actions/automation-x-annotation
+        with:
+          automation_id: visibility-utility
+          automation_class: analysis
+          automation_action: recommend
+          automation_target: visibility-utility/
+          automation_effect: proposal
+          human_review_required: "true"
+
+      - uses: ./.github/actions/node-project-setup
+
+      - name: Validate VISIBILITY-UTILITY and public charter contracts
+        run: node --test tests/unit/visibility-utility.test.mjs tests/unit/system-charter.test.mjs tests/unit/regulator.test.mjs tests/unit/guardian.test.mjs tests/unit/suggester.test.mjs
+
+      - name: Verify TypeScript and public static export
+        run: |
+          npm run check
+          npm run build
+
+      - name: Read Knowledge and BOTSQUAD inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/visibility-utility
+          for branch in automation/knowledge-feed automation/botsquad/orchestrator; do
+            git fetch origin "$branch" || true
+          done
+          git show origin/automation/knowledge-feed:knowledge/feeds/datanest.json > /tmp/visibility-utility/knowledge.json 2>/dev/null || echo '{}' > /tmp/visibility-utility/knowledge.json
+          git show origin/automation/botsquad/orchestrator:botsquad/feeds/datanest.json > /tmp/visibility-utility/botsquad.json 2>/dev/null || echo '{}' > /tmp/visibility-utility/botsquad.json
+
+      - name: Read configured trend, analytics and commercial feeds
+        env:
+          GLOBAL_TRENDS_URL: ${{ vars.VISIBILITY_GLOBAL_TRENDS_URL }}
+          LOCAL_TRENDS_URL: ${{ vars.VISIBILITY_LOCAL_TRENDS_URL }}
+          ANALYTICS_URL: ${{ vars.VISIBILITY_ANALYTICS_URL }}
+          COMMERCIAL_URL: ${{ vars.VISIBILITY_COMMERCIAL_URL }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          fetch_json() {
+            url="$1"; target="$2"
+            if [ -z "$url" ]; then echo '{}' > "$target"; return 0; fi
+            if ! curl --fail --silent --show-error --location --max-time 20 --proto '=https' --tlsv1.2 "$url" -o "$target"; then
+              echo "::warning::Unable to read configured VISIBILITY-UTILITY feed: $target"
+              echo '{}' > "$target"
+            fi
+            jq -e . "$target" >/dev/null || { echo '{}' > "$target"; }
+          }
+          fetch_json "$GLOBAL_TRENDS_URL" /tmp/visibility-utility/global-trends.json
+          fetch_json "$LOCAL_TRENDS_URL" /tmp/visibility-utility/local-trends.json
+          fetch_json "$ANALYTICS_URL" /tmp/visibility-utility/analytics.json
+          fetch_json "$COMMERCIAL_URL" /tmp/visibility-utility/commercial.json
+
+      - name: Build visibility assessment and market routes
+        env:
+          VISIBILITY_GLOBAL_TRENDS_PATH: /tmp/visibility-utility/global-trends.json
+          VISIBILITY_LOCAL_TRENDS_PATH: /tmp/visibility-utility/local-trends.json
+          VISIBILITY_ANALYTICS_PATH: /tmp/visibility-utility/analytics.json
+          VISIBILITY_COMMERCIAL_PATH: /tmp/visibility-utility/commercial.json
+          VISIBILITY_BOTSQUAD_PATH: /tmp/visibility-utility/botsquad.json
+          VISIBILITY_KNOWLEDGE_PATH: /tmp/visibility-utility/knowledge.json
+        run: node scripts/visibility-utility.mjs
+
+      - name: Verify non-authorizing market intelligence
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '
+            .productionAuthorization == false and
+            .controls.mayPurchaseAdvertising == false and
+            .controls.mayCommitMarketingSpend == false and
+            .controls.mayMakeBindingSalesCommitments == false and
+            .controls.mayPublishUnverifiedClaims == false
+          ' visibility-utility/state/latest.json >/dev/null
+
+      - name: Publish VISIBILITY-UTILITY state
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="automation/visibility-utility"
+          git fetch origin "$branch" || true
+          git switch -C "$branch"
+          git add visibility-utility/state/latest.json visibility-utility/feeds/datanest.json visibility-utility/projections/route-to-market.json public/transparency/visibility-utility/latest.json
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name="DataNest VISIBILITY-UTILITY"               -c user.email="41898282+github-actions[bot]@users.noreply.github.com"               commit -m "Refresh VISIBILITY-UTILITY market intelligence"
+          git push --force-with-lease origin HEAD:"$branch"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visibility-utility-${{ github.run_id }}
+          path: |
+            visibility-utility/state/latest.json
+            visibility-utility/feeds/datanest.json
+            visibility-utility/projections/route-to-market.json
+            public/transparency/visibility-utility/latest.json
+          retention-days: 30
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "visibility-utility"

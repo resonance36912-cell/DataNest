@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "audit_id": "external-full-system-audit-return-2026-09-25",
+  "audit_date": "2026-09-25",
+  "audit_type": "read-only public-surface inspection and commit-pinned source review",
+  "source_baseline": "ac93d51828707d398dfa9c5a471d8a6ed4c9059f",
+  "publication_status": "published",
+  "certification_status": "not_a_full_production_certification",
+  "validation_state": "pending_datanest_validation",
+  "findings": [
+    {
+      "id": "AUD-001",
+      "title": "Release metadata does not independently attest deployed database and function state",
+      "domain": "Architecture / Release governance",
+      "severity": "HIGH",
+      "confidence": "HIGH",
+      "reported_status": "PARTIAL — source; live reconciliation NOT TESTED",
+      "priority": "P1",
+      "validation_state": "pending"
+    },
+    {
+      "id": "AUD-002",
+      "title": "External-AI launch places work context and user email in a URL",
+      "domain": "Privacy / External AI",
+      "severity": "HIGH",
+      "confidence": "HIGH",
+      "reported_status": "FAIL — source",
+      "priority": "P1",
+      "validation_state": "pending"
+    },
+    {
+      "id": "AUD-003",
+      "title": "Changed external-AI content can receive an idempotent-success response without validation",
+      "domain": "AI / Output integrity",
+      "severity": "HIGH",
+      "confidence": "HIGH",
+      "reported_status": "FAIL — source",
+      "priority": "P1",
+      "validation_state": "pending"
+    },
+    {
+      "id": "AUD-004",
+      "title": "AI context retrieval retains the oldest 100 events rather than recent continuity",
+      "domain": "AI / Output quality",
+      "severity": "HIGH",
+      "confidence": "HIGH",
+      "reported_status": "FAIL — source",
+      "priority": "P1",
+      "validation_state": "pending"
+    },
+    {
+      "id": "AUD-005",
+      "title": "Sparks retry requests do not preserve the original user-intent key",
+      "domain": "Sparks / Reliability",
+      "severity": "HIGH",
+      "confidence": "HIGH",
+      "reported_status": "PARTIAL — source",
+      "priority": "P1",
+      "validation_state": "pending"
+    },
+    {
+      "id": "AUD-006",
+      "title": "Invitation email delivery precedes durable project-invitation registration",
+      "domain": "Membership / Reliability",
+      "severity": "HIGH",
+      "confidence": "HIGH",
+      "reported_status": "PARTIAL — source",
+      "priority": "P1",
+      "validation_state": "pending"
+    },
+    {
+      "id": "AUD-007",
+      "title": "Refresh and queue filtering do not operate on the complete visible data scope",
+      "domain": "UI / Workflow / Data loading",
+      "severity": "MEDIUM",
+      "confidence": "HIGH",
+      "reported_status": "PARTIAL — source",
+      "priority": "P2",
+      "validation_state": "pending"
+    },
+    {
+      "id": "AUD-008",
+      "title": "Think Tank thread loads can apply results after selection changes",
+      "domain": "Collaboration / Context integrity",
+      "severity": "HIGH",
+      "confidence": "HIGH for missing guard; MEDIUM for user impact",
+      "reported_status": "PARTIAL — source",
+      "priority": "P1",
+      "validation_state": "pending"
+    },
+    {
+      "id": "AUD-009",
+      "title": "Product Lab summaries do not consistently distinguish current-build evidence from historical samples",
+      "domain": "Output quality / Product Lab",
+      "severity": "MEDIUM",
+      "confidence": "HIGH",
+      "reported_status": "PARTIAL — source",
+      "priority": "P2",
+      "validation_state": "pending"
+    },
+    {
+      "id": "AUD-010",
+      "title": "Existing acceptance evidence does not fully exercise critical invariants",
+      "domain": "CI / Security assurance",
+      "severity": "HIGH",
+      "confidence": "HIGH",
+      "reported_status": "PARTIAL — inspected tests",
+      "priority": "P1",
+      "validation_state": "pending"
+    },
+    {
+      "id": "AUD-011",
+      "title": "Invitation delivery is coupled to the GitHub Pages origin",
+      "domain": "Portability / Architecture",
+      "severity": "MEDIUM",
+      "confidence": "HIGH",
+      "reported_status": "PARTIAL — source",
+      "priority": "P2",
+      "validation_state": "pending"
+    },
+    {
+      "id": "AUD-012",
+      "title": "Clipboard auto-capture lacks content-origin discrimination",
+      "domain": "Privacy / External AI",
+      "severity": "MEDIUM",
+      "confidence": "HIGH",
+      "reported_status": "PARTIAL — source",
+      "priority": "P1",
+      "validation_state": "pending"
+    },
+    {
+      "id": "AUD-013",
+      "title": "Separation between production AI review storage and CI staging remains unverified",
+      "domain": "Architecture / Data integrity",
+      "severity": "HIGH — verification priority",
+      "confidence": "MEDIUM",
+      "reported_status": "NOT TESTED — deployed topology",
+      "priority": "P1 verify",
+      "validation_state": "pending"
+    },
+    {
+      "id": "AUD-014",
+      "title": "External-AI resizing lacks a keyboard-operated control",
+      "domain": "Accessibility",
+      "severity": "MEDIUM",
+      "confidence": "HIGH for inspected markup",
+      "reported_status": "PARTIAL — source",
+      "priority": "P2",
+      "validation_state": "pending"
+    }
+  ]
+}

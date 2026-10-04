@@ -1,0 +1,3 @@
+-- Migration-history reconciliation: production applied this release under the canonical version.
+-- The implementation is retained in the later repository migration 20260928220000_reconcile_production_impact_scoring_governed.sql.
+-- This no-op preserves Supabase migration history alignment without replaying production DDL.

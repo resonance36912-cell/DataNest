@@ -1,0 +1,64 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-forgejo}
+      POSTGRES_USER: ${POSTGRES_USER:-forgejo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-forgejo} -d ${POSTGRES_DB:-forgejo}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:15
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      USER_UID: "1000"
+      USER_GID: "1000"
+      FORGEJO__DEFAULT__APP_NAME: "${FORGE_APP_NAME:-Reson8 Forge}"
+      FORGEJO__database__DB_TYPE: postgres
+      FORGEJO__database__HOST: db:5432
+      FORGEJO__database__NAME: ${POSTGRES_DB:-forgejo}
+      FORGEJO__database__USER: ${POSTGRES_USER:-forgejo}
+      FORGEJO__database__PASSWD: ${POSTGRES_PASSWORD}
+      FORGEJO__server__DOMAIN: ${FORGE_DOMAIN:-git.reson8.life}
+      FORGEJO__server__ROOT_URL: "https://${FORGE_DOMAIN:-git.reson8.life}/"
+      FORGEJO__server__HTTP_PORT: "3000"
+      FORGEJO__server__DISABLE_SSH: "${FORGE_DISABLE_SSH:-true}"
+      FORGEJO__service__DISABLE_REGISTRATION: "${FORGE_DISABLE_REGISTRATION:-true}"
+      FORGEJO__service__REQUIRE_SIGNIN_VIEW: "${FORGE_REQUIRE_SIGNIN_VIEW:-false}"
+      FORGEJO__packages__ENABLED: "true"
+      FORGEJO__actions__ENABLED: "true"
+    volumes:
+      - forgejo-data:/data
+    expose:
+      - "3000"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - forgejo
+    environment:
+      FORGE_DOMAIN: ${FORGE_DOMAIN:-git.reson8.life}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  postgres-data:
+  forgejo-data:
+  caddy-data:
+  caddy-config:

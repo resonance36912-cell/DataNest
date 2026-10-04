@@ -1,0 +1,589 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-01T13:56:06Z",
+  "expiresAt": "2026-10-01T15:26:06Z",
+  "source": "Supabase MCP control-plane verification; migration history cross-checked against canonical repository",
+  "projects": [
+    {
+      "ref": "sgqdmfgjbprsoqsmgigi",
+      "project": {
+        "id": "sgqdmfgjbprsoqsmgigi",
+        "ref": "sgqdmfgjbprsoqsmgigi",
+        "name": "DataNest Supository",
+        "region": "eu-central-1",
+        "status": "ACTIVE_HEALTHY"
+      },
+      "branches": [
+        {
+          "id": "90513cac-aad8-4df8-83e9-770b5c000238",
+          "name": "main",
+          "project_ref": "sgqdmfgjbprsoqsmgigi",
+          "is_default": true,
+          "git_branch": "main",
+          "status": "FUNCTIONS_DEPLOYED",
+          "preview_project_status": "ACTIVE_HEALTHY"
+        }
+      ],
+      "securityAdvisors": [
+        {
+          "name": "rls_enabled_no_policy",
+          "title": "RLS Enabled No Policy",
+          "level": "INFO",
+          "count": 11
+        },
+        {
+          "name": "extension_in_public",
+          "title": "Extension in Public",
+          "level": "WARN",
+          "count": 1
+        },
+        {
+          "name": "anon_security_definer_function_executable",
+          "title": "Public Can Execute SECURITY DEFINER Function",
+          "level": "WARN",
+          "count": 1
+        },
+        {
+          "name": "authenticated_security_definer_function_executable",
+          "title": "Signed-In Users Can Execute SECURITY DEFINER Function",
+          "level": "WARN",
+          "count": 130
+        },
+        {
+          "name": "auth_leaked_password_protection",
+          "title": "Leaked Password Protection Disabled",
+          "level": "WARN",
+          "count": 1
+        }
+      ],
+      "migrations": [
+        {
+          "version": "20260924111936",
+          "name": "bootstrap_resonance_datanest_control_plane"
+        },
+        {
+          "version": "20260924112127",
+          "name": "add_resonance_datanest_fk_indexes"
+        },
+        {
+          "version": "20260924112200",
+          "name": "seed_resonance_datanest_bootstrap_state"
+        },
+        {
+          "version": "20260924113814",
+          "name": "record_resonance_datanest_web_ui_release"
+        },
+        {
+          "version": "20260924115211",
+          "name": "record_provider_agnostic_runtime_hardening"
+        },
+        {
+          "version": "20260924115830",
+          "name": "record_free_public_runtime_deployment"
+        },
+        {
+          "version": "20260924122805",
+          "name": "fix_authenticated_app_table_grants"
+        },
+        {
+          "version": "20260924123459",
+          "name": "add_project_membership_rbac"
+        },
+        {
+          "version": "20260924123602",
+          "name": "remove_anon_control_plane_privileges"
+        },
+        {
+          "version": "20260924123753",
+          "name": "harden_rbac_helpers_and_indexes"
+        },
+        {
+          "version": "20260924124204",
+          "name": "add_transactional_unifi_job_rpcs"
+        },
+        {
+          "version": "20260924124319",
+          "name": "add_project_dashboard_summary_rpc"
+        },
+        {
+          "version": "20260924131629",
+          "name": "add_rnd_collaboration_ai_tracking"
+        },
+        {
+          "version": "20260924131742",
+          "name": "allow_collaborator_dashboard_summary"
+        },
+        {
+          "version": "20260924132136",
+          "name": "harden_rnd_rpc_boundaries_and_indexes"
+        },
+        {
+          "version": "20260924132933",
+          "name": "upgrade_rnd_ai_collaboration_loop"
+        },
+        {
+          "version": "20260924133218",
+          "name": "normalize_rnd_ai_suggestion_types"
+        },
+        {
+          "version": "20260924134713",
+          "name": "add_stakeholder_ai_credit_and_product_lab"
+        },
+        {
+          "version": "20260924135447",
+          "name": "complete_stakeholder_read_access"
+        },
+        {
+          "version": "20260924135846",
+          "name": "grant_service_role_edge_function_access"
+        },
+        {
+          "version": "20260924135934",
+          "name": "index_stakeholder_and_product_lab_foreign_keys"
+        },
+        {
+          "version": "20260924144645",
+          "name": "separate_usage_acceptance_and_version_stake_scoring"
+        },
+        {
+          "version": "20260924144912",
+          "name": "add_idempotent_ai_budgets_allowlists_and_revocation"
+        },
+        {
+          "version": "20260924145008",
+          "name": "version_product_lab_evidence_and_dedupe_test_credit"
+        },
+        {
+          "version": "20260924145038",
+          "name": "preserve_denied_failed_unknown_ai_request_states"
+        },
+        {
+          "version": "20260924145929",
+          "name": "add_security_acceptance_run_log"
+        },
+        {
+          "version": "20260924150148",
+          "name": "use_builtin_message_fingerprint"
+        },
+        {
+          "version": "20260924150346",
+          "name": "lock_service_rpc_execute_privileges"
+        },
+        {
+          "version": "20260924150605",
+          "name": "fix_project_default_ai_budget_upsert"
+        },
+        {
+          "version": "20260924150836",
+          "name": "harden_public_read_rpcs_and_index_integrity_foreign_keys"
+        },
+        {
+          "version": "20260924152302",
+          "name": "add_tracked_external_ai_chat_sessions"
+        },
+        {
+          "version": "20260924152612",
+          "name": "index_external_ai_session_user"
+        },
+        {
+          "version": "20260924153734",
+          "name": "pilot_ai_race_reservations_and_reconciliation"
+        },
+        {
+          "version": "20260924154115",
+          "name": "fix_ai_finish_parameter_ambiguity"
+        },
+        {
+          "version": "20260924161824",
+          "name": "add_external_ai_sidebar_launch_mode"
+        },
+        {
+          "version": "20260924163640",
+          "name": "external_ai_companion_mode"
+        },
+        {
+          "version": "20260924170201",
+          "name": "external_ai_tracked_prompt_prefill"
+        },
+        {
+          "version": "20260924230805",
+          "name": "datanest_ai_production"
+        },
+        {
+          "version": "20260924230811",
+          "name": "harden_authenticated_private_gateways"
+        },
+        {
+          "version": "20260925000530",
+          "name": "datanest_stakeholder_contribution_v1"
+        },
+        {
+          "version": "20260925000534",
+          "name": "harden_stakeholder_contribution_indexes"
+        },
+        {
+          "version": "20260925015523",
+          "name": "datanest_contribution_intelligence_v1"
+        },
+        {
+          "version": "20260925015529",
+          "name": "fix_contribution_intelligence_refresh"
+        },
+        {
+          "version": "20260925015534",
+          "name": "harden_contribution_intelligence_indexes"
+        },
+        {
+          "version": "20260925020254",
+          "name": "fix_contribution_workspace_model_version_ambiguity"
+        },
+        {
+          "version": "20260925022558",
+          "name": "datanest_think_tanks_v1"
+        },
+        {
+          "version": "20260925022603",
+          "name": "harden_datanest_think_tanks_indexes"
+        },
+        {
+          "version": "20260925024028",
+          "name": "datanest_sparks_economy_v1"
+        },
+        {
+          "version": "20260925053442",
+          "name": "datanest_sovereign_governance_v1"
+        },
+        {
+          "version": "20260925061327",
+          "name": "datanest_project_member_invitations_v1"
+        },
+        {
+          "version": "20260925191008",
+          "name": "datanest_ai_file_access_gateway"
+        },
+        {
+          "version": "20260925194836",
+          "name": "datanest_ai_provider_metadata_v3"
+        },
+        {
+          "version": "20260926055810",
+          "name": "add_governed_product_catalog"
+        },
+        {
+          "version": "20260927062000",
+          "name": "correct_ronsas_full_name"
+        },
+        {
+          "version": "20260927093000",
+          "name": "add_portfolio_registry_foundations"
+        },
+        {
+          "version": "20260927094000",
+          "name": "add_portfolio_registry_governed_operations"
+        },
+        {
+          "version": "20260927095000",
+          "name": "backfill_portfolio_registry_baseline"
+        },
+        {
+          "version": "20260927110124",
+          "name": "add_authority_execution_foundations"
+        },
+        {
+          "version": "20260927110125",
+          "name": "add_authority_execution_governed_operations"
+        },
+        {
+          "version": "20260927113000",
+          "name": "add_trust_policy_foundations"
+        },
+        {
+          "version": "20260927113110",
+          "name": "add_resource_fabric_foundations"
+        },
+        {
+          "version": "20260927113111",
+          "name": "add_resource_fabric_governed_operations"
+        },
+        {
+          "version": "20260927114000",
+          "name": "add_retention_policy_foundations"
+        },
+        {
+          "version": "20260927115000",
+          "name": "add_trust_policy_governed_operations"
+        },
+        {
+          "version": "20260927123000",
+          "name": "align_phase_d_authority_with_approved_spec"
+        },
+        {
+          "version": "20260927124000",
+          "name": "add_phase_d_approved_authority_operations"
+        },
+        {
+          "version": "20260927125000",
+          "name": "add_phase_d_authority_route_adapters"
+        },
+        {
+          "version": "20260927133334",
+          "name": "add_intelligence_fabric_foundations"
+        },
+        {
+          "version": "20260927133336",
+          "name": "add_intelligence_fabric_governed_operations"
+        },
+        {
+          "version": "20260927180402",
+          "name": "add_unifi_idempotent_manifest_v2"
+        },
+        {
+          "version": "20260927202758",
+          "name": "add_durable_mutation_recovery_ledger"
+        },
+        {
+          "version": "20260927203127",
+          "name": "harden_durable_mutation_recovery_idempotency"
+        },
+        {
+          "version": "20260927213827",
+          "name": "add_mutation_recovery_observability"
+        },
+        {
+          "version": "20260928134500",
+          "name": "add_project_shared_ai_provider_config"
+        },
+        {
+          "version": "20260928143013",
+          "name": "add_project_shared_ai_provider_config"
+        },
+        {
+          "version": "20260928164940",
+          "name": "fix_data_policy_manifest_lookup_found_state"
+        },
+        {
+          "version": "20260928190000",
+          "name": "add_development_command_working_memory"
+        },
+        {
+          "version": "20260928193140",
+          "name": "reconcile_production_impact_scoring_governed"
+        },
+        {
+          "version": "20260928195349",
+          "name": "add_development_command_working_memory"
+        },
+        {
+          "version": "20260928195353",
+          "name": "seed_development_command_founder_baseline"
+        },
+        {
+          "version": "20260928210200",
+          "name": "add_live_project_impact_scoring"
+        },
+        {
+          "version": "20260928211800",
+          "name": "add_n0nymous_squad_consideration"
+        },
+        {
+          "version": "20260928212000",
+          "name": "optimize_live_project_impact_scoring"
+        },
+        {
+          "version": "20260928212500",
+          "name": "seed_development_command_founder_baseline"
+        },
+        {
+          "version": "20260928220000",
+          "name": "reconcile_production_impact_scoring_governed"
+        },
+        {
+          "version": "20260928223000",
+          "name": "promote_legal_eagle_product"
+        },
+        {
+          "version": "20260928223500",
+          "name": "add_development_work_contribution_intake"
+        },
+        {
+          "version": "20260928223619",
+          "name": "fix_development_command_runtime_access"
+        },
+        {
+          "version": "20260929042816",
+          "name": "link_transcheduler_job_requirements_user_interests"
+        },
+        {
+          "version": "20260929043923",
+          "name": "optimize_collective_verified_memory"
+        },
+        {
+          "version": "20260929051213",
+          "name": "fix_verified_memory_relevance_ranking"
+        },
+        {
+          "version": "20260929053617",
+          "name": "add_certified_memory_usage_receipts"
+        },
+        {
+          "version": "20260929073824",
+          "name": "external_audit_foundations"
+        },
+        {
+          "version": "20260929073828",
+          "name": "external_audit_memory_receipts"
+        },
+        {
+          "version": "20260929073832",
+          "name": "external_audit_ai_requests"
+        },
+        {
+          "version": "20260929073845",
+          "name": "external_audit_operations"
+        },
+        {
+          "version": "20260929083316",
+          "name": "continuous_governance_optimization_v1"
+        },
+        {
+          "version": "20260929084704",
+          "name": "add_verified_memory_review_lifecycle"
+        },
+        {
+          "version": "20260929084708",
+          "name": "add_verified_memory_outcome_evidence"
+        },
+        {
+          "version": "20260929084713",
+          "name": "add_verified_memory_product_projections"
+        },
+        {
+          "version": "20260929084736",
+          "name": "optimize_continuous_governance_fk_indexes"
+        },
+        {
+          "version": "20260929090134",
+          "name": "external_audit_release_hardening"
+        },
+        {
+          "version": "20260929090517",
+          "name": "add_canonical_memory_consolidation"
+        },
+        {
+          "version": "20260929091545",
+          "name": "governance_control_evidence_graph_v1"
+        },
+        {
+          "version": "20260929092807",
+          "name": "split_external_audit_reviewer_rls_policies"
+        },
+        {
+          "version": "20260929095401",
+          "name": "index_certified_memory_usage_receipts_request"
+        },
+        {
+          "version": "20260929095814",
+          "name": "governance_ai_impact_assessments_v1"
+        },
+        {
+          "version": "20260929101554",
+          "name": "datanest_owner_optimizer_v1"
+        },
+        {
+          "version": "20260929102149",
+          "name": "optimize_datanest_owner_optimizer_indexes"
+        },
+        {
+          "version": "20260929102655",
+          "name": "governance_outcome_feedback_v1"
+        },
+        {
+          "version": "20260929102906",
+          "name": "lock_down_datanest_owner_optimizer_table_privileges"
+        },
+        {
+          "version": "20260929115908",
+          "name": "governance_control_effectiveness_monitoring_v1"
+        },
+        {
+          "version": "20260929121532",
+          "name": "password_security_audit_v1"
+        },
+        {
+          "version": "20260929190612",
+          "name": "provider_region_sovereignty_enforcement"
+        },
+        {
+          "version": "20260929232500",
+          "name": "optimize_canonical_memory_consolidation_fk_indexes"
+        },
+        {
+          "version": "20260929235100",
+          "name": "link_development_work_requirement_focus"
+        },
+        {
+          "version": "20260929235950",
+          "name": "add_development_work_dashboard_v1"
+        },
+        {
+          "version": "20260929242500",
+          "name": "delete_revoked_project_member_invites"
+        },
+        {
+          "version": "20260930001000",
+          "name": "add_owner_development_analytics_dashboard"
+        },
+        {
+          "version": "20260930070000",
+          "name": "add_rnd_device_administration_v1"
+        },
+        {
+          "version": "20260930071134",
+          "name": "enable_admin_system_optimizer_collaboration"
+        },
+        {
+          "version": "20260930105423",
+          "name": "datanest_release_attestation_v1"
+        },
+        {
+          "version": "20260930130500",
+          "name": "index_external_ai_companion_intake"
+        },
+        {
+          "version": "20260930160101",
+          "name": "fix_governance_workspace_member_role"
+        },
+        {
+          "version": "20261001035708",
+          "name": "enforce_mirror_product_surface_release_identity"
+        }
+      ]
+    },
+    {
+      "ref": "qchttpcyqlqnhvahprhz",
+      "project": {
+        "id": "qchttpcyqlqnhvahprhz",
+        "ref": "qchttpcyqlqnhvahprhz",
+        "name": "DataNest AI Staging",
+        "region": "eu-central-1",
+        "status": "ACTIVE_HEALTHY"
+      },
+      "branches": [],
+      "securityAdvisors": [
+        {
+          "name": "authenticated_security_definer_function_executable",
+          "title": "Signed-In Users Can Execute SECURITY DEFINER Function",
+          "level": "WARN",
+          "count": 49
+        },
+        {
+          "name": "auth_leaked_password_protection",
+          "title": "Leaked Password Protection Disabled",
+          "level": "WARN",
+          "count": 1
+        }
+      ],
+      "migrations": []
+    }
+  ]
+}

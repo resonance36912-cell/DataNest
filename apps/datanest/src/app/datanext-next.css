@@ -1,0 +1,213 @@
+/* DataNext Experience Layer
+   2026-10-01 — progressive UX refinement for the existing DataNest shell.
+   Visual enhancement only: governance semantics remain unchanged. */
+
+:root{
+  --datanext-cyan:#79ecff;
+  --datanext-violet:#b29cff;
+  --datanext-border:rgba(121,236,255,.16);
+  --datanext-border-strong:rgba(121,236,255,.34);
+  --datanext-ease:cubic-bezier(.2,.75,.2,1);
+  --datanext-emphasis:cubic-bezier(.16,1,.3,1);
+}
+
+.datanextExperience .mainPane{
+  background:
+    radial-gradient(circle at 96% 8%,rgba(121,236,255,.035),transparent 28rem),
+    radial-gradient(circle at 12% 52%,rgba(178,156,255,.03),transparent 34rem);
+}
+
+.datanextExperience .sidebar{
+  transition:box-shadow .32s var(--datanext-ease),border-color .32s ease;
+}
+.datanextExperience .sidebar:hover{
+  border-right-color:rgba(121,236,255,.22);
+  box-shadow:20px 0 70px rgba(0,0,0,.25),inset -1px 0 rgba(255,255,255,.03);
+}
+
+.datanextExperience .navGroup button{
+  position:relative;
+  transition:transform .2s var(--datanext-ease),background .2s ease,color .2s ease,border-color .2s ease,box-shadow .2s ease;
+}
+.datanextExperience .navGroup button:not(.aiHeroNav)::after{
+  content:"";
+  position:absolute;
+  left:-35%;
+  top:0;
+  bottom:0;
+  width:30%;
+  transform:skewX(-18deg);
+  background:linear-gradient(90deg,transparent,rgba(121,236,255,.12),transparent);
+  opacity:0;
+  pointer-events:none;
+}
+.datanextExperience .navGroup button:hover{transform:translateX(2px)}
+.datanextExperience .navGroup button:not(.aiHeroNav):hover::after,
+.datanextExperience .navGroup button:not(.aiHeroNav):focus-visible::after{
+  opacity:1;
+  animation:datanext-nav-sheen .65s var(--datanext-ease) both;
+}
+.datanextExperience .navGroup button.active{transform:translateX(2px)}
+@keyframes datanext-nav-sheen{
+  from{transform:translateX(0) skewX(-18deg)}
+  to{transform:translateX(430%) skewX(-18deg)}
+}
+
+.datanextShellTopbar{
+  position:sticky;
+  isolation:isolate;
+}
+.datanextShellTopbar::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  width:auto;
+  background:linear-gradient(90deg,transparent,rgba(121,236,255,.065),transparent);
+  background-repeat:no-repeat;
+  background-size:22% 100%;
+  background-position:-28% 0;
+  opacity:.72;
+  pointer-events:none;
+  animation:datanext-topbar-scan 11s linear infinite;
+}
+@keyframes datanext-topbar-scan{
+  0%{background-position:-28% 0;opacity:0}
+  8%{background-position:-10% 0;opacity:.65}
+  26%{background-position:70% 0;opacity:.42}
+  32%,100%{background-position:128% 0;opacity:0}
+}
+.datanextShellTopbar .topbarTitle,
+.datanextShellTopbar .topActions,
+.datanextShellTopbar .menuButton{
+  position:relative;
+  z-index:1;
+}
+
+.datanextExperience .commandPalette{
+  border-color:var(--datanext-border-strong);
+  box-shadow:0 42px 120px rgba(0,0,0,.58),0 0 42px rgba(121,236,255,.06),inset 0 1px rgba(255,255,255,.045);
+}
+.datanextExperience .commandResult{
+  transition:transform .18s var(--datanext-ease),background .18s ease,border-color .18s ease;
+}
+.datanextExperience .commandResult:hover,
+.datanextExperience .commandResult:focus-visible,
+.datanextExperience .commandResult.active{
+  transform:translateX(3px);
+}
+
+.datanextExperience .metricCard,
+.datanextExperience .panel,
+.datanextExperience .workspaceCard,
+.datanextExperience .toolCard,
+.datanextExperience .connectionCard,
+.datanextExperience .checkpointCard,
+.datanextExperience .capabilityCard{
+  transition:transform .24s var(--datanext-ease),border-color .24s ease,box-shadow .24s ease;
+}
+.datanextExperience .metricCard:hover,
+.datanextExperience .workspaceCard:hover,
+.datanextExperience .toolCard:hover,
+.datanextExperience .connectionCard:hover,
+.datanextExperience .checkpointCard:hover,
+.datanextExperience .capabilityCard:hover{
+  transform:translateY(-2px);
+  border-color:rgba(121,236,255,.22);
+  box-shadow:0 18px 44px rgba(0,0,0,.18),0 0 24px rgba(121,236,255,.035);
+}
+
+.datanextExperience .primaryButton,
+.datanextExperience .datanestAiCommandButton{
+  transition:transform .18s var(--datanext-emphasis),filter .18s ease,box-shadow .18s ease;
+}
+.datanextExperience .primaryButton:hover:not(:disabled),
+.datanextExperience .datanestAiCommandButton:hover:not(:disabled){
+  transform:translateY(-1px);
+}
+.datanextExperience .primaryButton:active:not(:disabled),
+.datanextExperience .secondaryButton:active:not(:disabled),
+.datanextExperience .datanestAiCommandButton:active:not(:disabled){
+  transform:translateY(0) scale(.985);
+}
+
+@media(max-width:900px){
+  .datanextExperience .navGroup button:hover,
+  .datanextExperience .navGroup button.active,
+  .datanextExperience .commandResult:hover,
+  .datanextExperience .commandResult:focus-visible,
+  .datanextExperience .commandResult.active{transform:none}
+  .datanextShellTopbar::before{animation-duration:15s}
+}
+@media(prefers-reduced-motion:reduce){
+  .datanextExperience .sidebar,
+  .datanextExperience .navGroup button,
+  .datanextExperience .commandResult,
+  .datanextExperience .metricCard,
+  .datanextExperience .panel,
+  .datanextExperience .workspaceCard,
+  .datanextExperience .toolCard,
+  .datanextExperience .connectionCard,
+  .datanextExperience .checkpointCard,
+  .datanextExperience .capabilityCard,
+  .datanextExperience .primaryButton,
+  .datanextExperience .secondaryButton,
+  .datanextExperience .datanestAiCommandButton{
+    transition:none!important;
+  }
+  .datanextShellTopbar::before,
+  .datanextPulse,
+  .datanextExperience .navGroup button:not(.aiHeroNav):hover::after{
+    animation:none!important;
+  }
+}
+@media(forced-colors:active){
+  .datanextShellTopbar::before,
+  .datanextExperience .navGroup button:not(.aiHeroNav)::after{display:none}
+}
+.datanextTelemetry{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:.55rem;
+  margin-top:1rem;
+  min-height:1.8rem;
+  color:rgba(220,236,244,.68);
+  font:600 10px/1.2 var(--font-mono,ui-monospace,monospace);
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.datanextTelemetryItem{
+  display:inline-flex;
+  align-items:center;
+  gap:.42rem;
+  white-space:nowrap;
+}
+.datanextTelemetryItem b{
+  color:rgba(235,249,255,.94);
+  font-weight:800;
+}
+.datanextTelemetryItem.warn b{color:#ffd37a}
+.datanextTelemetryDivider{opacity:.25}
+.datanextPulse{
+  width:.5rem;
+  height:.5rem;
+  border-radius:999px;
+  background:var(--datanext-cyan);
+  box-shadow:0 0 0 0 rgba(121,236,255,.42);
+  animation:datanext-pulse 2.2s ease-out infinite;
+}
+@keyframes datanext-pulse{
+  0%{box-shadow:0 0 0 0 rgba(121,236,255,.42)}
+  70%{box-shadow:0 0 0 7px rgba(121,236,255,0)}
+  100%{box-shadow:0 0 0 0 rgba(121,236,255,0)}
+}
+@media(max-width:640px){
+  .datanextTelemetry{gap:.4rem;font-size:9px}
+  .datanextTelemetryDivider{display:none}
+  .datanextTelemetryItem{width:calc(50% - .3rem)}
+}
+
+/* DataNext command cue: retain the existing AI nav affordance while making its role explicit. */
+.datanextExperience .navGroup button.aiHeroNav::after{
+  content:"COMMAND";
+}

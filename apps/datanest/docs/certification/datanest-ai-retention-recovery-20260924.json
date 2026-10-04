@@ -1,0 +1,62 @@
+{
+  "type": "datanest_ai_retention_recovery",
+  "started_timestamp_utc": "2026-09-24T21:59:00Z",
+  "completed_timestamp_utc": "2026-09-24T22:26:11Z",
+  "staging_project_ref": "qchttpcyqlqnhvahprhz",
+  "production_vault_secret_name": "datanest_ai_backup_key",
+  "encryption": "OpenPGP symmetric AES-256 via PostgreSQL pgcrypto",
+  "backup_id": "datanest-ai-governed-backup-20260925-01",
+  "payload_sha256": "a1f29aed8f6c21e7bde6201830fd4b1bdd2236de603ab68bcb4d12d6fce6d531",
+  "plaintext_chars": 681872,
+  "plaintext_bytes": 682282,
+  "ciphertext_base64_chars": 100831,
+  "encrypted_chunks": 12,
+  "recovery_verified": true,
+  "recovery_checks": {
+    "chunk_hashes": true,
+    "chunk_lengths": true,
+    "payload_sha256": true,
+    "format": "datanest-ai-governed-backup-v1",
+    "source_project_ref": "qchttpcyqlqnhvahprhz"
+  },
+  "recovery_counts": {
+    "ai_sessions": 39,
+    "ai_intake_events": 174,
+    "ai_reasoning_envelopes": 82,
+    "ai_trend_clusters": 4,
+    "ai_trend_evidence": 82,
+    "ai_learning_candidates": 76,
+    "ai_candidate_evidence": 1811,
+    "ai_validation_runs": 4,
+    "ai_certification_decisions": 1,
+    "ai_memory_supersessions": 0
+  },
+  "storage": {
+    "provider": "Dropbox",
+    "path": "/DataNest-AI-Backups/datanest-ai-governed-backup-20260925.zip",
+    "file_id": "id:nO5LRBcaPmkAAAAAAAAt6w",
+    "size_bytes": 104306,
+    "zip_sha256": "40290d77f72824638bcdfa015dee87e36ef12898963a667bef088fe09ab28f2e",
+    "dropbox_content_hash": "1ff174cd62c7a8391d7b7d4fcfb78f6957a055865cb3ce327354e541773f64be",
+    "stored_copy_hash_verified": true,
+    "key_stored_with_backup": false
+  },
+  "transfer_evidence": {
+    "github_actions_run_id": 36067347024,
+    "github_artifact_id": 10837305065,
+    "artifact_digest": "sha256:40290d77f72824638bcdfa015dee87e36ef12898963a667bef088fe09ab28f2e",
+    "artifact_retention_days": 1,
+    "purpose": "Encrypted transfer bridge only; plaintext was not stored in GitHub."
+  },
+  "cleanup": {
+    "staging_backup_download_function_version": 2,
+    "staging_backup_download_function_state": "disabled via HTTP 410 response",
+    "staging_export_rpc_removed": true,
+    "staging_export_table_removed": true,
+    "temporary_dropbox_adapter_file_removed": true
+  },
+  "merge_gate": {
+    "status": "passed",
+    "reason": "Encrypted backup is physically stored outside staging, stored-copy hash matches the transfer artifact, the decryption key remains separately in production Supabase Vault, and the current encrypted payload passed chunk and full-payload recovery verification."
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "schemaVersion": "datanest-guardian-blueprint-v1",
+  "blueprintVersion": 1,
+  "authority": "DataNest-Supository/DataNest",
+  "canonicalRoot": "main",
+  "description": "Optimal operating blueprint used by GUARDIAN to measure current tree, environment, branch, source, security and maintainability health.",
+  "requiredTrees": [
+    {
+      "id": "knowledge",
+      "contract": "config/knowledge-tree.json"
+    },
+    {
+      "id": "boundaries",
+      "contract": "config/boundaries.policy.json"
+    },
+    {
+      "id": "botsquad",
+      "contract": "config/botsquad.tree.json"
+    },
+    {
+      "id": "environment",
+      "contract": "config/environment.tree.json"
+    },
+    {
+      "id": "enforcer",
+      "contract": "config/enforcer.tree.json"
+    },
+    {
+      "id": "guardian",
+      "contract": "config/guardian.tree.json"
+    },
+    {
+      "id": "conductor",
+      "contract": "config/conductor.tree.json"
+    },
+    {
+      "id": "suggester",
+      "contract": "config/suggester.tree.json"
+    },
+    {
+      "id": "calmer",
+      "contract": "config/calmer.tree.json"
+    },
+    {
+      "id": "regulator",
+      "contract": "config/regulator.tree.json"
+    },
+    {
+      "id": "visibility-utility",
+      "contract": "config/visibility-utility.tree.json"
+    },
+    {
+      "id": "liberty-in-all",
+      "contract": "config/liberty-in-all.standard.json"
+    }
+  ],
+  "environment": {
+    "requiredDimensions": [
+      "source-control",
+      "runtime",
+      "ci-runner",
+      "delivery",
+      "backend",
+      "ai-inference",
+      "registry",
+      "backup-recovery",
+      "dependency-posture",
+      "branch-hygiene",
+      "evidence-observability"
+    ],
+    "requiredStatus": "compatible",
+    "requiredCompatible": true
+  },
+  "security": {
+    "enforcerBlockedAllowed": false,
+    "optimalEnforcerStatus": "pass"
+  },
+  "knowledge": {
+    "minimumApprovedItems": 1
+  },
+  "sourceHealth": {
+    "maximumHighReviewerFindings": 0,
+    "safeAutoRefinementOnly": true,
+    "behavioralDeduplicationRequiresReview": true
+  },
+  "branchHealth": {
+    "protectedAutomation": [
+      "^automation/knowledge-feed$",
+      "^automation/botsquad/",
+      "^automation/environment-feed$",
+      "^automation/enforcer$",
+      "^automation/guardian$",
+      "^automation/conductor$",
+      "^automation/suggester$",
+      "^automation/calmer$",
+      "^automation/regulator$",
+      "^automation/visibility-utility$",
+      "^automation/liberty-in-all$"
+    ],
+    "autonomousDeletion": "no-unique-commits-only"
+  },
+  "healthThresholds": {
+    "healthy": 90,
+    "degraded": 70,
+    "criticalBelow": 70
+  },
+  "blueprintSources": [
+    "config/guardian.blueprint.json",
+    "config/guardian.tree.json",
+    "config/environment.tree.json",
+    "config/boundaries.policy.json",
+    "config/knowledge-tree.json",
+    "config/botsquad.tree.json",
+    "config/enforcer.tree.json",
+    "config/supository.catalog.json",
+    "config/repository-boundary.json",
+    "infra/reson8-forge/specialized-trees.json",
+    "branch-cleaner.config.json",
+    "workflow-reviewer.config.json",
+    "package.json",
+    "config/conductor.tree.json",
+    "config/suggester.tree.json",
+    "config/calmer.tree.json",
+    "config/regulator.tree.json",
+    "config/visibility-utility.tree.json",
+    "docs/DATANEST_SYSTEM_CHARTER.md",
+    "config/liberty-in-all.standard.json"
+  ],
+  "coordination": {
+    "conductorMaxAgeMinutes": 30,
+    "suggesterMaxAgeMinutes": 30,
+    "requiredConductorAuthority": "process-synchronization",
+    "requiredSuggesterAuthority": "optimization-advisory"
+  },
+  "feedFreshness": {
+    "environmentMinutes": 420,
+    "enforcerMinutes": 210,
+    "knowledgeMinutes": 420,
+    "botsquadMinutes": 420,
+    "calmerMinutes": 45,
+    "regulatorMinutes": 45,
+    "visibilityUtilityMinutes": 240,
+    "libertyInAllMinutes": 20
+  },
+  "governanceHarmony": {
+    "calmerHardControlsRemoved": 0,
+    "regulatorFinancialCommitmentsAuthorized": false
+  },
+  "marketVisibility": {
+    "minimumSeoScore": 80,
+    "minimumPlatformCoveragePercent": 95
+  },
+  "traceabilityAssurance": {
+    "required": true,
+    "publicMetadataOnly": true,
+    "contentDigestsRequired": true
+  }
+}

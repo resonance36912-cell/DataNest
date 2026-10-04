@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "project": "Resonance DataNest",
+  "supabase_project": "sgqdmfgjbprsoqsmgigi",
+  "functions": {
+    "datanest-ai-chat": {
+      "version": 258,
+      "ezbr_sha256": "352a0c01905aabd7202f46c94e5518d5ba508ad8262e3e75b573b0459589790f"
+    },
+    "datanest-ai-intake": {
+      "version": 221,
+      "ezbr_sha256": "8775d83a630639811e6666e75000f540ad1d91e270350659eadc88c00cf59c01"
+    },
+    "datanest-ai-certification": {
+      "version": 230,
+      "ezbr_sha256": "3e88138662863e876f1a9b79c108e1ceecfed2516e21f7829b95f34fc898b8a0"
+    },
+    "manage-ai-provider-v2": {
+      "version": 22,
+      "ezbr_sha256": "f4bb2308918b860c4a034945384a39d7e92b18feaef933737736b3f8f1c5e56f"
+    },
+    "send-job-invite": {
+      "version": 3,
+      "ezbr_sha256": "da767243f62bb83bd4734e9da367f12beea3970de3cc3b8261e842fd0dab939b"
+    },
+    "send-project-member-invite": {
+      "version": 224,
+      "ezbr_sha256": "2b44bd0c623a1941fe4b4d8c10b2ff065cfb0f8bbcab5f788f20cca08bcd480a"
+    },
+    "ronsas-status": {
+      "version": 234,
+      "ezbr_sha256": "eb257b0c78b9c64af14255296c20f0121cd3a1918705d687d0a89410535234d5"
+    },
+    "external-audit": {
+      "version": 7,
+      "ezbr_sha256": "2b91de4b82be72df038b4e305b873ad2f3526e9c26e8e5d3db3f17b036a54bce"
+    }
+  },
+  "attestation_notes": {
+    "updated_from_live_inventory_at": "2026-09-30",
+    "scope": "governed DataNest production Edge Functions represented in public release-manifest.json",
+    "methodology": "Supabase Edge Function inventory read; version, ACTIVE status, JWT mode and ezbr_sha256 recorded",
+    "limitations": "This baseline identifies live deployment state but does not by itself prove that the deployment package was produced from the same Git SHA as the Pages artifact."
+  }
+}

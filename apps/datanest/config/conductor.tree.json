@@ -1,0 +1,244 @@
+{
+  "schemaVersion": "datanest-conductor-v1",
+  "authority": "DataNest-Supository/DataNest",
+  "mode": "event-driven-process-synchronization",
+  "productionAuthorization": false,
+  "purpose": "Coordinate timing, dependency freshness, pull/push data flow, and workflow dispatch so DataNest specialized trees operate in the required order without creating a competing authority plane.",
+  "pulseMinutes": 15,
+  "commandBranch": "automation/conductor",
+  "statePath": "conductor/state/latest.json",
+  "commandPath": "conductor/commands/latest.json",
+  "suggesterFeedPath": "suggester/feeds/datanest.json",
+  "processOrder": [
+    {
+      "id": "knowledge",
+      "workflow": "knowledge-tree.yml",
+      "workflowName": "Knowledge Tree",
+      "maxAgeMinutes": 360,
+      "dependencies": [],
+      "dispatch": {
+        "enabled": true
+      }
+    },
+    {
+      "id": "environment",
+      "workflow": "environment-tree.yml",
+      "workflowName": "ENVIRONMENT Tree",
+      "maxAgeMinutes": 360,
+      "dependencies": [],
+      "dispatch": {
+        "enabled": true
+      }
+    },
+    {
+      "id": "boundaries",
+      "workflow": "boundaries-assessment.yml",
+      "workflowName": "DataNest Boundaries",
+      "maxAgeMinutes": 1440,
+      "dependencies": [],
+      "dispatch": {
+        "enabled": true
+      }
+    },
+    {
+      "id": "security",
+      "workflow": "security-scan.yml",
+      "workflowName": "Security scan",
+      "maxAgeMinutes": 1440,
+      "dependencies": [],
+      "dispatch": {
+        "enabled": true
+      }
+    },
+    {
+      "id": "enforcer",
+      "workflow": "enforcer.yml",
+      "workflowName": "ENFORCER Defence Tree",
+      "maxAgeMinutes": 180,
+      "dependencies": [
+        "knowledge",
+        "environment",
+        "security",
+        "boundaries"
+      ],
+      "dispatch": {
+        "enabled": true
+      }
+    },
+    {
+      "id": "botsquad",
+      "workflow": "botsquad.yml",
+      "workflowName": "BOTSQUAD AI Tree",
+      "maxAgeMinutes": 60,
+      "dependencies": [
+        "knowledge",
+        "environment"
+      ],
+      "dispatch": {
+        "enabled": true
+      }
+    },
+    {
+      "id": "guardian",
+      "workflow": "guardian.yml",
+      "workflowName": "GUARDIAN Health & Healing Tree",
+      "maxAgeMinutes": 30,
+      "dependencies": [
+        "knowledge",
+        "environment",
+        "enforcer",
+        "botsquad",
+        "boundaries"
+      ],
+      "dispatch": {
+        "enabled": true
+      }
+    },
+    {
+      "id": "calmer",
+      "workflow": "calmer.yml",
+      "workflowName": "CALMER Governance Softening Tree",
+      "maxAgeMinutes": 30,
+      "dependencies": [
+        "guardian",
+        "enforcer",
+        "boundaries"
+      ],
+      "dispatch": {
+        "enabled": true
+      }
+    },
+    {
+      "id": "regulator",
+      "workflow": "regulator.yml",
+      "workflowName": "REGULATOR Harmony Tree",
+      "maxAgeMinutes": 30,
+      "dependencies": [
+        "calmer",
+        "guardian",
+        "enforcer",
+        "botsquad",
+        "boundaries"
+      ],
+      "dispatch": {
+        "enabled": true
+      }
+    },
+    {
+      "id": "visibility-utility",
+      "workflow": "visibility-utility.yml",
+      "workflowName": "VISIBILITY-UTILITY Market Presence Tree",
+      "maxAgeMinutes": 240,
+      "dependencies": [
+        "knowledge",
+        "botsquad",
+        "regulator"
+      ],
+      "dispatch": {
+        "enabled": true
+      }
+    }
+  ],
+  "safeSuggestionActions": {
+    "heal-redundant-branches": {
+      "workflow": "maintenance.yml",
+      "workflowName": "DataNest Maintenance",
+      "inputs": {
+        "task": "branch-cleaner"
+      },
+      "requiresSuggestionNewerThanWorkflow": true
+    },
+    "heal-byte-safe-source-noise": {
+      "workflow": "maintenance.yml",
+      "workflowName": "DataNest Maintenance",
+      "inputs": {
+        "task": "streamliner"
+      },
+      "requiresSuggestionNewerThanWorkflow": true
+    }
+  },
+  "dataFlows": [
+    {
+      "from": "main",
+      "to": "Knowledge",
+      "mode": "pull-source-evidence"
+    },
+    {
+      "from": "main",
+      "to": "ENVIRONMENT",
+      "mode": "pull-blueprint-and-runtime-contracts"
+    },
+    {
+      "from": "Knowledge+ENVIRONMENT+Security",
+      "to": "ENFORCER",
+      "mode": "pull-assess-push-defence-evidence"
+    },
+    {
+      "from": "Knowledge+ENVIRONMENT",
+      "to": "BOTSQUAD",
+      "mode": "pull-analyze-push-optimization-feeds"
+    },
+    {
+      "from": "all-specialized-tree-feeds",
+      "to": "GUARDIAN",
+      "mode": "pull-measure-heal-push-health"
+    },
+    {
+      "from": "GUARDIAN+Knowledge+BOTSQUAD+ENFORCER+ENVIRONMENT",
+      "to": "SUGGESTER",
+      "mode": "pull-suggest-push-optimization-queue"
+    },
+    {
+      "from": "SUGGESTER",
+      "to": "CONDUCTOR",
+      "mode": "pull-safe-automation-commands"
+    },
+    {
+      "from": "CONDUCTOR",
+      "to": "specialized-workflows",
+      "mode": "push-dispatch"
+    },
+    {
+      "from": "canonical-feeds",
+      "to": "Mirror-DataNest",
+      "mode": "push-public-feed-pull-by-mirror-consumers"
+    },
+    {
+      "from": "GUARDIAN+ENFORCER+CONDUCTOR",
+      "to": "CALMER",
+      "mode": "pull-minimize-governance-friction"
+    },
+    {
+      "from": "CALMER+GUARDIAN+ENFORCER+BOTSQUAD+SUGGESTER",
+      "to": "REGULATOR",
+      "mode": "pull-audit-stress-acquire-supply-action-requirements"
+    },
+    {
+      "from": "REGULATOR",
+      "to": "BOTSQUAD",
+      "mode": "push-requirement-packet"
+    },
+    {
+      "from": "Knowledge+BOTSQUAD+REGULATOR+public-platform-state",
+      "to": "VISIBILITY-UTILITY",
+      "mode": "pull-assess-project-market-routes"
+    },
+    {
+      "from": "VISIBILITY-UTILITY",
+      "to": "SUGGESTER",
+      "mode": "push-seo-market-and-route-to-market-evidence"
+    }
+  ],
+  "controls": {
+    "oneCoordinatedDispatchPerCycle": true,
+    "dispatchOnlyWorkflowDispatchEnabledTargets": true,
+    "neverMergePullRequests": true,
+    "neverDeployProductionDirectly": true,
+    "neverChangeBoundaries": true,
+    "neverSynchronizeFreetree": true,
+    "failedOrUnknownDependencyState": "do-not-dispatch-dependent-process"
+  },
+  "retryCooldownMinutes": 30,
+  "dispatchReservationMinutes": 5,
+  "suggestionMaxAgeMinutes": 30
+}

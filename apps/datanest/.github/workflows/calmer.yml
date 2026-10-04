@@ -1,0 +1,107 @@
+name: CALMER Governance Softening Tree
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: "5,20,35,50 * * * *"
+      timezone: Africa/Johannesburg
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "GUARDIAN Health & Healing Tree"
+      - "ENFORCER Defence Tree"
+    types: [completed]
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  # Coalesce scheduled and dependency-triggered runs that observe the same canonical SHA.
+  group: datanest-calmer-${{ github.event.workflow_run.head_sha || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  soften:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event != 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    name: Minimize avoidable governance friction
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && 'main' || '' }}
+          fetch-depth: 0
+
+      - uses: ./.github/actions/automation-x-annotation
+        with:
+          automation_id: calmer
+          automation_class: analysis
+          automation_action: recommend
+          automation_target: calmer/state/latest.json
+          automation_effect: proposal
+          human_review_required: "true"
+
+      - name: Read health, defence, timing, learning and suggestion state
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/calmer
+          for branch in automation/guardian automation/enforcer automation/conductor automation/knowledge-feed automation/suggester; do
+            git fetch origin "$branch" || true
+          done
+          git show origin/automation/guardian:guardian/snapshots/latest.json > /tmp/calmer/guardian.json 2>/dev/null || echo '{}' > /tmp/calmer/guardian.json
+          git show origin/automation/enforcer:enforcer/state/latest.json > /tmp/calmer/enforcer.json 2>/dev/null || echo '{}' > /tmp/calmer/enforcer.json
+          git show origin/automation/conductor:conductor/state/latest.json > /tmp/calmer/conductor.json 2>/dev/null || echo '{}' > /tmp/calmer/conductor.json
+          git show origin/automation/knowledge-feed:knowledge/feeds/datanest.json > /tmp/calmer/knowledge.json 2>/dev/null || echo '{}' > /tmp/calmer/knowledge.json
+          git show origin/automation/suggester:suggester/feeds/datanest.json > /tmp/calmer/suggester.json 2>/dev/null || echo '{}' > /tmp/calmer/suggester.json
+
+      - name: Calculate maximum safe softening and tier packages
+        env:
+          CALMER_GUARDIAN_PATH: /tmp/calmer/guardian.json
+          CALMER_ENFORCER_PATH: /tmp/calmer/enforcer.json
+          CALMER_CONDUCTOR_PATH: /tmp/calmer/conductor.json
+          CALMER_KNOWLEDGE_PATH: /tmp/calmer/knowledge.json
+          CALMER_SUGGESTER_PATH: /tmp/calmer/suggester.json
+        run: node scripts/calmer-governance.mjs
+
+      - name: Verify hard controls remain intact
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.productionAuthorization == false and .summary.hardControlsRemoved == 0' calmer/state/latest.json >/dev/null
+
+      - name: Publish CALMER state
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="automation/calmer"
+          git fetch origin "$branch" || true
+          git switch -C "$branch"
+          git add calmer/state/latest.json calmer/feeds/datanest.json
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name="DataNest CALMER"             -c user.email="41898282+github-actions[bot]@noreply.github.com"             commit -m "Refresh CALMER governance softening"
+          if git push --force-with-lease origin HEAD:"$branch"; then
+            echo "CALMER state branch updated."
+          else
+            echo "::warning::Protected automation/calmer refused the state publication push. The generated proposal remains available in the workflow artifact; no protection bypass is attempted."
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: calmer-state-${{ github.run_id }}
+          path: |
+            calmer/state/latest.json
+            calmer/feeds/datanest.json
+          retention-days: 30
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "calmer"

@@ -1,0 +1,185 @@
+osal | Specific change, not generic advice. |
+
+| Expected benefit | Speed, clarity, reliability, safety, cost, maintainability, quality. |
+
+| Effort | S / M / L / XL with short rationale. |
+
+| Dependencies | Prerequisite findings, migrations, design decisions, tooling, approvals. |
+
+| Risk / invariant check | Which safeguards must remain intact. |
+
+| Validation test | Exact test proving the fix. |
+
+| Screenshots / attachments | Names or references; redact secrets/personal data. |
+
+# 24. Severity and Prioritization Rules
+
+| Level | Use when | Example | Target response |
+
+| --- | --- | --- | --- |
+
+| BLOCKER | Core workflow cannot proceed or release cannot be trusted. | Login impossible; deployment points to wrong DB; destructive data corruption. | Immediate stop / hotfix. |
+
+| CRITICAL | Security, authorization, governance, data integrity, or severe production reliability risk. | Unauthorized vote; cross-project data leak; ledger overspend. | Urgent governed fix before expansion. |
+
+| HIGH | Major user journey broken, misleading, or operationally expensive. | External AI result attaches to wrong Job; scheduler unsafe recovery. | Next release / highest backlog. |
+
+| MEDIUM | Material friction, maintainability debt, incomplete observability, or non-critical defects. | Confusing status, duplicate screens, partial responsive breakage. | Planned optimization. |
+
+| LOW | Polish, wording, minor consistency, low-frequency edge issue. | Spacing inconsistency, redundant label. | Bundle with nearby work. |
+
+| OPPORTUNITY | New improvement not required to restore correctness. | Better export, simplified navigation, faster workflow. | Prioritize by impact/effort. |
+
+# 25. Required Optimization Backlog
+
+Group optimizations by root cause, not by the page where the symptom appears. Do not create multiple duplicate backlog items for one shared defect.
+
+| Priority | Finding IDs | Optimization | Impact | Effort | Risk | Owner / domain | Validation |
+
+| --- | --- | --- | --- | --- | --- | --- | --- |
+
+| P_ | AUD-___ | [enter optimization] | [impact] | S/M/L | [risk] | [owner] | [validation] |
+
+| P_ | AUD-___ | [enter optimization] | [impact] | S/M/L | [risk] | [owner] | [validation] |
+
+| P_ | AUD-___ | [enter optimization] | [impact] | S/M/L | [risk] | [owner] | [validation] |
+
+| P_ | AUD-___ | [enter optimization] | [impact] | S/M/L | [risk] | [owner] | [validation] |
+
+| P_ | AUD-___ | [enter optimization] | [impact] | S/M/L | [risk] | [owner] | [validation] |
+
+| Prioritization guidance P0: integrity/security/blocker. P1: high-impact core journey. P2: measurable efficiency/quality gain. P3: polish or longer-horizon improvement. Prefer high-impact, low-complexity changes that reduce duplicate states or repeated manual checks. |
+
+| --- |
+
+# 26. Required Final Audit Deliverables
+
+[ ] Executive summary: 10-20 bullets covering strengths, largest risks, largest friction, and highest-leverage optimizations.
+
+[ ] System map: current-state UI/module + architecture/data/control flow.
+
+[ ] Scorecard from Section 22 with tested/not-tested coverage.
+
+[ ] Full finding register using Section 23 IDs and evidence.
+
+[ ] Prioritized optimization backlog from Section 25.
+
+[ ] Target-state architecture proposal: what to consolidate, separate, automate, cache, observe, or retire.
+
+[ ] Target-state UI / navigation proposal: pages to merge, hide, rename, simplify, or move to admin.
+
+[ ] Workflow optimizations: fewer clicks/manual copies/reloads while preserving explicit approvals and provenance.
+
+[ ] Output-quality improvements: formats, traceability, summarization, validation, export/import improvements.
+
+[ ] Security/privacy hardening plan, including any outstanding Supabase/Auth/configuration issues.
+
+[ ] Performance/reliability plan with measurable SLOs and fastest bottleneck wins.
+
+[ ] CI/test plan: missing regression tests, browser journeys, database acceptance tests, failure injections.
+
+[ ] 30/60/90-day implementation sequence with dependencies and rollback considerations.
+
+[ ] List of assumptions, areas NOT TESTED, and access/evidence required to close them.
+
+# 27. Copy/Paste Return Format
+
+Return the audit using the exact major headings below. This makes the result easy to paste back into ChatGPT for validation and implementation planning.
+
+# RESONANCE DATANEST / RONSAS - EXTERNAL AUDIT RETURN
+
+## 1. Executive Summary
+
+- Overall state:
+
+- Strongest areas:
+
+- Highest risks:
+
+- Highest-friction workflows:
+
+- Highest-leverage optimizations:
+
+## 2. Audit Coverage
+
+- Tested:
+
+- Not tested:
+
+- Access limitations:
+
+- Evidence sources:
+
+## 3. Scorecard
+
+| Domain | Score 0-5 | Confidence | Coverage | Top Gap |
+
+## 4. Findings
+
+### AUD-001 - <Title>
+
+- Domain:
+
+- Severity:
+
+- Confidence:
+
+- Status:
+
+- Evidence:
+
+- Observed behavior:
+
+- Expected behavior:
+
+- Root-cause hypothesis:
+
+- User impact:
+
+- Optimization proposal:
+
+- Expected benefit:
+
+- Effort:
+
+- Dependencies:
+
+- Risk / invariant check:
+
+- Validation test:
+
+## 5. Cross-System Journey Results
+
+- J1 ... J12:
+
+## 6. Target-State UI / UX
+
+## 7. Target-State Architecture
+
+## 8. Workflow and Automation Optimizations
+
+## 9. Output / Result Quality Optimizations
+
+## 10. Security / Privacy / Integrity Hardening
+
+## 11. Performance / Reliability / Observability
+
+## 12. CI / Test / Release Improvements
+
+## 13. Prioritized Optimization Backlog
+
+| Priority | Finding IDs | Optimization | Impact | Effort | Risk | Dependencies | Validation |
+
+## 14. 30 / 60 / 90-Day Plan
+
+## 15. Assumptions and Unverified Areas
+
+# 28. Optional Master Prompt for an External AI Auditor
+
+| Use this prompt with the full document attached The prompt below is intentionally strict about evidence, read-only production behavior, and optimization boundaries. |
+
+| --- |
+
+You are conducting an independent technical, UX, architecture, workflow, output-quality, security, and optimization audit of Resonance DataNest / RONSAS. Use the attached External Full-System Audit Brief as the authoritative audit specification.
+
+R

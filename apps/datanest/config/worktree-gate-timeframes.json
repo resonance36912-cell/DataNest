@@ -1,0 +1,466 @@
+{
+  "schemaVersion": "datanest-worktree-gate-timeframes-v2",
+  "maxHumanHours": 72,
+  "humanBuckets": [
+    6,
+    12,
+    24,
+    36,
+    48,
+    60,
+    72
+  ],
+  "machineBucketsMinutes": [
+    5,
+    10,
+    15,
+    20,
+    30,
+    45,
+    60,
+    90,
+    120
+  ],
+  "humanResponseAssumptions": {
+    "ownerOperator": {
+      "label": "Owner/operator response",
+      "typicalHours": 4,
+      "rangeHours": [
+        1,
+        12
+      ]
+    },
+    "engineeringReview": {
+      "label": "Engineering/code review",
+      "typicalHours": 8,
+      "rangeHours": [
+        4,
+        24
+      ]
+    },
+    "securityReview": {
+      "label": "Security review/triage",
+      "typicalHours": 12,
+      "rangeHours": [
+        8,
+        24
+      ]
+    },
+    "visualReview": {
+      "label": "Visual/UX review",
+      "typicalHours": 8,
+      "rangeHours": [
+        4,
+        24
+      ]
+    },
+    "governanceReview": {
+      "label": "Governance-impact review",
+      "typicalHours": 12,
+      "rangeHours": [
+        8,
+        24
+      ]
+    },
+    "legalReview": {
+      "label": "Legal review",
+      "typicalHours": 24,
+      "rangeHours": [
+        12,
+        48
+      ]
+    },
+    "externalReview": {
+      "label": "External/independent review",
+      "typicalHours": 24,
+      "rangeHours": [
+        12,
+        48
+      ]
+    },
+    "operationsReview": {
+      "label": "Operations/deployment review",
+      "typicalHours": 8,
+      "rangeHours": [
+        4,
+        24
+      ]
+    }
+  },
+  "taskComplexityHours": {
+    "routine": 2,
+    "standard": 6,
+    "complex": 12,
+    "cross_system": 18
+  },
+  "reportingComplexityHours": {
+    "summary": 2,
+    "standard": 4,
+    "detailed": 8,
+    "audit_grade": 12
+  },
+  "gateProfiles": {
+    "branch-cleaner.yml": {
+      "gateId": "branch-cleaner",
+      "gateType": "manual_mutation",
+      "taskComplexity": "standard",
+      "reportingComplexity": "detailed",
+      "reviewDomains": [
+        "ownerOperator"
+      ],
+      "machineBaselineMinutes": 15
+    },
+    "ci.yml": {
+      "gateId": "ci",
+      "gateType": "automated_validation",
+      "taskComplexity": "complex",
+      "reportingComplexity": "standard",
+      "reviewDomains": [
+        "engineeringReview"
+      ],
+      "machineBaselineMinutes": 30
+    },
+    "datanest-ai-certification.yml": {
+      "gateId": "datanest-ai-certification",
+      "gateType": "automated_validation",
+      "taskComplexity": "cross_system",
+      "reportingComplexity": "audit_grade",
+      "reviewDomains": [
+        "engineeringReview",
+        "governanceReview"
+      ],
+      "machineBaselineMinutes": 60
+    },
+    "datanest-ai-file-worker-deploy.yml": {
+      "gateId": "datanest-ai-file-worker-deploy",
+      "gateType": "manual_mutation",
+      "taskComplexity": "complex",
+      "reportingComplexity": "detailed",
+      "reviewDomains": [
+        "operationsReview",
+        "securityReview"
+      ],
+      "machineBaselineMinutes": 20
+    },
+    "edge-function-validation.yml": {
+      "gateId": "edge-function-validation",
+      "gateType": "automated_validation",
+      "taskComplexity": "standard",
+      "reportingComplexity": "detailed",
+      "reviewDomains": [
+        "engineeringReview",
+        "securityReview"
+      ],
+      "machineBaselineMinutes": 15
+    },
+    "migration-replay-validation.yml": {
+      "gateId": "migration-replay-validation",
+      "gateType": "automated_validation",
+      "taskComplexity": "complex",
+      "reportingComplexity": "detailed",
+      "reviewDomains": [
+        "engineeringReview",
+        "operationsReview"
+      ],
+      "machineBaselineMinutes": 20
+    },
+    "mirror-production-import.yml": {
+      "gateId": "mirror-production-import",
+      "gateType": "manual_mutation",
+      "taskComplexity": "cross_system",
+      "reportingComplexity": "audit_grade",
+      "reviewDomains": [
+        "engineeringReview",
+        "governanceReview",
+        "operationsReview"
+      ],
+      "machineBaselineMinutes": 30
+    },
+    "pages.yml": {
+      "gateId": "pages",
+      "gateType": "manual_mutation",
+      "taskComplexity": "cross_system",
+      "reportingComplexity": "audit_grade",
+      "reviewDomains": [
+        "governanceReview",
+        "legalReview",
+        "externalReview"
+      ],
+      "machineBaselineMinutes": 45
+    },
+    "pr-verification.yml": {
+      "gateId": "pr-verification",
+      "gateType": "automated_validation",
+      "taskComplexity": "complex",
+      "reportingComplexity": "detailed",
+      "reviewDomains": [
+        "engineeringReview",
+        "visualReview"
+      ],
+      "machineBaselineMinutes": 30
+    },
+    "ronsas-app-validation.yml": {
+      "gateId": "ronsas-app-validation",
+      "gateType": "automated_validation",
+      "taskComplexity": "cross_system",
+      "reportingComplexity": "detailed",
+      "reviewDomains": [
+        "engineeringReview",
+        "visualReview"
+      ],
+      "machineBaselineMinutes": 45
+    },
+    "security-scan.yml": {
+      "gateId": "security-scan",
+      "gateType": "automated_validation",
+      "taskComplexity": "complex",
+      "reportingComplexity": "audit_grade",
+      "reviewDomains": [
+        "securityReview"
+      ],
+      "machineBaselineMinutes": 30
+    },
+    "ui-owner-test-mode-expiry.yml": {
+      "gateId": "ui-owner-test-mode-expiry",
+      "gateType": "automated_enforcement",
+      "taskComplexity": "routine",
+      "reportingComplexity": "summary",
+      "reviewDomains": [
+        "ownerOperator"
+      ],
+      "machineBaselineMinutes": 10
+    },
+    "ui-test-mode.yml": {
+      "gateId": "ui-test-mode",
+      "gateType": "automated_evidence",
+      "taskComplexity": "cross_system",
+      "reportingComplexity": "audit_grade",
+      "reviewDomains": [
+        "visualReview",
+        "governanceReview"
+      ],
+      "machineBaselineMinutes": 45
+    },
+    "workflow-reviewer.yml": {
+      "gateId": "workflow-reviewer",
+      "gateType": "automated_analysis",
+      "taskComplexity": "standard",
+      "reportingComplexity": "detailed",
+      "reviewDomains": [
+        "engineeringReview",
+        "operationsReview"
+      ],
+      "machineBaselineMinutes": 10
+    },
+    "production-edge-function-release.yml": {
+      "gateId": "production-edge-function-release",
+      "gateType": "manual_mutation",
+      "taskComplexity": "cross_system",
+      "reportingComplexity": "audit_grade",
+      "reviewDomains": [
+        "engineeringReview",
+        "securityReview",
+        "operationsReview"
+      ],
+      "machineBaselineMinutes": 30
+    },
+    "sec01-governance-certification.yml": {
+      "gateId": "sec01-governance-certification",
+      "gateType": "automated_validation",
+      "taskComplexity": "complex",
+      "reportingComplexity": "audit_grade",
+      "reviewDomains": [
+        "securityReview",
+        "governanceReview"
+      ],
+      "machineBaselineMinutes": 20
+    },
+    "resonance-forge-phase-a.yml": {
+      "gateId": "resonance-forge-phase-a",
+      "gateType": "automated_validation",
+      "taskComplexity": "cross_system",
+      "reportingComplexity": "audit_grade",
+      "reviewDomains": [
+        "engineeringReview",
+        "securityReview",
+        "governanceReview"
+      ],
+      "machineBaselineMinutes": 30
+    },
+    "boundaries-assessment.yml": {
+      "gateId": "boundaries-assessment",
+      "gateType": "automated_validation",
+      "taskComplexity": "standard",
+      "reportingComplexity": "detailed",
+      "reviewDomains": [
+        "governanceReview",
+        "engineeringReview"
+      ],
+      "machineBaselineMinutes": 10
+    },
+    "knowledge-tree.yml": {
+      "gateId": "knowledge-tree",
+      "gateType": "automated_analysis",
+      "taskComplexity": "standard",
+      "reportingComplexity": "detailed",
+      "reviewDomains": [
+        "engineeringReview",
+        "governanceReview"
+      ],
+      "machineBaselineMinutes": 15
+    },
+    "maintenance.yml": {
+      "gateId": "maintenance",
+      "gateType": "automated_enforcement",
+      "taskComplexity": "complex",
+      "reportingComplexity": "detailed",
+      "reviewDomains": [
+        "operationsReview",
+        "governanceReview"
+      ],
+      "machineBaselineMinutes": 20
+    },
+    "botsquad.yml": {
+      "gateId": "botsquad",
+      "gateType": "automated_analysis",
+      "taskComplexity": "complex",
+      "reportingComplexity": "detailed",
+      "reviewDomains": [
+        "engineeringReview",
+        "visualReview",
+        "governanceReview"
+      ],
+      "machineBaselineMinutes": 20
+    },
+    "environment-tree.yml": {
+      "gateId": "environment-tree",
+      "gateType": "automated_analysis",
+      "taskComplexity": "standard",
+      "reportingComplexity": "detailed",
+      "reviewDomains": [
+        "engineeringReview",
+        "operationsReview",
+        "governanceReview"
+      ],
+      "machineBaselineMinutes": 15
+    },
+    "enforcer.yml": {
+      "gateId": "enforcer",
+      "gateType": "automated_enforcement",
+      "taskComplexity": "complex",
+      "reportingComplexity": "audit_grade",
+      "reviewDomains": [
+        "securityReview",
+        "governanceReview",
+        "engineeringReview"
+      ],
+      "machineBaselineMinutes": 20
+    },
+    "guardian.yml": {
+      "gateId": "guardian",
+      "gateType": "automated_enforcement",
+      "taskComplexity": "cross_system",
+      "reportingComplexity": "audit_grade",
+      "reviewDomains": [
+        "engineeringReview",
+        "operationsReview",
+        "securityReview",
+        "governanceReview"
+      ],
+      "machineBaselineMinutes": 30
+    },
+    "conductor.yml": {
+      "gateId": "conductor",
+      "gateType": "automated_enforcement",
+      "taskComplexity": "cross_system",
+      "reportingComplexity": "audit_grade",
+      "reviewDomains": [
+        "engineeringReview",
+        "operationsReview",
+        "governanceReview"
+      ],
+      "machineBaselineMinutes": 20
+    },
+    "suggester.yml": {
+      "gateId": "suggester",
+      "gateType": "automated_analysis",
+      "taskComplexity": "complex",
+      "reportingComplexity": "detailed",
+      "reviewDomains": [
+        "engineeringReview",
+        "operationsReview",
+        "governanceReview"
+      ],
+      "machineBaselineMinutes": 15
+    },
+    "calmer.yml": {
+      "gateId": "calmer",
+      "gateType": "automated_analysis",
+      "taskComplexity": "standard",
+      "reportingComplexity": "detailed",
+      "reviewDomains": [
+        "governanceReview",
+        "securityReview"
+      ],
+      "machineBaselineMinutes": 15
+    },
+    "regulator.yml": {
+      "gateId": "regulator",
+      "gateType": "automated_analysis",
+      "taskComplexity": "cross_system",
+      "reportingComplexity": "audit_grade",
+      "reviewDomains": [
+        "governanceReview",
+        "securityReview",
+        "operationsReview"
+      ],
+      "machineBaselineMinutes": 20
+    },
+    "visibility-utility.yml": {
+      "gateId": "visibility-utility",
+      "gateType": "automated_analysis",
+      "taskComplexity": "complex",
+      "reportingComplexity": "detailed",
+      "reviewDomains": [
+        "engineeringReview",
+        "visualReview",
+        "governanceReview"
+      ],
+      "machineBaselineMinutes": 20
+    },
+    "liberty-in-all.yml": {
+      "gateId": "liberty-in-all",
+      "gateType": "automated_evidence",
+      "taskComplexity": "complex",
+      "reportingComplexity": "audit_grade",
+      "reviewDomains": [
+        "engineeringReview",
+        "securityReview",
+        "governanceReview"
+      ],
+      "machineBaselineMinutes": 20
+    },
+    "branch-protection-tree.yml": {
+      "gateId": "branch-protection-tree",
+      "gateType": "automated_validation",
+      "taskComplexity": "standard",
+      "reportingComplexity": "detailed",
+      "reviewDomains": [
+        "engineeringReview",
+        "governanceReview"
+      ],
+      "machineBaselineMinutes": 10
+    }
+  },
+  "branch-protection-tree.yml": {
+    "gateId": "branch-protection-tree",
+    "gateType": "automated_validation",
+    "taskComplexity": "standard",
+    "reportingComplexity": "detailed",
+    "reviewDomains": [
+      "engineeringReview",
+      "governanceReview"
+    ],
+    "machineBaselineMinutes": 10
+  }
+}

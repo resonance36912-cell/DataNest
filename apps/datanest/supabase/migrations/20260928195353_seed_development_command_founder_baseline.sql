@@ -1,0 +1,3 @@
+-- Migration-history reconciliation: production applied this release under the canonical version.
+-- The implementation is retained in the repository migration 20260928212500_seed_development_command_founder_baseline.sql.
+-- This no-op preserves Supabase migration history alignment without replaying production DDL.

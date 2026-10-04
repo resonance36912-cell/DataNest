@@ -1,0 +1,8 @@
+{
+  "candidateId": "example-candidate",
+  "repository": "DataNest-Supository/DataNest",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "type": "unit",
+  "result": "pass",
+  "producer": "forge-phase-a"
+}

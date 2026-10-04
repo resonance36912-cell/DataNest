@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Resonance Forge Promotion State",
+  "type": "object",
+  "required": ["schemaVersion", "candidateId", "commitSha", "state", "history"],
+  "properties": {
+    "schemaVersion": {"type": "integer", "const": 1},
+    "candidateId": {"type": "string"},
+    "commitSha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "state": {
+      "type": "string",
+      "enum": [
+        "r_and_d", "live_candidate", "evidence_complete",
+        "canonical_review", "governance_review", "human_authorized",
+        "production", "post_deploy_verified", "blocked"
+      ]
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "at"],
+        "properties": {
+          "from": {"type": ["string", "null"]},
+          "to": {"type": "string"},
+          "at": {"type": "string", "format": "date-time"},
+          "evidenceRef": {"type": ["string", "null"]}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

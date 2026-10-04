@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "datanest-botsquad-v1",
+  "authority": "DataNest-Supository/DataNest",
+  "mode": "ai-only-advisory",
+  "productionAuthorization": false,
+  "humanReviewRequiredForCanonicalChange": true,
+  "inputs": [
+    "knowledge/feeds/datanest.json",
+    "environment/feeds/datanest.json",
+    "config/supository.catalog.json",
+    "config/boundaries.policy.json"
+  ],
+  "botBranches": [
+    {
+      "id": "orchestrator",
+      "branch": "automation/botsquad/orchestrator",
+      "purpose": "Synthesize specialist outputs into prioritized DataNest optimization and UX feeds."
+    },
+    {
+      "id": "optimizer",
+      "branch": "automation/botsquad/optimizer",
+      "purpose": "Reduce friction, duplication, latency, complexity, and maintenance cost."
+    },
+    {
+      "id": "product-expansion",
+      "branch": "automation/botsquad/product-expansion",
+      "purpose": "Identify responsible product, service, integration, and capability expansion opportunities."
+    },
+    {
+      "id": "business-growth",
+      "branch": "automation/botsquad/business-growth",
+      "purpose": "Identify sustainable business-model, adoption, retention, and portfolio-growth opportunities without autonomous commercial commitments."
+    },
+    {
+      "id": "ux-ease",
+      "branch": "automation/botsquad/ux-ease",
+      "purpose": "Produce ease-of-use, discoverability, accessibility, onboarding, and workflow-friction feeds."
+    },
+    {
+      "id": "ui-evolution",
+      "branch": "automation/botsquad/ui-evolution",
+      "purpose": "Propose evolved UI surfaces and interaction patterns consistent with DataNest design authority."
+    },
+    {
+      "id": "function-evolution",
+      "branch": "automation/botsquad/function-evolution",
+      "purpose": "Propose new or simplified functions, automations, controls, and workflows."
+    },
+    {
+      "id": "integration-scout",
+      "branch": "automation/botsquad/integration-scout",
+      "purpose": "Identify free/open integration opportunities and dependency simplifications."
+    },
+    {
+      "id": "quality-observer",
+      "branch": "automation/botsquad/quality-observer",
+      "purpose": "Surface regressions, evidence gaps, reliability risks, and acceptance-test needs."
+    },
+    {
+      "id": "environment-liaison",
+      "branch": "automation/botsquad/environment-liaison",
+      "purpose": "Translate ENVIRONMENT constraints and opportunities into implementable tree-level recommendations."
+    },
+    {
+      "id": "regulator-auditor",
+      "branch": "automation/botsquad/regulator-auditor",
+      "purpose": "Audit REGULATOR requirements, evidence completeness, transparency, control consistency and unresolved obligations."
+    },
+    {
+      "id": "regulator-stress-tester",
+      "branch": "automation/botsquad/regulator-stress-tester",
+      "purpose": "Stress-test REGULATOR requirements, limits, failure modes, recovery paths and operating assumptions."
+    },
+    {
+      "id": "regulator-acquisition-scout",
+      "branch": "automation/botsquad/regulator-acquisition-scout",
+      "purpose": "Identify free/open or already-authorized resources, tools, dependencies and evidence required by REGULATOR without purchases or credential acquisition."
+    },
+    {
+      "id": "regulator-supply-coordinator",
+      "branch": "automation/botsquad/regulator-supply-coordinator",
+      "purpose": "Assess supply readiness of approved internal/free/open resources, evidence, capabilities and dependencies required by REGULATOR."
+    },
+    {
+      "id": "regulator-action-planner",
+      "branch": "automation/botsquad/regulator-action-planner",
+      "purpose": "Translate validated REGULATOR requirements into bounded SUGGESTER/CONDUCTOR or human-review action plans."
+    }
+  ],
+  "feedTargets": [
+    {
+      "target": "datanest",
+      "path": "botsquad/feeds/datanest.json"
+    },
+    {
+      "target": "mirror",
+      "path": "botsquad/feeds/mirror-datanest.json"
+    }
+  ],
+  "controls": {
+    "aiIdentitiesOnly": true,
+    "mayOpenOrUpdateAutomationBranches": true,
+    "mayMutateCanonicalMain": false,
+    "mayApprovePullRequests": false,
+    "mayMerge": false,
+    "mayDeployProduction": false,
+    "mayChangeGovernance": false,
+    "mayHandleProductionSecrets": false,
+    "proposalsRequireTraceableInputs": true,
+    "canonicalChangesRequireHumanReview": true
+  },
+  "regulatorInput": {
+    "branch": "automation/regulator",
+    "path": "regulator/requirements/botsquad.json",
+    "authority": "requirement-request",
+    "productionAuthorization": false
+  }
+}

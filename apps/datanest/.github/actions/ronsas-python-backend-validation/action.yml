@@ -1,0 +1,36 @@
+name: RONSAS Python backend validation
+description: Install and validate the Python RONSAS sovereign backend.
+inputs:
+  working-directory:
+    description: RONSAS backend directory.
+    required: false
+    default: apps/ronsas/sovereign-backend
+  python-version:
+    description: Python version to install.
+    required: false
+    default: "3.12"
+  cache-dependency-path:
+    description: Requirements file used to key the pip cache.
+    required: false
+    default: apps/ronsas/sovereign-backend/requirements-dev.txt
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: pip
+        cache-dependency-path: ${{ inputs.cache-dependency-path }}
+    - name: Install dependencies
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: python -m pip install -r requirements-dev.txt
+    - name: Verify dependency environment
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: python -m pip check
+    - name: Run backend tests
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: python -m pytest -q

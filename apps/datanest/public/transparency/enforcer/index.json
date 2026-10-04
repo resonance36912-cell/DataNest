@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "datanest-enforcer-public-transparency-v1",
+  "tree": "ENFORCER",
+  "status": "continuous-generated-evidence",
+  "authority": {
+    "defensiveCheckEnforcement": true,
+    "productionAuthorization": false,
+    "governanceRewrite": false
+  },
+  "knowledge": {
+    "restrictionMode": "none-on-approved-knowledge-corpus",
+    "categoryFilters": [],
+    "topicFilters": [],
+    "secretValuesPublished": false,
+    "privateAuthenticationMaterialPublished": false
+  },
+  "evidence": {
+    "branch": "automation/enforcer",
+    "latestTransparencyUrl": "https://raw.githubusercontent.com/DataNest-Supository/DataNest/automation/enforcer/enforcer/transparency/latest.json",
+    "latestLearningUrl": "https://raw.githubusercontent.com/DataNest-Supository/DataNest/automation/enforcer/enforcer/feeds/knowledge-learning.json"
+  }
+}

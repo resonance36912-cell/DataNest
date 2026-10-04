@@ -1,0 +1,55 @@
+name: Edge Function Validation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - "supabase/functions/**"
+      - "supabase/migrations/**"
+      - "supabase/config.toml"
+      - ".github/workflows/edge-function-validation.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        function:
+          - datanest-ai-chat
+          - manage-ai-provider-v2
+          - datanest-ai-intake
+          - datanest-ai-certification
+          - datanest-ai-upload
+          - datanest-ai-file-worker
+          - send-job-invite
+          - send-project-member-invite
+          - manage-user-password
+          - manage-own-password
+          - ronsas-status
+          - external-audit
+          - audit-optimizer
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.9.7
+      - name: Deno check ${{ matrix.function }}
+        shell: bash
+        run: |
+          FUNCTION_DIR="supabase/functions/${{ matrix.function }}"
+          if [ -f "$FUNCTION_DIR/deno.json" ]; then
+            deno check --config "$FUNCTION_DIR/deno.json" "$FUNCTION_DIR/index.ts"
+          else
+            deno check "$FUNCTION_DIR/index.ts"
+          fi
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "edge-function-validation"

@@ -1,0 +1,96 @@
+name: Owner Live Test Mode Expiry
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-owner-test-mode-expiry
+  cancel-in-progress: false
+
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    outputs:
+      expired: ${{ steps.check.outputs.expired }}
+      release_sha: ${{ steps.check.outputs.release_sha }}
+      expires_at: ${{ steps.check.outputs.expires_at }}
+    steps:
+      - name: Check live governance marker
+        id: check
+        shell: bash
+        run: |
+          curl --fail --silent --show-error --location --retry 5 --retry-delay 3 \
+            https://datanest-supository.github.io/DataNest/ui-governance-release.json \
+            -o /tmp/ui-governance-release.json || { echo "expired=false" >> "$GITHUB_OUTPUT"; exit 0; }
+          node <<'NODE'
+          const fs=require("fs");
+          const path=process.env.GITHUB_OUTPUT;
+          const evidence=JSON.parse(fs.readFileSync("/tmp/ui-governance-release.json","utf8"));
+          const active=evidence.releaseState==="owner_test_mode" && evidence.ownerTestMode?.active===true;
+          const expiry=Date.parse(evidence.ownerTestMode?.expiresAt || "");
+          const expired=active && Number.isFinite(expiry) && Date.now()>=expiry;
+          fs.appendFileSync(path,`expired=${expired ? "true" : "false"}\n`);
+          fs.appendFileSync(path,`release_sha=${evidence.releaseSha || ""}\n`);
+          fs.appendFileSync(path,`expires_at=${evidence.ownerTestMode?.expiresAt || ""}\n`);
+          NODE
+
+  build-expired-marker:
+    if: ${{ needs.inspect.outputs.expired == 'true' }}
+    needs: inspect
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Build expired holding page
+        shell: bash
+        env:
+          RELEASE_SHA: ${{ needs.inspect.outputs.release_sha }}
+          EXPIRES_AT: ${{ needs.inspect.outputs.expires_at }}
+        run: |
+          mkdir -p out
+          cat > out/index.html <<EOF
+          <!doctype html><html><head><meta charset="utf-8"><title>DataNest Owner Test Mode expired</title></head>
+          <body><main><h1>Owner Test Mode expired</h1><p>The temporary production evidence-gathering window has ended.</p><p>Full governance review is required before normal production access resumes.</p></main></body></html>
+          EOF
+          printf '{"ok":false,"project":"Resonance DataNest","state":"owner_test_mode_expired"}\n' > out/health.json
+          node <<'NODE'
+          const fs=require("fs");
+          const payload={
+            schemaVersion:"ui-governance-release-v2",
+            project:"Resonance DataNest",
+            releaseSha:process.env.RELEASE_SHA,
+            releaseState:"owner_test_mode_expired",
+            authorized:false,
+            fullyGoverned:false,
+            productionDeploymentAllowed:false,
+            ownerTestMode:{active:false,expired:true,expiresAt:process.env.EXPIRES_AT},
+            generatedAt:new Date().toISOString()
+          };
+          fs.writeFileSync("out/ui-governance-release.json",JSON.stringify(payload)+"\n");
+          NODE
+      - uses: actions/upload-pages-artifact@v5.0.0
+        with:
+          path: ./out
+
+  deploy-expired-marker:
+    if: ${{ needs.inspect.outputs.expired == 'true' }}
+    needs: [inspect, build-expired-marker]
+    environment:
+      name: github-pages-owner-test-mode
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Replace expired Owner Test Mode deployment
+        id: deployment
+        uses: actions/deploy-pages@v5.0.1
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "ui-owner-test-mode-expiry"

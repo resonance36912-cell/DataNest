@@ -1,0 +1,8 @@
+{
+  "imports": {
+    "jszip": "npm:jszip@3.10.2",
+    "fast-xml-parser": "npm:fast-xml-parser@5.11.1",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2.57.4",
+    "pdfjs-dist/legacy/build/pdf.mjs": "npm:pdfjs-dist@6.3.289/legacy/build/pdf.mjs"
+  }
+}

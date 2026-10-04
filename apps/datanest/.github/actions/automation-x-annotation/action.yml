@@ -1,0 +1,40 @@
+name: Automation X Annotation
+description: Emit a non-authorizing provenance annotation for the current GitHub Actions run.
+inputs:
+  automation_id:
+    description: Stable automation identity.
+    required: true
+  automation_class:
+    description: Automation class.
+    required: true
+  automation_action:
+    description: Declared automation action.
+    required: true
+  automation_target:
+    description: Target of the automation.
+    required: true
+  automation_effect:
+    description: Declared effect.
+    required: true
+  human_review_required:
+    description: Whether human review is required.
+    required: false
+    default: "true"
+  human_review_reason:
+    description: Why human review is required or not required.
+    required: false
+    default: ""
+runs:
+  using: composite
+  steps:
+    - name: Emit Automation X annotation
+      shell: bash
+      env:
+        AUTOMATION_X_ID: ${{ inputs.automation_id }}
+        AUTOMATION_X_CLASS: ${{ inputs.automation_class }}
+        AUTOMATION_X_ACTION: ${{ inputs.automation_action }}
+        AUTOMATION_X_TARGET: ${{ inputs.automation_target }}
+        AUTOMATION_X_EFFECT: ${{ inputs.automation_effect }}
+        AUTOMATION_X_HUMAN_REVIEW_REQUIRED: ${{ inputs.human_review_required }}
+        AUTOMATION_X_HUMAN_REVIEW_REASON: ${{ inputs.human_review_reason }}
+      run: node scripts/emit-automation-x-annotation.mjs

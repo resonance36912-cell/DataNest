@@ -1,0 +1,307 @@
+name: GUARDIAN Health & Healing Tree
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: "7,37 * * * *"
+      timezone: Africa/Johannesburg
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "Knowledge Tree"
+      - "ENVIRONMENT Tree"
+      - "ENFORCER Defence Tree"
+      - "BOTSQUAD AI Tree"
+      - "Security scan"
+      - "DataNest Maintenance"
+      - "Resonance Forge Phase A"
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: datanest-guardian-${{ github.ref || github.event.workflow_run.head_branch || 'pulse' }}
+  cancel-in-progress: true
+
+jobs:
+  monitor:
+    if: >-
+      (github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main') &&
+      (github.event_name != 'workflow_run' ||
+        (github.event.workflow_run.head_branch == 'main' &&
+         github.event.workflow_run.head_repository.full_name == github.repository &&
+         github.event.workflow_run.event != 'pull_request' &&
+         github.event.workflow_run.event != 'workflow_run'))
+    name: Snapshot blueprint health and drift
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && 'main' || '' }}
+          fetch-depth: 0
+
+      - uses: ./.github/actions/automation-x-annotation
+        with:
+          automation_id: guardian/monitor
+          automation_class: enforcement
+          automation_action: observe
+          automation_target: guardian/snapshots/latest.json
+          automation_effect: read_only
+          human_review_required: "false"
+
+      - name: Fetch branch topology
+        shell: bash
+        run: git fetch --all --prune
+
+      - name: Read live specialized-tree state
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/guardian
+          for branch in automation/knowledge-feed automation/environment-feed automation/enforcer automation/botsquad/orchestrator automation/conductor automation/suggester automation/calmer automation/regulator automation/visibility-utility automation/guardian; do
+            git fetch origin "$branch" || true
+          done
+          git show origin/automation/environment-feed:environment/feeds/guardian.json > /tmp/guardian/environment.json 2>/dev/null ||             git show origin/automation/environment-feed:environment/feeds/datanest.json > /tmp/guardian/environment.json 2>/dev/null || echo '{}' > /tmp/guardian/environment.json
+          git show origin/automation/enforcer:enforcer/state/latest.json > /tmp/guardian/enforcer.json 2>/dev/null || echo '{}' > /tmp/guardian/enforcer.json
+          git show origin/automation/knowledge-feed:knowledge/feeds/datanest.json > /tmp/guardian/knowledge.json 2>/dev/null || echo '{}' > /tmp/guardian/knowledge.json
+          git show origin/automation/botsquad/orchestrator:botsquad/feeds/datanest.json > /tmp/guardian/botsquad.json 2>/dev/null || echo '{}' > /tmp/guardian/botsquad.json
+          git show origin/automation/conductor:conductor/state/latest.json > /tmp/guardian/conductor.json 2>/dev/null || echo '{}' > /tmp/guardian/conductor.json
+          git show origin/automation/suggester:suggester/feeds/datanest.json > /tmp/guardian/suggester.json 2>/dev/null || echo '{}' > /tmp/guardian/suggester.json
+          git show origin/automation/calmer:calmer/state/latest.json > /tmp/guardian/calmer.json 2>/dev/null || echo '{}' > /tmp/guardian/calmer.json
+          git show origin/automation/regulator:regulator/state/latest.json > /tmp/guardian/regulator.json 2>/dev/null || echo '{}' > /tmp/guardian/regulator.json
+          git show origin/automation/visibility-utility:visibility-utility/state/latest.json > /tmp/guardian/visibility.json 2>/dev/null || echo '{}' > /tmp/guardian/visibility.json
+          git show origin/automation/guardian:guardian/snapshots/latest.json > /tmp/guardian/previous.json 2>/dev/null || echo 'null' > /tmp/guardian/previous.json
+
+      - name: Measure source streamlining health
+        run: node scripts/workflow-reviewer.mjs --report-dir /tmp/guardian/reviewer
+
+      - name: Measure all-branch redundancy and lineage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/guardian/branches
+          if node scripts/branch-cleaner.mjs --report-dir /tmp/guardian/branches; then
+            exit 0
+          fi
+          echo "::warning::GUARDIAN branch inventory unavailable; recording degraded evidence and skipping branch-healing candidates."
+          cat > /tmp/guardian/branches/branch-cleaner-report.json <<'JSON'
+          {
+            "schemaVersion": 1,
+            "mode": "report-unavailable",
+            "github": {"branches": []},
+            "apply": {"deleted": [], "failed": []},
+            "availability": {
+              "available": false,
+              "reason": "github-api-or-control-plane-unavailable"
+            }
+          }
+          JSON
+
+      - name: Build GUARDIAN health snapshot
+        env:
+          GUARDIAN_ENVIRONMENT_PATH: /tmp/guardian/environment.json
+          GUARDIAN_ENFORCER_PATH: /tmp/guardian/enforcer.json
+          GUARDIAN_KNOWLEDGE_PATH: /tmp/guardian/knowledge.json
+          GUARDIAN_BOTSQUAD_PATH: /tmp/guardian/botsquad.json
+          GUARDIAN_CONDUCTOR_PATH: /tmp/guardian/conductor.json
+          GUARDIAN_SUGGESTER_PATH: /tmp/guardian/suggester.json
+          GUARDIAN_CALMER_PATH: /tmp/guardian/calmer.json
+          GUARDIAN_REGULATOR_PATH: /tmp/guardian/regulator.json
+          GUARDIAN_VISIBILITY_PATH: /tmp/guardian/visibility.json
+          GUARDIAN_PREVIOUS_SNAPSHOT_PATH: /tmp/guardian/previous.json
+          GUARDIAN_BRANCH_REPORT_PATH: /tmp/guardian/branches/branch-cleaner-report.json
+          GUARDIAN_REVIEWER_REPORT_PATH: /tmp/guardian/reviewer/report.json
+        run: node scripts/guardian-health.mjs --out-dir /tmp/guardian/output
+
+      - name: Publish GUARDIAN snapshot branch
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="automation/guardian"
+          git fetch origin "$branch" || true
+          git switch -C "$branch"
+          mkdir -p guardian/snapshots guardian/feeds
+          cp /tmp/guardian/output/snapshots/latest.json guardian/snapshots/latest.json
+          cp /tmp/guardian/output/feeds/*.json guardian/feeds/
+          git add guardian/snapshots/latest.json guardian/feeds/
+          if git diff --cached --quiet; then
+            echo "GUARDIAN snapshot unchanged."
+            exit 0
+          fi
+          git -c user.name="DataNest GUARDIAN" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "Refresh GUARDIAN health snapshot"
+          if git push --force-with-lease origin HEAD:"$branch"; then
+            echo "GUARDIAN snapshot branch updated."
+          else
+            echo "::warning::Protected automation/guardian refused the snapshot publication push. The generated snapshot remains available in the workflow artifact; no protection bypass is attempted."
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: guardian-health-${{ github.run_id }}
+          path: |
+            /tmp/guardian/output/
+            /tmp/guardian/reviewer/
+            /tmp/guardian/branches/
+          retention-days: 30
+
+      - name: Enforce critical health floor
+        shell: bash
+        run: |
+          set -euo pipefail
+          status="$(jq -r '.status' /tmp/guardian/output/snapshots/latest.json)"
+          if [ "$status" = "critical" ]; then
+            if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+              echo "::warning::GUARDIAN reports a critical health state on this PR. The snapshot remains published as evidence; asynchronous audit/evidence debt is advisory for PR progression and receives separate remediation deadlines."
+              exit 0
+            fi
+            echo "::error::GUARDIAN critical health floor failed on a main/scheduled execution."
+            exit 1
+          fi
+
+  heal:
+    needs: monitor
+    if: >-
+      needs.monitor.result == 'success' &&
+      (
+        github.event_name == 'pull_request' ||
+        github.event_name == 'push' ||
+        github.event_name == 'schedule' ||
+        (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+      )
+    concurrency:
+      group: datanest-safe-healing
+      cancel-in-progress: false
+    name: Heal proven redundancy and safe source noise
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: ./.github/actions/automation-x-annotation
+        with:
+          automation_id: guardian/heal
+          automation_class: enforcement
+          automation_action: heal
+          automation_target: guardian/
+          automation_effect: bounded_mutation
+          human_review_required: "true"
+          human_review_reason: "GUARDIAN healing can mutate repository state or open a PR; require explicit human review in the automation contract."
+
+      - name: PR safety gate
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "GUARDIAN healing is intentionally non-mutating on pull requests."
+          echo "PR event: observe/verify only; mutation actions remain disabled."
+
+      - name: Remove only branches proven to have no unique commits
+        if: github.event_name != 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/guardian/branch-healing
+          if node scripts/branch-cleaner.mjs --git-only-safe-apply --report-dir artifacts/guardian/branch-healing; then
+            exit 0
+          fi
+          echo "::warning::Live branch verification is unavailable. GUARDIAN is skipping destructive branch healing for this cycle."
+          cat > artifacts/guardian/branch-healing/branch-cleaner-report.json <<'JSON'
+          {
+            "schemaVersion": 1,
+            "mode": "safe-apply-skipped",
+            "apply": {
+              "deleted": [],
+              "failed": [],
+              "skipped": true,
+              "reason": "live-branch-verification-unavailable"
+            },
+            "availability": {
+              "available": false,
+              "failClosed": true
+            }
+          }
+          JSON
+
+      - name: Apply only byte-safe non-workflow source streamlining
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Workflow definitions are governance/control-plane code. GUARDIAN may
+          # analyze them in monitor mode, but autonomous healing must never mutate
+          # .github/workflows/**; any workflow change requires a governed PR.
+          jq '.exclude = (((.exclude // []) + [".github/workflows"]) | unique)' \
+            workflow-reviewer.config.json > /tmp/guardian-workflow-reviewer.config.json
+          node scripts/workflow-reviewer.mjs \
+            --apply \
+            --config /tmp/guardian-workflow-reviewer.config.json \
+            --report-dir artifacts/guardian/source-healing
+
+      - name: Enforce workflow-definition mutation boundary
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! git diff --quiet -- .github/workflows; then
+            echo "::error::GUARDIAN autonomous healing attempted to modify .github/workflows/**. Workflow changes require a governed human-reviewed PR."
+            git diff -- .github/workflows
+            exit 1
+          fi
+
+      - name: Open reviewed healing PR for tracked source refinements
+        if: github.event_name != 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! pending="$(gh pr list --state open --json headRefName --jq 'any(.[]; (.headRefName | startswith("guardian/heal-") or startswith("maintenance/streamline-")))' 2>/tmp/guardian-gh-pr-list.err)"; then
+            echo "::warning::GitHub PR inventory unavailable; source-healing changes will remain artifact evidence for this cycle."
+            cat /tmp/guardian-gh-pr-list.err || true
+            exit 0
+          fi
+          if [ "$pending" = "true" ]; then
+            echo "A source-healing PR already awaits review."
+            exit 0
+          fi
+          git add -u
+          if git diff --cached --quiet; then
+            echo "No tracked safe source refinements require a pull request."
+            exit 0
+          fi
+          branch="guardian/heal-${GITHUB_RUN_ID}"
+          git switch -c "$branch"
+          git -c user.name="DataNest GUARDIAN"               -c user.email="41898282+github-actions[bot]@users.noreply.github.com"               commit -m "chore: GUARDIAN safe source healing"
+          git push origin "$branch"
+          gh pr create             --base main             --head "$branch"             --title "GUARDIAN safe source healing"             --body "GUARDIAN applied byte-safe normalization only. Behavioral redundancy and refactoring candidates remain review-only."
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: guardian-healing-${{ github.run_id }}
+          path: artifacts/guardian/
+          retention-days: 30
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "guardian"

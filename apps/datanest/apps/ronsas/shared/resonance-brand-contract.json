@@ -1,0 +1,42 @@
+{
+  "schema": "datanest.ronsas.brand-contract.v1",
+  "operator": "Resonance Sole Proprietorship",
+  "businessBrand": "Resonance App Development",
+  "platform": "Resonance DataNest",
+  "governanceLabel": "RSGP Governed",
+  "governanceRoute": "/governance",
+  "legalRoute": "/legal",
+  "promotionState": {
+    "mode": "free-promotion",
+    "paidCheckoutActive": false
+  },
+  "fonts": [
+    "Inter Tight",
+    "Inter",
+    "Instrument Serif",
+    "JetBrains Mono"
+  ],
+  "surfaceTokens": {
+    "canvas": "#070414",
+    "chrome": "rgba(12, 5, 29, .96)",
+    "work": "rgba(18, 10, 39, .86)",
+    "workSoft": "rgba(24, 12, 52, .72)",
+    "elevated": "rgba(34, 18, 65, .96)"
+  },
+  "semanticTokens": {
+    "success": "#72e6ae",
+    "warning": "#f4c66f",
+    "danger": "#ff86ab",
+    "info": "#8aa6ff"
+  },
+  "appAccents": {
+    "career-compass": "#14bfff",
+    "creative-studio": "#ff36d8",
+    "epublisher": "#8b5cf6",
+    "lyricsync-studio": "#8aa6ff",
+    "scene-song-spark": "#f4c66f",
+    "sovereign-forge": "#72e6ae",
+    "syncvision": "#42e7ff",
+    "youtube-optimizer": "#ff86ab"
+  }
+}

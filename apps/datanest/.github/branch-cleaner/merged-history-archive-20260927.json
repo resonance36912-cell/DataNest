@@ -1,0 +1,331 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-27T05:45:48Z",
+  "sourceAudit": {
+    "runId": 36298114914,
+    "commit": "f03a12fe1d77488a53716d04a0e3d098be5607e8",
+    "classification": "merged_pr_unique_history"
+  },
+  "policy": {
+    "additiveOnly": true,
+    "deletesBranches": false,
+    "purpose": "Preserve unique merged-PR branch history as lightweight tags before any future branch-ref consolidation."
+  },
+  "entries": [
+    {
+      "branch": "ci-remove-remote-desktop-dependency",
+      "sha": "e1c532987d59518e884bca3cf445ace6a59df0a2",
+      "tag": "branch-archive/ci-remove-remote-desktop-dependency"
+    },
+    {
+      "branch": "enhance/branch-cleaner-family-containment-20260927",
+      "sha": "224c073898de0e1f432ecd77c8ad8299e50e59c9",
+      "tag": "branch-archive/enhance/branch-cleaner-family-containment-20260927"
+    },
+    {
+      "branch": "enhance/branch-cleaner-merge-activity-20260927",
+      "sha": "b816ec3706ea397e4a857e5dd6ea6eaac7dcc5c2",
+      "tag": "branch-archive/enhance/branch-cleaner-merge-activity-20260927"
+    },
+    {
+      "branch": "feat/center-datanest-ai-chat",
+      "sha": "039de8f002ac22f1443e28656268d62af6a08945",
+      "tag": "branch-archive/feat/center-datanest-ai-chat"
+    },
+    {
+      "branch": "feat/datanest-ai-chat-directly-below-hero",
+      "sha": "4f049cada37648a315de96c145ea11c0c5bff908",
+      "tag": "branch-archive/feat/datanest-ai-chat-directly-below-hero"
+    },
+    {
+      "branch": "feat/datanest-ai-command-access-v2",
+      "sha": "555f96ef75d45b8cbe58d3a68081f4f4e0332f3c",
+      "tag": "branch-archive/feat/datanest-ai-command-access-v2"
+    },
+    {
+      "branch": "feat/datanest-ai-command-console",
+      "sha": "44c560bd7d97ecc4e661c9f4fbcf1139bc58543e",
+      "tag": "branch-archive/feat/datanest-ai-command-console"
+    },
+    {
+      "branch": "feat/datanest-ai-command-context-lock-v4",
+      "sha": "17fbaa0d925d8e216f6a7578cee4007f7c3b1110",
+      "tag": "branch-archive/feat/datanest-ai-command-context-lock-v4"
+    },
+    {
+      "branch": "feat/datanest-ai-hero-presence",
+      "sha": "96917c0044694018f4bc7feab3e441c74bcb51f4",
+      "tag": "branch-archive/feat/datanest-ai-hero-presence"
+    },
+    {
+      "branch": "feat/datanest-ai-live-transcript",
+      "sha": "e67d00db720fee5348745e4349349d5f52ba2131",
+      "tag": "branch-archive/feat/datanest-ai-live-transcript"
+    },
+    {
+      "branch": "feat/datanest-ai-quick-commands-v2",
+      "sha": "b4f1fc6a4e580d8056045102ad5144fcd0e5fbab",
+      "tag": "branch-archive/feat/datanest-ai-quick-commands-v2"
+    },
+    {
+      "branch": "feat/datanest-ai-session-drafts",
+      "sha": "3694530c6c75680a655355532c8c1b73ec8839fd",
+      "tag": "branch-archive/feat/datanest-ai-session-drafts"
+    },
+    {
+      "branch": "feat/datanest-ai-vertical-command-flow-v2",
+      "sha": "868f64ade293a50320a81f8d2ecb67a108a72dfd",
+      "tag": "branch-archive/feat/datanest-ai-vertical-command-flow-v2"
+    },
+    {
+      "branch": "feat/datanest-purposeful-transitions",
+      "sha": "1eac0f80e5fdc8117b3032a22fe7680e47dce80d",
+      "tag": "branch-archive/feat/datanest-purposeful-transitions"
+    },
+    {
+      "branch": "feat/ronsas-cloud-integration-20260926",
+      "sha": "dd123760ada7fd6f6183fb89ad80f86bbf6e9e51",
+      "tag": "branch-archive/feat/ronsas-cloud-integration-20260926"
+    },
+    {
+      "branch": "feature/companion-auto-return",
+      "sha": "a82bb63b5f451e7ced9f4ba331a14addbd71016f",
+      "tag": "branch-archive/feature/companion-auto-return"
+    },
+    {
+      "branch": "feature/datanest-ai-live-turn-response-20260925",
+      "sha": "934f83fb3fc5589df589e5073a3ac72fdf357661",
+      "tag": "branch-archive/feature/datanest-ai-live-turn-response-20260925"
+    },
+    {
+      "branch": "feature/datanest-contribution-intelligence-v1",
+      "sha": "fe6a98032cb46f1e3c4bf122d9bb970a69c9d95b",
+      "tag": "branch-archive/feature/datanest-contribution-intelligence-v1"
+    },
+    {
+      "branch": "feature/datanest-external-audit-return-v1",
+      "sha": "7fe751866cb75eb71c2f4940aa5d7ea862242fcd",
+      "tag": "branch-archive/feature/datanest-external-audit-return-v1"
+    },
+    {
+      "branch": "feature/datanest-project-member-invitations-v1",
+      "sha": "092603fb014365d3354c64a60c8fc380a65fc7bf",
+      "tag": "branch-archive/feature/datanest-project-member-invitations-v1"
+    },
+    {
+      "branch": "feature/datanest-sovereign-governance-v1",
+      "sha": "ee7d111563717a246d1c6cfc3f24b1e9baa13b37",
+      "tag": "branch-archive/feature/datanest-sovereign-governance-v1"
+    },
+    {
+      "branch": "feature/datanest-sparks-economy-v1",
+      "sha": "ad8d35423789b09aae141e9dbc068f2f0cfdc7a4",
+      "tag": "branch-archive/feature/datanest-sparks-economy-v1"
+    },
+    {
+      "branch": "feature/datanest-stakeholder-contribution-v1",
+      "sha": "720ed8bb12e71255196880dad8b6021151093228",
+      "tag": "branch-archive/feature/datanest-stakeholder-contribution-v1"
+    },
+    {
+      "branch": "feature/datanest-think-tanks-v1",
+      "sha": "984669c73eda083630181e55e04cfbcaf8c30632",
+      "tag": "branch-archive/feature/datanest-think-tanks-v1"
+    },
+    {
+      "branch": "feature/datanest-transparency-audit-library-v1",
+      "sha": "b1d7d0bef6e3ae101c6aa1fbaa05d3dcbffa999f",
+      "tag": "branch-archive/feature/datanest-transparency-audit-library-v1"
+    },
+    {
+      "branch": "feature/legal-eagle-live-v2",
+      "sha": "032529329b76326f590785107ce51a3da6b07a22",
+      "tag": "branch-archive/feature/legal-eagle-live-v2"
+    },
+    {
+      "branch": "feature/products-hero-animation",
+      "sha": "cdf7b946cd03264cccfd470c670e74b1acdff253",
+      "tag": "branch-archive/feature/products-hero-animation"
+    },
+    {
+      "branch": "feature/products-resonance-assistance-legal-eagle",
+      "sha": "bf477d2bec779aa12e1446ba3ccb260092c30335",
+      "tag": "branch-archive/feature/products-resonance-assistance-legal-eagle"
+    },
+    {
+      "branch": "fix/audit-p1-wave1-20260925",
+      "sha": "5af062aa43c9f3bc6fe0c34d4efcd87753ab9ac2",
+      "tag": "branch-archive/fix/audit-p1-wave1-20260925"
+    },
+    {
+      "branch": "fix/branch-cleaner-strict-preflight-20260927",
+      "sha": "fffe4442194ac36bfd87ab44b12e9fe8c0c1ca1d",
+      "tag": "branch-archive/fix/branch-cleaner-strict-preflight-20260927"
+    },
+    {
+      "branch": "fix/chatgpt-companion-prefill-dock",
+      "sha": "cb436cd44fdc8cf2a07246f0ddbb80cfec009b4d",
+      "tag": "branch-archive/fix/chatgpt-companion-prefill-dock"
+    },
+    {
+      "branch": "fix/chatgpt-companion-prefill-placement-20260925",
+      "sha": "334b562725f90e98e50f5c906a846a2459596261",
+      "tag": "branch-archive/fix/chatgpt-companion-prefill-placement-20260925"
+    },
+    {
+      "branch": "fix/datanest-ai-candidate-dedup-20260925",
+      "sha": "5b7d767d2556b5f92636c9b3c541efb7303b4222",
+      "tag": "branch-archive/fix/datanest-ai-candidate-dedup-20260925"
+    },
+    {
+      "branch": "fix/datanest-ai-console-sync-shell-v2",
+      "sha": "f02e681c4089b55bfcf3c6f5c62f2fd991b134f3",
+      "tag": "branch-archive/fix/datanest-ai-console-sync-shell-v2"
+    },
+    {
+      "branch": "fix/datanest-ai-job-scoped-drafts-v3",
+      "sha": "84f9e53756e256d64ccafb458853c0fe7eb8c85a",
+      "tag": "branch-archive/fix/datanest-ai-job-scoped-drafts-v3"
+    },
+    {
+      "branch": "fix/datanest-ai-job-scoped-sessions",
+      "sha": "784cb7b126016e5080faab52f0fad4ee30a54f54",
+      "tag": "branch-archive/fix/datanest-ai-job-scoped-sessions"
+    },
+    {
+      "branch": "fix/datanest-ai-user-scoped-session-drafts-v2",
+      "sha": "4b94025206c1d5d7f1c09c86a5104024166ba0f5",
+      "tag": "branch-archive/fix/datanest-ai-user-scoped-session-drafts-v2"
+    },
+    {
+      "branch": "fix/home-alignment-20260926",
+      "sha": "e85d9ce3bacf200e623565231c3b8722b5e51678",
+      "tag": "branch-archive/fix/home-alignment-20260926"
+    },
+    {
+      "branch": "fix/home-rail-rounding-tolerance",
+      "sha": "490cf9ece040cf92ace10792f377de08ec05c55b",
+      "tag": "branch-archive/fix/home-rail-rounding-tolerance"
+    },
+    {
+      "branch": "fix/invite-password-setup",
+      "sha": "580149ea970be6f891febe810915ff5b334dbcce",
+      "tag": "branch-archive/fix/invite-password-setup"
+    },
+    {
+      "branch": "fix/legal-eagle-release-manifest-v2",
+      "sha": "1421f66153f391f510b055b04fdad1c38c571b95",
+      "tag": "branch-archive/fix/legal-eagle-release-manifest-v2"
+    },
+    {
+      "branch": "fix/project-invite-password-for-existing-users",
+      "sha": "ccfcbdcd71a155a30480e502714b7c5953e93816",
+      "tag": "branch-archive/fix/project-invite-password-for-existing-users"
+    },
+    {
+      "branch": "fix/project-invite-retry-v3-current",
+      "sha": "cf12481a2ca7985b276c54e766594087fd36df75",
+      "tag": "branch-archive/fix/project-invite-retry-v3-current"
+    },
+    {
+      "branch": "fix/restore-production-migration-history-20260927",
+      "sha": "dcbc08c95b3fc8a9f956bbc36f11730c1ff55185",
+      "tag": "branch-archive/fix/restore-production-migration-history-20260927"
+    },
+    {
+      "branch": "fix/review-ai-return-safety-20260925",
+      "sha": "e9b7f6e5b8b0819c219e35e9c33f189e4a0b8b29",
+      "tag": "branch-archive/fix/review-ai-return-safety-20260925"
+    },
+    {
+      "branch": "fix/stakeholder-release-manifest",
+      "sha": "3b29b92e12d747561e5a0dab8641a19a22bc47ca",
+      "tag": "branch-archive/fix/stakeholder-release-manifest"
+    },
+    {
+      "branch": "hotfix/stakeholder-model-version-ambiguity",
+      "sha": "b7c88d683287e2f76306db58bb9111f7d840deab",
+      "tag": "branch-archive/hotfix/stakeholder-model-version-ambiguity"
+    },
+    {
+      "branch": "remove-remote-desktop-final",
+      "sha": "d7ef3dd86ca04db54ea712ba48ec6943aebb5612",
+      "tag": "branch-archive/remove-remote-desktop-final"
+    },
+    {
+      "branch": "test/datanest-ai-hero-console-layout",
+      "sha": "e5b1e1cdb119dca84b8145933fccd4c8b5c052cb",
+      "tag": "branch-archive/test/datanest-ai-hero-console-layout"
+    },
+    {
+      "branch": "test/home-ai-rail-alignment-20260926",
+      "sha": "c86666c24b88ac4ef71704b5ee4519d2e7152304",
+      "tag": "branch-archive/test/home-ai-rail-alignment-20260926"
+    },
+    {
+      "branch": "tool/branch-cleaner-20260926",
+      "sha": "f6e2e0370d31324ea6293c1ef484741b48bfb8a6",
+      "tag": "branch-archive/tool/branch-cleaner-20260926"
+    },
+    {
+      "branch": "ui/datanest-ai-command-center-20260927",
+      "sha": "a1571c989da48feac0aebd7efddca88cde181e0f",
+      "tag": "branch-archive/ui/datanest-ai-command-center-20260927"
+    },
+    {
+      "branch": "ui/datanest-command-palette-20260925",
+      "sha": "71c44ef53d3fd3bee7c4aa4560cbf183299751c5",
+      "tag": "branch-archive/ui/datanest-command-palette-20260925"
+    },
+    {
+      "branch": "ui/datanest-command-palette-arrows-20260925",
+      "sha": "ccb91e5d5fe03acb56937368955ae733d3128fea",
+      "tag": "branch-archive/ui/datanest-command-palette-arrows-20260925"
+    },
+    {
+      "branch": "ui/datanest-command-palette-enter-20260925",
+      "sha": "4ab78f3c13285399964b8db635bcf4f428823cfc",
+      "tag": "branch-archive/ui/datanest-command-palette-enter-20260925"
+    },
+    {
+      "branch": "ui/datanest-command-palette-focus-20260925",
+      "sha": "f475c9a9cef25ab130f2b92ec65e2940f589b1fd",
+      "tag": "branch-archive/ui/datanest-command-palette-focus-20260925"
+    },
+    {
+      "branch": "ui/datanest-mobile-operational-cards-20260925",
+      "sha": "f6836b3e781451930903fe984f75405f4866568e",
+      "tag": "branch-archive/ui/datanest-mobile-operational-cards-20260925"
+    },
+    {
+      "branch": "ui/datanest-mobile-scheduler-filter-v2-20260925",
+      "sha": "f0090c1c818d855bbdad39063dfd31ce934ba0f2",
+      "tag": "branch-archive/ui/datanest-mobile-scheduler-filter-v2-20260925"
+    },
+    {
+      "branch": "ui/datanest-navigation-continuity-20260925",
+      "sha": "21dc8622078a4056cf88b2b5cea24ec2b68a6f45",
+      "tag": "branch-archive/ui/datanest-navigation-continuity-20260925"
+    },
+    {
+      "branch": "ui/datanest-ux-polish-20260925",
+      "sha": "c71c356819c1dabebb55119118c46df3914500e8",
+      "tag": "branch-archive/ui/datanest-ux-polish-20260925"
+    },
+    {
+      "branch": "ui/datanest-ux-polish-wave2-20260925",
+      "sha": "736a676751abf079c63c6c31d34c12ec312675c0",
+      "tag": "branch-archive/ui/datanest-ux-polish-wave2-20260925"
+    },
+    {
+      "branch": "ui/optimize-and-disable-vercel-20260926",
+      "sha": "be7bef79b8161bb940196b771f661bd572adf113",
+      "tag": "branch-archive/ui/optimize-and-disable-vercel-20260926"
+    },
+    {
+      "branch": "ui/project-invite-feedback-20260926",
+      "sha": "a7b6b4330f36193367ebce64de5d61fab79e384b",
+      "tag": "branch-archive/ui/project-invite-feedback-20260926"
+    }
+  ]
+}

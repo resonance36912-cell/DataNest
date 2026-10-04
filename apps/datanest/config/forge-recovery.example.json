@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "repository": "DataNest-Supository/DataNest",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "canonicalBaseSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "environment": "candidate",
+  "manifestDigest": "manifest-sha256-example",
+  "events": [],
+  "evidence": [],
+  "reconciliation": [],
+  "createdAt": "2026-09-30T15:00:00.000Z",
+  "snapshotDigest": "9bd75ef7d6651b7ccc8f1eaedc0a7a6e4cb5737c478b55caee6615adea0133c6"
+}

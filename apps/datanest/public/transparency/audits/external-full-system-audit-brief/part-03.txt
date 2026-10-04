@@ -1,0 +1,121 @@
+Source, data, hosting, modularity
+
+Audit purpose. Verify the implemented system matches the declared authority chain and remains portable and maintainable.
+
+[ ] Reconcile GitHub main, release-manifest commit, database release, migrations, and deployed Edge Function versions.
+
+[ ] Identify live production behavior that cannot be reproduced from source/migrations.
+
+[ ] Check for duplicated business logic across React, SQL functions, Edge Functions, and client-side state.
+
+[ ] Assess coupling between UI modules and data domains; identify opportunities for typed service boundaries or shared domain clients.
+
+[ ] Verify hosting-specific code does not compromise provider-agnostic deployment.
+
+[ ] Review runtime configuration loading, health endpoints, cache behavior, and environment separation.
+
+[ ] Map production vs staging responsibilities and identify accidental cross-environment dependencies.
+
+[ ] Review schema evolution, foreign keys, indexes, RLS, SECURITY DEFINER gateways, append-only triggers, and migration naming/order.
+
+[ ] Identify dead migrations, legacy tables, obsolete views/functions, or inconsistent naming that increase maintenance risk.
+
+[ ] Propose a target component/domain diagram with clear ownership and APIs.
+
+Evidence to return: Current-state architecture diagram, authority-gap findings, dependency/coupling map, proposed target-state architecture.
+
+# 8. Authentication, Membership, Roles, and Authorization
+
+## 8.1 Identity and authorization
+
+Audit purpose. Verify each identity/role transition is explicit, least-privilege, auditable, and understandable.
+
+Do not break. Do not collapse Job collaboration and formal governance membership into one implicit role.
+
+[ ] Test password and magic-link sign-in; distinguish user-not-found, expired link, invalid session, and unauthorized project access.
+
+[ ] Verify Job collaborator access is separate from formal project membership.
+
+[ ] Test project-member invite: sent -> invited/non-voter -> matching account sign-in -> active -> formal voter.
+
+[ ] Test invitation expiry, revoke, reinvite, existing account, new account, self-invite rejection, and admin invite restrictions.
+
+[ ] Verify disabled/invited members cannot use general project APIs or vote.
+
+[ ] Check role-based UI hiding does not substitute for server-side authorization.
+
+[ ] Audit owner/admin/operator/viewer semantics for least privilege and clarity.
+
+[ ] Review any role-management gaps, especially demotion/removal/role-change workflows after activation.
+
+[ ] Ensure audit events identify actor, target, role, project, and outcome.
+
+Evidence to return: Role matrix, invite/acceptance sequence diagram, authorization defects, least-privilege recommendations.
+
+# 9. UNIFI, Job Manifests, Checkpoints, and External AI Handoff
+
+## 9.1 Work orchestration and handoff
+
+Audit purpose. Determine whether users can create, track, pause, resume, hand off, and complete work without losing project context.
+
+[ ] Create/review a Job Manifest and verify Project ID, Job ID, trace key, provider/session attribution, priority, status, context, constraints, and acceptance criteria.
+
+[ ] Verify checkpoints contain enough state to resume work accurately after a new session/browser/account.
+
+[ ] Test External AI sidebar opening, prompt preparation, send flow, result return/import, and authoritative session reconciliation.
+
+[ ] Confirm Return to DataNest remains visible/useful when the AI sidebar is open.
+
+[ ] Check external AI result import for attribution, duplication, stale-session mismatch, partial pastes, and malformed content.
+
+[ ] Verify artifacts/outputs are linked to the correct Job and project and are discoverable later.
+
+[ ] Audit user controls for pause, retry, cancel, resume, approve, and final acceptance.
+
+[ ] Assess whether handoff prompts are concise enough for external tools but complete enough for correct execution.
+
+[ ] Identify opportunities for auto-capture that do not weaken explicit acceptance or provenance.
+
+Evidence to return: Job lifecycle journey, handoff screenshots, trace samples, checkpoint quality assessment, friction/automation proposals.
+
+# 10. TranScheduler and Execution Safety
+
+## 10.1 Scheduling and capability routing
+
+Audit purpose. Verify that scheduling is deterministic, safe, observable, fair, and recoverable.
+
+Do not break. Never weaken capability ownership, no-worker, or execution-permission safeguards to make tests pass.
+
+[ ] Test capability-aware routing with AVAILABLE, UNAVAILABLE, BUSY, UNKNOWN, and stale observations.
+
+[ ] Confirm UNKNOWN never grants execution permission.
+
+[ ] Test dependency gating, queue ordering, reservations, release, retry/backoff, time windows, and cancellation.
+
+[ ] Check fairness/starvation behavior across competing Jobs and users.
+
+[ ] Verify manual controls can intervene without corrupting queue state.
+
+[ ] Test runner/service failure and recovery, including stale-busy-like states without manufacturing unsafe state.
+
+[ ] Assess execution history for operator diagnosis: why a Job ran, did not run, retried, or failed.
+
+[ ] Measure avoidable polling, redundant checks, and opportunities to reduce operational load.
+
+[ ] Propose clearer scheduling explanations for non-technical users.
+
+Evidence to return: Scheduler state-transition map, failure/recovery evidence, safety findings, queue optimization proposals.
+
+# 11. DataNest AI, External AI, Memory, and Learning
+
+## 11.1 Governed AI behavior
+
+Audit purpose. Audit whether AI outputs are correctly attributed, context-bounded, useful, and safely promoted into reusable knowledge.
+
+[ ] Verify every DataNest AI request/response is linked to authorized project/job context and a traceable usage request.
+
+[ ] Test context switching between Jobs/sessions for cross-job leakage or stale context.
+
+[ ] Audit External AI intake and reconciliation for session mismatch, replay, duplicate import, and wrong-Job attribution.
+
+[ ] Review response quality: correctness, completeness, actionable next steps, explici

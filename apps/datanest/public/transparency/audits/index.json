@@ -1,0 +1,266 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-10-01",
+  "documents": [
+    {
+      "id": "external-full-system-audit-brief-v1",
+      "title": "Resonance DataNest / RONSAS External Full-System Audit Brief",
+      "document_type": "audit_brief",
+      "version": "1.0",
+      "status": "published",
+      "audit_result_status": "external_audit_return_received",
+      "published_at": "2026-09-25",
+      "baseline": {
+        "source_commit": "ac93d51828707d398dfa9c5a471d8a6ed4c9059f",
+        "database_release": "datanest-project-member-invitations-v1"
+      },
+      "source_artifact": {
+        "filename": "Resonance_DataNest_External_Full_System_Audit_Brief.docx",
+        "format": "DOCX",
+        "note": "Original formatted audit artifact. DataNest publishes a complete accessible text transcription as the transparency representation."
+      },
+      "accessibility": {
+        "html_summary": true,
+        "full_text_transcription": true,
+        "text_download": true,
+        "parts": [
+          "part-01.txt",
+          "part-02.txt",
+          "part-03.txt",
+          "part-04.txt",
+          "part-05.txt",
+          "part-06.txt",
+          "part-07.txt",
+          "part-08.txt"
+        ]
+      },
+      "authority": {
+        "governance_effect": false,
+        "financial_effect": false,
+        "ownership_effect": false,
+        "role_effect": false
+      },
+      "audit_result_id": "external-full-system-audit-return-2026-09-25"
+    },
+    {
+      "id": "external-full-system-audit-return-2026-09-25",
+      "title": "Resonance DataNest / RONSAS External Audit Return",
+      "document_type": "audit_return",
+      "version": "1.0",
+      "status": "published",
+      "audit_result_status": "published_pending_datanest_validation",
+      "published_at": "2026-09-25",
+      "audit_date": "2026-09-25",
+      "audit_type": "read-only public-surface inspection and commit-pinned source review",
+      "baseline": {
+        "source_commit": "ac93d51828707d398dfa9c5a471d8a6ed4c9059f",
+        "production_certified": false
+      },
+      "coverage": {
+        "authenticated_runtime": false,
+        "production_mutations": false,
+        "production_database_controls": false,
+        "runtime_output_quality": false
+      },
+      "findings": {
+        "total": 14,
+        "high_or_verification_priority": 9,
+        "medium": 5,
+        "validation_state": "pending_datanest_validation",
+        "source": "external-full-system-audit-return-2026-09-25/findings.json"
+      },
+      "remediation": {
+        "proposed_backlog_items": 13,
+        "validated_or_closed": 0,
+        "source": "external-full-system-audit-return-2026-09-25/remediation-backlog.json"
+      },
+      "source_artifact": {
+        "filename": "Pasted markdown(20260925-075334).md",
+        "format": "Markdown/plain text",
+        "path": "external-full-system-audit-return-2026-09-25/report.md",
+        "note": "Exact uploaded audit return is preserved as the immutable source artifact. Structured findings/backlog are derived indexes for accessibility and workflow."
+      },
+      "authority": {
+        "governance_effect": false,
+        "financial_effect": false,
+        "ownership_effect": false,
+        "role_effect": false,
+        "certification_effect": false
+      }
+    },
+    {
+      "id": "enforcer-continuous-defence",
+      "title": "DataNest ENFORCER Continuous Defence Transparency",
+      "document_type": "continuous_defence_index",
+      "version": "1.0",
+      "status": "published",
+      "audit_result_status": "continuous_generated_evidence",
+      "published_at": "2026-10-01",
+      "source": "../enforcer/index.json",
+      "coverage": {
+        "boundaries": true,
+        "security_workflow_state": true,
+        "complete_approved_knowledge": true,
+        "environment_compatibility": true,
+        "secret_values": false
+      },
+      "authority": {
+        "governance_effect": false,
+        "financial_effect": false,
+        "ownership_effect": false,
+        "role_effect": false,
+        "production_authorization": false
+      }
+    },
+    {
+      "id": "regulator-continuous-harmony",
+      "title": "DataNest REGULATOR Continuous Harmony Transparency",
+      "document_type": "continuous_regulation_index",
+      "version": "1.0",
+      "status": "published",
+      "audit_result_status": "continuous_generated_evidence",
+      "published_at": "2026-10-01",
+      "source": "../regulator/index.json",
+      "coverage": {
+        "requirements": true,
+        "botsquad_audit": true,
+        "stress_test": true,
+        "free_open_acquisition_scout": true,
+        "supply_readiness": true,
+        "action_planning": true,
+        "financial_commitments": false,
+        "credential_acquisition": false
+      },
+      "authority": {
+        "governance_effect": false,
+        "financial_effect": false,
+        "ownership_effect": false,
+        "role_effect": false,
+        "production_authorization": false
+      }
+    },
+    {
+      "id": "datanest-system-charter-v1",
+      "title": "DataNest System Charter · Scope, Mission, Governance, Architecture & Assurance",
+      "document_type": "system_charter",
+      "version": "1.0",
+      "status": "published",
+      "audit_result_status": "public_management_system_reference",
+      "published_at": "2026-10-01",
+      "source": "../system-charter/index.json",
+      "coverage": {
+        "mission": true,
+        "vision": true,
+        "value_proposition": true,
+        "governance": true,
+        "architecture": true,
+        "infrastructure": true,
+        "products_services": true,
+        "projections": true,
+        "standards_alignment": true
+      },
+      "assurance": {
+        "iso_certified": false,
+        "accreditation_claimed": false,
+        "guaranteed_business_outcomes": false
+      },
+      "authority": {
+        "governance_effect": false,
+        "financial_effect": false,
+        "ownership_effect": false,
+        "role_effect": false,
+        "production_authorization": false
+      }
+    },
+    {
+      "id": "visibility-utility-continuous-market-intelligence",
+      "title": "DataNest VISIBILITY-UTILITY Continuous Visibility & Market Intelligence",
+      "document_type": "continuous_visibility_index",
+      "version": "1.0",
+      "status": "published",
+      "audit_result_status": "continuous_generated_evidence",
+      "published_at": "2026-10-01",
+      "source": "../visibility-utility/index.json",
+      "coverage": {
+        "technical_seo": true,
+        "platform_visibility": true,
+        "trend_inputs": true,
+        "route_to_market": true,
+        "projected_outcomes": true,
+        "guaranteed_outcomes": false,
+        "marketing_spend_authority": false
+      },
+      "authority": {
+        "governance_effect": false,
+        "financial_effect": false,
+        "ownership_effect": false,
+        "role_effect": false,
+        "production_authorization": false
+      }
+    },
+    {
+      "id": "liberty-in-all-continuous-traceability",
+      "title": "DataNest LIBERTY-IN-ALL Continuous Indexing & Traceability",
+      "document_type": "continuous_traceability_index",
+      "version": "1.0",
+      "status": "published",
+      "audit_result_status": "continuous_generated_evidence",
+      "published_at": "2026-10-01",
+      "source": "../liberty-in-all/index.json",
+      "coverage": {
+        "content_digests": true,
+        "source_commit_lineage": true,
+        "evidence_gaps": true,
+        "public_sanitized_index": true,
+        "record_contents": false,
+        "secrets": false,
+        "private_authentication_material": false,
+        "protected_personal_data": false
+      },
+      "standards_alignment": [
+        "ISO 15489-1:2016",
+        "ISO 23081-1:2017",
+        "W3C PROV",
+        "ISO/IEC 27001:2022",
+        "ISO/IEC 27701:2025",
+        "NIST CSF 2.0"
+      ],
+      "authority": {
+        "governance_effect": false,
+        "financial_effect": false,
+        "ownership_effect": false,
+        "role_effect": false,
+        "production_authorization": false
+      }
+    },
+    {
+      "id": "pr-365-liberty-in-all-final-validation",
+      "title": "PR #365 · LIBERTY-IN-ALL Final Validation Evidence",
+      "document_type": "pull_request_validation_evidence",
+      "version": "1.0",
+      "status": "published_evidence_candidate",
+      "audit_result_status": "source_pr_closed_unmerged_checks_successful",
+      "published_at": "2026-10-01",
+      "source": "pr-365-liberty-in-all-evidence.json",
+      "baseline": {
+        "pull_request": 365,
+        "source_commit": "aeccb98be7ed4929a7086a1dba1bdf9685066618",
+        "merged": false
+      },
+      "validation": {
+        "observed_workflows": 5,
+        "successful_workflows": 5,
+        "exact_head_bound": true
+      },
+      "authority": {
+        "governance_effect": false,
+        "financial_effect": false,
+        "ownership_effect": false,
+        "role_effect": false,
+        "production_authorization": false,
+        "merge_authorization": false,
+        "certification_effect": false
+      }
+    }
+  ]
+}

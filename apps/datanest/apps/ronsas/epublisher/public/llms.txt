@@ -1,0 +1,23 @@
+# Resonance ePublisher
+
+> AI-powered platform that turns topics, manuscripts, PDFs, research, and recordings into researched, narrated audiovisual eBooks.
+
+Resonance ePublisher is currently available at no charge under the Resonance Free Access Promotion while real provider, generation, storage, and support costs are measured.
+
+## Promotion access
+
+- No payment, checkout, credit pack, or subscription is required during the promotion.
+- Full product capability is available after sign-in so projects can persist and usage can be measured.
+- Future pricing has not been established and will require a new governed release after costing is validated.
+
+## Pages
+
+- [Home](/): Product overview and entry point.
+- [About](/about): Research, storyboard, visual book, narration, and export workflow.
+- [Free access](/pricing): Current promotion status.
+- [Contact](/contact): Product support.
+
+## Optional
+
+- [Terms of Service](/terms)
+- [Privacy Policy](/privacy)

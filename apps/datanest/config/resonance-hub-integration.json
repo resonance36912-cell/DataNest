@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "integrationId": "resonance-hub-datanest",
+  "status": "contractual-alignment",
+  "hub": {
+    "repository": "Resonance-AppDev/resonance-hub",
+    "branch": "main",
+    "publicOrigin": "https://reson8.life/",
+    "role": "ecosystem-hub",
+    "authorities": {
+      "billing": true,
+      "entitlements": true,
+      "checkoutVerification": true,
+      "ropTelemetry": true,
+      "sharedGovernance": true,
+      "rONSASApplicationSource": false
+    },
+    "wireContracts": [
+      "POST /api/public/verify-purchase",
+      "POST /api/public/rop/ingest",
+      "/checkout?app=<slug>&plan=<sku>"
+    ]
+  },
+  "datanest": {
+    "repository": "DataNest-Supository/DataNest",
+    "branch": "main",
+    "publicOrigin": "https://datanest-supository.github.io/DataNest/",
+    "role": "operating-control-plane",
+    "authorities": {
+      "portfolioRegistry": true,
+      "appDevGovernance": true,
+      "sourceHistoryCiEvidence": true,
+      "productionPromotion": true,
+      "ronsasApplicationSource": true,
+      "billing": false,
+      "checkoutAuthority": false
+    },
+    "backend": "Supabase:sgqdmfgjbprsoqsmgigi",
+    "delivery": "GitHub Pages"
+  },
+  "sharedIdentity": {
+    "technicalIdentifier": "RONSAS",
+    "masterBrand": "Resonance AppDev",
+    "customerSuite": "Resonance"
+  },
+  "authorityBoundaries": {
+    "hubMayDeployDataNestCanonicalProduction": false,
+    "dataNestMayDeployHubCanonicalProduction": false,
+    "hubMayReplaceDataNestSourceAuthority": false,
+    "dataNestMayReplaceHubSourceAuthority": false,
+    "historicalRonsasRepositoriesRemainRuntimeAuthorities": false,
+    "dataNestCoreAvailabilityRequiresHub": false,
+    "dnsCutoverRequiredForIntegration": false
+  },
+  "dataFlows": {
+    "telemetry": "RONSAS/spokes -> Resonance Hub ROP ingest",
+    "commercialVerification": "spokes -> Resonance Hub checkout verification",
+    "portfolioRegistration": "products/services -> DataNest Portfolio Registry",
+    "governanceEvidence": "DataNest -> governed release/evidence records",
+    "sharedNavigation": "DataNest <-> Resonance Hub via explicit public URLs/contracts"
+  },
+  "runtimeRegistration": {
+    "state": "pending",
+    "issue": "https://github.com/Resonance-AppDev/resonance-hub/issues/136",
+    "statusEndpoint": "https://reson8.life/api/public/app-status/health",
+    "note": "Repository-level alignment is explicit; live Hub registration remains a separate runtime verification step."
+  }
+}

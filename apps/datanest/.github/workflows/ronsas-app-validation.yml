@@ -1,0 +1,148 @@
+name: RONSAS Application Validation
+# Release-candidate note: comment-only changes to this workflow may be used to request exact-head RONSAS validation when automated workflow_dispatch is unavailable.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/ronsas/**"
+      - "ops/ronsas/**"
+      - "scripts/validate-ronsas-imports.mjs"
+      - "scripts/validate-ronsas-brand-contract.mjs"
+      - "apps/ronsas/shared/resonance-brand-contract.json"
+      - "scripts/build-ronsas-pages.mjs"
+      - "src/lib/ronsasApps.ts"
+      - ".github/workflows/ronsas-app-validation.yml"
+      - ".github/workflows/pages.yml"
+      - ".github/workflows/ui-test-mode.yml"
+      - ".github/workflows/ui-owner-test-mode-expiry.yml"
+      - ".github/workflows/worktree-gate-timeframe.yml"
+      - "config/worktree-gate-timeframes.json"
+      - "scripts/propose-worktree-gate-timeframe.mjs"
+      - ".github/actions/node-project-setup/**"
+      - ".github/actions/ronsas-bun-app-validation/**"
+      - ".github/actions/ronsas-python-backend-validation/**"
+  push:
+    branches: [main]
+    paths:
+      - "apps/ronsas/**"
+      - "ops/ronsas/**"
+      - "scripts/validate-ronsas-imports.mjs"
+      - "scripts/build-ronsas-pages.mjs"
+      - "src/lib/ronsasApps.ts"
+      - ".github/workflows/ronsas-app-validation.yml"
+      - ".github/workflows/pages.yml"
+      - ".github/workflows/ui-test-mode.yml"
+      - ".github/workflows/ui-owner-test-mode-expiry.yml"
+      - ".github/workflows/worktree-gate-timeframe.yml"
+      - "config/worktree-gate-timeframes.json"
+      - "scripts/propose-worktree-gate-timeframe.mjs"
+      - ".github/actions/node-project-setup/**"
+      - ".github/actions/ronsas-bun-app-validation/**"
+      - ".github/actions/ronsas-python-backend-validation/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ronsas-app-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  brand-contract:
+    name: Canonical brand contract
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 22
+      - name: Validate canonical Resonance DataNest brand contract
+        run: node scripts/validate-ronsas-brand-contract.mjs --complete
+
+  npm-apps:
+    needs: brand-contract
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: ePublisher
+            path: apps/ronsas/epublisher
+            verify: npm test && npm run build:types && npm run build -- --base=/DataNest/apps/epublisher/
+          - name: Creative Studio
+            path: apps/ronsas/creative-studio
+            verify: npm test && npm run build -- --base=/DataNest/apps/creative-studio/ && cd ../../.. && node scripts/validate-ronsas-brand-contract.mjs --app creative-studio
+          - name: SyncVision
+            path: apps/ronsas/syncvision
+            verify: npm run typecheck && npm test && npm run build -- --base=/DataNest/apps/syncvision/
+          - name: Career Compass
+            path: apps/ronsas/career-compass
+            verify: npm test && npm run build
+          - name: SovereignForge
+            path: apps/ronsas/sovereign-forge
+            verify: npm test && npm run build
+          - name: LyricSync Studio
+            path: apps/ronsas/lyricsync-studio
+            verify: npm test && npm run build
+          - name: Scene Song Spark
+            path: apps/ronsas/scene-song-spark
+            verify: npm test && npm run build
+    defaults:
+      run:
+        working-directory: ${{ matrix.path }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: ./.github/actions/node-project-setup
+        with:
+          working-directory: ${{ matrix.path }}
+          cache-dependency-path: ${{ matrix.path }}/package-lock.json
+      - name: Validate from DataNest source
+        run: ${{ matrix.verify }}
+
+  datanest-pages-bundle:
+    needs: brand-contract
+    name: DataNest Pages RONSAS bundle
+    runs-on: ubuntu-24.04
+    env:
+      DATANEST_STATIC_EXPORT: "true"
+      NEXT_PUBLIC_BASE_PATH: "/DataNest"
+      NEXT_PUBLIC_SUPABASE_URL: "https://sgqdmfgjbprsoqsmgigi.supabase.co"
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_yIf5HFKNNteed4HdYCS2Vw_4TB-4LvB"
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: ./.github/actions/node-project-setup
+      - name: Build DataNest static shell
+        run: npm run build
+      - name: Bundle RONSAS apps into DataNest
+        run: node scripts/build-ronsas-pages.mjs
+      - name: Verify bundled launch targets
+        run: |
+          for app in career-compass creative-studio epublisher lyricsync-studio scene-song-spark sovereign-forge syncvision; do
+            test -f "out/apps/$app/index.html"
+          done
+          test -f out/apps/manifest.json
+
+  youtube-optimizer:
+    needs: brand-contract
+    name: YouTube Optimizer
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: ./.github/actions/ronsas-bun-app-validation
+
+  sovereign-backend:
+    needs: brand-contract
+    name: Sovereign Backend
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: ./.github/actions/ronsas-python-backend-validation
+
+  gate-timeframe:
+    name: DataNest AI worktree gate timeframe
+    uses: ./.github/workflows/worktree-gate-timeframe.yml
+    with:
+      gate_id: "ronsas-app-validation"

@@ -1,0 +1,34 @@
+/* Shared, function-aware presentation. Decorative motifs never represent metrics. */
+[data-rdn-app] { --rdn-edge:color-mix(in srgb,var(--rdn-app-accent,#42e7ff) 30%,transparent); --rdn-wash:color-mix(in srgb,var(--rdn-app-accent,#42e7ff) 9%,transparent); --rdn-ease:cubic-bezier(.2,.8,.2,1); }
+[data-rdn-app] :where(button,a,input,select,textarea) { transition:border-color 160ms var(--rdn-ease),background-color 160ms var(--rdn-ease),box-shadow 160ms var(--rdn-ease); }
+[data-rdn-app] :where(button,a):focus-visible { outline:3px solid var(--dn-focus,#42e7ff); outline-offset:3px; }
+[data-rdn-app] :where(input,textarea,select):focus-visible { box-shadow:0 0 0 4px var(--rdn-wash); }
+[data-rdn-app] :where(button):disabled { cursor:not-allowed; }
+[data-rdn-app] :where(.panel,[data-slot="card"]) { border-color:var(--rdn-edge); box-shadow:0 12px 32px #00000012; }
+[data-rdn-app] :where([role="tab"][aria-selected="true"]) { box-shadow:inset 0 -2px var(--rdn-app-accent); }
+[data-rdn-app] .shell { width:min(100%,1180px); padding:clamp(24px,5vw,56px) clamp(16px,3vw,36px); }
+[data-rdn-app] .shell>header { position:relative; isolation:isolate; overflow:hidden; padding:clamp(24px,4vw,42px); border:1px solid var(--rdn-edge); border-radius:22px; background:linear-gradient(110deg,var(--rdn-wash),transparent); }
+[data-rdn-app] .shell>header::after { content:""; position:absolute; z-index:-1; pointer-events:none; top:-20%; right:-4%; width:36%; height:140%; opacity:.22; background:var(--rdn-motif); mask-image:linear-gradient(90deg,transparent,#000); }
+[data-rdn-app] .shell>header h1 { font-size:clamp(34px,5.5vw,62px); line-height:1.08; letter-spacing:-.045em; text-wrap:balance; }
+[data-rdn-app] .shell>header>p { max-width:66ch; line-height:1.65; }
+[data-rdn-app] .shell .eyebrow { font-size:10px; letter-spacing:.18em; }
+[data-rdn-app] .shell .grid { grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr); align-items:start; }
+[data-rdn-app] .shell :is(.panel,.head,.output,.result) { min-width:0; }
+[data-rdn-app] .shell .panel { padding:clamp(18px,2.5vw,28px); }
+[data-rdn-app] .shell .head { flex-wrap:wrap; gap:12px; }
+[data-rdn-app] .shell :is(input,select,textarea,button) { min-height:44px; font-size:14px; }
+[data-rdn-app] .shell :is(pre,.result,.output) { overflow-wrap:anywhere; }
+[data-rdn-app] .shell button:not(:disabled):hover { box-shadow:0 0 0 3px var(--rdn-wash),0 6px 20px #00000016; }
+[data-rdn-app="career-compass"] { --rdn-motif:repeating-radial-gradient(circle at 65% 50%,transparent 0 22px,var(--rdn-app-accent) 23px 24px,transparent 25px 48px); }
+[data-rdn-app="lyricsync-studio"] { --rdn-motif:repeating-linear-gradient(90deg,transparent 0 14px,var(--rdn-app-accent) 15px 17px,transparent 18px 28px); }
+[data-rdn-app="scene-song-spark"] { --rdn-motif:repeating-linear-gradient(0deg,transparent 0 46px,var(--rdn-app-accent) 47px 49px,transparent 50px 66px); }
+[data-rdn-app="sovereign-forge"] { --rdn-motif:repeating-linear-gradient(90deg,transparent 0 31px,var(--rdn-app-accent) 32px 33px),repeating-linear-gradient(0deg,transparent 0 31px,var(--rdn-app-accent) 32px 33px); }
+[data-rdn-app="creative-studio"] :where(header) { border-bottom-color:var(--rdn-edge); }
+[data-rdn-app="epublisher"] :where([role="tablist"]),[data-rdn-app="youtube-optimizer"] :where([role="tablist"]) { border-bottom:1px solid var(--rdn-edge); }
+[data-rdn-app="syncvision"] :where([role="slider"]):focus-visible { outline:3px solid var(--dn-focus); outline-offset:4px; }
+@keyframes rdnSurfaceArrival { from { opacity:.6; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+@media(prefers-reduced-motion:no-preference) { [data-rdn-app] .shell>header { animation:rdnSurfaceArrival 320ms var(--rdn-ease) both; } [data-rdn-app] .shell .grid { animation:rdnSurfaceArrival 380ms var(--rdn-ease) both; } }
+@media(max-width:780px) { [data-rdn-app] .shell .grid { grid-template-columns:minmax(0,1fr); } [data-rdn-app] .shell>header { padding:24px 20px; border-radius:16px; } }
+@media(prefers-reduced-motion:reduce) { [data-rdn-app] *,[data-rdn-app] *::before,[data-rdn-app] *::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
+@media(prefers-contrast:more) { [data-rdn-app] .shell :is(.panel,input,select,textarea) { border-width:2px; } }
+@media print { [data-rdn-app] .shell>header::after { display:none; } [data-rdn-app] * { animation:none!important; box-shadow:none!important; } }
