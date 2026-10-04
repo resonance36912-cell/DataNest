@@ -1,0 +1,1341 @@
+diff --git a/apps/hub/.github/workflows/security-scan.yml b/apps/hub/.github/workflows/security-scan.yml
+index 6833b89a..06045492 100644
+--- a/apps/hub/.github/workflows/security-scan.yml
++++ b/apps/hub/.github/workflows/security-scan.yml
+@@ -6,28 +6,25 @@ on:
+   push:
+     branches: [main]
+   schedule:
+-    # Daily at 03:17 UTC — catches newly-disclosed CVEs in pinned deps.
++    # Daily at 03:17 UTC ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â catches newly-disclosed CVEs in pinned deps.
+     - cron: "17 3 * * *"
+   workflow_dispatch:
+ 
+ env:
+   # SARIF artifact retention in days. Override by setting repo/org variable
+   # SARIF_RETENTION_DAYS (GitHub caps user-set retention at 90 days).
+-  # Default: 14 days — long enough to triage a work week + weekend, short
++  # Default: 14 days ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â long enough to triage a work week + weekend, short
+   # enough to keep artifact storage bounded.
+   SARIF_RETENTION_DAYS: ${{ vars.SARIF_RETENTION_DAYS || '14' }}
+   # Number of top rule IDs to include in job-summary tables AND PR-annotation
+   # emissions for both CodeQL and Semgrep. Override with repo/org variable
+-  # SARIF_SUMMARY_TOP_N. Default: 10 — small enough to skim in a PR review,
++  # SARIF_SUMMARY_TOP_N. Default: 10 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â small enough to skim in a PR review,
+   # large enough to cover the meaningful long tail on most runs.
+   SARIF_SUMMARY_TOP_N: ${{ vars.SARIF_SUMMARY_TOP_N || '10' }}
+ 
+ permissions:
+   contents: read
+   security-events: write
+-  # `write` (not `read`) is required so the pr-comment job below can post
+-  # and update the sticky SARIF-artifacts comment via the GitHub API.
+-  pull-requests: write
+ 
+ concurrency:
+   group: security-scan-${{ github.ref }}
+@@ -43,8 +40,6 @@ jobs:
+       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+         with:
+           bun-version: "1.3.3"
+-      - name: Install dependencies
+-        run: bun install --frozen-lockfile
+       - name: Run verify-security-invariants
+         run: bun run scripts/verify-security-invariants.ts
+ 
+@@ -86,10 +81,6 @@ jobs:
+         # bun.lock resolved a different version than package.json declares.
+         # Keeps fresh installs deterministic so security scans stay green.
+         run: bun run scripts/verify-pinned-deps.ts
+-      - name: Install with frozen lockfile
+-        # --frozen-lockfile ensures CI installs exactly what's committed;
+-        # any drift between package.json and bun.lock fails the job.
+-        run: bun install --frozen-lockfile
+       - name: bun audit (high+)
+         # `bun audit` queries the npm advisory DB. Fail only on high/critical
+         # so transient low-severity noise doesn't block PRs.
+@@ -103,7 +94,7 @@ jobs:
+     # minimal Alpine image lacks the glibc / unzip tooling that
+     # oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2 and other node-based actions need, breaking the
+     # whole job before Semgrep even ran. Install Semgrep via pip on the
+-    # standard ubuntu-latest runner instead — same rulesets, working actions.
++    # standard ubuntu-latest runner instead ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â same rulesets, working actions.
+     steps:
+       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+       - name: Setup Python
+@@ -142,7 +133,7 @@ jobs:
+         if: always() && hashFiles('semgrep.sarif') != ''
+         run: bun run scripts/summarize-sarif.ts semgrep.sarif --label "Semgrep" --top "$SARIF_SUMMARY_TOP_N"
+       - name: Upload Semgrep SARIF artifact (always)
+-        # Uploads SARIF on every run — success or failure — so alerts can be
++        # Uploads SARIF on every run ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â success or failure ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â so alerts can be
+         # triaged locally without needing the Security tab. Retention is
+         # controlled by the SARIF_RETENTION_DAYS repo variable (default 14).
+         id: upload-semgrep-sarif
+@@ -166,174 +157,3 @@ jobs:
+         env:
+           ARTIFACT_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-semgrep-sarif.outputs.artifact-id }}
+         run: bun run scripts/annotate-sarif.ts semgrep.sarif --label "Semgrep" --top "$SARIF_SUMMARY_TOP_N" --artifact-url "$ARTIFACT_URL"
+-
+-  codeql:
+-    name: CodeQL (JavaScript/TypeScript)
+-    runs-on: ubuntu-latest
+-    timeout-minutes: 20
+-    permissions:
+-      security-events: write
+-      actions: read
+-      contents: read
+-    steps:
+-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+-      - name: Initialize CodeQL
+-        uses: github/codeql-action/init@3ea06614dafe36dec890db3446326e0d40ce53d4 # v3
+-        with:
+-          languages: javascript-typescript
+-          queries: security-extended,security-and-quality
+-      - name: Analyze
+-        id: codeql-analyze
+-        uses: github/codeql-action/analyze@3ea06614dafe36dec890db3446326e0d40ce53d4 # v3
+-        with:
+-          category: "/language:javascript-typescript"
+-          output: codeql-results
+-      - name: Setup Bun (for SARIF summarizer)
+-        if: always()
+-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+-        with:
+-          bun-version: "1.3.3"
+-      - name: Write CodeQL summary
+-        if: always()
+-        run: bun run scripts/summarize-sarif.ts codeql-results --label "CodeQL" --top "$SARIF_SUMMARY_TOP_N"
+-      - name: Upload CodeQL SARIF artifact (always)
+-        # Uploads SARIF on every run — success or failure — so alerts can be
+-        # triaged locally without needing the Security tab. Retention is
+-        # controlled by the SARIF_RETENTION_DAYS repo variable (default 14).
+-        id: upload-codeql-sarif
+-        if: always()
+-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+-        with:
+-          # Artifact name includes the workflow run ID and commit SHA for easy
+-          # correlation across re-runs and branches.
+-          name: codeql-sarif-${{ github.run_id }}-${{ github.sha }}
+-          path: codeql-results
+-          if-no-files-found: warn
+-          retention-days: ${{ env.SARIF_RETENTION_DAYS }}
+-      - name: Annotate PR with top CodeQL findings
+-        # Emits ::warning / ::error workflow commands so the top findings
+-        # render as inline annotations on the PR "Files changed" tab. Each
+-        # annotation message links back to this run's SARIF artifact entry.
+-        # Runs on pull_request only; skipped if the SARIF wasn't produced.
+-        if: always() && github.event_name == 'pull_request' && steps.upload-codeql-sarif.outputs.artifact-id != ''
+-        env:
+-          ARTIFACT_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-codeql-sarif.outputs.artifact-id }}
+-        run: bun run scripts/annotate-sarif.ts codeql-results --label "CodeQL" --top "$SARIF_SUMMARY_TOP_N" --artifact-url "$ARTIFACT_URL"
+-
+-  pr-comment:
+-    name: SARIF artifacts PR comment
+-    # Only runs on pull_request events; skipped for push/schedule/manual runs
+-    # since there is no PR to comment on. Always runs even if scan jobs
+-    # failed — reviewers still want the SARIF download link for triage.
+-    if: github.event_name == 'pull_request'
+-    needs: [sast-semgrep, codeql]
+-    runs-on: ubuntu-latest
+-    timeout-minutes: 5
+-    permissions:
+-      pull-requests: write
+-      actions: read
+-      contents: read
+-    steps:
+-      - name: Post/update sticky SARIF-artifacts comment
+-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+-        env:
+-          RUN_ID: ${{ github.run_id }}
+-          SHA: ${{ github.sha }}
+-          SEMGREP_RESULT: ${{ needs.sast-semgrep.result }}
+-          CODEQL_RESULT: ${{ needs.codeql.result }}
+-          RETENTION: ${{ env.SARIF_RETENTION_DAYS }}
+-        with:
+-          script: |
+-            const marker = '<!-- security-scan:sarif-artifacts -->';
+-            const { RUN_ID, SHA, SEMGREP_RESULT, CODEQL_RESULT, RETENTION } = process.env;
+-            const { owner, repo } = context.repo;
+-            const pr = context.payload.pull_request;
+-            const prNumber = pr.number;
+-            const runUrl = `https://github.com/${owner}/${repo}/actions/runs/${RUN_ID}`;
+-            const summaryUrl = `${runUrl}#step-summary`;
+-            const shortSha = SHA.slice(0, 7);
+-
+-            // Fork PRs run with a read-only GITHUB_TOKEN — pull-requests: write
+-            // is downgraded, and listWorkflowRunArtifacts may also be blocked.
+-            // Detect the fork case up front so we can skip API calls that would
+-            // 403 and fall back to job-summary links instead of hard-failing.
+-            const isFork = !!(pr.head?.repo?.full_name && pr.head.repo.full_name !== `${owner}/${repo}`);
+-
+-            // Try to resolve real artifact download URLs. Any failure (403 on
+-            // fork PRs, transient API error, empty list) falls back to the
+-            // job summary link so reviewers still get somewhere useful to click.
+-            let artifactData = { artifacts: [] };
+-            let artifactsResolved = false;
+-            try {
+-              const res = await github.rest.actions.listWorkflowRunArtifacts({
+-                owner, repo, run_id: Number(RUN_ID), per_page: 100,
+-              });
+-              artifactData = res.data;
+-              artifactsResolved = true;
+-            } catch (err) {
+-              core.warning(`Could not list run artifacts (${err.status || 'error'}: ${err.message}); falling back to job-summary links.`);
+-            }
+-
+-            const artifactCell = (namePrefix, label) => {
+-              const a = artifactData.artifacts.find((x) => x.name.startsWith(namePrefix));
+-              if (a) {
+-                return `[\`${a.name}\`](https://github.com/${owner}/${repo}/actions/runs/${RUN_ID}/artifacts/${a.id})`;
+-              }
+-              if (!artifactsResolved) {
+-                // API unavailable (e.g. fork PR) — link to the run's Artifacts
+-                // section and to the job summary so reviewers can still triage.
+-                return `[Artifacts tab](${runUrl}#artifacts) · [${label} summary](${summaryUrl})`;
+-              }
+-              return `_(not produced — job may have failed before upload)_`;
+-            };
+-            const icon = (r) => r === 'success' ? '✅' : r === 'failure' ? '❌' : r === 'cancelled' ? '⚪' : '⏭️';
+-
+-            const forkNote = isFork
+-              ? `\n> ℹ️ **Fork PR detected** — GitHub restricts the Actions API for forks, so direct artifact download links may be unavailable. Use the [job summary](${summaryUrl}) or the run's [Artifacts tab](${runUrl}#artifacts) instead.\n`
+-              : '';
+-
+-            const body = [
+-              marker,
+-              `## 🔎 Security scan SARIF artifacts`,
+-              ``,
+-              `Commit \`${shortSha}\` · [Run #${RUN_ID}](${runUrl}) · Retention: **${RETENTION} days**`,
+-              forkNote,
+-              `| Scanner | Status | SARIF artifact |`,
+-              `| ------- | ------ | -------------- |`,
+-              `| Semgrep | ${icon(SEMGREP_RESULT)} \`${SEMGREP_RESULT}\` | ${artifactCell('semgrep-sarif-', 'Semgrep')} |`,
+-              `| CodeQL  | ${icon(CODEQL_RESULT)} \`${CODEQL_RESULT}\` | ${artifactCell('codeql-sarif-', 'CodeQL')} |`,
+-              ``,
+-              `<sub>Download the SARIF, then triage with any viewer (e.g. \`code --install-extension MS-SarifVSCode.sarif-viewer\`), or check the top rule IDs in the [job summary](${summaryUrl}).</sub>`,
+-            ].join('\n');
+-
+-            // Sticky comment upsert. On fork PRs GITHUB_TOKEN lacks
+-            // pull-requests: write, so listComments/create/update will 403.
+-            // Wrap in try/catch and mirror the payload into the job summary so
+-            // reviewers still see the artifact table on the run page.
+-            const emitFallbackSummary = (reason) => {
+-              core.warning(`PR comment skipped (${reason}); rendering to job summary instead.`);
+-              core.summary
+-                .addRaw(body.replace(marker, ''))
+-                .addRaw(`\n\n_Posted to the job summary because the PR comment could not be written (${reason})._\n`)
+-                .write();
+-            };
+-
+-            try {
+-              const { data: comments } = await github.rest.issues.listComments({
+-                owner, repo, issue_number: prNumber, per_page: 100,
+-              });
+-              const existing = comments.find((c) => c.body && c.body.includes(marker));
+-              if (existing) {
+-                await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+-              } else {
+-                await github.rest.issues.createComment({ owner, repo, issue_number: prNumber, body });
+-              }
+-            } catch (err) {
+-              const status = err.status || 'error';
+-              if (status === 403 || status === 404 || isFork) {
+-                emitFallbackSummary(`fork PR / restricted token: ${err.message}`);
+-              } else {
+-                emitFallbackSummary(`${status}: ${err.message}`);
+-                throw err;
+-              }
+-            }
+diff --git a/apps/hub/.github/workflows/verify-prebuild.yml b/apps/hub/.github/workflows/verify-prebuild.yml
+index ea64afc4..d011d43d 100644
+--- a/apps/hub/.github/workflows/verify-prebuild.yml
++++ b/apps/hub/.github/workflows/verify-prebuild.yml
+@@ -57,27 +57,7 @@ jobs:
+           # Need history so diff-based lint can compare against the base ref.
+           fetch-depth: 0
+ 
+-      # Secret scanning: gitleaks inspects commit history (on PRs, every
+-      # introduced commit) for high-confidence credential
+-      # patterns — API keys, tokens, private keys, provider secrets. Fails
+-      # the build on any finding. Runs before install/build so a leaked
+-      # credential is caught even if later steps would fail for other
+-      # reasons.
+-      - name: Scan for leaked secrets (gitleaks)
+-        shell: bash
+-        env:
+-          GITLEAKS_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+-          GITLEAKS_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+-          GITLEAKS_BEFORE_SHA: ${{ github.event.before }}
+-        run: bash scripts/run-gitleaks.sh
+-      - name: Upload redacted secret-scan report
+-        if: always()
+-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+-        with:
+-          name: gitleaks-prebuild-${{ github.run_id }}
+-          path: ${{ runner.temp }}/gitleaks-report.sarif
+-          if-no-files-found: ignore
+-          retention-days: 14
++      # Security scanning is handled by the dedicated Security scan workflow.
+ 
+       - name: Set up Bun
+         id: setup_bun
+@@ -120,49 +100,7 @@ jobs:
+       - name: Install dependencies
+         if: steps.cache_node_modules.outputs.cache-hit != 'true'
+         run: bun install --frozen-lockfile
+-
+-      # Dependency vulnerability scan. Reads the lockfile, not node_modules
+-      # state, so it stays authoritative whether or not the install step
+-      # was skipped by a cache hit. Fails the build on any high- or
+-      # critical-severity advisory.
+-      - name: Audit dependencies for high-severity vulnerabilities
+-        run: bun audit --audit-level=high
+-
+-      # SBOM: syft scans the installed node_modules + lockfile and emits a
+-      # CycloneDX + SPDX inventory of every shipped dependency. Uploaded as
+-      # a workflow artifact for supply-chain traceability (auditing what
+-      # exact versions were built into a given commit). Non-blocking.
+-      - name: Generate SBOM (syft, CycloneDX + SPDX)
+-        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0
+-        with:
+-          path: .
+-          format: cyclonedx-json
+-          artifact-name: sbom-cyclonedx.json
+-          output-file: sbom-cyclonedx.json
+-          upload-artifact: false
+-          upload-release-assets: false
+-
+-      - name: Generate SBOM (syft, SPDX)
+-        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0
+-        with:
+-          path: .
+-          format: spdx-json
+-          artifact-name: sbom-spdx.json
+-          output-file: sbom-spdx.json
+-          upload-artifact: false
+-          upload-release-assets: false
+-
+-      - name: Upload SBOM artifacts
+-        if: always()
+-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+-        with:
+-          name: sbom-${{ github.sha }}
+-          path: |
+-            sbom-cyclonedx.json
+-            sbom-spdx.json
+-          if-no-files-found: warn
+-          retention-days: 90
+-
++\r\n      # Security scanning, dependency audit, and SBOM generation are handled by the dedicated Security scan workflow.\r\n\r\n      # Cache Vite
+       # Cache Vite's transform cache. Restored across runs so unchanged
+       # modules skip re-transformation. Safe: Vite invalidates entries
+       # whose source or config hash changed.
+diff --git a/apps/hub/.gitignore b/apps/hub/.gitignore
+index d5c79092..b431bc82 100644
+--- a/apps/hub/.gitignore
++++ b/apps/hub/.gitignore
+@@ -56,5 +56,7 @@ supabase/.temp/
+ src/routeTree.gen.ts
+ 
+ reports/discernment-violations.json
++.lighthouseci/
+ .output-railway/
+ .lighthouseci/
++.lighthouseci/
+diff --git a/apps/hub/README.md b/apps/hub/README.md
+index 336f494b..016776bc 100644
+--- a/apps/hub/README.md
++++ b/apps/hub/README.md
+@@ -49,6 +49,6 @@ Apache-2.0. See `LICENSE`.
+ 
+ ## Resonance UI/UX alignment
+ 
+-This application follows the **Resonance Sovereign Spectrum 2026** portfolio design system: sovereign-dark operational surfaces, restrained translucent control layers, product-specific accents, explicit AI/governance state, accessible focus/motion behavior, and Resonance AppDev-aligned product identity.
++This application follows the **Resonance Sovereign Spectrum 2026** portfolio design system: sovereign-dark operational surfaces, restrained translucent control layers, product-specific accents, explicit AI/governance state, accessible focus/motion behavior, and RONSAS-aligned product identity.
+ 
+ Canonical design authority: https://github.com/resonance36912-cell/RONSAS/blob/main/docs/design/RESONANCE_SOVEREIGN_SPECTRUM_2026.md
+diff --git a/apps/hub/public/llms.txt b/apps/hub/public/llms.txt
+index ad78e474..832dfe79 100644
+--- a/apps/hub/public/llms.txt
++++ b/apps/hub/public/llms.txt
+@@ -1,6 +1,6 @@
+ # The Resonance Hub
+ 
+-> Reson8.life is the source of truth for the Resonance ecosystem. All core Resonance apps are currently available at no charge under the Resonance Free Access Promotion while real operating costs are measured.
++> Reson8.life is the source of truth for the Resonance ecosystem. All core RONSAS apps are currently available at no charge under the Resonance Free Access Promotion while real operating costs are measured.
+ 
+ ## Free Access Promotion
+ 
+diff --git a/apps/hub/src/components/nova/NovaNavigator.tsx b/apps/hub/src/components/nova/NovaNavigator.tsx
+index 1d3cf510..aae088e1 100644
+--- a/apps/hub/src/components/nova/NovaNavigator.tsx
++++ b/apps/hub/src/components/nova/NovaNavigator.tsx
+@@ -1,16 +1,7 @@
+ import { Link } from "@tanstack/react-router";
+ import { BrainCircuit, FolderKanban, Home, Landmark, Layers3 } from "lucide-react";
+ 
+-const WORKSPACE_SECTIONS = [
+-  "Create",
+-  "Build",
+-  "Research",
+-  "Assets",
+-  "Publish",
+-  "Collaborate",
+-  "Automate",
+-  "Insights",
+-];
++const WORKSPACE_SECTIONS = ["Create", "Build", "Research", "Assets", "Publish", "Collaborate", "Automate", "Insights"];
+ 
+ export function NovaNavigator({ projectId }: { projectId?: string }) {
+   return (
+@@ -19,45 +10,25 @@ export function NovaNavigator({ projectId }: { projectId?: string }) {
+         <BrainCircuit className="size-4" /> NOVA
+       </div>
+       <nav aria-label="Nova workspace navigation" className="space-y-1 text-sm">
+-        <Link
+-          to="/nova"
+-          className="flex items-center gap-2 rounded-xl px-3 py-2.5 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+-        >
++        <Link to="/nova" className="flex items-center gap-2 rounded-xl px-3 py-2.5 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">
+           <Home className="size-4" /> Home
+         </Link>
+         {projectId ? (
+-          <Link
+-            to="/nova/projects/$projectId"
+-            params={{ projectId }}
+-            className="flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+-          >
++          <Link to="/nova/projects/$projectId" params={{ projectId }} className="flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">
+             <FolderKanban className="size-4" /> Project
+           </Link>
+         ) : (
+-          <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-white/60">
+-            <FolderKanban className="size-4" /> Projects
+-          </div>
++          <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-white/60"><FolderKanban className="size-4" /> Projects</div>
+         )}
+         {WORKSPACE_SECTIONS.map((label) => (
+-          <button
+-            key={label}
+-            type="button"
+-            className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-white/75 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+-            title={`${label} stays inside the current Resonance Project Graph.`}
+-          >
++          <button key={label} type="button" className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-white/75 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" title={`${label} stays inside the current RONSAS Project Graph.`}>
+             <Layers3 className="size-4" /> {label}
+           </button>
+         ))}
+-        <Link
+-          to="/myify"
+-          className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-white/75 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+-        >
++        <Link to="/myify" className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-white/75 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">
+           <Layers3 className="size-4" /> DataNest
+         </Link>
+-        <Link
+-          to="/governance/workspace"
+-          className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-white/75 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+-        >
++        <Link to="/governance/workspace" className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-white/75 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">
+           <Landmark className="size-4" /> Governance
+         </Link>
+       </nav>
+diff --git a/apps/hub/src/components/nova/NovaShell.tsx b/apps/hub/src/components/nova/NovaShell.tsx
+index e2a84c1c..e8031e24 100644
+--- a/apps/hub/src/components/nova/NovaShell.tsx
++++ b/apps/hub/src/components/nova/NovaShell.tsx
+@@ -51,93 +51,40 @@ export function NovaShell({
+         <div className="flex min-w-0 items-center gap-3">
+           <div className="lg:hidden">
+             <Sheet>
+-              <SheetTrigger asChild>
+-                <Button variant="ghost" size="icon" aria-label="Open Nova navigation">
+-                  <Menu className="size-5" />
+-                </Button>
+-              </SheetTrigger>
+-              <SheetContent side="left" className="border-0 bg-[#141721] p-3 text-white">
+-                <SheetHeader className="sr-only">
+-                  <SheetTitle>Nova navigation</SheetTitle>
+-                </SheetHeader>
+-                <NovaNavigator projectId={projectId} />
+-              </SheetContent>
++              <SheetTrigger asChild><Button variant="ghost" size="icon" aria-label="Open Nova navigation"><Menu className="size-5" /></Button></SheetTrigger>
++              <SheetContent side="left" className="border-0 bg-[#141721] p-3 text-white"><SheetHeader className="sr-only"><SheetTitle>Nova navigation</SheetTitle></SheetHeader><NovaNavigator projectId={projectId} /></SheetContent>
+             </Sheet>
+           </div>
+           <div className="truncate">
+-            <p className="text-lg font-semibold sm:text-[22px]">Resonance AppDev · Nova Studio</p>
++            <p className="text-lg font-semibold sm:text-[22px]">RONSAS · Nova Studio</p>
+             {projectName && <p className="truncate text-xs text-muted-foreground">{projectName}</p>}
+           </div>
+         </div>
+         <div className="flex items-center gap-2">
+           <label className="hidden text-xs text-muted-foreground md:flex md:items-center md:gap-2">
+             View
+-            <select
+-              value={mode}
+-              onChange={(event) => setMode(event.target.value as NovaDisplayMode)}
+-              className="rounded-lg border border-border bg-background px-2 py-1.5 text-xs text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+-            >
+-              <option value="simple">Simple</option>
+-              <option value="creator">Creator</option>
+-              <option value="builder">Builder</option>
+-              <option value="admin_rd">Admin/R&amp;D</option>
++            <select value={mode} onChange={(event) => setMode(event.target.value as NovaDisplayMode)} className="rounded-lg border border-border bg-background px-2 py-1.5 text-xs text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
++              <option value="simple">Simple</option><option value="creator">Creator</option><option value="builder">Builder</option><option value="admin_rd">Admin/R&amp;D</option>
+             </select>
+           </label>
+           <RsgpStatus />
+           <div className="lg:hidden">
+             <Sheet>
+-              <SheetTrigger asChild>
+-                <Button variant="ghost" size="icon" aria-label="Open Nova intelligence">
+-                  <PanelRight className="size-5" />
+-                </Button>
+-              </SheetTrigger>
+-              <SheetContent side="right" className="p-3">
+-                <SheetHeader className="sr-only">
+-                  <SheetTitle>Nova intelligence</SheetTitle>
+-                </SheetHeader>
+-                <NovaIntelligenceRail
+-                  jobs={jobs}
+-                  decisions={decisions}
+-                  memoryCount={memoryCount}
+-                  providerLabel={providerLabel}
+-                />
+-              </SheetContent>
++              <SheetTrigger asChild><Button variant="ghost" size="icon" aria-label="Open Nova intelligence"><PanelRight className="size-5" /></Button></SheetTrigger>
++              <SheetContent side="right" className="p-3"><SheetHeader className="sr-only"><SheetTitle>Nova intelligence</SheetTitle></SheetHeader><NovaIntelligenceRail jobs={jobs} decisions={decisions} memoryCount={memoryCount} providerLabel={providerLabel} /></SheetContent>
+             </Sheet>
+           </div>
+         </div>
+       </header>
+ 
+       <div className="grid min-h-[calc(100vh-72px)] gap-[18px] p-[18px] lg:grid-cols-[230px_minmax(0,1fr)_310px]">
+-        <div className="hidden lg:block">
+-          <NovaNavigator projectId={projectId} />
+-        </div>
++        <div className="hidden lg:block"><NovaNavigator projectId={projectId} /></div>
+         <div className="min-w-0 space-y-[18px]">
+-          <NovaCanvas showStarterActions={showStarterActions} onStarterAction={onStarterAction}>
+-            {children}
+-          </NovaCanvas>
+-          <div className="sticky bottom-3 z-20">
+-            <NovaComposer
+-              value={composerValue}
+-              onChange={onComposerChange}
+-              onSubmit={onComposerSubmit}
+-              busy={composerBusy}
+-              disabled={composerDisabled}
+-            />
+-          </div>
+-          {mode === "simple" && decisions.length > 0 && (
+-            <div className="lg:hidden">
+-              <NovaDecisionTray decisions={decisions} />
+-            </div>
+-          )}
+-        </div>
+-        <div className="hidden lg:block">
+-          <NovaIntelligenceRail
+-            jobs={jobs}
+-            decisions={decisions}
+-            memoryCount={memoryCount}
+-            providerLabel={providerLabel}
+-          />
++          <NovaCanvas showStarterActions={showStarterActions} onStarterAction={onStarterAction}>{children}</NovaCanvas>
++          <div className="sticky bottom-3 z-20"><NovaComposer value={composerValue} onChange={onComposerChange} onSubmit={onComposerSubmit} busy={composerBusy} disabled={composerDisabled} /></div>
++          {mode === "simple" && decisions.length > 0 && <div className="lg:hidden"><NovaDecisionTray decisions={decisions} /></div>}
+         </div>
++        <div className="hidden lg:block"><NovaIntelligenceRail jobs={jobs} decisions={decisions} memoryCount={memoryCount} providerLabel={providerLabel} /></div>
+       </div>
+     </div>
+   );
+diff --git a/apps/hub/src/lib/app-registry.ts b/apps/hub/src/lib/app-registry.ts
+index 388808ca..162db217 100644
+--- a/apps/hub/src/lib/app-registry.ts
++++ b/apps/hub/src/lib/app-registry.ts
+@@ -191,7 +191,7 @@ export const ECOSYSTEM_REGISTRY: Record<string, EcosystemEntry> = {
+   },
+   nova_studio: {
+     key: "nova_studio",
+-    label: "Resonance Nova Studio",
++    label: "RONSAS Nova Studio",
+     url: `${HUB_URL}/nova`,
+     status: "pilot",
+     tagline:
+@@ -201,7 +201,7 @@ export const ECOSYSTEM_REGISTRY: Record<string, EcosystemEntry> = {
+ 
+   resonance_app_dev: {
+     key: "resonance_app_dev",
+-    label: "Resonance AppDev",
++    label: "The Resonance App Dev",
+     url: "https://reson8.life",
+     status: "live",
+     tagline: "The in-house dev team building every app in the Resonance ecosystem.",
+diff --git a/apps/hub/src/lib/github-ci.functions.ts b/apps/hub/src/lib/github-ci.functions.ts
+index 252eb7c0..79fbdf8d 100644
+--- a/apps/hub/src/lib/github-ci.functions.ts
++++ b/apps/hub/src/lib/github-ci.functions.ts
+@@ -3,6 +3,7 @@ import { z } from "zod";
+ import { requireRonsAuth } from "@/lib/rons-auth-middleware";
+ import { hasBackendRole } from "@/lib/backend-provider.server";
+ import { supabaseAdmin } from "@/integrations/supabase/client.server";
++import { cachedGithubJson } from "./github-read-cache.server";
+ import { githubJson, githubRequest, GitHubApiError } from "./github-provider.server";
+ import { validateRepoSlug } from "./repo-slug";
+ import {
+@@ -13,7 +14,7 @@ import {
+ export { GitHubApiError };
+ 
+ async function ghFetch(path: string) {
+-  return githubJson(path, { method: "GET" });
++  return cachedGithubJson(path, () => githubJson(path, { method: "GET" }));
+ }
+ 
+ export { validateRepoSlug };
+@@ -26,7 +27,7 @@ export function friendlyGithubError(err: unknown, repo: string): string {
+     if (err.status === 401 || err.status === 403) {
+       return `Access denied to "${repo}" (HTTP ${err.status}). Reconnect the GitHub integration with the required repository scope.`;
+     }
+-    if (err.status === 429) return `GitHub rate limit hit for "${repo}" — try again shortly`;
++    if (err.status === 429) return `GitHub rate limit hit for "${repo}" Ã¢â‚¬â€ try again shortly`;
+     if (err.status >= 500) return `GitHub is unavailable (HTTP ${err.status})`;
+     return `GitHub error ${err.status} for "${repo}"`;
+   }
+@@ -195,7 +196,7 @@ export function invalidRepoResult(input: string, error: string): RepoCiHealth {
+ /**
+  * Deduplicates and validates a repo list, then invokes `loader` for each valid
+  * slug. A thrown error from `loader` is caught and translated into a friendly
+- * error on that repo's result — one bad repo never fails the whole batch.
++ * error on that repo's result Ã¢â‚¬â€ one bad repo never fails the whole batch.
+  * Exposed for unit testing; the server-fn handler uses this with `loadRepoCi`.
+  */
+ export async function runRepoBatch(
+diff --git a/apps/hub/src/lib/github-health.functions.ts b/apps/hub/src/lib/github-health.functions.ts
+index 8632ce4c..c5fed6c8 100644
+--- a/apps/hub/src/lib/github-health.functions.ts
++++ b/apps/hub/src/lib/github-health.functions.ts
+@@ -3,10 +3,11 @@ import { z } from "zod";
+ import { requireRonsAuth } from "@/lib/rons-auth-middleware";
+ import { hasBackendRole } from "@/lib/backend-provider.server";
+ import { supabaseAdmin } from "@/integrations/supabase/client.server";
++import { cachedGithubJson } from "./github-read-cache.server";
+ import { githubJson } from "./github-provider.server";
+ 
+ async function ghFetch(path: string) {
+-  return githubJson(path, { method: "GET" });
++  return cachedGithubJson(path, () => githubJson(path, { method: "GET" }));
+ }
+ 
+ async function requireAdmin(ctx: { userId: string }) {
+diff --git a/apps/hub/src/lib/github-pulls.functions.ts b/apps/hub/src/lib/github-pulls.functions.ts
+index 333561d3..bd7c820f 100644
+--- a/apps/hub/src/lib/github-pulls.functions.ts
++++ b/apps/hub/src/lib/github-pulls.functions.ts
+@@ -3,10 +3,11 @@ import { z } from "zod";
+ import { requireRonsAuth } from "@/lib/rons-auth-middleware";
+ import { hasBackendRole } from "@/lib/backend-provider.server";
+ import { supabaseAdmin } from "@/integrations/supabase/client.server";
++import { cachedGithubJson } from "./github-read-cache.server";
+ import { githubJson } from "./github-provider.server";
+ 
+ async function ghFetch(path: string) {
+-  return githubJson(path, { method: "GET" });
++  return cachedGithubJson(path, () => githubJson(path, { method: "GET" }));
+ }
+ 
+ async function requireAdmin(ctx: { userId: string }) {
+diff --git a/apps/hub/src/lib/github-releases.functions.ts b/apps/hub/src/lib/github-releases.functions.ts
+index 1a995d9b..9b084918 100644
+--- a/apps/hub/src/lib/github-releases.functions.ts
++++ b/apps/hub/src/lib/github-releases.functions.ts
+@@ -3,11 +3,11 @@ import { z } from "zod";
+ import { requireRonsAuth } from "@/lib/rons-auth-middleware";
+ import { hasBackendRole } from "@/lib/backend-provider.server";
+ import { supabaseAdmin } from "@/integrations/supabase/client.server";
+-import { memoizeRequest } from "./request-memo.server";
++import { cachedGithubJson } from "./github-read-cache.server";
+ import { githubJson } from "./github-provider.server";
+ 
+ async function ghFetch(path: string) {
+-  return githubJson(path, { method: "GET" });
++  return cachedGithubJson(path, () => githubJson(path, { method: "GET" }));
+ }
+ 
+ async function requireAdmin(ctx: { userId: string }) {
+@@ -71,11 +71,14 @@ export const listRecentReleases = createServerFn({ method: "POST" })
+             `/repos/${repo}/releases?per_page=${limit}`,
+           )) as any[];
+ 
+-          const loadWorkflowRuns = memoizeRequest(
+-            async (target: string): Promise<WorkflowRunSummary[]> => {
++          const workflowRunsByTarget = new Map<string, Promise<WorkflowRunSummary[]>>();
++          const loadWorkflowRuns = (target: string): Promise<WorkflowRunSummary[]> => {
++            const existing = workflowRunsByTarget.get(target);
++            if (existing) return existing;
++            const promise = (async () => {
+               const query = /^[0-9a-f]{7,40}$/i.test(target)
+                 ? `head_sha=${target}`
+-                : `branch=${encodeURIComponent(target)}&event=push`;
++                : `branch=${encodeURIComponent(target)}&event=push&per_page=10`;
+               const wr = (await ghFetch(
+                 `/repos/${repo}/actions/runs?${query}&per_page=20`,
+               )) as any;
+@@ -93,14 +96,17 @@ export const listRecentReleases = createServerFn({ method: "POST" })
+                   created_at: run.created_at,
+                   updated_at: run.updated_at,
+                 }));
+-            },
+-          );
++            })();
++            workflowRunsByTarget.set(target, promise);
++            return promise;
++          };
+ 
+           const enriched = await Promise.all(
+             releases.map(async (r) => {
+               let runs: WorkflowRunSummary[] = [];
+               let runs_error: string | undefined;
+-              // Share one lookup per release target within this repository request.
++              // Workflow results are deduplicated by release target and shared
++              // with the short-lived GitHub read cache across page refreshes.
+               try {
+                 runs = await loadWorkflowRuns(r.target_commitish);
+               } catch (err) {
+diff --git a/apps/hub/src/lib/requireTier-request.ts b/apps/hub/src/lib/requireTier-request.ts
+index de101ab3..7d7d20b1 100644
+--- a/apps/hub/src/lib/requireTier-request.ts
++++ b/apps/hub/src/lib/requireTier-request.ts
+@@ -2,7 +2,7 @@
+  * Request-shaped tier gate for hub server ROUTES (createFileRoute).
+  *
+  * The canonical snippet at `docs/snippets/requireTier.ts` is for spoke
+- * `createServerFn` handlers — it reads the access token from a TanStack
++ * `createServerFn` handlers Ã¢â‚¬â€ it reads the access token from a TanStack
+  * Start handler context. Hub server routes only get a raw `Request`, so
+  * this variant duplicates the gate semantics against that shape.
+  *
+@@ -22,7 +22,7 @@ import { fetchSubscriptionRows, resolveBearerUserId } from "@/lib/backend-provid
+ import { deriveFeatures, type AppKey, type Tier } from "@/lib/entitlement.functions";
+ import { FREE_PROMOTION_ACTIVE } from "@/lib/promotion";
+ 
+-// ── Tier ranking (mirror of canonical) ──────────────────────────────────────
++// Ã¢â€â‚¬Ã¢â€â‚¬ Tier ranking (mirror of canonical) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+ const TIER_RANK: Record<Tier, number> = {
+   free: 0,
+   starter: 1,
+@@ -36,7 +36,7 @@ function hasAtLeast(tier: Tier, required: Tier): boolean {
+   return (TIER_RANK[tier] ?? 0) >= (TIER_RANK[required] ?? 0);
+ }
+ 
+-// ── 60s entitlement cache (per-process) ─────────────────────────────────────
++// Ã¢â€â‚¬Ã¢â€â‚¬ 60s entitlement cache (per-process) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+ type CachedEntitlement = {
+   ok: true;
+   app: AppKey;
+@@ -53,6 +53,8 @@ type CachedEntitlement = {
+ 
+ const CACHE_TTL_MS = 60_000;
+ const MAX_CACHE_ENTRIES = 2048;
++const MAX_CACHE_ENTRIES = 2048;
++const MAX_CACHE_ENTRIES = 2048;
+ const cache = new Map<string, { ent: CachedEntitlement; expiresAt: number }>();
+ const cacheKey = (userId: string, app: AppKey) => `${userId}:${app}`;
+ 
+@@ -60,7 +62,7 @@ export function invalidateEntitlementCache(userId: string, app: AppKey): void {
+   cache.delete(cacheKey(userId, app));
+ }
+ 
+-// ── Public types ────────────────────────────────────────────────────────────
++// Ã¢â€â‚¬Ã¢â€â‚¬ Public types Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+ export type RequireTierResult = {
+   userId: string;
+   accessToken: string;
+@@ -116,21 +118,21 @@ export async function requireTierFromRequest(args: {
+   // 1. Extract bearer token.
+   const authHeader = request.headers.get("authorization") ?? "";
+   if (!authHeader.toLowerCase().startsWith("bearer ")) {
+-    throw new Response(JSON.stringify({ error: "unauthorized", message: "Sign in required" }), {
+-      status: 401,
+-      headers,
+-    });
++    throw new Response(
++      JSON.stringify({ error: "unauthorized", message: "Sign in required" }),
++      { status: 401, headers },
++    );
+   }
+   const accessToken = authHeader.slice(7).trim();
+   if (!accessToken) {
+-    throw new Response(JSON.stringify({ error: "unauthorized", message: "Sign in required" }), {
+-      status: 401,
+-      headers,
+-    });
++    throw new Response(
++      JSON.stringify({ error: "unauthorized", message: "Sign in required" }),
++      { status: 401, headers },
++    );
+   }
+ 
+   // 2. Validate the bearer token through the selected backend provider.
+-  let userId: string | null;
++  let userId: string | null = null;
+   try {
+     userId = await resolveBearerUserId(accessToken);
+   } catch {
+@@ -159,10 +161,10 @@ export async function requireTierFromRequest(args: {
+       rows = await fetchSubscriptionRows(accessToken, userId, [app, "all_access"]);
+     } catch {
+       // Fail closed on provider/query errors.
+-      throw new Response(JSON.stringify(upgradeBody(app, required, "free", "inactive", returnTo)), {
+-        status: 402,
+-        headers,
+-      });
++      throw new Response(
++        JSON.stringify(upgradeBody(app, required, "free", "inactive", returnTo)),
++        { status: 402, headers },
++      );
+     }
+ 
+     const active = rows.filter((r) => r.status === "active");
+@@ -203,23 +205,29 @@ export async function requireTierFromRequest(args: {
+       };
+     }
+ 
+-    cache.set(cacheKey(userId, app), { ent, expiresAt: Date.now() + CACHE_TTL_MS });
++    const key = cacheKey(userId, app);
++    const now = Date.now();
++    for (const [cachedKey, cached] of cache) {
++      if (cached.expiresAt <= now) cache.delete(cachedKey);
++    }
++    cache.set(key, { ent, expiresAt: now + CACHE_TTL_MS });
+     while (cache.size > MAX_CACHE_ENTRIES) {
+-      const oldest = cache.keys().next().value;
+-      if (typeof oldest !== "string") break;
+-      cache.delete(oldest);
++      const first = cache.keys().next().value;
++      if (typeof first !== "string") break;
++      cache.delete(first);
+     }
+   }
+ 
+   // 5. Evaluate.
+   const allowed =
+-    ent.status === "active" && (ent.source === "all_access" || hasAtLeast(ent.tier, required));
++    ent.status === "active" &&
++    (ent.source === "all_access" || hasAtLeast(ent.tier, required));
+ 
+   if (!allowed) {
+-    throw new Response(JSON.stringify(upgradeBody(app, required, ent.tier, ent.status, returnTo)), {
+-      status: 402,
+-      headers,
+-    });
++    throw new Response(
++      JSON.stringify(upgradeBody(app, required, ent.tier, ent.status, returnTo)),
++      { status: 402, headers },
++    );
+   }
+ 
+   return {
+diff --git a/apps/hub/src/routes/__root.tsx b/apps/hub/src/routes/__root.tsx
+index 1c094d1a..20197de2 100644
+--- a/apps/hub/src/routes/__root.tsx
++++ b/apps/hub/src/routes/__root.tsx
+@@ -76,7 +76,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
+       { charSet: "utf-8" },
+       { name: "viewport", content: "width=device-width, initial-scale=1" },
+       { property: "og:type", content: "website" },
+-      { property: "og:site_name", content: "Resonance Hub" },
++      { property: "og:site_name", content: "RONSAS" },
+       { name: "twitter:card", content: "summary_large_image" },
+       { name: "google-site-verification", content: "cyauvD1JwPPom3ad_AbEip05fQr_BpFJF_Xfkcvblpw" },
+     ],
+diff --git a/apps/hub/src/routes/index.tsx b/apps/hub/src/routes/index.tsx
+index 00874ae7..974e3d94 100644
+--- a/apps/hub/src/routes/index.tsx
++++ b/apps/hub/src/routes/index.tsx
+@@ -5,7 +5,6 @@ import { subscribeNewsletter } from "@/lib/newsletter.functions";
+ import { getRequestOrigin } from "@/lib/origin.functions";
+ 
+ const CANONICAL_ORIGIN = "https://reson8.life";
+-
+ import resonanceLockup from "@/assets/resonance-lockup.png";
+ import logoEpublisher from "@/assets/logo-epublisher.png";
+ import logoCreativeStudio from "@/assets/logo-creative-studio.png";
+@@ -49,7 +48,7 @@ export const Route = createFileRoute("/")({
+         { property: "og:url", content: `${origin}/` },
+         { property: "og:image", content: `${origin}/og-logo.png` },
+         { property: "og:image:alt", content: "The Resonance logo" },
+-        { property: "og:site_name", content: "Resonance Hub" },
++        { property: "og:site_name", content: "RONSAS" },
+         { name: "twitter:card", content: "summary_large_image" },
+         {
+           name: "twitter:title",
+@@ -68,13 +67,13 @@ export const Route = createFileRoute("/")({
+         {
+           rel: "alternate",
+           type: "application/rss+xml",
+-          title: "Resonance Hub | Latest Updates (RSS)",
++          title: "RONSAS | Latest Updates (RSS)",
+           href: `${origin}/api/public/updates/rss`,
+         },
+         {
+           rel: "alternate",
+           type: "application/atom+xml",
+-          title: "Resonance Hub | Latest Updates (Atom)",
++          title: "RONSAS | Latest Updates (Atom)",
+           href: `${origin}/api/public/updates/atom`,
+         },
+       ],
+@@ -86,7 +85,7 @@ export const Route = createFileRoute("/")({
+             "@graph": [
+               {
+                 "@type": "Organization",
+-                name: "Resonance AppDev",
++                name: "RONSAS",
+                 alternateName: "The Resonance",
+                 url: `${origin}/`,
+                 logo: `${origin}/og-logo.png`,
+@@ -100,8 +99,8 @@ export const Route = createFileRoute("/")({
+               },
+               {
+                 "@type": "WebSite",
+-                name: "Resonance Hub",
+-                alternateName: "Reson8.life",
++                name: "RONSAS",
++                alternateName: "The Resonance",
+                 url: `${origin}/`,
+               },
+               {
+@@ -183,7 +182,7 @@ export const Route = createFileRoute("/")({
+                     "Will I be charged during the promotion?",
+                     "No new checkout is available during the promotion. Promotional access does not require a new payment.",
+                   ],
+-                  ["Can schools use Career Compass?", "Yes — schools can join the free pilot."],
++                  ["Can schools use Career Compass?", "Yes Ã¢â‚¬â€ schools can join the free pilot."],
+ 
+                   [
+                     "Does Resonance Media Sync generate final videos or AI-ready storyboards?",
+@@ -191,7 +190,7 @@ export const Route = createFileRoute("/")({
+                   ],
+                   [
+                     "Can Resonance Creator Studio create ads and product visuals?",
+-                    "Yes — posters, brochures, social ads, product mockups, and short marketing videos.",
++                    "Yes Ã¢â‚¬â€ posters, brochures, social ads, product mockups, and short marketing videos.",
+                   ],
+                 ].map(([q, a]) => ({
+                   "@type": "Question",
+@@ -232,13 +231,13 @@ const apps: App[] = [
+     localPort: 3101,
+     subscribeHref: "https://epublisher.reson8.life",
+     priceLabel: "Free promotion",
+-    priceNote: "Full access during the costing study · no payment required",
++    priceNote: "Full access during the costing study Ã‚Â· no payment required",
+ 
+     logo: logoEpublisher,
+     accent: "magenta",
+     status: "live",
+     attribute: {
+-      icon: "🧠",
++      icon: "Ã°Å¸Â§Â ",
+       label: "Authors, educators & publishers",
+       body: "Structuring knowledge, automated publishing workflows, and literary preservation.",
+     },
+@@ -251,12 +250,12 @@ const apps: App[] = [
+     localPort: 3201,
+     subscribeHref: "https://creative.reson8.life",
+     priceLabel: "Free promotion",
+-    priceNote: "Full access during the costing study · no payment required",
++    priceNote: "Full access during the costing study Ã‚Â· no payment required",
+     logo: logoCreativeStudio,
+     accent: "violet",
+     status: "live",
+     attribute: {
+-      icon: "❤",
++      icon: "Ã¢ÂÂ¤",
+       label: "Small businesses, creators & agencies",
+       body: "Visual storytelling, emotional design, and brand identity mapping.",
+     },
+@@ -270,12 +269,12 @@ const apps: App[] = [
+     localPort: 3301,
+     subscribeHref: "https://sync.reson8.life",
+     priceLabel: "Free promotion",
+-    priceNote: "Full access during the costing study · no payment required",
++    priceNote: "Full access during the costing study Ã‚Â· no payment required",
+     logo: logoSyncVision,
+     accent: "pink",
+     status: "live",
+     attribute: {
+-      icon: "🏃",
++      icon: "Ã°Å¸ÂÆ’",
+       label: "Musicians, labels & video creators",
+       body: "Cinematic story planning, character continuity, and AI-ready scene direction.",
+     },
+@@ -287,12 +286,12 @@ const apps: App[] = [
+     href: "https://www.resonance-podcast.com/episodes",
+     subscribeHref: "https://www.resonance-podcast.com/episodes",
+     priceLabel: "Free",
+-    priceNote: "Listen and watch — not a SaaS subscription",
++    priceNote: "Listen and watch Ã¢â‚¬â€ not a SaaS subscription",
+     logo: logoPodcast,
+     accent: "cyan",
+     status: "free",
+     attribute: {
+-      icon: "∞",
++      icon: "Ã¢Ë†Å¾",
+       label: "Listeners & ecosystem followers",
+       body: "Conversational exploration of Mind, Body, and Soul.",
+     },
+@@ -310,7 +309,7 @@ const apps: App[] = [
+     accent: "emerald",
+     status: "free",
+     attribute: {
+-      icon: "🎯",
++      icon: "Ã°Å¸Å½Â¯",
+       label: "Students, schools & parents",
+       body: "Aligning vocational execution with universal growth principles.",
+     },
+@@ -323,12 +322,12 @@ const apps: App[] = [
+     localPort: 3401,
+     subscribeHref: "https://youtube.reson8.life",
+     priceLabel: "Free promotion",
+-    priceNote: "Full access during the costing study · no payment required",
++    priceNote: "Full access during the costing study Ã‚Â· no payment required",
+     logo: logoYouTubeOptimizer,
+     accent: "gold",
+     status: "live",
+     attribute: {
+-      icon: "🚀",
++      icon: "Ã°Å¸Å¡â‚¬",
+       label: "YouTubers, creators & agencies",
+       body: "Algorithmic mastery met with content authenticity.",
+     },
+@@ -486,12 +485,12 @@ function HeroCarousel({
+             rel="noopener noreferrer"
+             className="shrink-0 text-[10px] font-bold uppercase tracking-[0.18em] px-3 py-2 rounded-full border border-white/15 hover:border-white/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(295_90%_60%)]"
+           >
+-            Open →
++            Open Ã¢â€ â€™
+           </a>
+         </div>
+       </div>
+ 
+-      {/* Dots — visual stays small, tap target is 32×32 for mobile */}
++      {/* Dots Ã¢â‚¬â€ visual stays small, tap target is 32Ãƒâ€”32 for mobile */}
+       <div className="absolute -bottom-14 left-0 right-0 flex justify-center gap-1">
+         {items.map((it, idx) => (
+           <button
+@@ -623,7 +622,7 @@ function Index() {
+           <a
+             href="#"
+             className="flex items-center gap-2.5 group min-w-0"
+-            aria-label="The Resonance — Home"
++            aria-label="The Resonance Ã¢â‚¬â€ Home"
+           >
+             <img
+               src={resonanceLockup}
+@@ -672,7 +671,7 @@ function Index() {
+               className="md:hidden grid place-items-center h-10 w-10 rounded-full border border-white/15 hover:border-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(295_90%_60%)]"
+             >
+               <span aria-hidden className="text-lg leading-none">
+-                {mobileMenuOpen ? "✕" : "☰"}
++                {mobileMenuOpen ? "Ã¢Å“â€¢" : "Ã¢ËœÂ°"}
+               </span>
+             </button>
+           </div>
+@@ -709,7 +708,7 @@ function Index() {
+           <div>
+             <div className="inline-flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.25em] text-white/65 border border-white/10 rounded-full px-4 py-1.5 mb-5">
+               <span className="size-1.5 rounded-full bg-[hsl(295_90%_60%)] shadow-[0_0_10px_hsl(295_90%_60%)]" />
+-              Resonance AppDev · Sovereign application suite
++              RONSAS Ã‚Â· Sovereign application suite
+             </div>
+             <h1 className="font-display text-[2.5rem] sm:text-5xl md:text-6xl lg:text-[4.5rem] font-bold tracking-[-0.035em] leading-[0.96] text-balance mb-8">
+               AI tools for South African creators, publishers, schools, and small businesses.
+@@ -761,7 +760,7 @@ function Index() {
+           <ul className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-[11px] font-mono uppercase tracking-[0.18em] text-white/65">
+             {[
+               "Built in South Africa",
+-              "Resonance governed",
++              "RONSAS governed",
+               "Free promotional access",
+               "No payment required",
+               "Cost study active",
+@@ -791,7 +790,7 @@ function Index() {
+             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+               <div className="min-w-0">
+                 <div className="text-[10px] font-mono uppercase tracking-[0.25em] text-white/60 mb-2">
+-                  ✦ Featured · Partners & Channels
++                  Ã¢Å“Â¦ Featured Ã‚Â· Partners & Channels
+                 </div>
+                 <h2 className="font-display text-xl md:text-2xl font-bold tracking-[-0.02em] text-white">
+                   Explore the wider Resonance network
+@@ -808,7 +807,7 @@ function Index() {
+                   className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] hover:border-[hsl(150_80%_55%/0.4)] px-3.5 py-3 transition-all"
+                 >
+                   <span className="grid place-items-center size-9 rounded-lg bg-[hsl(150_80%_55%/0.15)] border border-[hsl(150_80%_55%/0.3)] text-base">
+-                    🩺
++                    Ã°Å¸Â©Âº
+                   </span>
+                   <span className="min-w-0 flex-1">
+                     <span className="block text-[10px] font-mono uppercase tracking-[0.18em] text-[hsl(150_80%_65%)]">
+@@ -818,7 +817,7 @@ function Index() {
+                       medi-tech.co.za
+                     </span>
+                   </span>
+-                  <span className="text-white/65 group-hover:text-white transition-colors">↗</span>
++                  <span className="text-white/65 group-hover:text-white transition-colors">Ã¢â€ â€”</span>
+                 </a>
+                 <a
+                   href="https://www.resonance-podcast.com/episodes"
+@@ -827,7 +826,7 @@ function Index() {
+                   className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] hover:border-[hsl(190_90%_60%/0.4)] px-3.5 py-3 transition-all"
+                 >
+                   <span className="grid place-items-center size-9 rounded-lg bg-[hsl(190_90%_60%/0.15)] border border-[hsl(190_90%_60%/0.3)] text-base">
+-                    🎙️
++                    Ã°Å¸Å½â„¢Ã¯Â¸Â
+                   </span>
+                   <span className="min-w-0 flex-1">
+                     <span className="block text-[10px] font-mono uppercase tracking-[0.18em] text-[hsl(190_90%_70%)]">
+@@ -837,7 +836,7 @@ function Index() {
+                       resonance-podcast.com
+                     </span>
+                   </span>
+-                  <span className="text-white/65 group-hover:text-white transition-colors">↗</span>
++                  <span className="text-white/65 group-hover:text-white transition-colors">Ã¢â€ â€”</span>
+                 </a>
+                 <a
+                   href="https://www.youtube.com/@resonance36912"
+@@ -858,7 +857,7 @@ function Index() {
+                       @resonance36912
+                     </span>
+                   </span>
+-                  <span className="text-white/65 group-hover:text-white transition-colors">↗</span>
++                  <span className="text-white/65 group-hover:text-white transition-colors">Ã¢â€ â€”</span>
+                 </a>
+                 <a
+                   href="https://www.youtube.com/@theresonancefrequencies"
+@@ -879,7 +878,7 @@ function Index() {
+                       @theresonancefrequencies
+                     </span>
+                   </span>
+-                  <span className="text-white/65 group-hover:text-white transition-colors">↗</span>
++                  <span className="text-white/65 group-hover:text-white transition-colors">Ã¢â€ â€”</span>
+                 </a>
+               </div>
+             </div>
+@@ -948,7 +947,7 @@ function Index() {
+                   rel="noopener noreferrer"
+                   className="text-[11px] font-bold uppercase tracking-widest text-white/80 hover:text-white border-t border-white/10 pt-4"
+                 >
+-                  {p.cta} →
++                  {p.cta} Ã¢â€ â€™
+                 </a>
+               </article>
+             ))}
+@@ -1104,7 +1103,7 @@ function Index() {
+                 to="/pricing"
+                 className="px-6 py-3 rounded-full border border-white/15 hover:border-white/40 text-xs font-bold uppercase tracking-widest"
+               >
+-                Promotion details →
++                Promotion details Ã¢â€ â€™
+               </Link>
+             </div>
+           </div>
+@@ -1223,14 +1222,14 @@ function Index() {
+                   className="inline-flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-white/15 text-white/70 hover:text-white hover:border-white/40 transition-colors"
+                   aria-label="Subscribe to Resonance updates via RSS"
+                 >
+-                  <span aria-hidden>📡</span> Subscribe · RSS
++                  <span aria-hidden>Ã°Å¸â€œÂ¡</span> Subscribe Ã‚Â· RSS
+                 </a>
+                 <a
+                   href="/api/public/updates/atom"
+                   className="inline-flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-white/15 text-white/70 hover:text-white hover:border-white/40 transition-colors"
+                   aria-label="Subscribe to Resonance updates via Atom"
+                 >
+-                  <span aria-hidden>⚛️</span> Subscribe · Atom
++                  <span aria-hidden>Ã¢Å¡â€ºÃ¯Â¸Â</span> Subscribe Ã‚Â· Atom
+                 </a>
+               </div>
+             </div>
+@@ -1256,7 +1255,7 @@ function Index() {
+             </h2>
+             <div className="space-y-5 text-white/70 leading-relaxed">
+               <p>
+-                Technology shouldn't fragment our attention — it should align it. Every Resonance
++                Technology shouldn't fragment our attention Ã¢â‚¬â€ it should align it. Every Resonance
+                 app is built on <span className="text-white">Harmonic UX</span>: tools that respond
+                 to human intuition the way a tuned instrument responds to breath.
+               </p>
+@@ -1359,9 +1358,9 @@ function Index() {
+                 className="px-8 py-3 bg-gradient-brand text-white rounded-full font-bold text-sm shadow-[0_0_30px_-5px_hsl(295_90%_60%/0.8)] disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+               >
+                 {joinStatus === "loading"
+-                  ? "Subscribing…"
++                  ? "SubscribingÃ¢â‚¬Â¦"
+                   : joinStatus === "ok"
+-                    ? "Subscribed ✓"
++                    ? "Subscribed Ã¢Å“â€œ"
+                     : "Subscribe"}
+               </button>
+             </form>
+@@ -1398,7 +1397,7 @@ function Index() {
+               className="h-6 w-auto opacity-60 brightness-0 invert"
+             />
+             <div className="text-[10px] font-mono uppercase tracking-widest text-white/65">
+-              © {new Date().getFullYear()} The Resonance · Ecosystem Hub
++              Ã‚Â© {new Date().getFullYear()} The Resonance Ã‚Â· Ecosystem Hub
+             </div>
+           </div>
+           <div className="flex flex-wrap gap-x-6 gap-y-3 text-[10px] font-mono uppercase tracking-widest text-white/70 justify-center md:justify-end">
+@@ -1493,7 +1492,7 @@ type UpdateItem = {
+ };
+ 
+ // Fallback in case /content/updates.json can't be fetched (offline, 404).
+-// Source of truth for editing lives in public/content/updates.json — no code
++// Source of truth for editing lives in public/content/updates.json Ã¢â‚¬â€ no code
+ // changes required to add / edit / reorder cards.
+ const FALLBACK_UPDATES: UpdateItem[] = [
+   {
+@@ -1560,7 +1559,7 @@ const FALLBACK_UPDATES: UpdateItem[] = [
+     app: "The Resonance Podcast",
+     status: "Live",
+     tone: "live",
+-    change: "New season live — free episodes, media kits, and shop. Never a subscription.",
++    change: "New season live Ã¢â‚¬â€ free episodes, media kits, and shop. Never a subscription.",
+     date: "Jun 2026",
+     href: "https://www.resonance-podcast.com/episodes",
+     cta: "Listen",
+@@ -1570,7 +1569,7 @@ const FALLBACK_UPDATES: UpdateItem[] = [
+     status: "New",
+     tone: "new",
+     change:
+-      "Resonance Constitutional Governance Framework v1.0 published — how we build, price, and evolve every app.",
++      "Resonance Constitutional Governance Framework v1.0 published Ã¢â‚¬â€ how we build, price, and evolve every app.",
+     date: "May 2026",
+     href: "/governance",
+     cta: "Read RCGF",
+@@ -1707,14 +1706,14 @@ function UpdatesGrid() {
+                       rel="noopener noreferrer"
+                       className="text-xs font-bold uppercase tracking-widest text-white/85 hover:text-white"
+                     >
+-                      {u.cta} →
++                      {u.cta} Ã¢â€ â€™
+                     </a>
+                   ) : (
+                     <Link
+                       to={u.href}
+                       className="text-xs font-bold uppercase tracking-widest text-white/85 hover:text-white"
+                     >
+-                      {u.cta} →
++                      {u.cta} Ã¢â€ â€™
+                     </Link>
+                   )}
+                   {hasMore && (
+@@ -1787,7 +1786,7 @@ function UpdatesGrid() {
+                               rel="noopener noreferrer"
+                               className="text-sm text-white/85 hover:text-white underline underline-offset-4 decoration-white/25 hover:decoration-white/60"
+                             >
+-                              {l.label} ↗
++                              {l.label} Ã¢â€ â€”
+                             </a>
+                           ) : (
+                             <Link
+@@ -1795,7 +1794,7 @@ function UpdatesGrid() {
+                               onClick={() => setOpenIndex(null)}
+                               className="text-sm text-white/85 hover:text-white underline underline-offset-4 decoration-white/25 hover:decoration-white/60"
+                             >
+-                              {l.label} →
++                              {l.label} Ã¢â€ â€™
+                             </Link>
+                           )}
+                         </li>
+@@ -1813,7 +1812,7 @@ function UpdatesGrid() {
+                     rel="noopener noreferrer"
+                     className="px-4 py-2 rounded-full bg-gradient-brand text-white text-xs font-bold uppercase tracking-widest shadow-[0_0_25px_-8px_hsl(295_90%_60%/0.8)]"
+                   >
+-                    {active.cta} ↗
++                    {active.cta} Ã¢â€ â€”
+                   </a>
+                 ) : (
+                   <Link
+@@ -1821,7 +1820,7 @@ function UpdatesGrid() {
+                     onClick={() => setOpenIndex(null)}
+                     className="px-4 py-2 rounded-full bg-gradient-brand text-white text-xs font-bold uppercase tracking-widest shadow-[0_0_25px_-8px_hsl(295_90%_60%/0.8)]"
+                   >
+-                    {active.cta} →
++                    {active.cta} Ã¢â€ â€™
+                   </Link>
+                 )}
+               </div>
+diff --git a/apps/hub/src/routes/myify.tsx b/apps/hub/src/routes/myify.tsx
+index afe031c0..a4f90f2b 100644
+--- a/apps/hub/src/routes/myify.tsx
++++ b/apps/hub/src/routes/myify.tsx
+@@ -24,7 +24,7 @@ import {
+ export const Route = createFileRoute("/myify")({
+   head: () => ({
+     meta: [
+-      { title: "MYIFY · DataNest · Resonance Hub" },
++      { title: "MYIFY · DataNest · RONSAS" },
+       {
+         name: "description",
+         content:
+@@ -273,7 +273,7 @@ function MyifyWorkspace() {
+       <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
+         <header className="workspace-panel mb-6 flex flex-wrap items-start justify-between gap-5 p-5 sm:p-6">
+           <div>
+-            <p className="workspace-kicker">Resonance Hub · MYIFY</p>
++            <p className="workspace-kicker">RONSAS · MYIFY</p>
+             <h1 className="mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">MYIFY</h1>
+             <p className="mt-1 text-sm font-medium text-primary">May Your Intentions Find You</p>
+             <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
+diff --git a/apps/hub/src/routes/nova.tsx b/apps/hub/src/routes/nova.tsx
+index 8643f439..21efaf1c 100644
+--- a/apps/hub/src/routes/nova.tsx
++++ b/apps/hub/src/routes/nova.tsx
+@@ -2,12 +2,7 @@ import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
+ import { ronsAuth } from "@/lib/auth-provider";
+ 
+ export const Route = createFileRoute("/nova")({
+-  head: () => ({
+-    meta: [
+-      { title: "Nova Studio · Resonance AppDev" },
+-      { name: "robots", content: "noindex, nofollow" },
+-    ],
+-  }),
++  head: () => ({ meta: [{ title: "Nova Studio · RONSAS" }, { name: "robots", content: "noindex, nofollow" }] }),
+   ssr: false,
+   beforeLoad: async () => {
+     const { data, error } = await ronsAuth.getUser();
+diff --git a/apps/hub/src/styles.css b/apps/hub/src/styles.css
+index 4a59136e..e38f31b4 100644
+--- a/apps/hub/src/styles.css
++++ b/apps/hub/src/styles.css
+@@ -40,7 +40,7 @@
+ 
+ :root {
+   --radius: 1rem;
+-  /* Aligned with resonance-podcast.com — deep near-black with violet undertone */
++  /* Aligned with resonance-podcast.com â€” deep near-black with violet undertone */
+   --background: hsl(265 30% 4%);
+   --foreground: hsl(0 0% 98%);
+   --card: hsl(265 20% 8%);
+@@ -56,7 +56,7 @@
+   --destructive: hsl(0 78% 62%);
+   --ring: hsl(295 90% 64%);
+ 
+-  /* Brand spectrum — violet → magenta → pink (podcast palette) */
++  /* Brand spectrum â€” violet â†’ magenta â†’ pink (podcast palette) */
+   --violet: hsl(265 85% 65%);
+   --magenta: hsl(295 90% 60%);
+   --pink: hsl(325 90% 65%);
+@@ -170,7 +170,6 @@
+   transition:
+     opacity 0.9s var(--ease-out-expo),
+     transform 0.9s var(--ease-out-expo);
+-
+ }
+ [data-reveal].is-visible {
+   opacity: 1;
