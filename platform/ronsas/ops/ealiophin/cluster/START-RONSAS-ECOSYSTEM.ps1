@@ -285,8 +285,18 @@ if (-not (Test-BackendReady)) {
 }
 $backendUrl = 'http://127.0.0.1:8787/v1/backend/health'
 $services += [pscustomobject]@{name='sovereign-backend';port=58600;url=$backendUrl;pid=(Get-ListenerPid 58600);owned=$false;root=$AppDev}
-$opsRuntimeCandidate = Join-Path (Split-Path $PSScriptRoot -Parent) 'runtime'
-$opsRuntime = if (Test-Path -LiteralPath $opsRuntimeCandidate -PathType Container) { $opsRuntimeCandidate } else { $Runtime }
+$opsRuntimeCandidates = @(
+    (Join-Path (Split-Path $PSScriptRoot -Parent) 'runtime'),
+    (Join-Path $PSScriptRoot 'runtime')
+)
+$opsRuntime = @($opsRuntimeCandidates | Where-Object { Test-Path -LiteralPath $_ -PathType Container } | Select-Object -First 1)
+if (-not $opsRuntime) {
+    throw ('Governed RONSAS runtime source bundle is missing. Checked: ' + ($opsRuntimeCandidates -join '; '))
+}
+$opsRuntime = [string]$opsRuntime[0]
+if ([IO.Path]::GetFullPath($opsRuntime).TrimEnd('\') -eq [IO.Path]::GetFullPath($Runtime).TrimEnd('\')) {
+    throw 'Governed RONSAS runtime source bundle must be distinct from the mutable live runtime directory.'
+}
 $sttSource = Join-Path $opsRuntime 'syncvision-local-stt.py'
 if (-not (Test-Path -LiteralPath $sttSource -PathType Leaf)) { throw "STT runtime source missing: $sttSource" }
 $sttTarget = Join-Path $Runtime 'syncvision-local-stt.py'
