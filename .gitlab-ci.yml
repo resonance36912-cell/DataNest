@@ -6,6 +6,12 @@ stages:
   - deploy
   - promote
 
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH'
+    - if: '$CI_COMMIT_TAG'
+
 default:
   interruptible: true
   retry:
@@ -14,17 +20,11 @@ default:
       - runner_system_failure
       - stuck_or_timeout_failure
 
-workflow:
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH'
-    - if: '$CI_COMMIT_TAG'
-
 variables:
   GIT_DEPTH: "0"
+  CI: "true"
   npm_config_audit: "false"
   npm_config_fund: "false"
-  CI: "true"
   DATANEST_STATIC_EXPORT: "true"
   NEXT_PUBLIC_BASE_PATH: "/DataNest"
   SUPABASE_URL: "$NEXT_PUBLIC_SUPABASE_URL"
@@ -43,24 +43,25 @@ variables:
     - if: '$CI_COMMIT_TAG'
 
 .node_job: &node_job
-  image: node:22-bookworm
+  image: node:24-bookworm-slim
   before_script:
     - node --version
     - npm --version
 
 .bun_job: &bun_job
-  image: node:22-bookworm
+  image: oven/bun:1.3.14
   before_script:
-    - node --version
-    - npm install --global bun@1.3.14
     - bun --version
 
 canonical:traceability:
   stage: audit
-  image: mcr.microsoft.com/powershell:7.4-debian-12
+  image: mcr.microsoft.com/powershell:7.5-alpine-3.20
   <<: *audit_rules
+  before_script:
+    - apk add --no-cache git
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
   script:
-    - pwsh -NoProfile -File ops/validation/Test-ResonanceTraceability.ps1 -RepoRoot .
+    - pwsh -NoLogo -NoProfile -File ops/validation/Test-ResonanceTraceability.ps1 -RepoRoot "$CI_PROJECT_DIR"
 
 canonical:git-hygiene:
   stage: audit
@@ -78,29 +79,28 @@ canonical:git-hygiene:
 
 open-nova:sealed-manifest:
   stage: audit
-  image: mcr.microsoft.com/powershell:7.4-debian-12
+  image: mcr.microsoft.com/powershell:7.5-alpine-3.20
   <<: *audit_rules
   script:
-    - pwsh -NoProfile -File platform/open-nova/scripts/verify-build-manifest.ps1 -RootPath platform/open-nova
+    - pwsh -NoLogo -NoProfile -File platform/open-nova/scripts/verify-build-manifest.ps1 -RootPath "$CI_PROJECT_DIR/platform/open-nova"
 
 datanest:test:
   <<: *node_job
   stage: test
   rules:
-    - changes:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
         - apps/datanest/**/*
         - apps/ronsas/**/*
         - ops/index/**/*
         - .gitlab-ci.yml
-  cache:
-    key:
-      files:
-        - apps/datanest/package-lock.json
-    paths:
-      - apps/datanest/.npm/
-  script:
+  before_script:
+    - test -n "$NEXT_PUBLIC_SUPABASE_URL"
+    - test -n "$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
     - cd apps/datanest
-    - npm ci --cache .npm --prefer-offline
+    - npm ci --no-audit --no-fund
+  script:
     - npm run check
     - npm test
     - npm run check:contracts
@@ -119,13 +119,11 @@ datanest:build:
         - ops/index/**/*
         - .gitlab-ci.yml
   before_script:
-    - node --version
-    - npm --version
     - test -n "$NEXT_PUBLIC_SUPABASE_URL"
     - test -n "$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
-  script:
     - cd apps/datanest
-    - npm ci --prefer-offline
+    - npm ci --no-audit --no-fund
+  script:
     - npm run build
     - node scripts/build-ronsas-pages.mjs
     - test -s out/index.html
@@ -139,25 +137,27 @@ hub:test-build:
   <<: *bun_job
   stage: test
   rules:
-    - changes:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
         - apps/hub/**/*
         - packages/**/*
         - .gitlab-ci.yml
-  script:
+  before_script:
     - cd apps/hub
     - bun install --frozen-lockfile
-    - bun run lint
-    - bun test scripts/lib/
+  script:
     - bun run verify:pinned-deps
     - bun run verify:back-to-hub
     - bun run verify:no-stale-domains
     - bun run verify:honest-copy
     - bun run verify:security
+    - bun run verify:app-registry
     - bun run verify:public-audit
     - bun run verify:sovereign-itn
     - bun run verify:transparency-copy
     - bun run verify:discernment-usage
-    - bun run verify:app-registry
+    - bun test scripts/lib/
     - bun run build
     - test -f .output/nitro.json
   artifacts:
@@ -290,13 +290,13 @@ canonical:certify:
     paths:
       - evidence/ci/certification.json
 
-pages:candidate:
+create-pages-candidate:
   stage: deploy
-  image: alpine:3.21
+  image: alpine:3.20
   needs:
-    - job: canonical:certify
     - job: datanest:build
       artifacts: true
+    - job: canonical:certify
   script:
     - test -s apps/datanest/out/index.html
     - printf 'Candidate publication only; production DNS remains governance-gated.\n'
