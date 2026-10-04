@@ -1,0 +1,3 @@
+# Preserve sealed/reproducible artifacts byte-for-byte across Windows/Linux checkouts.
+platform/open-nova/** -text
+evidence/**/*.patch -text
