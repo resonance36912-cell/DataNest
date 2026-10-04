@@ -114,9 +114,10 @@ function Assert-KnownPort([string]$Name, [int]$Port, [string]$Expected) {
         if ($response.StatusCode -ne 200 -or $contentType -notlike ([string]$identity.contentType + '*') -or -not $contentMatches) {
             throw "$Name endpoint is reachable without a Windows listener record, but its fingerprint is not recognized. No process was stopped."
         }
+        $allowBlankCommandLine = ([string]$identity.process -notin @('python.exe','node.exe','powershell.exe','pwsh.exe'))
         $candidates = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object {
             [string]$_.Name -ieq [string]$identity.process -and
-            ([string]::IsNullOrWhiteSpace([string]$_.CommandLine) -or [string]$_.CommandLine -like "*$Expected*")
+            ([string]$_.CommandLine -like "*$Expected*" -or ($allowBlankCommandLine -and [string]::IsNullOrWhiteSpace([string]$_.CommandLine)))
         })
         if ($candidates.Count -ne 1) {
             throw "$Name endpoint is healthy without a Windows listener record, but exactly one matching $($identity.process) process was not found. No process was stopped."
