@@ -2,6 +2,9 @@ name: ChatGPT Codex Plugin Autopilot Evaluation
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 permissions:
   contents: read
