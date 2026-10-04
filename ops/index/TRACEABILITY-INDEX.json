@@ -121,7 +121,7 @@
                       "machineAlias":  "Spider",
                       "environment":  "RSN-ENV-DR",
                       "role":  "support-worker",
-                      "currentObservation":  "online-audited-with-git-origin-connectivity-warning",
+                      "currentObservation":  "online-audited-legacy-control-origin-degraded",
                       "promotionAuthority":  false
                   }
               ],
