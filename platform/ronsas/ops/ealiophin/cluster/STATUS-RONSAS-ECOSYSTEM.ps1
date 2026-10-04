@@ -51,7 +51,10 @@ function Test-RonsasEntry($Entry) {
     } catch { $errorText = $_.Exception.Message }
     $listenPort = if ($Entry.PSObject.Properties['listenPort']) { [int]$Entry.listenPort } else { [int]$Entry.port }
     $listenerPid = Get-ListenerPid $listenPort
-    $healthy = $semantic -and [bool]$listenerPid
+    # Loopback endpoints can be forwarded by Windows/WSL/Podman with PID 0 or no
+    # user-visible listener even while the governed health endpoint is reachable.
+    # Treat semantic health as authoritative; listener metadata remains advisory.
+    $healthy = $semantic
     [pscustomobject]@{
         id=[string]$Entry.id
         kind=[string]$Entry.kind
@@ -59,6 +62,7 @@ function Test-RonsasEntry($Entry) {
         required=[bool]$Entry.required
         port=[int]$Entry.port
         listenPort=$listenPort
+        listenerVisible=($null -ne $listenerPid)
         http=$http
         healthy=$healthy
         pid=$listenerPid

@@ -74,7 +74,7 @@ function Assert-KnownPort([string]$Name, [int]$Port, [string]$Expected) {
     $listener = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
     if (-not $listener) { return $null }
     $listenerPid = [int]$listener.OwningProcess
-    $cmd = Get-CommandLine $listenerPid
+    $cmd = if ($listenerPid -gt 0) { Get-CommandLine $listenerPid } else { '' }
     if ($cmd -like "*$Expected*") {
         return [pscustomobject]@{ pid=$listenerPid; owned=$false; command=$cmd; identity='command-line' }
     }
@@ -83,10 +83,8 @@ function Assert-KnownPort([string]$Name, [int]$Port, [string]$Expected) {
     }
 
     $identity = $KnownEndpointIdentities[$Name]
-    $process = Get-CimInstance Win32_Process -Filter "ProcessId=$listenerPid" -ErrorAction SilentlyContinue
     $loopbackAddresses = @('127.0.0.1', '::1')
-    if (-not $identity -or -not $process -or [string]$process.Name -ne [string]$identity.process -or
-        $loopbackAddresses -notcontains [string]$listener.LocalAddress) {
+    if (-not $identity -or $loopbackAddresses -notcontains [string]$listener.LocalAddress) {
         throw "$Name port $Port is occupied by an unrecognized process PID $listenerPid. No process was stopped."
     }
 
@@ -98,6 +96,23 @@ function Assert-KnownPort([string]$Name, [int]$Port, [string]$Expected) {
             throw 'Endpoint fingerprint mismatch.'
         }
     } catch {
+        throw "$Name port $Port is occupied by an unrecognized process PID $listenerPid. No process was stopped."
+    }
+
+    if ($listenerPid -eq 0) {
+        $candidates = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object {
+            [string]$_.Name -ieq [string]$identity.process -and [string]$_.CommandLine -like "*$Expected*"
+        })
+        if ($candidates.Count -ne 1) {
+            throw "$Name port $Port is exposed through PID 0, but exactly one matching $($identity.process) process was not found. No process was stopped."
+        }
+        $resolvedPid = [int]$candidates[0].ProcessId
+        Write-Host "[SAFE REUSE] $Name PID 0 listener resolved to PID $resolvedPid by loopback endpoint fingerprint + unique expected command line." -ForegroundColor Yellow
+        return [pscustomobject]@{ pid=$resolvedPid; owned=$false; command=[string]$candidates[0].CommandLine; identity='pid0-loopback-endpoint-and-unique-commandline' }
+    }
+
+    $process = Get-CimInstance Win32_Process -Filter "ProcessId=$listenerPid" -ErrorAction SilentlyContinue
+    if (-not $process -or [string]$process.Name -ne [string]$identity.process) {
         throw "$Name port $Port is occupied by an unrecognized process PID $listenerPid. No process was stopped."
     }
 
@@ -120,11 +135,9 @@ function Start-ViteApp([string]$Name, [string]$Dir, [int]$Port, [string]$Mode, [
     $proc = Start-Process -FilePath $Node -ArgumentList $args -WorkingDirectory $Dir `
         -RedirectStandardOutput $outLog -RedirectStandardError $errLog -WindowStyle Hidden -PassThru
     Wait-Http $Name $url 45 | Out-Null
-    $listenerPid = Get-ListenerPid $Port
-    if (-not $listenerPid) { throw "$Name became reachable but has no listener PID." }
-    $cmd = Get-CommandLine $listenerPid
-    if ($cmd -notlike "*$Dir*") { throw "$Name listener identity mismatch after startup." }
-    return [pscustomobject]@{name=$Name;port=$Port;url=$url;pid=$listenerPid;owned=$true;root=$Dir;launcherPid=$proc.Id}
+    $verified = Assert-KnownPort $Name $Port $Dir
+    if (-not $verified) { throw "$Name became reachable but its listener could not be verified." }
+    return [pscustomobject]@{name=$Name;port=$Port;url=$url;pid=$verified.pid;owned=$true;root=$Dir;launcherPid=$proc.Id}
 }
 function Start-PythonService([string]$Name, [int]$Port, [string]$Url, [string]$Script, [string]$Python, [string]$Expected, [hashtable]$Environment = @{}) {
     $existing = Assert-KnownPort $Name $Port $Expected
@@ -140,9 +153,9 @@ function Start-PythonService([string]$Name, [int]$Port, [string]$Url, [string]$S
     try { $proc = Start-Process -FilePath $Python -ArgumentList @($Script) -WorkingDirectory (Split-Path $Script -Parent) -RedirectStandardOutput $outLog -RedirectStandardError $errLog -WindowStyle Hidden -PassThru }
     finally { foreach ($key in $Environment.Keys) { [Environment]::SetEnvironmentVariable($key, $prior[$key], 'Process') } }
     Wait-Http $Name $Url 90 | Out-Null
-    $listenerPid = Get-ListenerPid $Port; if (-not $listenerPid) { throw "$Name became reachable but has no listener PID." }
-    $cmd = Get-CommandLine $listenerPid; if ($cmd -and $cmd -notlike "*$Expected*") { throw "$Name listener identity mismatch after startup." }
-    return [pscustomobject]@{name=$Name;port=$Port;url=$Url;pid=$listenerPid;owned=$true;root=(Split-Path $Script -Parent);launcherPid=$proc.Id}
+    $verified = Assert-KnownPort $Name $Port $Expected
+    if (-not $verified) { throw "$Name became reachable but its listener could not be verified." }
+    return [pscustomobject]@{name=$Name;port=$Port;url=$Url;pid=$verified.pid;owned=$true;root=(Split-Path $Script -Parent);launcherPid=$proc.Id}
 }
 
 function Start-NodeService([string]$Name, [int]$Port, [string]$Url, [string]$Entry, [string]$WorkingDirectory, [string]$Expected, [hashtable]$Environment = @{}) {
@@ -155,9 +168,9 @@ function Start-NodeService([string]$Name, [int]$Port, [string]$Url, [string]$Ent
     try { $proc = Start-Process -FilePath $Node -ArgumentList @($Entry) -WorkingDirectory $WorkingDirectory -RedirectStandardOutput $outLog -RedirectStandardError $errLog -WindowStyle Hidden -PassThru }
     finally { foreach ($key in $Environment.Keys) { [Environment]::SetEnvironmentVariable($key, $prior[$key], 'Process') } }
     Wait-Http $Name $Url 60 | Out-Null
-    $listenerPid = Get-ListenerPid $Port; if (-not $listenerPid) { throw "$Name became reachable but has no listener PID." }
-    $cmd = Get-CommandLine $listenerPid; if ($cmd -and $cmd -notlike "*$Expected*") { throw "$Name listener identity mismatch after startup." }
-    return [pscustomobject]@{name=$Name;port=$Port;url=$Url;pid=$listenerPid;owned=$true;root=$WorkingDirectory;launcherPid=$proc.Id}
+    $verified = Assert-KnownPort $Name $Port $Expected
+    if (-not $verified) { throw "$Name became reachable but its listener could not be verified." }
+    return [pscustomobject]@{name=$Name;port=$Port;url=$Url;pid=$verified.pid;owned=$true;root=$WorkingDirectory;launcherPid=$proc.Id}
 }
 
 function Start-OllamaService {
@@ -168,8 +181,9 @@ function Start-OllamaService {
     $outLog = Join-Path $LogRoot 'ollama.out.log'; $errLog = Join-Path $LogRoot 'ollama.err.log'
     $proc = Start-Process -FilePath $ollama.Source -ArgumentList @('serve') -RedirectStandardOutput $outLog -RedirectStandardError $errLog -WindowStyle Hidden -PassThru
     Wait-Http 'Ollama' $url 30 | Out-Null
-    $listenerPid = Get-ListenerPid $port; if (-not $listenerPid) { throw 'Ollama became reachable but has no listener PID.' }
-    return [pscustomobject]@{name=$name;port=$port;url=$url;pid=$listenerPid;owned=$true;root=(Split-Path $ollama.Source -Parent);launcherPid=$proc.Id}
+    $verified = Assert-KnownPort $name $port 'ollama'
+    if (-not $verified) { throw 'Ollama became reachable but its listener could not be verified.' }
+    return [pscustomobject]@{name=$name;port=$port;url=$url;pid=$verified.pid;owned=$true;root=(Split-Path $ollama.Source -Parent);launcherPid=$proc.Id}
 }
 
 function Start-LaunchBroker {
@@ -199,11 +213,9 @@ function Start-LaunchBroker {
         $env:RONS_AUTH_EXCHANGE_KEY_FILE = $priorKey
     }
     Wait-Http $name $url 20 | Out-Null
-    $listenerPid = Get-ListenerPid $port
-    if (-not $listenerPid -or (Get-CommandLine $listenerPid) -notlike '*rons-launch-broker.py*') {
-        throw 'Launch broker listener identity mismatch after startup.'
-    }
-    return [pscustomobject]@{name=$name;port=$port;url=$url;pid=$listenerPid;owned=$true;root=$Runtime;launcherPid=$proc.Id}
+    $verified = Assert-KnownPort $name $port 'rons-launch-broker.py'
+    if (-not $verified) { throw 'Launch broker became reachable but its listener could not be verified.' }
+    return [pscustomobject]@{name=$name;port=$port;url=$url;pid=$verified.pid;owned=$true;root=$Runtime;launcherPid=$proc.Id}
 }
 $services = @()
 $foundryUrl = 'http://127.0.0.1:8787/v1/apps'
@@ -407,9 +419,9 @@ if ($hubExisting) {
         $env:RONS_GATEWAY_PROCEDURE_KEY_FILE = $priorGatewayProcedureKeyFile
     }
     Wait-Http 'Hub' 'http://127.0.0.1:4173/' 45 | Out-Null
-    $hubPid = Get-ListenerPid 4173
-    if ((Get-CommandLine $hubPid) -notlike '*ronsas-hub-canonical*') { throw 'Hub listener identity mismatch after startup.' }
-    $services += [pscustomobject]@{name='hub';port=4173;url='http://127.0.0.1:4173/';pid=$hubPid;owned=$true;root=$hub;launcherPid=$hubProc.Id}
+    $verified = Assert-KnownPort 'hub' 4173 $hub
+    if (-not $verified) { throw 'Hub became reachable but its listener could not be verified.' }
+    $services += [pscustomobject]@{name='hub';port=4173;url='http://127.0.0.1:4173/';pid=$verified.pid;owned=$true;root=$hub;launcherPid=$hubProc.Id}
 }
 $services += Start-ViteApp 'epublisher' (Join-Path $Root 'apps\epublisher-sovereign-local-v0.1') 3101 'preview' '127.0.0.1'
 $services += Start-ViteApp 'creative-studio' (Join-Path $Root 'apps\creative-studio-sovereign-local-v0.1') 3201 'preview' '127.0.0.1' 'runner'
@@ -430,9 +442,9 @@ if ($museExisting) {
     $launchProc = Start-Process -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',$launcher,'-Root',$Root) `
         -RedirectStandardOutput $outLog -RedirectStandardError $errLog -WindowStyle Hidden -PassThru
     Wait-Http 'MuseTalk bridge' $museUrl 60 | Out-Null
-    $musePid = Get-ListenerPid 7863
-    if ((Get-CommandLine $musePid) -notlike '*musetalk_bridge.py*') { throw 'MuseTalk listener identity mismatch after startup.' }
-    $services += [pscustomobject]@{name='musetalk-bridge';port=7863;url=$museUrl;pid=$musePid;owned=$true;root=(Join-Path $Root 'integrations\musetalk-syncvision-bridge');launcherPid=$launchProc.Id}
+    $verified = Assert-KnownPort 'musetalk-bridge' 7863 'musetalk_bridge.py'
+    if (-not $verified) { throw 'MuseTalk bridge became reachable but its listener could not be verified.' }
+    $services += [pscustomobject]@{name='musetalk-bridge';port=7863;url=$museUrl;pid=$verified.pid;owned=$true;root=(Join-Path $Root 'integrations\musetalk-syncvision-bridge');launcherPid=$launchProc.Id}
 }
 
 $priorOwned = @()
