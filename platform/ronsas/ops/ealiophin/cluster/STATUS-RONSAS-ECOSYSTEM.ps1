@@ -18,6 +18,21 @@ if (@($ids | Sort-Object -Unique).Count -ne $ids.Count) {
 
 function Get-ListenerPid([int]$Port) {
     $listener = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($listener -and [int]$listener.OwningProcess -gt 0) { return [int]$listener.OwningProcess }
+
+    $netstat = Join-Path $env:SystemRoot 'System32\netstat.exe'
+    if (Test-Path -LiteralPath $netstat -PathType Leaf) {
+        foreach ($line in @(& $netstat -ano -p tcp 2>$null)) {
+            if ([string]$line -notmatch '^\s*TCP\s+(\S+)\s+\S+\s+LISTENING\s+(\d+)\s*$') { continue }
+            $endpoint = [string]$Matches[1]
+            $pid = [int]$Matches[2]
+            $seenPort = $null
+            if ($endpoint -match '^\[[^\]]+\]:(\d+)$') { $seenPort=[int]$Matches[1] }
+            elseif ($endpoint -match '^.+:(\d+)$') { $seenPort=[int]$Matches[1] }
+            if ($seenPort -eq $Port) { return $pid }
+        }
+    }
+
     if ($listener) { return [int]$listener.OwningProcess }
     return $null
 }
