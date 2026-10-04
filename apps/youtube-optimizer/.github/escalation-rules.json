@@ -1,0 +1,33 @@
+{
+  "$schema": "internal://escalation-rules-v1",
+  "_comment": "Per-branch CI escalation rules. First matching rule wins. Patterns support * (no slash), **, ?, !negation and regex:<expr>. Fields: threshold, labels/addLabels, assignees/addAssignees, enabled. Validated by `bun run check:escalation`.",
+  "rules": [
+    {
+      "name": "production",
+      "description": "main is the release surface — escalate on the second red run.",
+      "branches": ["main"],
+      "threshold": 2,
+      "addLabels": ["priority:high"]
+    },
+    {
+      "name": "release-and-hotfix",
+      "description": "Release prep must never stay red.",
+      "branches": ["release/*", "hotfix/**"],
+      "threshold": 2,
+      "addLabels": ["release-blocker"]
+    },
+    {
+      "name": "experiments",
+      "description": "Spikes are expected to be red; no triage issues.",
+      "branches": ["exp/*", "spike/*", "sandbox/**"],
+      "enabled": false
+    },
+    {
+      "name": "feature-branches",
+      "description": "Normal day-to-day work: give it three strikes.",
+      "branches": ["feat/*", "fix/*", "chore/*", "codex/**", "lovable/**"],
+      "threshold": 3,
+      "addLabels": ["flaky-candidate"]
+    }
+  ]
+}

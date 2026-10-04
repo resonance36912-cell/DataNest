@@ -1,0 +1,31 @@
+{
+  "//": "Minimum Lighthouse category scores (0-100) required per route, plus how much a category may drop against .lighthouse/baseline.json before the gate fails. Regression allowance resolves as: LH_MAX_REGRESSION env > maxRegressionByRoute[route][category] > maxRegressionByCategory[category] > maxRegression. Bigger drops only pass with --accept-regression during a deliberate refresh.",
+  "maxRegression": 4,
+  "maxRegressionByCategory": {
+    "performance": 6,
+    "seo": 2,
+    "best-practices": 3
+  },
+  "maxRegressionByRoute": {
+    "/pricing": {
+      "performance": 8
+    }
+  },
+  "categories": [
+    "performance",
+    "seo",
+    "best-practices"
+  ],
+  "minScores": {
+    "default": {
+      "performance": 50,
+      "seo": 95,
+      "best-practices": 90
+    }
+  },
+  "routes": [
+    "/",
+    "/pricing",
+    "/features"
+  ]
+}

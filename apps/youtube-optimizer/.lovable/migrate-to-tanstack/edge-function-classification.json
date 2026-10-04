@@ -1,0 +1,8 @@
+{"functions": [
+  {"name": "analyze-episode", "classification": "internal-only", "signal": "called from src/components/VideoScoreAnalyzer.tsx and src/components/EpisodeAnalysis.tsx", "outcome": "migrated"},
+  {"name": "audit-channel", "classification": "Deno-only dependency", "signal": "uses EdgeRuntime.waitUntil background processing (Supabase Functions runtime API)", "outcome": "left"},
+  {"name": "edit-thumbnail", "classification": "internal-only", "signal": "called from src/components/tabs/AuditTab.tsx", "outcome": "migrated"},
+  {"name": "generate-thumbnail", "classification": "internal-only", "signal": "called from AuditTab.tsx (2x) and EpisodeAnalysis.tsx", "outcome": "migrated"},
+  {"name": "monitoring-cron", "classification": "cron target", "signal": "scheduled daily monitoring; name matches *-cron; service_role JWT required", "outcome": "left"},
+  {"name": "process-email-queue", "classification": "cron target", "signal": "pg_cron job via net.http_post in supabase/migrations/20260702062714_email_infra.sql", "outcome": "left"}
+]}

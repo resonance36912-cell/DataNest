@@ -1,0 +1,12 @@
+{
+  "_comment": "Brand pack manifest. Any logo/brand image referenced from code MUST be listed here. Update this file when adding or replacing brand assets.",
+  "srcAssets": [
+    "logo-youtube-optimizer.png",
+    "resonance-lockup.png",
+    "resonance-logo.png"
+  ],
+  "publicAssets": [
+    "favicon.png",
+    "og-image.png"
+  ]
+}
