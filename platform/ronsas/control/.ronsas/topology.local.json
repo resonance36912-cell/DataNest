@@ -1,0 +1,23 @@
+{
+  "schema": "ronsas-topology/v1",
+  "host": "Weed",
+  "suite": "Resonance Open Nova Sovereign Application Suite",
+  "short_name": "RONSAS",
+  "strategy": "governed-worker-node",
+  "control_root": "%USERPROFILE%\\Resonance\\RONSAS\\github\\control",
+  "cloud": {
+    "github": { "destination_remote": "https://github.com/resonance36912-cell/RONSAS.git" },
+    "dropbox": { "local_root": "%USERPROFILE%\\Resonance\\RONSAS\\audit", "cloud_root": "/RONS-Audit/RONS-AI-AUDIT-REPOSITORY", "authority": "immutable-audit-and-release-evidence" }
+  },
+  "repositories": [
+    { "id": "ronsas-control", "role": "control-read-validation", "local_path": "%USERPROFILE%\\Resonance\\RONSAS\\github\\control", "required": true, "configured_remote": "https://github.com/resonance36912-cell/RONSAS.git" },
+    { "id": "hub-worker", "role": "github-linked-worker", "local_path": "%USERPROFILE%\\Resonance\\RONSAS\\github\\resonance-hub", "required": true, "configured_remote": "https://github.com/resonance36912-cell/resonance-hub.git" }
+  ],
+  "paths": [
+    { "id": "worker-root", "role": "worker-root", "local_path": "%USERPROFILE%\\Resonance\\RONSAS", "authority": "local-worker", "required": true },
+    { "id": "dropbox-audit", "role": "audit-and-release-evidence", "local_path": "%USERPROFILE%\\Resonance\\RONSAS\\audit", "authority": "dropbox-cloud", "required": true },
+    { "id": "ealiophin-observed", "role": "latest-observed-ealiophin-authority", "local_path": "%USERPROFILE%\\Resonance\\RONSAS\\ealiophin-authority\\latest-observed", "authority": "dropbox-snapshot-read-only", "required": true },
+    { "id": "legacy-opennova", "role": "legacy-local-runtime-not-authority", "local_path": "%USERPROFILE%\\Resonance\\OpenNova", "authority": "non-authoritative-worker-copy", "required": false }
+  ],
+  "services": []
+}

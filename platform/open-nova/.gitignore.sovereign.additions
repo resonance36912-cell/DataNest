@@ -1,0 +1,43 @@
+.env.sovereign
+runtime/receipts/*.jsonl
+.resonance-venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+# v0.5 protected local trust material
+runtime/secrets/*
+!runtime/secrets/.gitkeep
+runtime/supply-chain/artifacts/*
+!runtime/supply-chain/.gitkeep
+imports/projects/*
+!imports/projects/.gitkeep
+imports/artifacts/*
+!imports/artifacts/.gitkeep
+# v0.9 generated local runtime state
+runtime/backend-runtime/*
+!runtime/backend-runtime/.gitkeep
+services/wheelhouse/*.whl
+services/wheelhouse/*.tar.gz
+# v1.2 cutover evidence and disposable regression workspaces
+runtime/cutover/*
+!runtime/cutover/.gitkeep
+apps/.cutover-scratch-*
+# v1.x controller-owned operational evidence
+runtime/registry/*
+!runtime/registry/.gitkeep
+runtime/deployment/*
+!runtime/deployment/.gitkeep
+runtime/source-ingestion/*
+!runtime/source-ingestion/.gitkeep
+runtime/migration-execution/*
+!runtime/migration-execution/.gitkeep
+runtime/workstation/*
+!runtime/workstation/.gitkeep
+
+# v1.5 first-real-execution evidence
+runtime/real-execution/*
+!runtime/real-execution/.gitkeep
+
+# v1.5.2 operator evidence handoff bundles
+exports/evidence-bundles/*.zip
+exports/operator-reports/*.json

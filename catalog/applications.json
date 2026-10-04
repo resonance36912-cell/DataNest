@@ -1,0 +1,64 @@
+{
+  "schema": "resonance.catalog.applications/v1",
+  "generated_at": "2026-10-04T14:01:17.494Z",
+  "items": [
+    {
+      "canonical_id": "urn:resonance:application:datanest",
+      "trace_id": "APP-DN",
+      "display_name": "DataNest",
+      "platform_id": "urn:resonance:platform:datanest",
+      "source_path": "apps/datanest",
+      "lifecycle": "import-pending",
+      "source_authority": "Ealiophin local DataNest repository"
+    },
+    {
+      "canonical_id": "urn:resonance:application:hub",
+      "trace_id": "APP-HUB",
+      "display_name": "Resonance Hub",
+      "platform_id": "urn:resonance:platform:resonance",
+      "source_path": "apps/hub",
+      "lifecycle": "candidate",
+      "source_authority": "Hub runtime/commercial line"
+    },
+    {
+      "canonical_id": "urn:resonance:application:epublisher",
+      "trace_id": "APP-EPUB",
+      "display_name": "Resonance ePublisher",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "lifecycle": "active",
+      "public_url": "https://epublisher.reson8.life"
+    },
+    {
+      "canonical_id": "urn:resonance:application:creative-studio",
+      "trace_id": "APP-CRTV",
+      "display_name": "Resonance Creative Studio",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "lifecycle": "active",
+      "public_url": "https://creative.reson8.life"
+    },
+    {
+      "canonical_id": "urn:resonance:application:sync-vision",
+      "trace_id": "APP-SYNC",
+      "display_name": "Resonance Sync Vision",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "lifecycle": "beta",
+      "public_url": "https://sync.reson8.life"
+    },
+    {
+      "canonical_id": "urn:resonance:application:youtube-optimizer",
+      "trace_id": "APP-YT",
+      "display_name": "YouTube Optimizer",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "lifecycle": "pilot",
+      "public_url": "https://youtube.reson8.life"
+    },
+    {
+      "canonical_id": "urn:resonance:application:myify",
+      "trace_id": "APP-MYIFY",
+      "display_name": "MYIFY · DataNest",
+      "platform_id": "urn:resonance:platform:datanest",
+      "lifecycle": "pilot",
+      "public_url": "https://reson8.life/myify"
+    }
+  ]
+}

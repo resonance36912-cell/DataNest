@@ -1,0 +1,21 @@
+{
+  "schema": "ronsas-bridge-agent/v1",
+  "deviceId": "00000000-0000-0000-0000-000000000000",
+  "pollSeconds": 3,
+  "workspaces": {
+    "ronsas-control": {
+      "path": "C:\\Users\\Ashley\\Documents\\GitHub\\rons-sovereign-codebase",
+      "commands": {
+        "build": ["bun", "run", "build"],
+        "test": ["bun", "test"],
+        "lint": ["bun", "run", "lint"],
+        "typecheck": ["bunx", "tsc", "--noEmit"],
+        "dev_smoke": ["bun", "run", "prebuild"]
+      },
+      "preview": {
+        "command": "bun",
+        "args": ["run", "dev", "--host", "127.0.0.1"]
+      }
+    }
+  }
+}

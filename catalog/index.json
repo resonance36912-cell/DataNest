@@ -1,0 +1,15 @@
+{
+  "schema": "resonance.catalog.index/v1",
+  "generated_at": "2026-10-04T14:01:17.494Z",
+  "files": [
+    "platforms.json",
+    "applications.json",
+    "governance.json",
+    "environments.json",
+    "nodes.json",
+    "services.json",
+    "aliases.json",
+    "public-assets.json"
+  ],
+  "identity_standard": "docs/traceability/NOMENCLATURE.md"
+}

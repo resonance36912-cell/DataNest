@@ -1,0 +1,25 @@
+version: "0.8"
+name: Resonance Provider-Neutral Application Contract
+network_scope: loopback-only
+external_ai_required: false
+routes:
+  database:
+    query: POST /v1/db/query
+    supported_operations: [select, insert, update, upsert, delete]
+    supported_filters: [eq, neq, gt, gte, lt, lte]
+  auth:
+    session: GET /v1/auth/session
+    user: GET /v1/auth/user
+    sign_in: POST /v1/auth/sign-in
+    sign_up: POST /v1/auth/sign-up
+    sign_out: POST /v1/auth/sign-out
+  storage:
+    object: /v1/storage/{bucket}/{path}
+    public_object: /v1/storage/public/{bucket}/{path}
+  ai:
+    chat: POST /v1/ai/chat
+governance:
+  ambiguous_provider_operations_are_blockers: true
+  destructive_schema_changes_require_human_approval: true
+  source_rewrites_require_confirmation: true
+  rollback_must_preserve_post_migration_user_changes: true

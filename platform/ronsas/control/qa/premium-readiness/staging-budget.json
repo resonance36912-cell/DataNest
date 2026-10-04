@@ -1,0 +1,22 @@
+{
+  "schema": "ronsas.premium-readiness.staging-budget.v1",
+  "status": "active_zero_external_spend",
+  "scope": "isolated-local-staging",
+  "approved_external_spend_cents_max": 0,
+  "approved_real_provider_calls_max": 0,
+  "production_hosts_forbidden": true,
+  "allowed_target_hosts": ["127.0.0.1", "localhost", "::1"],
+  "allowed_public_probe_requests_max": 10,
+  "smoke_only_until_prerequisites_complete": true,
+  "load_profiles_require_separate_explicit_concurrency_values": true,
+  "destructive_tests_require_disposable_accounts": true,
+  "payment_tests_require_sandbox_credentials": true,
+  "abort_on": [
+    "cross-account-access",
+    "duplicate-charge",
+    "data-corruption",
+    "uncontrolled-cost",
+    "production-target-detected"
+  ],
+  "note": "This budget authorizes zero-spend isolated staging verification only. It does not authorize real provider usage, real payments, or public production load."
+}

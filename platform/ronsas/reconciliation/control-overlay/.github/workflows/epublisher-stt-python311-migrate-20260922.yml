@@ -1,0 +1,218 @@
+name: ePublisher STT Python 3.11 migration
+
+on:
+  push:
+    branches: [ronsas/epublisher-stt-python311-20260922]
+    paths:
+      - "ops/ealiophin/control-center/RONS-ePublisher-STT.ps1"
+      - "ops/ealiophin/control-center/REGISTER-RONS-EPUBLISHER-STT-TASK.ps1"
+      - "ops/ealiophin/runtime/requirements-stt-gpu.txt"
+      - "ops/ealiophin/runtime/syncvision-local-stt.py"
+      - ".github/workflows/epublisher-stt-python311-migrate-20260922.yml"
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: epublisher-stt-python311-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  migrate:
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Resolve Python 3.11+ interpreter
+        id: resolve
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          function Test-PythonCandidate([string]$Path) {
+            if (-not $Path -or -not (Test-Path -LiteralPath $Path -PathType Leaf)) { return $null }
+            try {
+              $json = & $Path -c "import json,sys; print(json.dumps({'executable':sys.executable,'major':sys.version_info.major,'minor':sys.version_info.minor,'version':sys.version.split()[0]}))"
+              if ($LASTEXITCODE -ne 0) { return $null }
+              $info = $json | ConvertFrom-Json
+              if ([int]$info.major -eq 3 -and [int]$info.minor -ge 11) { return $info }
+            } catch { }
+            return $null
+          }
+
+          $resolved = $null
+          if (Get-Command py.exe -ErrorAction SilentlyContinue) {
+            foreach ($selector in @('-3.11','-3.12','-3.13')) {
+              try {
+                $candidate = (& py.exe $selector -c "import sys; print(sys.executable)" 2>$null | Select-Object -First 1)
+                $resolved = Test-PythonCandidate $candidate
+                if ($resolved) { break }
+              } catch { }
+            }
+          }
+
+          if (-not $resolved) {
+            $known = @(
+              (Join-Path $env:LOCALAPPDATA 'Programs\Python\Python311\python.exe'),
+              (Join-Path $env:LOCALAPPDATA 'Programs\Python\Python312\python.exe'),
+              (Join-Path $env:LOCALAPPDATA 'Programs\Python\Python313\python.exe'),
+              'C:\Python311\python.exe',
+              'C:\Python312\python.exe',
+              'C:\Python313\python.exe'
+            )
+            foreach ($candidate in $known) {
+              $resolved = Test-PythonCandidate $candidate
+              if ($resolved) { break }
+            }
+          }
+
+          if (-not $resolved) {
+            $winget = Get-Command winget.exe -ErrorAction SilentlyContinue
+            if (-not $winget) { throw 'Python 3.11+ is not installed and winget is unavailable.' }
+            & $winget.Source install --id Python.Python.3.11 --exact --scope user --silent --accept-package-agreements --accept-source-agreements --disable-interactivity
+            if ($LASTEXITCODE -ne 0) { throw "winget Python 3.11 install failed with exit code $LASTEXITCODE" }
+            $candidate = Join-Path $env:LOCALAPPDATA 'Programs\Python\Python311\python.exe'
+            $resolved = Test-PythonCandidate $candidate
+          }
+
+          if (-not $resolved) { throw 'Unable to resolve a Python 3.11+ interpreter after install attempt.' }
+          "python_path=$($resolved.executable)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "python_version=$($resolved.version)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          Write-Host "Resolved Python $($resolved.version): $($resolved.executable)"
+
+      - name: Build blue-green ePublisher STT environment
+        id: build
+        env:
+          BASE_PYTHON: ${{ steps.resolve.outputs.python_path }}
+          BASE_VERSION: ${{ steps.resolve.outputs.python_version }}
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $runtime = Join-Path $env:USERPROFILE 'Resonance\OpenNova\runtime'
+          $envRoot = Join-Path $runtime 'python-envs\epublisher-stt-py311'
+          $venvPython = Join-Path $envRoot 'Scripts\python.exe'
+          $requirements = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\runtime\requirements-stt-gpu.txt'
+
+          if (Test-Path -LiteralPath $venvPython -PathType Leaf) {
+            $existing = & $venvPython -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"
+            if ($LASTEXITCODE -ne 0 -or [version]$existing -lt [version]'3.11') {
+              Remove-Item -LiteralPath $envRoot -Recurse -Force
+            }
+          }
+
+          if (-not (Test-Path -LiteralPath $venvPython -PathType Leaf)) {
+            & $env:BASE_PYTHON -m venv $envRoot
+            if ($LASTEXITCODE -ne 0) { throw 'Python 3.11+ venv creation failed.' }
+          }
+
+          & $venvPython -m pip install --upgrade pip setuptools wheel
+          if ($LASTEXITCODE -ne 0) { throw 'pip bootstrap failed.' }
+          & $venvPython -m pip install -r $requirements
+          if ($LASTEXITCODE -ne 0) { throw 'STT dependency installation failed.' }
+          & $venvPython -m pip check
+          if ($LASTEXITCODE -ne 0) { throw 'pip check failed for Python 3.11+ STT environment.' }
+
+          $verify = & $venvPython -c "import json,sys,av,ctranslate2,yt_dlp,faster_whisper; print(json.dumps({'python':sys.version.split()[0],'av':av.__version__,'ctranslate2':ctranslate2.__version__,'yt_dlp':yt_dlp.version.__version__,'faster_whisper':faster_whisper.__version__}))"
+          if ($LASTEXITCODE -ne 0) { throw 'STT import verification failed.' }
+          $info = $verify | ConvertFrom-Json
+          if ([version]$info.python -lt [version]'3.11') { throw "New STT venv is not Python 3.11+: $($info.python)" }
+          "venv_python=$venvPython" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "build_json=$($verify -replace '%','%25' -replace "`r",'%0D' -replace "`n",'%0A')" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Activate governed Python 3.11 STT runtime
+        id: activate
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $runtime = Join-Path $env:USERPROFILE 'Resonance\OpenNova\runtime'
+          $control = Join-Path $env:LOCALAPPDATA 'Resonance\RONS-ControlCenter'
+          New-Item -ItemType Directory -Force -Path $control | Out-Null
+
+          $runnerSource = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\control-center\RONS-ePublisher-STT.ps1'
+          $installerSource = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\control-center\REGISTER-RONS-EPUBLISHER-STT-TASK.ps1'
+          $runtimeSource = Join-Path $env:GITHUB_WORKSPACE 'ops\ealiophin\runtime\syncvision-local-stt.py'
+          $runnerTarget = Join-Path $control 'RONS-ePublisher-STT.ps1'
+          $installerTarget = Join-Path $control 'REGISTER-RONS-EPUBLISHER-STT-TASK.ps1'
+          $runtimeTarget = Join-Path $runtime 'syncvision-local-stt.py'
+
+          Copy-Item -LiteralPath $runnerSource -Destination $runnerTarget -Force
+          Copy-Item -LiteralPath $installerSource -Destination $installerTarget -Force
+          Copy-Item -LiteralPath $runtimeSource -Destination $runtimeTarget -Force
+
+          $result = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installerTarget 2>&1
+          if ($LASTEXITCODE -ne 0) { throw ("STT task activation failed: " + (($result | Select-Object -Last 20) -join ' | ')) }
+
+          $preferred = Join-Path $runtime 'python-envs\epublisher-stt-py311\Scripts\python.exe'
+          $activeVersion = & $preferred -c "import sys; print(sys.version.split()[0])"
+          if ($LASTEXITCODE -ne 0 -or [version]$activeVersion -lt [version]'3.11') { throw "Preferred STT interpreter invalid: $activeVersion" }
+          "active_version=$activeVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Validate Python 3.11 STT end to end
+        id: acceptance
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          function Get-Status([string]$Url, [int]$TimeoutSec = 10) {
+            try {
+              $response = Invoke-WebRequest -UseBasicParsing -Uri $Url -TimeoutSec $TimeoutSec
+              return [ordered]@{ status=[int]$response.StatusCode; ok=([int]$response.StatusCode -eq 200) }
+            } catch {
+              $status = $null
+              if ($_.Exception.Response -and $_.Exception.Response.StatusCode) { $status = [int]$_.Exception.Response.StatusCode }
+              return [ordered]@{ status=$status; ok=$false; detail=$_.Exception.Message }
+            }
+          }
+
+          $result = [ordered]@{}
+          $result.direct_health_before = Get-Status 'http://127.0.0.1:7869/health' 10
+          $result.public_health = Get-Status 'https://epublisher.reson8.life/open-nova-stt/health' 20
+
+          $body = @{ url='https://www.youtube.com/watch?v=jNQXAC9IVRw'; mode='fast' } | ConvertTo-Json -Compress
+          try {
+            $response = Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:7869/transcribe-url' -Method Post -ContentType 'application/json' -Body $body -TimeoutSec 180
+            $payload = $response.Content | ConvertFrom-Json
+            $result.transcription = [ordered]@{ status=[int]$response.StatusCode; ok=([int]$response.StatusCode -eq 200 -and ([string]$payload.text).Length -gt 0); text_length=([string]$payload.text).Length; provider=[string]$payload.quality.provider; video_id=[string]$payload.video_id }
+          } catch {
+            $status = $null
+            if ($_.Exception.Response -and $_.Exception.Response.StatusCode) { $status = [int]$_.Exception.Response.StatusCode }
+            $result.transcription = [ordered]@{ status=$status; ok=$false; detail=$_.Exception.Message }
+          }
+
+          Start-Sleep -Seconds 3
+          $result.direct_health_after = Get-Status 'http://127.0.0.1:7869/health' 10
+          $listener = Get-NetTCPConnection -LocalPort 7869 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
+          $task = Get-ScheduledTask -TaskName 'RONS ePublisher STT' -ErrorAction SilentlyContinue
+          $result.persistent = [ordered]@{ listening=[bool]$listener; task_state=if($task){[string]$task.State}else{'missing'} }
+
+          $runtime = Join-Path $env:USERPROFILE 'Resonance\OpenNova\runtime'
+          $preferred = Join-Path $runtime 'python-envs\epublisher-stt-py311\Scripts\python.exe'
+          $result.python_version = (& $preferred -c "import sys; print(sys.version.split()[0])" | Select-Object -First 1)
+
+          $ok = ([version]$result.python_version -ge [version]'3.11' -and $result.direct_health_before.ok -and $result.public_health.ok -and $result.transcription.ok -and $result.direct_health_after.ok -and $result.persistent.listening)
+          $result.acceptance_ok = [bool]$ok
+          $json = $result | ConvertTo-Json -Depth 8 -Compress
+          "acceptance_json=$($json -replace '%','%25' -replace "`r",'%0D' -replace "`n",'%0A')" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          if (-not $ok) { throw "Python 3.11 STT acceptance failed: $json" }
+
+      - name: Publish migration receipt
+        if: always()
+        uses: actions/github-script@v8
+        env:
+          RESOLVED_VERSION: ${{ steps.resolve.outputs.python_version }}
+          BUILD_JSON: ${{ steps.build.outputs.build_json }}
+          ACTIVE_VERSION: ${{ steps.activate.outputs.active_version }}
+          ACCEPTANCE_JSON: ${{ steps.acceptance.outputs.acceptance_json }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const payload = {
+              resolved_version: process.env.RESOLVED_VERSION || "",
+              build: (() => { try { return JSON.parse(process.env.BUILD_JSON || "{}"); } catch { return {raw: process.env.BUILD_JSON || ""}; } })(),
+              active_version: process.env.ACTIVE_VERSION || "",
+              acceptance: (() => { try { return JSON.parse(process.env.ACCEPTANCE_JSON || "{}"); } catch { return {raw: process.env.ACCEPTANCE_JSON || ""}; } })(),
+            };
+            const body = ["EPUBLISHER_STT_PY311_MIGRATION", "", "SHA: " + context.sha, "", JSON.stringify(payload)].join("\n");
+            await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: 283, body});

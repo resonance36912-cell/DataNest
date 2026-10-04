@@ -1,0 +1,433 @@
+{
+  "schema": "resonance.catalog.services/v1",
+  "generated_at": "2026-10-04T14:01:17.494Z",
+  "items": [
+    {
+      "canonical_id": "urn:resonance:service:datanest-web",
+      "trace_id": "SVC-DN-WEB",
+      "display_name": "DataNest Web",
+      "kind": "web-application",
+      "platform_id": "urn:resonance:platform:datanest",
+      "application_id": "urn:resonance:application:datanest",
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:production"
+      ],
+      "local_endpoint": null,
+      "public_url": null,
+      "visibility": "public",
+      "credential_policy": "no-server-secrets-in-public-assets",
+      "declared_by": "apps/datanest/IMPORT-PENDING.md",
+      "weed_observation": null
+    },
+    {
+      "canonical_id": "urn:resonance:service:hub-web",
+      "trace_id": "SVC-HUB-WEB",
+      "display_name": "Resonance Hub Web",
+      "kind": "web-application",
+      "platform_id": "urn:resonance:platform:resonance",
+      "application_id": "urn:resonance:application:hub",
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:production"
+      ],
+      "local_endpoint": "http://127.0.0.1:4173/",
+      "public_url": "https://reson8.life",
+      "visibility": "public",
+      "credential_policy": "no-server-secrets-in-public-assets",
+      "declared_by": "platform/ronsas/control/ops/ealiophin/cluster/RONSAS-MODULES.json",
+      "weed_observation": {
+        "id": "hub",
+        "url": "http://127.0.0.1:4173/",
+        "status": null,
+        "ms": 2204,
+        "observed": "unreachable"
+      }
+    },
+    {
+      "canonical_id": "urn:resonance:service:epublisher-web",
+      "trace_id": "SVC-EPUB-WEB",
+      "display_name": "ePublisher Web",
+      "kind": "application-service",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "application_id": "urn:resonance:application:epublisher",
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:production"
+      ],
+      "local_endpoint": "http://127.0.0.1:3101/",
+      "public_url": "https://epublisher.reson8.life",
+      "visibility": "public",
+      "credential_policy": "no-server-secrets-in-public-assets",
+      "declared_by": "platform/ronsas/control/ops/ealiophin/cluster/RONSAS-MODULES.json",
+      "weed_observation": {
+        "id": "epublisher",
+        "url": "http://127.0.0.1:3101/",
+        "status": null,
+        "ms": 2037,
+        "observed": "unreachable"
+      }
+    },
+    {
+      "canonical_id": "urn:resonance:service:creative-studio-web",
+      "trace_id": "SVC-CRTV-WEB",
+      "display_name": "Creative Studio Web",
+      "kind": "application-service",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "application_id": "urn:resonance:application:creative-studio",
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:production"
+      ],
+      "local_endpoint": "http://127.0.0.1:3201/studio",
+      "public_url": "https://creative.reson8.life",
+      "visibility": "public",
+      "credential_policy": "no-server-secrets-in-public-assets",
+      "declared_by": "platform/ronsas/control/ops/ealiophin/cluster/RONSAS-MODULES.json",
+      "weed_observation": {
+        "id": "creative-studio",
+        "url": "http://127.0.0.1:3201/studio",
+        "status": null,
+        "ms": 2032,
+        "observed": "unreachable"
+      }
+    },
+    {
+      "canonical_id": "urn:resonance:service:sync-vision-web",
+      "trace_id": "SVC-SYNC-WEB",
+      "display_name": "Sync Vision Web",
+      "kind": "application-service",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "application_id": "urn:resonance:application:sync-vision",
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:production"
+      ],
+      "local_endpoint": "http://127.0.0.1:3301/",
+      "public_url": "https://sync.reson8.life",
+      "visibility": "public",
+      "credential_policy": "no-server-secrets-in-public-assets",
+      "declared_by": "platform/ronsas/control/ops/ealiophin/cluster/RONSAS-MODULES.json",
+      "weed_observation": {
+        "id": "sync-vision",
+        "url": "http://127.0.0.1:3301/",
+        "status": null,
+        "ms": 2041,
+        "observed": "unreachable"
+      }
+    },
+    {
+      "canonical_id": "urn:resonance:service:youtube-optimizer-web",
+      "trace_id": "SVC-YT-WEB",
+      "display_name": "YouTube Optimizer Web",
+      "kind": "application-service",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "application_id": "urn:resonance:application:youtube-optimizer",
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:production"
+      ],
+      "local_endpoint": "http://127.0.0.1:3401/",
+      "public_url": "https://youtube.reson8.life",
+      "visibility": "public",
+      "credential_policy": "no-server-secrets-in-public-assets",
+      "declared_by": "platform/ronsas/control/ops/ealiophin/cluster/RONSAS-MODULES.json",
+      "weed_observation": {
+        "id": "youtube-optimizer",
+        "url": "http://127.0.0.1:3401/",
+        "status": null,
+        "ms": 2027,
+        "observed": "unreachable"
+      }
+    },
+    {
+      "canonical_id": "urn:resonance:service:launch-broker",
+      "trace_id": "SVC-LAUNCH",
+      "display_name": "Launch Broker",
+      "kind": "control-service",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "application_id": null,
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:production"
+      ],
+      "local_endpoint": "http://127.0.0.1:4450/health",
+      "public_url": null,
+      "visibility": "internal",
+      "credential_policy": "server-side-only",
+      "declared_by": "platform/ronsas/control/ops/ealiophin/cluster/RONSAS-MODULES.json",
+      "weed_observation": {
+        "id": "launch-broker",
+        "url": "http://127.0.0.1:4450/health",
+        "status": null,
+        "ms": 2034,
+        "observed": "unreachable"
+      }
+    },
+    {
+      "canonical_id": "urn:resonance:service:musetalk-bridge",
+      "trace_id": "SVC-MUSE",
+      "display_name": "MuseTalk Bridge",
+      "kind": "media-service",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "application_id": null,
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:production"
+      ],
+      "local_endpoint": "http://127.0.0.1:7863/health",
+      "public_url": null,
+      "visibility": "internal",
+      "credential_policy": "server-side-only",
+      "declared_by": "platform/ronsas/control/ops/ealiophin/cluster/RONSAS-MODULES.json",
+      "weed_observation": {
+        "id": "musetalk-bridge",
+        "url": "http://127.0.0.1:7863/health",
+        "status": null,
+        "ms": 2049,
+        "observed": "unreachable"
+      }
+    },
+    {
+      "canonical_id": "urn:resonance:service:local-stt",
+      "trace_id": "SVC-STT",
+      "display_name": "Local Speech-to-Text",
+      "kind": "ai-service",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "application_id": null,
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:production"
+      ],
+      "local_endpoint": "http://127.0.0.1:7864/health",
+      "public_url": null,
+      "visibility": "internal",
+      "credential_policy": "server-side-only",
+      "declared_by": "platform/ronsas/control/ops/ealiophin/cluster/RONSAS-MODULES.json",
+      "weed_observation": {
+        "id": "local-stt",
+        "url": "http://127.0.0.1:7864/health",
+        "status": null,
+        "ms": 2031,
+        "observed": "unreachable"
+      }
+    },
+    {
+      "canonical_id": "urn:resonance:service:local-image",
+      "trace_id": "SVC-IMG",
+      "display_name": "Local Image",
+      "kind": "ai-service",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "application_id": null,
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:production"
+      ],
+      "local_endpoint": "http://127.0.0.1:7865/health",
+      "public_url": null,
+      "visibility": "internal",
+      "credential_policy": "server-side-only",
+      "declared_by": "platform/ronsas/control/ops/ealiophin/cluster/RONSAS-MODULES.json",
+      "weed_observation": {
+        "id": "local-image",
+        "url": "http://127.0.0.1:7865/health",
+        "status": null,
+        "ms": 2041,
+        "observed": "unreachable"
+      }
+    },
+    {
+      "canonical_id": "urn:resonance:service:local-llm",
+      "trace_id": "SVC-LLM",
+      "display_name": "Local LLM",
+      "kind": "ai-service",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "application_id": null,
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:production"
+      ],
+      "local_endpoint": "http://127.0.0.1:7866/health",
+      "public_url": null,
+      "visibility": "internal",
+      "credential_policy": "server-side-only",
+      "declared_by": "platform/ronsas/control/ops/ealiophin/cluster/RONSAS-MODULES.json",
+      "weed_observation": {
+        "id": "local-llm",
+        "url": "http://127.0.0.1:7866/health",
+        "status": null,
+        "ms": 2032,
+        "observed": "unreachable"
+      }
+    },
+    {
+      "canonical_id": "urn:resonance:service:creative-source",
+      "trace_id": "SVC-CSRC",
+      "display_name": "Creative Source",
+      "kind": "content-service",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "application_id": null,
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:production"
+      ],
+      "local_endpoint": "http://127.0.0.1:7867/health",
+      "public_url": null,
+      "visibility": "internal",
+      "credential_policy": "server-side-only",
+      "declared_by": "platform/ronsas/control/ops/ealiophin/cluster/RONSAS-MODULES.json",
+      "weed_observation": {
+        "id": "creative-source",
+        "url": "http://127.0.0.1:7867/health",
+        "status": null,
+        "ms": 2026,
+        "observed": "unreachable"
+      }
+    },
+    {
+      "canonical_id": "urn:resonance:service:ai-broker",
+      "trace_id": "SVC-AIB",
+      "display_name": "AI Broker",
+      "kind": "ai-governance-service",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "application_id": null,
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:production"
+      ],
+      "local_endpoint": "http://127.0.0.1:7868/health",
+      "public_url": null,
+      "visibility": "internal",
+      "credential_policy": "server-side-only",
+      "declared_by": "platform/ronsas/control/ops/ealiophin/cluster/RONSAS-MODULES.json",
+      "weed_observation": {
+        "id": "ai-broker",
+        "url": "http://127.0.0.1:7868/health",
+        "status": null,
+        "ms": 2057,
+        "observed": "unreachable"
+      }
+    },
+    {
+      "canonical_id": "urn:resonance:service:epublisher-stt",
+      "trace_id": "SVC-EPUB-STT",
+      "display_name": "ePublisher Speech-to-Text",
+      "kind": "ai-service",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "application_id": null,
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:production"
+      ],
+      "local_endpoint": "http://127.0.0.1:7869/health",
+      "public_url": null,
+      "visibility": "internal",
+      "credential_policy": "server-side-only",
+      "declared_by": "platform/ronsas/control/ops/ealiophin/cluster/RONSAS-MODULES.json",
+      "weed_observation": {
+        "id": "epublisher-stt",
+        "url": "http://127.0.0.1:7869/health",
+        "status": null,
+        "ms": 2042,
+        "observed": "unreachable"
+      }
+    },
+    {
+      "canonical_id": "urn:resonance:service:premium-image",
+      "trace_id": "SVC-PIMG",
+      "display_name": "Premium ePublisher Image",
+      "kind": "ai-service",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "application_id": null,
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:production"
+      ],
+      "local_endpoint": "http://127.0.0.1:7870/health",
+      "public_url": null,
+      "visibility": "internal",
+      "credential_policy": "server-side-only",
+      "declared_by": "platform/ronsas/control/ops/ealiophin/cluster/RONSAS-MODULES.json",
+      "weed_observation": {
+        "id": "premium-image",
+        "url": "http://127.0.0.1:7870/health",
+        "status": null,
+        "ms": 2037,
+        "observed": "unreachable"
+      }
+    },
+    {
+      "canonical_id": "urn:resonance:service:foundry",
+      "trace_id": "SVC-FNDRY",
+      "display_name": "Foundry",
+      "kind": "development-service",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "application_id": null,
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:research-and-development",
+        "urn:resonance:environment:staging"
+      ],
+      "local_endpoint": "http://127.0.0.1:8787/v1/apps",
+      "public_url": null,
+      "visibility": "internal",
+      "credential_policy": "server-side-only",
+      "declared_by": "platform/ronsas/control/ops/ealiophin/cluster/RONSAS-MODULES.json",
+      "weed_observation": {
+        "id": "foundry",
+        "url": "http://127.0.0.1:8787/v1/apps",
+        "status": null,
+        "ms": 2024,
+        "observed": "unreachable"
+      }
+    },
+    {
+      "canonical_id": "urn:resonance:service:sovereign-backend",
+      "trace_id": "SVC-BACK",
+      "display_name": "Sovereign Backend",
+      "kind": "data-service",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "application_id": null,
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:production"
+      ],
+      "local_endpoint": "http://127.0.0.1:8787/v1/backend/health",
+      "public_url": null,
+      "visibility": "internal",
+      "credential_policy": "server-side-only",
+      "declared_by": "platform/ronsas/control/ops/ealiophin/cluster/RONSAS-MODULES.json",
+      "weed_observation": {
+        "id": "sovereign-backend",
+        "url": "http://127.0.0.1:8787/v1/backend/health",
+        "status": null,
+        "ms": 2036,
+        "observed": "unreachable"
+      }
+    },
+    {
+      "canonical_id": "urn:resonance:service:ollama",
+      "trace_id": "SVC-OLLAMA",
+      "display_name": "Ollama Runtime",
+      "kind": "local-model-runtime",
+      "platform_id": "urn:resonance:platform:ronsas",
+      "application_id": null,
+      "runtime_authority_node_id": "urn:resonance:node:ealiophin",
+      "environment_ids": [
+        "urn:resonance:environment:production"
+      ],
+      "local_endpoint": "http://127.0.0.1:11434/",
+      "public_url": null,
+      "visibility": "internal",
+      "credential_policy": "server-side-only",
+      "declared_by": "platform/ronsas/control/ops/ealiophin/cluster/RONSAS-MODULES.json",
+      "weed_observation": {
+        "id": "ollama",
+        "url": "http://127.0.0.1:11434/",
+        "status": null,
+        "ms": 2056,
+        "observed": "unreachable"
+      }
+    }
+  ]
+}

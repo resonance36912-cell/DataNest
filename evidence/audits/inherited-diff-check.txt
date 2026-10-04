@@ -1,0 +1,42 @@
+﻿# Inherited source whitespace exceptions
+# Captured during initial canonical staging preflight on 2026-10-04.
+# These originate in preserved imported snapshots and are not auto-normalized before authority reconciliation.
+# git diff --cached --check exit=2
+
+apps/hub/.github/workflows/dependabot-sync.yml:517: new blank line at EOF.
+apps/hub/.github/workflows/verify-checkout-links.yml:37: new blank line at EOF.
+apps/hub/scripts/check-prices.ts:243: new blank line at EOF.
+apps/hub/scripts/lib/ci-health-auth.test.ts:134: new blank line at EOF.
+apps/hub/scripts/smoke-hub-routes.ts:118: new blank line at EOF.
+apps/hub/src/integrations/supabase/auth-middleware.ts:11: trailing whitespace.
++    
+apps/hub/src/integrations/supabase/auth-middleware.ts:24: trailing whitespace.
++    
+apps/hub/src/integrations/supabase/client.ts:40: new blank line at EOF.
+apps/hub/src/lib/checkout.functions.ts:263: new blank line at EOF.
+apps/hub/src/lib/rop/ingest-schemas.ts:99: new blank line at EOF.
+apps/hub/src/routes/account.subscriptions.tsx:643: new blank line at EOF.
+apps/hub/src/routes/api/public/updates/rss.ts:227: new blank line at EOF.
+platform/open-nova/README-SOVEREIGN.md:3: trailing whitespace.
++**Release:** `1.5.5-oneclick1`  
+platform/open-nova/README-SOVEREIGN.md:4: trailing whitespace.
++**Mode:** `zero-credit`  
+platform/open-nova/README-SOVEREIGN.md:5: trailing whitespace.
++**External AI default:** denied  
+platform/open-nova/foundry_controller/app/main.py:1664: new blank line at EOF.
+platform/ronsas/control/ops/ealiophin/README.md:43: new blank line at EOF.
+platform/ronsas/control/ops/ealiophin/cluster/PROMOTE-RONSAS-HUB.ps1:205: new blank line at EOF.
+platform/ronsas/control/ops/ealiophin/runtime/rons-local-llm-service.py:98: new blank line at EOF.
+platform/ronsas/control/recovered-integrations/ui-backup/src/components/steps/StoryboardStep.tsx:152: trailing whitespace.
++  
+platform/ronsas/control/recovered-integrations/ui-backup/src/components/steps/StoryboardStep.tsx:794: trailing whitespace.
++          
+platform/ronsas/control/recovered-integrations/ui-backup/src/components/steps/StoryboardStep.tsx:1072: trailing whitespace.
++                
+platform/ronsas/reconciliation/control-overlay/.github/workflows/dependabot-sync.yml:518: new blank line at EOF.
+platform/ronsas/reconciliation/control-overlay/.github/workflows/verify-checkout-links.yml:42: new blank line at EOF.
+platform/ronsas/reconciliation/control-overlay/src/integrations/supabase/auth-middleware.ts:11: trailing whitespace.
++    
+platform/ronsas/reconciliation/control-overlay/src/integrations/supabase/auth-middleware.ts:24: trailing whitespace.
++    
+platform/ronsas/reconciliation/control-overlay/src/integrations/supabase/client.ts:40: new blank line at EOF.

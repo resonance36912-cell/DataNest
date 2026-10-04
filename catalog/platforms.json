@@ -1,0 +1,38 @@
+{
+  "schema": "resonance.catalog.platforms/v1",
+  "generated_at": "2026-10-04T14:01:17.494Z",
+  "items": [
+    {
+      "canonical_id": "urn:resonance:platform:resonance",
+      "trace_id": "PLT-RES",
+      "display_name": "Resonance",
+      "kind": "ecosystem-orchestration",
+      "parent_id": null,
+      "lifecycle": "active"
+    },
+    {
+      "canonical_id": "urn:resonance:platform:datanest",
+      "trace_id": "PLT-DN",
+      "display_name": "DataNest",
+      "kind": "governance-knowledge-control",
+      "parent_id": "urn:resonance:platform:resonance",
+      "lifecycle": "migration-pending"
+    },
+    {
+      "canonical_id": "urn:resonance:platform:ronsas",
+      "trace_id": "PLT-RS",
+      "display_name": "RONSAS",
+      "kind": "sovereign-runtime-control",
+      "parent_id": "urn:resonance:platform:resonance",
+      "lifecycle": "active"
+    },
+    {
+      "canonical_id": "urn:resonance:platform:open-nova",
+      "trace_id": "PLT-ON",
+      "display_name": "Open Nova",
+      "kind": "provider-neutral-development",
+      "parent_id": "urn:resonance:platform:resonance",
+      "lifecycle": "active"
+    }
+  ]
+}

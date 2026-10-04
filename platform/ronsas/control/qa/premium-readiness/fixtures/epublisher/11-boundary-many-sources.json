@@ -1,0 +1,60 @@
+{
+  "schema": "ronsas.premium-fixture.v1",
+  "id": "epublisher-boundary-05-many-sources",
+  "app": "epublisher",
+  "category": "boundary",
+  "review_status": "source-derived-reviewed",
+  "review_basis": "Mapped to existing app source/tests and checked against the premium-readiness required_checks manifest on 2026-09-19.",
+  "input": {
+    "title": "Source Dense",
+    "source_notes": [
+      "Source note 1",
+      "Source note 2",
+      "Source note 3",
+      "Source note 4",
+      "Source note 5",
+      "Source note 6",
+      "Source note 7",
+      "Source note 8",
+      "Source note 9",
+      "Source note 10",
+      "Source note 11",
+      "Source note 12",
+      "Source note 13",
+      "Source note 14",
+      "Source note 15",
+      "Source note 16",
+      "Source note 17",
+      "Source note 18",
+      "Source note 19",
+      "Source note 20",
+      "Source note 21",
+      "Source note 22",
+      "Source note 23",
+      "Source note 24",
+      "Source note 25"
+    ]
+  },
+  "expected_checks": [
+    "source-fidelity",
+    "toc-navigation",
+    "narration-fidelity",
+    "export-reopen",
+    "epubcheck-when-epub"
+  ],
+  "provenance": [
+    "src/lib/__tests__/book-structure.test.ts",
+    "src/lib/__tests__/canonical-storyboard.test.ts",
+    "src/lib/__tests__/chapter-source-notes.test.ts",
+    "src/lib/__tests__/publication-readiness.test.ts",
+    "src/lib/__tests__/research-source-quality.test.ts",
+    "tests/e2e/export-matrix.spec.ts",
+    "tests/e2e/narration-gating.spec.ts"
+  ],
+  "critical_failure_classes": [
+    "cross-account-access",
+    "incorrect-billing",
+    "unusable-paid-artifact",
+    "fabricated-source-attribution"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "schema": "ronsas.premium-fixture.v1",
+  "id": "creative-studio-normal-03-event-flyer",
+  "app": "creative-studio",
+  "category": "normal",
+  "review_status": "source-derived-reviewed",
+  "review_basis": "Mapped to existing app source/tests and checked against the premium-readiness required_checks manifest on 2026-09-19.",
+  "input": {
+    "event": "Creator Workshop",
+    "date": "2026-10-10",
+    "venue": "Cape Town",
+    "format": "A4 portrait"
+  },
+  "expected_checks": [
+    "copy-fidelity",
+    "price-fidelity",
+    "product-preservation",
+    "declared-dimensions",
+    "typography",
+    "brand-consistency",
+    "downloadable-assets"
+  ],
+  "provenance": [
+    "src/lib/posterPrompt.ts",
+    "src/lib/promptPresets.ts",
+    "src/test/provider-cards.test.tsx",
+    "src/test/share-parity.test.tsx"
+  ],
+  "critical_failure_classes": [
+    "unusable-paid-artifact",
+    "incorrect-billing"
+  ]
+}

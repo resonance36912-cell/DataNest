@@ -1,0 +1,48 @@
+name: Recover YouTube Optimizer spoke
+# governed execution trigger: 2026-09-20 edge recovery
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ops/release-requests/youtube-optimizer-recovery.json"
+      - "ops/ealiophin/edge/RECOVER-YOUTUBE-PUBLIC-EDGE.ps1"
+      - ".github/workflows/recover-youtube-optimizer.yml"
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: ronsas-youtube-optimizer-recovery
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    runs-on: [self-hosted, Windows, X64, ronsas, ealiophin, production-host]
+    timeout-minutes: 12
+    steps:
+      - name: Check out RONSAS control authority
+        uses: actions/checkout@v4
+
+      - name: Recover governed YouTube public edge
+        id: recover
+        shell: powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((Get-Content -Raw '{0}')))"
+        run: |
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\ops\ealiophin\edge\RECOVER-YOUTUBE-PUBLIC-EDGE.ps1" -RequestPath ".\ops\release-requests\youtube-optimizer-recovery.json"
+          if($LASTEXITCODE){throw "YouTube public-edge recovery failed with exit code $LASTEXITCODE"}
+
+      - name: Publish YouTube recovery outcome
+        if: always()
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const outcome = "${{ steps.recover.outcome }}";
+            const body = `YOUTUBE_EDGE_RECOVERY: ${outcome} run=${context.runId} sha=${context.sha}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: 182,
+              body,
+            });

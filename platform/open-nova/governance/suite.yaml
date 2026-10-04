@@ -1,0 +1,27 @@
+version: "0.7"
+name: Resonance Sovereign App Suite
+apps:
+  - app_id: reson8-life
+    display_name: reson8.life
+    public_url: https://reson8.life
+    migration_aliases: [reson8.life, reson8-life, resonance-hub]
+  - app_id: resonanceonline-life
+    display_name: resonanceonline.life
+    public_url: https://resonanceonline.life
+    migration_aliases: [resonanceonline.life, resonanceonline-life]
+  - app_id: creative-studio
+    display_name: Creative Studio
+    public_url: https://creativestudio.life
+    migration_aliases: [creative-studio, creativestudio.life]
+  - app_id: lyricsync-studio
+    display_name: LyricSync Studio
+    migration_aliases: [lyricsync-studio, lyric-sync-studio]
+  - app_id: youtube-optimizer
+    display_name: YouTube Optimizer
+    migration_aliases: [youtube-optimizer]
+  - app_id: scene-song-spark
+    display_name: Scene Song Spark
+    migration_aliases: [scene-song-spark]
+  - app_id: sovereignforge
+    display_name: SovereignForge
+    migration_aliases: [sovereignforge, resonance-sovereign-forge]

@@ -1,0 +1,45 @@
+{
+  "schema": "resonance-open-nova-release/v1",
+  "release": "1.5.5-oneclick1",
+  "version": "1.5.5-oneclick1",
+  "name": "Resonance Open Nova Sovereign Handoff v1.5.5",
+  "milestone": "Zero-Extraction Windows One-Click Handoff",
+  "previous": "1.5.4-hotfix1",
+  "mode": "zero-credit",
+  "external_ai_default": "denied",
+  "production_cutover_automatic": false,
+  "provisioning": {
+    "network_downloads_silent": false,
+    "one_time_network_provisioning_requires_explicit_flag": true,
+    "ai_model_downloaded": false,
+    "runtime_install_uses_local_wheelhouse": true,
+    "wheelhouse_sha256_recorded": true
+  },
+  "windows_handoff": {
+    "manual_extract_all_required": false,
+    "zip_view_launcher_supported": true,
+    "common_download_locations_scanned": true,
+    "file_picker_fallback": true,
+    "manifest_verified_before_launch": true,
+    "existing_installation_preserved": true
+  },
+  "core_flow": [
+    "zero_extraction_start",
+    "temporary_staging",
+    "build_manifest_verification",
+    "verified_local_installation",
+    "explicit_one_time_provisioning_if_needed",
+    "strict_offline_normal_runtime",
+    "real_local_repository_execution",
+    "source_free_evidence_packaging"
+  ],
+  "build_validation": {
+    "pytest_minimum_expected": 163,
+    "python_compile": true,
+    "runtime_containers_started_in_build_environment": false,
+    "operational_sovereignty_claimed": false,
+    "real_application_source_present_in_build_environment": false,
+    "real_application_cutover_claimed": false,
+    "github_repository_visibility_required_for_local_execution": false
+  }
+}

@@ -1,0 +1,39 @@
+name: Verify governance database runtime
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+      - "scripts/verify-governance-bootstrap.sql"
+      - "scripts/verify-governance-db.sql"
+      - "scripts/verify-governance-runtime.py"
+      - ".github/workflows/verify-governance-db.yml"
+      - "src/lib/governance/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-governance-db-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  governance-db-runtime:
+    name: Supabase governance migration + RPC runtime
+    runs-on: [self-hosted, Linux, X64, ronsas, ealiophin]
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Verify sovereign runner Python 3.12
+        run: |
+          python --version
+          python -c 'import sys; assert sys.version_info[:2] == (3, 12), sys.version'
+
+      - name: Verify governance migrations on sovereign PostgreSQL 17
+        env:
+          PODMAN_API_URL: http://ronsas-podman-api:2375
+        run: python scripts/verify-governance-runtime.py

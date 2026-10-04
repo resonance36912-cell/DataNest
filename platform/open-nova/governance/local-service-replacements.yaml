@@ -1,0 +1,30 @@
+version: "0.7"
+replacements:
+  lovable:
+    target: Resonance Open Nova Sovereign App Factory
+    class: builder
+    strategy: import portable source, remove Lovable-only runtime assumptions, build locally
+  supabase-hosted:
+    target: Sovereign Service Fabric (Postgres/Auth/Storage/Gateway)
+    class: backend
+    strategy: preserve PostgreSQL-compatible schema and replace hosted endpoints with local service configuration
+  firebase:
+    target: Sovereign Service Fabric (Postgres/Auth/Storage/Gateway)
+    class: backend
+    strategy: migrate data contracts first, then replace Firebase-specific client calls behind provider interfaces
+  vercel:
+    target: Sovereign Service Fabric gateway + local OCI runtime
+    class: deployment
+    strategy: replace platform-specific deployment metadata with portable container/runtime manifests
+  netlify:
+    target: Sovereign Service Fabric gateway + local OCI runtime
+    class: deployment
+    strategy: replace platform-specific deployment metadata with portable container/runtime manifests
+  openai-api:
+    target: Local Ollama provider adapter
+    class: ai
+    strategy: route model calls through the Resonance provider interface; external escalation remains disabled by default
+  anthropic-api:
+    target: Local Ollama provider adapter
+    class: ai
+    strategy: route model calls through the Resonance provider interface; external escalation remains disabled by default

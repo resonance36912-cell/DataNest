@@ -1,0 +1,8 @@
+{
+  "schema": "resonance.public-environment/v1",
+  "environment_id": "urn:resonance:environment:migration-staging",
+  "trace_id": "ENV-MIG",
+  "node_authority_id": "urn:resonance:node:ealiophin",
+  "deployed": false,
+  "generated_at": "2026-10-04T14:01:17.494Z"
+}

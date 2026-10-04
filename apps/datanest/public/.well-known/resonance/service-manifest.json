@@ -1,0 +1,11 @@
+{
+  "schema": "resonance.public-service/v1",
+  "generated_at": "2026-10-04T14:01:17.494Z",
+  "application_id": "urn:resonance:application:datanest",
+  "service_id": "urn:resonance:service:datanest-web",
+  "trace_id": "SVC-DN-WEB",
+  "environment_id": "urn:resonance:environment:migration-staging",
+  "authority_state": "source-import-pending",
+  "public_safe": true,
+  "secret_material_permitted": false
+}

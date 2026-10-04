@@ -1,0 +1,84 @@
+{
+  "schema": "resonance.public-assets/v1",
+  "generated_at": "2026-10-04T14:01:17.494Z",
+  "application_id": "urn:resonance:application:datanest",
+  "items": [
+    {
+      "canonical_id": "urn:resonance:public-asset:datanest:well-known-resonance-environment-json",
+      "trace_id": "PUB-DN-WELL_KNOWN_RESONANCE_ENVIRONMENT_JSON",
+      "application_id": "urn:resonance:application:datanest",
+      "path": "apps/datanest/public/.well-known/resonance/environment.json",
+      "sha256": "5a84a1820d53c7cf57a32127ede9b8ce7b507d0c8f09800e0b3fc1a876caf896",
+      "media_type": "application/json",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:datanest:well-known-resonance-release-json",
+      "trace_id": "PUB-DN-WELL_KNOWN_RESONANCE_RELEASE_JSON",
+      "application_id": "urn:resonance:application:datanest",
+      "path": "apps/datanest/public/.well-known/resonance/release.json",
+      "sha256": "e36f27122f1b35aad868cd73eced3e4aa4a4d5355da422a44346506f02f30036",
+      "media_type": "application/json",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:datanest:well-known-resonance-service-manifest-json",
+      "trace_id": "PUB-DN-WELL_KNOWN_RESONANCE_SERVICE_MANIFEST_JSON",
+      "application_id": "urn:resonance:application:datanest",
+      "path": "apps/datanest/public/.well-known/resonance/service-manifest.json",
+      "sha256": "d363bb4cc520bf979b7fb6026e9eb126617af8722eb71d6bf75aa32db480ba26",
+      "media_type": "application/json",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:datanest:release-manifest-json",
+      "trace_id": "PUB-DN-RELEASE_MANIFEST_JSON",
+      "application_id": "urn:resonance:application:datanest",
+      "path": "apps/datanest/public/release-manifest.json",
+      "sha256": null,
+      "media_type": "application/json",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "import-pending"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:datanest:runtime-config-js",
+      "trace_id": "PUB-DN-RUNTIME_CONFIG_JS",
+      "application_id": "urn:resonance:application:datanest",
+      "path": "apps/datanest/public/runtime-config.js",
+      "sha256": null,
+      "media_type": "text/javascript",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "import-pending"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:datanest:health-json",
+      "trace_id": "PUB-DN-HEALTH_JSON",
+      "application_id": "urn:resonance:application:datanest",
+      "path": "apps/datanest/public/health.json",
+      "sha256": null,
+      "media_type": "application/json",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "import-pending"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:datanest:transparency-audits-index-json",
+      "trace_id": "PUB-DN-TRANSPARENCY_AUDITS_INDEX_JSON",
+      "application_id": "urn:resonance:application:datanest",
+      "path": "apps/datanest/public/transparency/audits/index.json",
+      "sha256": null,
+      "media_type": "application/json",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "import-pending"
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+﻿ {
+	admin 127.0.0.1:2029
+	auto_https off
+}
+
+(common_security) {
+	encode zstd gzip
+	header X-Content-Type-Options "nosniff"
+	header X-Frame-Options "DENY"
+	header Referrer-Policy "strict-origin-when-cross-origin"
+	header Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	header Strict-Transport-Security "max-age=31536000"
+}
+
+:8800 {
+	bind 127.0.0.1
+	import common_security
+	@internal path /admin* /mcp* /.mcp* /.well-known/oauth-protected-resource* /.lovable* /lovable/email*
+	respond @internal 404
+	reverse_proxy 127.0.0.1:4173 {
+		header_up Host reson8.life
+		header_up X-Forwarded-Host reson8.life
+		header_up X-Forwarded-Proto https
+	}
+}
+
+:8801 {
+	bind 127.0.0.1
+	import common_security
+	handle /_rons/* {
+		reverse_proxy 127.0.0.1:4450 {
+			header_up X-RONS-App epublisher
+			header_up X-Forwarded-Proto https
+		}
+	}
+	# Same-origin sovereign service routes must precede the SPA/static fallback.
+	# Backends remain loopback-only; the edge translates the public browser origin
+	# to the governed localhost ePublisher origin expected by each service.
+	handle_path /open-nova-research/* {
+		reverse_proxy 127.0.0.1:8787 {
+			# Research service independently enforces a loopback Host header.
+			header_up Host 127.0.0.1:8787
+			header_up Origin http://localhost:3101
+		}
+	}
+	handle_path /open-nova-stt/* {
+		reverse_proxy 127.0.0.1:7869 127.0.0.1:7864 {
+			lb_policy first
+			lb_try_duration 2s
+			lb_try_interval 250ms
+			header_up Origin http://localhost:3101
+		}
+	}
+	handle_path /open-nova-image/* {
+		reverse_proxy 127.0.0.1:7870 {
+			header_up Origin http://localhost:3101
+		}
+	}
+	handle_path /open-nova-ai/* {
+		reverse_proxy 127.0.0.1:7868 {
+			header_up Origin http://localhost:3101
+		}
+	}
+	handle {
+		# Emergency production cutover 2026-09-22: preserve the Ealiophin
+		# Cloudflare tunnel, session bridge, and sovereign service routes while
+		# sourcing only the ePublisher SPA/root from the verified Railway fallback.
+		reverse_proxy https://epublisher-fallback-production.up.railway.app {
+			header_up Host epublisher-fallback-production.up.railway.app
+			header_up X-Forwarded-Host epublisher.reson8.life
+			header_up X-Forwarded-Proto https
+		}
+	}
+}
+
+:8802 {
+	bind 127.0.0.1
+	import common_security
+	handle /_rons/* {
+		reverse_proxy 127.0.0.1:4450 {
+			header_up X-RONS-App creative_studio
+			header_up X-Forwarded-Proto https
+		}
+	}
+	handle {
+		reverse_proxy 127.0.0.1:3201 {
+			header_up Host 127.0.0.1:3201
+			header_up X-Forwarded-Host creative.reson8.life
+			header_up X-Forwarded-Proto https
+		}
+	}
+}
+
+:8803 {
+	bind 127.0.0.1
+	import common_security
+	handle /_rons/* {
+		reverse_proxy 127.0.0.1:4450 {
+			header_up X-RONS-App sync_vision
+			header_up X-Forwarded-Proto https
+		}
+	}
+	handle {
+		reverse_proxy 127.0.0.1:3301 {
+			header_up Host 127.0.0.1:3301
+			header_up X-Forwarded-Host sync.reson8.life
+			header_up X-Forwarded-Proto https
+		}
+	}
+}
+
+:8804 {
+	bind 127.0.0.1
+	import common_security
+	handle /_rons/* {
+		reverse_proxy 127.0.0.1:4450 {
+			header_up X-RONS-App youtube_optimizer
+			header_up X-Forwarded-Proto https
+		}
+	}
+	handle {
+		reverse_proxy 127.0.0.1:3401 {
+			header_up Host 127.0.0.1:3401
+			header_up X-Forwarded-Host youtube.reson8.life
+			header_up X-Forwarded-Proto https
+		}
+	}
+}

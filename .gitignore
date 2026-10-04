@@ -1,0 +1,47 @@
+# Dependencies and generated build output
+node_modules/
+.next/
+.output/
+.output-*/
+dist/
+build/
+coverage/
+.cache/
+reports/
+.lighthouseci/
+
+# Local/runtime state
+runtime/secrets/**
+!runtime/secrets/.gitkeep
+**/runtime/secrets/**
+**/.ronsas/state/**
+*.log
+*.pid
+
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+id_rsa*
+*.pfx
+*.p12
+
+# Recovery archives stay outside canonical Git history
+*.bundle
+*.zip
+*.7z
+*.tar
+*.gz
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Temporary migration material
+*.tmp
+*.bak

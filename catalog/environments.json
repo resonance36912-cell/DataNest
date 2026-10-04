@@ -1,0 +1,48 @@
+{
+  "schema": "resonance.catalog.environments/v1",
+  "generated_at": "2026-10-04T14:01:17.494Z",
+  "items": [
+    {
+      "canonical_id": "urn:resonance:environment:development",
+      "trace_id": "ENV-DEV",
+      "display_name": "Development",
+      "lifecycle": "persistent"
+    },
+    {
+      "canonical_id": "urn:resonance:environment:research-and-development",
+      "trace_id": "ENV-RND",
+      "display_name": "R&D",
+      "lifecycle": "persistent"
+    },
+    {
+      "canonical_id": "urn:resonance:environment:test",
+      "trace_id": "ENV-TST",
+      "display_name": "Controlled Test",
+      "lifecycle": "persistent"
+    },
+    {
+      "canonical_id": "urn:resonance:environment:staging",
+      "trace_id": "ENV-STG",
+      "display_name": "Staging / Certification",
+      "lifecycle": "persistent"
+    },
+    {
+      "canonical_id": "urn:resonance:environment:production",
+      "trace_id": "ENV-PRD",
+      "display_name": "Production",
+      "lifecycle": "persistent"
+    },
+    {
+      "canonical_id": "urn:resonance:environment:disaster-recovery",
+      "trace_id": "ENV-DR",
+      "display_name": "Disaster Recovery / Compatibility Recovery",
+      "lifecycle": "persistent"
+    },
+    {
+      "canonical_id": "urn:resonance:environment:migration-staging",
+      "trace_id": "ENV-MIG",
+      "display_name": "Migration Staging",
+      "lifecycle": "temporary"
+    }
+  ]
+}

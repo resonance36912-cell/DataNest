@@ -1,0 +1,121 @@
+﻿[
+    {
+        "id":  "hub",
+        "url":  "http://127.0.0.1:4173/",
+        "status":  null,
+        "ms":  2204,
+        "observed":  "unreachable"
+    },
+    {
+        "id":  "epublisher",
+        "url":  "http://127.0.0.1:3101/",
+        "status":  null,
+        "ms":  2037,
+        "observed":  "unreachable"
+    },
+    {
+        "id":  "creative-studio",
+        "url":  "http://127.0.0.1:3201/studio",
+        "status":  null,
+        "ms":  2032,
+        "observed":  "unreachable"
+    },
+    {
+        "id":  "sync-vision",
+        "url":  "http://127.0.0.1:3301/",
+        "status":  null,
+        "ms":  2041,
+        "observed":  "unreachable"
+    },
+    {
+        "id":  "youtube-optimizer",
+        "url":  "http://127.0.0.1:3401/",
+        "status":  null,
+        "ms":  2027,
+        "observed":  "unreachable"
+    },
+    {
+        "id":  "launch-broker",
+        "url":  "http://127.0.0.1:4450/health",
+        "status":  null,
+        "ms":  2034,
+        "observed":  "unreachable"
+    },
+    {
+        "id":  "musetalk-bridge",
+        "url":  "http://127.0.0.1:7863/health",
+        "status":  null,
+        "ms":  2049,
+        "observed":  "unreachable"
+    },
+    {
+        "id":  "local-stt",
+        "url":  "http://127.0.0.1:7864/health",
+        "status":  null,
+        "ms":  2031,
+        "observed":  "unreachable"
+    },
+    {
+        "id":  "local-image",
+        "url":  "http://127.0.0.1:7865/health",
+        "status":  null,
+        "ms":  2041,
+        "observed":  "unreachable"
+    },
+    {
+        "id":  "local-llm",
+        "url":  "http://127.0.0.1:7866/health",
+        "status":  null,
+        "ms":  2032,
+        "observed":  "unreachable"
+    },
+    {
+        "id":  "creative-source",
+        "url":  "http://127.0.0.1:7867/health",
+        "status":  null,
+        "ms":  2026,
+        "observed":  "unreachable"
+    },
+    {
+        "id":  "ai-broker",
+        "url":  "http://127.0.0.1:7868/health",
+        "status":  null,
+        "ms":  2057,
+        "observed":  "unreachable"
+    },
+    {
+        "id":  "epublisher-stt",
+        "url":  "http://127.0.0.1:7869/health",
+        "status":  null,
+        "ms":  2042,
+        "observed":  "unreachable"
+    },
+    {
+        "id":  "premium-image",
+        "url":  "http://127.0.0.1:7870/health",
+        "status":  null,
+        "ms":  2037,
+        "observed":  "unreachable"
+    },
+    {
+        "id":  "foundry",
+        "url":  "http://127.0.0.1:8787/v1/apps",
+        "status":  null,
+        "ms":  2024,
+        "observed":  "unreachable"
+    },
+    {
+        "id":  "sovereign-backend",
+        "url":  "http://127.0.0.1:8787/v1/backend/health",
+        "status":  null,
+        "ms":  2036,
+        "observed":  "unreachable"
+    },
+    {
+        "id":  "ollama",
+        "url":  "http://127.0.0.1:11434/",
+        "status":  null,
+        "ms":  2056,
+        "observed":  "unreachable"
+    }
+]

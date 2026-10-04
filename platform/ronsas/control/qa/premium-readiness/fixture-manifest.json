@@ -1,0 +1,98 @@
+{
+  "schema": "ronsas.premium-readiness-fixture-manifest.v1",
+  "minimum_representative_fixtures_per_generative_app": 30,
+  "repeat_runs_per_generative_case": 3,
+  "representative_categories": [
+    "normal",
+    "boundary",
+    "malformed",
+    "multilingual",
+    "ambiguous"
+  ],
+  "apps": [
+    {
+      "id": "epublisher",
+      "generative": true,
+      "minimum_fixtures": 30,
+      "fixture_directory": "qa/premium-readiness/fixtures/epublisher",
+      "required_checks": [
+        "source-fidelity",
+        "toc-navigation",
+        "narration-fidelity",
+        "export-reopen",
+        "epubcheck-when-epub"
+      ]
+    },
+    {
+      "id": "creative-studio",
+      "generative": true,
+      "minimum_fixtures": 30,
+      "fixture_directory": "qa/premium-readiness/fixtures/creative-studio",
+      "required_checks": [
+        "copy-fidelity",
+        "price-fidelity",
+        "product-preservation",
+        "declared-dimensions",
+        "typography",
+        "brand-consistency",
+        "downloadable-assets"
+      ]
+    },
+    {
+      "id": "sync-vision",
+      "generative": true,
+      "minimum_fixtures": 30,
+      "fixture_directory": "qa/premium-readiness/fixtures/sync-vision",
+      "required_checks": [
+        "audio-timing",
+        "character-continuity",
+        "scene-continuity",
+        "prompt-usability",
+        "deliverable-match"
+      ]
+    },
+    {
+      "id": "youtube-optimizer",
+      "generative": true,
+      "minimum_fixtures": 30,
+      "fixture_directory": "qa/premium-readiness/fixtures/youtube-optimizer",
+      "required_checks": [
+        "channel-attribution",
+        "traceable-statistics",
+        "reproducible-scoring",
+        "prioritized-actions",
+        "no-private-analytics-fabrication"
+      ]
+    },
+    {
+      "id": "hub-billing",
+      "generative": false,
+      "fixture_directory": "qa/premium-readiness/fixtures/hub-billing",
+      "required_checks": [
+        "advertised-entitlements",
+        "no-duplicate-debit",
+        "recoverable-failure",
+        "transaction-history",
+        "concurrent-final-credit",
+        "payment-replay-idempotency"
+      ]
+    }
+  ],
+  "pass_targets": {
+    "representative_run_pass_rate_min": 0.95,
+    "critical_failures_max": 0,
+    "ordinary_api_p95_ms_max": 750,
+    "unexpected_error_rate_max": 0.01
+  },
+  "critical_failure_classes": [
+    "private-data-exposure",
+    "cross-account-access",
+    "duplicate-charge",
+    "incorrect-billing",
+    "unusable-paid-artifact",
+    "fabricated-source-attribution",
+    "unrecoverable-paid-job-failure",
+    "data-corruption",
+    "uncontrolled-cost"
+  ]
+}

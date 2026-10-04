@@ -1,0 +1,7 @@
+{
+  "schema": "resonance.public-release/v1",
+  "source_commit": "1cbc8b72f88c210c076c4a9f9edafb40e55414fc",
+  "source_role": "weed-recovery-snapshot",
+  "certification": "not-certified-for-production",
+  "generated_at": "2026-10-04T14:01:17.494Z"
+}

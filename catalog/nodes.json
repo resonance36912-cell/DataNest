@@ -1,0 +1,55 @@
+{
+  "schema": "resonance.catalog.nodes/v1",
+  "generated_at": "2026-10-04T14:01:17.494Z",
+  "items": [
+    {
+      "canonical_id": "urn:resonance:node:ealiophin",
+      "trace_id": "NOD-EAL",
+      "display_name": "Ealiophin",
+      "roles": [
+        "primary-runtime-authority",
+        "production-control"
+      ],
+      "environment_ids": [
+        "urn:resonance:environment:production",
+        "urn:resonance:environment:staging"
+      ],
+      "connector_state": "offline-at-2026-10-04-audit",
+      "authority": "production runtime",
+      "current_state": "requires-direct-reobservation"
+    },
+    {
+      "canonical_id": "urn:resonance:node:weed",
+      "trace_id": "NOD-WED",
+      "display_name": "Weed",
+      "roles": [
+        "support-worker",
+        "compatibility-recovery"
+      ],
+      "environment_ids": [
+        "urn:resonance:environment:disaster-recovery",
+        "urn:resonance:environment:test",
+        "urn:resonance:environment:migration-staging"
+      ],
+      "connector_state": "online",
+      "authority": "non-production",
+      "current_state": "services-observed-unreachable"
+    },
+    {
+      "canonical_id": "urn:resonance:node:spider",
+      "trace_id": "NOD-SPD",
+      "display_name": "Spider",
+      "roles": [
+        "review-worker",
+        "control-worker"
+      ],
+      "environment_ids": [
+        "urn:resonance:environment:test",
+        "urn:resonance:environment:disaster-recovery"
+      ],
+      "connector_state": "not-observed-this-session",
+      "authority": "non-production",
+      "current_state": "historical-reference-only"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "schema": "ronsas.gate6.governance-evidence.v1",
+  "capturedAtUtc": "2026-09-17T10:55:38Z",
+  "scope": "Checkpoint-defined Gate 6 governance evidence verification",
+  "result": "pass",
+  "controlAuthority": {
+    "repo": "resonance36912-cell/RONSAS",
+    "branch": "main",
+    "head": "7d23abf"
+  },
+  "historicalProductionEvidence": {
+    "claimDocument": "docs/operations/GOVERNANCE-PRODUCTION-CLAIM-20260916.md",
+    "productionClaimReceipt": "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\production-edge\\RONSAS-GOVERNANCE-PRODUCTION-CLAIM-20260916.json",
+    "productionClaimSha256": "58dd13e1f14e5f7bc15067b9ec0f50b0cb19e1ed0ea353f1081f0cdb8f2bfd1e",
+    "stabilizationReceipt": "C:\\Users\\Ashley\\Resonance\\OpenNova\\runtime\\production-edge\\RONSAS-GOVERNANCE-PRODUCTION-STABILIZATION-20260916.json",
+    "stabilizationSha256": "ee5e4e8fa891299fe7f0180fcaa452b7d78d3cd285fb871b8908b946425c7dac",
+    "hashesReverified": true
+  },
+  "historicallyVerifiedDatabaseBoundaries": {
+    "governanceTables": 6,
+    "rls": "enabled on all six governance tables",
+    "authenticatedPrivileges": "SELECT only",
+    "anonPrivileges": "none",
+    "mutationRpcExecutor": "service_role only",
+    "source": "hash-verified production claim and reviewed migrations"
+  },
+  "freshRuntimeValidation": {
+    "publicWorkspaceStatus": 200,
+    "publicSovereignSessionStatus": 200,
+    "localWorkspaceStatus": 200,
+    "backendReady": true,
+    "backendNetworkScope": "loopback_only",
+    "requiredBackendServicesReachable": 4,
+    "gatewayStatus": 200,
+    "semanticAcceptance": "13/13 pass"
+  },
+  "freshDatabaseCatalogQuery": {
+    "attempted": true,
+    "result": "not_authorized",
+    "claim": "No fresh SQL grant/RLS catalog query is asserted from the connector session."
+  },
+  "limitations": [
+    "This receipt certifies governance evidence integrity plus current observable production/runtime boundaries.",
+    "Database RLS/grant details are historical evidence revalidated by exact receipt hashes, not freshly queried from production SQL in this session.",
+    "The Supabase connector denied read-only execute_sql permission for the governance project.",
+    "This does not certify Gate 7 recovery or Gate 8 final ledger."
+  ]
+}

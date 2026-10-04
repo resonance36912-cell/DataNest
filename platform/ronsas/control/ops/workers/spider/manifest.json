@@ -1,0 +1,32 @@
+{
+  "schema": "ronsas.worker-ops-manifest.v1",
+  "node": "spider",
+  "captured_at_utc": "2026-09-17T07:22:13.4503377Z",
+  "role": "support-worker",
+  "control_branch": "main",
+  "hub_branch": "ronsas/ealiophin-production",
+  "live_root": "C:\\Users\\iamas\\Resonance\\RONSAS",
+  "mutable_authority_json_tracked": false,
+  "files": [
+    {
+      "name": "Publish-RonsasControlMirror.ps1",
+      "sha256": "26c323f8585c7f7dff685f22e9281f2af01d4cb7ff044def37bbb1913b8382e6",
+      "bytes": 1223
+    },
+    {
+      "name": "Start-RonsasWorkerLoop.ps1",
+      "sha256": "f362bcaaddba20761ab1313e65a966ed32af99702d23f1adc6773c7ead5086d7",
+      "bytes": 892
+    },
+    {
+      "name": "Sync-RonsasWorker.ps1",
+      "sha256": "6fafb66d11d215acc17f21c3313f1f274316ba85f46e6db25a49e8788111d63d",
+      "bytes": 2278
+    },
+    {
+      "name": "Verify-RONSAS.ps1",
+      "sha256": "42546a11ad8153497c7292ab109883e8800e66af8aa57d4df223217b3e614f7d",
+      "bytes": 1123
+    }
+  ]
+}

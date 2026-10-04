@@ -1,0 +1,235 @@
+#!/usr/bin/env bun
+import { existsSync, readFileSync } from "node:fs";
+
+type Check = { label: string; ok: boolean; detail?: string };
+
+type FixtureApp = {
+  id?: string;
+  generative?: boolean;
+  minimum_fixtures?: number;
+  fixture_directory?: string;
+};
+
+type FixtureManifest = {
+  apps?: FixtureApp[];
+  minimum_representative_fixtures_per_generative_app?: number;
+  repeat_runs_per_generative_case?: number;
+  representative_categories?: string[];
+  pass_targets?: {
+    critical_failures_max?: number;
+    representative_run_pass_rate_min?: number;
+    ordinary_api_p95_ms_max?: number;
+    unexpected_error_rate_max?: number;
+  };
+};
+
+const read = (path: string) => readFileSync(path, "utf8");
+const manifestPath = "qa/premium-readiness/fixture-manifest.json";
+const prereqScriptPath = "scripts/Test-RonsasPremiumReadiness.ps1";
+const credentialPrereqScriptPath = "scripts/Test-RonsasPremiumCredentialPrereqs.ps1";
+const k6Path = "qa/performance/reson8-staging.k6.js";
+const budgetPath = "qa/premium-readiness/staging-budget.json";
+const providerCapabilitiesPath = "qa/premium-readiness/provider-capabilities.json";
+
+const checks: Check[] = [
+  { label: "fixture manifest exists", ok: existsSync(manifestPath) },
+  { label: "staging prerequisite harness exists", ok: existsSync(prereqScriptPath) },
+  { label: "credential prerequisite preflight exists", ok: existsSync(credentialPrereqScriptPath) },
+  { label: "k6 staging workload exists", ok: existsSync(k6Path) },
+  { label: "zero-spend staging budget exists", ok: existsSync(budgetPath) },
+  { label: "provider capability manifest exists", ok: existsSync(providerCapabilitiesPath) },
+];
+
+if (checks.every((check) => check.ok)) {
+  const manifest = JSON.parse(read(manifestPath)) as FixtureManifest;
+  const prereq = read(prereqScriptPath);
+  const credentialPrereq = read(credentialPrereqScriptPath);
+  const k6 = read(k6Path);
+  const budget = JSON.parse(read(budgetPath)) as Record<string, unknown>;
+  const providerCapabilities = JSON.parse(read(providerCapabilitiesPath)) as {
+    apps?: Array<{ id?: string; stub_ready?: boolean; source_commit?: string }>;
+    overall_provider_stubs_ready?: boolean;
+  };
+
+  const requiredApps = ["epublisher", "creative-studio", "sync-vision", "youtube-optimizer"];
+  const apps = Array.isArray(manifest.apps) ? manifest.apps : [];
+  const appMap = new Map(apps.map((app) => [app.id, app]));
+
+  checks.push(
+    {
+      label: "minimum representative fixture count is at least 30",
+      ok: Number(manifest.minimum_representative_fixtures_per_generative_app) >= 30,
+    },
+    {
+      label: "generative cases require at least three repeat runs",
+      ok: Number(manifest.repeat_runs_per_generative_case) >= 3,
+    },
+    {
+      label: "representative categories cover normal/boundary/malformed/multilingual/ambiguous",
+      ok: ["normal", "boundary", "malformed", "multilingual", "ambiguous"].every(
+        (value) =>
+          Array.isArray(manifest.representative_categories) &&
+          manifest.representative_categories.includes(value),
+      ),
+    },
+    {
+      label: "critical failure allowance is zero",
+      ok: Number(manifest.pass_targets?.critical_failures_max) === 0,
+    },
+    {
+      label: "representative pass-rate target is at least 95%",
+      ok: Number(manifest.pass_targets?.representative_run_pass_rate_min) >= 0.95,
+    },
+    {
+      label: "ordinary API p95 target is no more than 750 ms",
+      ok: Number(manifest.pass_targets?.ordinary_api_p95_ms_max) <= 750,
+    },
+    {
+      label: "unexpected-error target is below 1%",
+      ok: Number(manifest.pass_targets?.unexpected_error_rate_max) <= 0.01,
+    },
+  );
+
+  for (const id of requiredApps) {
+    const app = appMap.get(id);
+    checks.push({
+      label: `${id} fixture gate is configured at 30 or more`,
+      ok:
+        Boolean(app?.generative) &&
+        Number(app?.minimum_fixtures) >= 30 &&
+        typeof app?.fixture_directory === "string",
+    });
+  }
+
+  const protectedHosts = [
+    "reson8.life",
+    "epublisher.reson8.life",
+    "creative.reson8.life",
+    "sync.reson8.life",
+    "youtube.reson8.life",
+    "career-compass.org",
+    "career-compass-admin.org",
+    "resonance-podcast.com",
+  ];
+  for (const host of protectedHosts) {
+    checks.push({
+      label: `PowerShell harness blocks production host ${host}`,
+      ok: prereq.includes(host),
+    });
+    checks.push({
+      label: `k6 harness blocks production host ${host}`,
+      ok: k6.includes(host),
+    });
+  }
+
+  checks.push(
+    {
+      label: "PowerShell harness requires explicit staging traffic opt-in",
+      ok: /AllowStagingTraffic/.test(prereq) && /Traffic is disabled by default/.test(prereq),
+    },
+    {
+      label: "PowerShell load mode requires explicit load-test approval",
+      ok: /RONSAS_ALLOW_LOAD_TEST/.test(prereq),
+    },
+    {
+      label: "PowerShell harness resolves portable k6 without requiring PATH mutation",
+      ok:
+        /Resolve-K6Executable/.test(prereq) &&
+        /RONSAS_K6_PATH/.test(prereq) &&
+        /Resonance\\OpenNova\\tools\\k6/.test(prereq),
+    },
+    {
+      label: "k6 load script requires explicit load-test approval",
+      ok: /RONSAS_ALLOW_LOAD_TEST/.test(k6) && /Load traffic is disabled/.test(k6),
+    },
+    {
+      label: "k6 profiles do not invent non-smoke concurrency",
+      ok:
+        /requirePositiveInt\("RONSAS_BASELINE_VUS"\)/.test(k6) &&
+        /requirePositiveInt\("RONSAS_PEAK_VUS"\)/.test(k6) &&
+        /requirePositiveInt\("RONSAS_SPIKE_VUS"\)/.test(k6),
+    },
+    {
+      label: "load thresholds enforce audit targets",
+      ok:
+        /http_req_failed:\s*\["rate<0\.01"\]/.test(k6) &&
+        /http_req_duration:\s*\["p\(95\)<750"\]/.test(k6),
+    },
+    {
+      label: "staging budget is zero external spend",
+      ok:
+        budget["schema"] === "ronsas.premium-readiness.staging-budget.v1" &&
+        Number(budget["approved_external_spend_cents_max"]) === 0 &&
+        Number(budget["approved_real_provider_calls_max"]) === 0,
+    },
+    {
+      label:
+        "staging budget forbids production and remains smoke-only while prerequisites are incomplete",
+      ok:
+        budget["production_hosts_forbidden"] === true &&
+        budget["smoke_only_until_prerequisites_complete"] === true,
+    },
+    {
+      label: "readiness harness can prove zero-spend budget automatically",
+      ok: /Test-ZeroSpendBudget/.test(prereq),
+    },
+    {
+      label: "readiness harness can prove isolated staging observability automatically",
+      ok:
+        /Test-StagingObservability/.test(prereq) &&
+        /resonance-sovereign-staging-v2-gateway-1/.test(prereq) &&
+        /127\.0\.0\.1:60600\/health/.test(prereq),
+    },
+    {
+      label: "provider capability manifest proves all four zero-external staging paths",
+      ok:
+        Array.isArray(providerCapabilities.apps) &&
+        providerCapabilities.apps.length === 4 &&
+        providerCapabilities.apps.every((app) => app.stub_ready === true) &&
+        providerCapabilities.apps.some(
+          (app) =>
+            app.id === "youtube-optimizer" &&
+            app.source_commit === "b78a628be1c85ed5047c7775afbaf5e65524ed8d",
+        ) &&
+        providerCapabilities.overall_provider_stubs_ready === true &&
+        /Test-ProviderStubCapability/.test(prereq),
+    },
+    {
+      label: "credential preflight is restricted to loopback staging auth",
+      ok:
+        /127\.0\.0\.1/.test(credentialPrereq) &&
+        /localhost/.test(credentialPrereq) &&
+        /Credential probes are restricted to loopback staging auth endpoints/.test(
+          credentialPrereq,
+        ),
+    },
+    {
+      label:
+        "credential preflight never creates accounts or claims PayFast proof from configuration alone",
+      ok:
+        !/\/v1\/auth\/sign-up/.test(credentialPrereq) &&
+        /\/v1\/auth\/sign-in/.test(credentialPrereq) &&
+        /payfast_sandbox_proven = \$false/.test(credentialPrereq),
+    },
+    {
+      label: "credential preflight reports hashed identity only and documents secret omission",
+      ok:
+        /identity_hash/.test(credentialPrereq) &&
+        /No passwords, keys, passphrases or session tokens are written/.test(credentialPrereq),
+    },
+  );
+}
+
+const failed = checks.filter((check) => !check.ok);
+for (const check of checks) {
+  console.log(`${check.ok ? "✓" : "✗"} ${check.label}${check.detail ? ` — ${check.detail}` : ""}`);
+}
+
+if (failed.length) {
+  console.error(
+    `\nverify-premium-readiness-harness failed: ${failed.length} invariant(s) violated.`,
+  );
+  process.exit(1);
+}
+
+console.log("\n✓ premium-readiness harness invariants hold.");

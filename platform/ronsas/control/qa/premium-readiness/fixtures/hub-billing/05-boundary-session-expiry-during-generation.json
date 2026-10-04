@@ -1,0 +1,32 @@
+{
+  "schema": "ronsas.premium-fixture.v1",
+  "id": "hub-billing-05-session-expiry-during-generation",
+  "app": "hub-billing",
+  "category": "boundary",
+  "review_status": "source-derived-reviewed",
+  "review_basis": "Mapped to existing PayFast/checkout verification and September 2026 premium-readiness audit scenarios.",
+  "input": {
+    "event": "session expires while paid generation is running",
+    "expected": "job remains recoverable"
+  },
+  "expected_checks": [
+    "advertised-entitlements",
+    "no-duplicate-debit",
+    "recoverable-failure",
+    "transaction-history",
+    "concurrent-final-credit",
+    "payment-replay-idempotency"
+  ],
+  "provenance": [
+    "scripts/test-payfast-itn.ts",
+    "scripts/verify-all-apps-checkout.ts",
+    "scripts/verify-checkout-links.ts",
+    "docs/spoke-payment-gate-bridge.md"
+  ],
+  "critical_failure_classes": [
+    "duplicate-charge",
+    "incorrect-billing",
+    "cross-account-access",
+    "unrecoverable-paid-job-failure"
+  ]
+}

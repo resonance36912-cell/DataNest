@@ -1,0 +1,62 @@
+{
+  "schema": "resonance.catalog.aliases/v1",
+  "generated_at": "2026-10-04T14:01:17.494Z",
+  "items": [
+    {
+      "canonical_id": "urn:resonance:application:hub",
+      "aliases": [
+        "resonance-hub",
+        "reson8-life",
+        "reson8.life",
+        "RONSAS Hub"
+      ]
+    },
+    {
+      "canonical_id": "urn:resonance:platform:ronsas",
+      "aliases": [
+        "RONSAS",
+        "rons-sovereign-codebase",
+        "Resonance Open Nova Sovereign Application Suite"
+      ]
+    },
+    {
+      "canonical_id": "urn:resonance:platform:open-nova",
+      "aliases": [
+        "OpenNova",
+        "ResonanceAppDev_ZeroCredit_v1.5.5"
+      ]
+    },
+    {
+      "canonical_id": "urn:resonance:application:datanest",
+      "aliases": [
+        "DataNest",
+        "DataNest-Supository/DataNest"
+      ]
+    },
+    {
+      "canonical_id": "urn:resonance:application:creative-studio",
+      "aliases": [
+        "creative_studio",
+        "creativestudio.life",
+        "creative.reson8.life"
+      ]
+    },
+    {
+      "canonical_id": "urn:resonance:application:sync-vision",
+      "aliases": [
+        "sync_vision",
+        "syncvision.life",
+        "sync.reson8.life",
+        "LyricSync Studio"
+      ]
+    },
+    {
+      "canonical_id": "urn:resonance:application:youtube-optimizer",
+      "aliases": [
+        "youtube_optimizer",
+        "youtubeoptimizer.life",
+        "youtube.reson8.life"
+      ]
+    }
+  ]
+}

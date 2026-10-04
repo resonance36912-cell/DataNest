@@ -1,0 +1,205 @@
+{
+  "schema": "resonance.public-assets/v1",
+  "generated_at": "2026-10-04T14:01:17.494Z",
+  "application_id": "urn:resonance:application:hub",
+  "items": [
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:well-known-resonance-environment-json",
+      "trace_id": "PUB-HUB-WELL_KNOWN_RESONANCE_ENVIRONMENT_JSON",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/.well-known/resonance/environment.json",
+      "sha256": "5a84a1820d53c7cf57a32127ede9b8ce7b507d0c8f09800e0b3fc1a876caf896",
+      "media_type": "application/json",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:well-known-resonance-release-json",
+      "trace_id": "PUB-HUB-WELL_KNOWN_RESONANCE_RELEASE_JSON",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/.well-known/resonance/release.json",
+      "sha256": "b1c52eb3cf876a9465d00dfb74b3f3354a1244ba221e954161b628c11f82e90c",
+      "media_type": "application/json",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:well-known-resonance-service-manifest-json",
+      "trace_id": "PUB-HUB-WELL_KNOWN_RESONANCE_SERVICE_MANIFEST_JSON",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/.well-known/resonance/service-manifest.json",
+      "sha256": "e0886cb59de393cf154a6611e2c4a67822f4fd2501333ee9747d4dcb70017108",
+      "media_type": "application/json",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:apple-touch-icon-png",
+      "trace_id": "PUB-HUB-APPLE_TOUCH_ICON_PNG",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/apple-touch-icon.png",
+      "sha256": "6cb5595ac5a59caa2297606eebc131acbaeeabb451c8427e5629f96667c8f603",
+      "media_type": "image/png",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:content-readme-md",
+      "trace_id": "PUB-HUB-CONTENT_README_MD",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/content/README.md",
+      "sha256": "3a4c8fb7c65f35657f69de6d24d8a33d6d0ca6e38818c77feab004b8e2fb60ca",
+      "media_type": "text/markdown",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:content-updates-json",
+      "trace_id": "PUB-HUB-CONTENT_UPDATES_JSON",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/content/updates.json",
+      "sha256": "9fbd29df3bf69a5ee3eba9c101897764036cc16f5f48eddb3ad82efad164b079",
+      "media_type": "application/json",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:favicon-16-png",
+      "trace_id": "PUB-HUB-FAVICON_16_PNG",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/favicon-16.png",
+      "sha256": "eecc50b26cbd3b045fa1278831d918e6bc711fb0fdfde4b0de1524d2105d9c3d",
+      "media_type": "image/png",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:favicon-32-png",
+      "trace_id": "PUB-HUB-FAVICON_32_PNG",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/favicon-32.png",
+      "sha256": "94ded2f069c11e1c0147842a0ba15e884e07dd8e3e2f61fa3ce43ee3e6155b6b",
+      "media_type": "image/png",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:favicon-48-png",
+      "trace_id": "PUB-HUB-FAVICON_48_PNG",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/favicon-48.png",
+      "sha256": "f73750d9de0cdc5e989edb001408a1955724ff9f4b14e2e20f548e58b8446d0f",
+      "media_type": "image/png",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:favicon-64-png",
+      "trace_id": "PUB-HUB-FAVICON_64_PNG",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/favicon-64.png",
+      "sha256": "eb4d53c58d264edf9e40d03ff24dd8ba966591ce0de234a19541beed4ceb8842",
+      "media_type": "image/png",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:favicon-ico",
+      "trace_id": "PUB-HUB-FAVICON_ICO",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/favicon.ico",
+      "sha256": "dade67c049c121732a0b6660ea3de74c224664832acb66444aa3151adc369ef5",
+      "media_type": "image/x-icon",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:icon-192-png",
+      "trace_id": "PUB-HUB-ICON_192_PNG",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/icon-192.png",
+      "sha256": "23a700ec81476af81072de94e1a832cd8bb5774edd095862052aa604d8acb930",
+      "media_type": "image/png",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:icon-512-png",
+      "trace_id": "PUB-HUB-ICON_512_PNG",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/icon-512.png",
+      "sha256": "8d80ac6039458d9360fcf08ba622a84b9e675010464413273e368ff3b1c7016d",
+      "media_type": "image/png",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:llms-txt",
+      "trace_id": "PUB-HUB-LLMS_TXT",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/llms.txt",
+      "sha256": "b5af8ace1dbc754512950fcfa2e24920fb119708c4224140d70956f76a1cd4a5",
+      "media_type": "text/plain",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:og-logo-png",
+      "trace_id": "PUB-HUB-OG_LOGO_PNG",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/og-logo.png",
+      "sha256": "35709284553fa563c371ecbe11be9eb8fa4cd37d69b18ffda5282ca9815e43fd",
+      "media_type": "image/png",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:robots-txt",
+      "trace_id": "PUB-HUB-ROBOTS_TXT",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/robots.txt",
+      "sha256": "9ac484335a2df942a2187a14532eb4196772f87f9e7b50a815ee6b7d2e59da7a",
+      "media_type": "text/plain",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:rons-app-icon-512-png",
+      "trace_id": "PUB-HUB-RONS_APP_ICON_512_PNG",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/rons-app-icon-512.png",
+      "sha256": "b98c1c012f750f50f19e97b79c4b339434ed075492e94cf8644986a2f8d60569",
+      "media_type": "image/png",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    },
+    {
+      "canonical_id": "urn:resonance:public-asset:hub:site-webmanifest",
+      "trace_id": "PUB-HUB-SITE_WEBMANIFEST",
+      "application_id": "urn:resonance:application:hub",
+      "path": "apps/hub/public/site.webmanifest",
+      "sha256": "43a7a6034561ec1c8174ecf271d87ddf41c47d980a71aeb25c22a339fe406b04",
+      "media_type": "application/manifest+json",
+      "visibility": "public",
+      "secret_material_permitted": false,
+      "state": "present"
+    }
+  ]
+}
