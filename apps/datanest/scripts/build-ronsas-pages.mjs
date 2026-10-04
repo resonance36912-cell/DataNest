@@ -20,7 +20,10 @@ const apps=[
 ];
 
 function run(command,args,cwd){
-  const result=spawnSync(command,args,{
+  const windowsCommand=process.platform==="win32" && /\.cmd$/i.test(command);
+  const executable=windowsCommand?(process.env.ComSpec||"cmd.exe"):command;
+  const executableArgs=windowsCommand?["/d","/s","/c",command,...args]:args;
+  const result=spawnSync(executable,executableArgs,{
     cwd,
     stdio:"inherit",
     env:{...process.env,CI:process.env.CI||"true"}
