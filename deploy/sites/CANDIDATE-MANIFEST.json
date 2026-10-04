@@ -2,7 +2,7 @@
   "schema": "resonance-sites-candidate@1",
   "generatedAt": "2026-10-04T17:03:00+02:00",
   "updatedOn": "2026-10-04",
-  "status": "rebuilt-candidate-awaiting-forge-domain-spider-connectivity-and-human-approval",
+  "status": "rebuilt-candidate-awaiting-forge-domain-spider-remote-repoint-and-human-approval",
   "canonicalRepository": "DataNest-Supository-CANONICAL-STAGING",
   "artifactSourceCommit": "3c6b4bb0889b53f8d25ab2897e453c980c25ab7b",
   "controlHeadAtRebuild": "76422105595ab5f6eed89d196f3efaddd56f86eb",
@@ -37,11 +37,16 @@
     "fullTopologyCertificationBlockedUntilFreshAudit": false,
     "workerManifestValidator": "platform/ronsas/scripts/verify-worker-ops-manifests.ts",
     "workerManifestValidation": "passed",
-    "freshAuditResult": "passed-with-git-origin-connectivity-warning",
-    "hubOriginReachability": "current-refresh-connection-reset",
+    "freshAuditResult": "passed-local-alignment-with-legacy-git-origin-connectivity-warning",
+    "hubOriginReachability": "current-ls-remote-failed-connection-reset",
     "fullTopologyCertificationBlockedByHubOriginReachability": true,
-    "controlOriginReachability": "last-success-2026-10-04T17:15+02; current-refresh-connection-reset",
-    "fullTopologyCertificationBlockedByGitOriginReachability": true
+    "controlOriginReachability": "current-ls-remote-failed-schannel-SEC_E_MESSAGE_ALTERED",
+    "fullTopologyCertificationBlockedByGitOriginReachability": true,
+    "legacyControlRemoteSyncReady": false,
+    "auditEvidenceManifest": "spider-audit-20261004/SPIDER-AUDIT-MANIFEST-20261004.json",
+    "auditEvidenceManifestSha256": "B3AE5A432DF2EB2C44B5B9D1E3F9DF9E1EAF28909B5D4418E97BE3F4BBEFE7A6",
+    "legacyHubRemoteSyncReady": false,
+    "postGitLabRemoteRepointRequired": true
   },
   "buildVerification": {
     "dataNestStatic": "passed",
@@ -76,7 +81,7 @@
       "sha256": "A475A9EE2328C2CE98F65A2DA7DC050B3008D1DE5EF3387BE5E6FEBB4453B7A0",
       "bytes": 4219,
       "productionCertified": false,
-      "note": "Sealed governed Spider worker-control package containing manifest plus four RONSAS worker scripts. Fresh Spider audit completed and local worker hashes match; full DR sync readiness remains gated by reliable GitHub reachability for the governed control and Hub origins."
+      "note": "Sealed governed Spider worker-control package containing manifest plus four RONSAS worker scripts. Fresh Spider audit completed and local worker hashes match canonical. Current fresh Git checks for both legacy private GitHub origins are failing at the TLS/connection layer; after GitLab import, repoint Spider to the governed forge authority and verify fresh fetches before remote DR synchronization is declared ready."
     }
   ],
   "deploymentModel": {
@@ -90,7 +95,7 @@
   "hardGates": [
     "Establish and protect the new GitLab forge repository authority, then verify a fresh clone matches the governed export/source history.",
     "Run or reproduce the approved build and worker-ops gates from remote forge authority before production promotion.",
-    "Restore reliable Spider GitHub reachability for both the RONSAS control and resonance-hub origins and record successful fresh remote checks/fetches before claiming the Spider DR sync path fully ready.",
+    "After GitLab import, repoint Spider worker Git remotes from the degraded legacy private GitHub origins to the governed GitLab authority and record successful fresh fetches before declaring Spider remote DR synchronization ready.",
     "Verify the target ChatGPT Site exposes Add domain, record the provider-issued DNS values, and verify TLS before DNS changes.",
     "Update Supabase Auth/OAuth redirects, CSP/CORS, canonical metadata, robots and sitemap origins as part of the governed cutover.",
     "Record human governance approval before production promotion or DNS cutover."
