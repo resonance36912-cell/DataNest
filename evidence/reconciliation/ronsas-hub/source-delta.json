@@ -1,0 +1,1640 @@
+{
+    "schema":  "resonance-source-reconciliation/v1",
+    "generated_at":  "2026-10-04T14:09:57.4206844Z",
+    "canonical_target":  "DataNest-Supository-canonical",
+    "hub_authority":  "apps/hub",
+    "ronsas_historical_tree":  "platform/ronsas/src",
+    "ronsas_preserved_ref":  "legacy/ronsas-authority/main",
+    "policy":  "Hub remains runtime/commercial frontend authority; RONSAS frontend delta is preserved as evidence/history and is not silently promoted.",
+    "counts":  {
+                   "identical":  98,
+                   "different":  95,
+                   "ronsas_only":  10
+               },
+    "files":  [
+                  {
+                      "path":  "router.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "7e3481892de4073ba86e9a6c3a52f1cc6c0d8ab8668df1b14a3ce9f7658edc4a",
+                      "hub_sha256":  "e6efe36ba2374be1842757c45c6570722a528beb532379cf897aa8c356760faf",
+                      "ronsas_bytes":  410,
+                      "hub_bytes":  415
+                  },
+                  {
+                      "path":  "routeTree.gen.ts",
+                      "state":  "ronsas_only",
+                      "ronsas_sha256":  "982e54690fa26b21ced236a6d0ef1473b706196eff865eec71311e35a6696a79",
+                      "hub_sha256":  null,
+                      "ronsas_bytes":  63707,
+                      "hub_bytes":  null
+                  },
+                  {
+                      "path":  "server.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "ca9d2dc65ed29882a55da1947e0d4508100ca5dd8263f2f7e2f26923c8306803",
+                      "hub_sha256":  "fe28e87c36a286f7b492bc8ab26b18a6bf876ba19ea3afb334b6308858021505",
+                      "ronsas_bytes":  2571,
+                      "hub_bytes":  2605
+                  },
+                  {
+                      "path":  "start.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "0f9d31e5d1e79b1a1885a5fc9e50324e9fb29ed2aa166fc931d3d313822d76af",
+                      "hub_sha256":  "0f9d31e5d1e79b1a1885a5fc9e50324e9fb29ed2aa166fc931d3d313822d76af",
+                      "ronsas_bytes":  1022,
+                      "hub_bytes":  1022
+                  },
+                  {
+                      "path":  "styles.css",
+                      "state":  "different",
+                      "ronsas_sha256":  "c300b78b77d6ecf35405abff23e8baab904dbd5d129e07f1d559fb296f220499",
+                      "hub_sha256":  "5a66e500e6e300e1bfcb1d1499d01769c407404d5a5967614113e39c7f0a1a05",
+                      "ronsas_bytes":  9476,
+                      "hub_bytes":  9442
+                  },
+                  {
+                      "path":  "assets\\logo-career-compass.png",
+                      "state":  "identical",
+                      "ronsas_sha256":  "1f32fa62096d5ba0c664c3b55bf1deb94eda962b2e440df1be2494b8dfca89ae",
+                      "hub_sha256":  "1f32fa62096d5ba0c664c3b55bf1deb94eda962b2e440df1be2494b8dfca89ae",
+                      "ronsas_bytes":  40323,
+                      "hub_bytes":  40323
+                  },
+                  {
+                      "path":  "assets\\logo-creative-studio.png",
+                      "state":  "identical",
+                      "ronsas_sha256":  "e68cd602b7e1b3cfefb2154b227e7308df253acbc531f1d940eebeebecbdfc69",
+                      "hub_sha256":  "e68cd602b7e1b3cfefb2154b227e7308df253acbc531f1d940eebeebecbdfc69",
+                      "ronsas_bytes":  39668,
+                      "hub_bytes":  39668
+                  },
+                  {
+                      "path":  "assets\\logo-epublisher.png",
+                      "state":  "identical",
+                      "ronsas_sha256":  "58c86e8ca30b04f73603a07b77a2204bfae89f09788e777f1eb0deaad5b6016a",
+                      "hub_sha256":  "58c86e8ca30b04f73603a07b77a2204bfae89f09788e777f1eb0deaad5b6016a",
+                      "ronsas_bytes":  41883,
+                      "hub_bytes":  41883
+                  },
+                  {
+                      "path":  "assets\\logo-podcast.png",
+                      "state":  "identical",
+                      "ronsas_sha256":  "2623b73e5baed52e1dc674540e56380be8b9e6358dfd8a9396471bc6501a97ce",
+                      "hub_sha256":  "2623b73e5baed52e1dc674540e56380be8b9e6358dfd8a9396471bc6501a97ce",
+                      "ronsas_bytes":  41132,
+                      "hub_bytes":  41132
+                  },
+                  {
+                      "path":  "assets\\logo-sync-vision.png",
+                      "state":  "identical",
+                      "ronsas_sha256":  "dd13aeba6d6f576c2fbf5f2516582c7eee92db755555fa1825ee03e5ea457553",
+                      "hub_sha256":  "dd13aeba6d6f576c2fbf5f2516582c7eee92db755555fa1825ee03e5ea457553",
+                      "ronsas_bytes":  46197,
+                      "hub_bytes":  46197
+                  },
+                  {
+                      "path":  "assets\\logo-youtube-optimizer.png",
+                      "state":  "identical",
+                      "ronsas_sha256":  "0916567fcf04ca649157e1f06924f85b9780b10327d3c04e9fa61e7ff8170ef9",
+                      "hub_sha256":  "0916567fcf04ca649157e1f06924f85b9780b10327d3c04e9fa61e7ff8170ef9",
+                      "ronsas_bytes":  30490,
+                      "hub_bytes":  30490
+                  },
+                  {
+                      "path":  "assets\\resonance-lockup-dark.png",
+                      "state":  "identical",
+                      "ronsas_sha256":  "8fada261e3caaef5bfeee5048102cbf629c1c5706b6ec3971da5737c411fb467",
+                      "hub_sha256":  "8fada261e3caaef5bfeee5048102cbf629c1c5706b6ec3971da5737c411fb467",
+                      "ronsas_bytes":  1033574,
+                      "hub_bytes":  1033574
+                  },
+                  {
+                      "path":  "assets\\resonance-lockup.png",
+                      "state":  "identical",
+                      "ronsas_sha256":  "b67485b1b3f932b31400677234668b77370b75d6210c0e3f693ad8ca867103ea",
+                      "hub_sha256":  "b67485b1b3f932b31400677234668b77370b75d6210c0e3f693ad8ca867103ea",
+                      "ronsas_bytes":  795580,
+                      "hub_bytes":  795580
+                  },
+                  {
+                      "path":  "assets\\resonance-logo.png",
+                      "state":  "ronsas_only",
+                      "ronsas_sha256":  "35709284553fa563c371ecbe11be9eb8fa4cd37d69b18ffda5282ca9815e43fd",
+                      "hub_sha256":  null,
+                      "ronsas_bytes":  632680,
+                      "hub_bytes":  null
+                  },
+                  {
+                      "path":  "components\\VisitTracker.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "ee11454347b9d59a95c2d3ac8f7a02c5864bfdc18c8ec2eec8d122646b768613",
+                      "hub_sha256":  "e8acd8845934f7cb9982fba599c49cf7f377f2523698322509bd22099cc25a8f",
+                      "ronsas_bytes":  1552,
+                      "hub_bytes":  1321
+                  },
+                  {
+                      "path":  "components\\ui\\accordion.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "0de02bb71ec1739e64a2fc2af0848458f204490719bad8e51c3fbe2bcb31d3a8",
+                      "hub_sha256":  "0de02bb71ec1739e64a2fc2af0848458f204490719bad8e51c3fbe2bcb31d3a8",
+                      "ronsas_bytes":  2066,
+                      "hub_bytes":  2066
+                  },
+                  {
+                      "path":  "components\\ui\\alert-dialog.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "7b92eace677b37b106e83baeebc3be6ef396ed7ebce0b20967990ddb83271549",
+                      "hub_sha256":  "7b92eace677b37b106e83baeebc3be6ef396ed7ebce0b20967990ddb83271549",
+                      "ronsas_bytes":  4298,
+                      "hub_bytes":  4298
+                  },
+                  {
+                      "path":  "components\\ui\\alert.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "aef6ee0b3672f312e6906461273d8135f11f0f56e2f9b115d92262b7946dd6f9",
+                      "hub_sha256":  "aef6ee0b3672f312e6906461273d8135f11f0f56e2f9b115d92262b7946dd6f9",
+                      "ronsas_bytes":  1638,
+                      "hub_bytes":  1638
+                  },
+                  {
+                      "path":  "components\\ui\\aspect-ratio.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "67c60b91df6dc9fc729390742b04c02d40c19f51f7a2d4f79110911a061266bb",
+                      "hub_sha256":  "67c60b91df6dc9fc729390742b04c02d40c19f51f7a2d4f79110911a061266bb",
+                      "ronsas_bytes":  148,
+                      "hub_bytes":  148
+                  },
+                  {
+                      "path":  "components\\ui\\avatar.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "a2077be3cb2702c55b3ff024e28a2d19e426bb5827e366d03a6bf756dbf8221c",
+                      "hub_sha256":  "a2077be3cb2702c55b3ff024e28a2d19e426bb5827e366d03a6bf756dbf8221c",
+                      "ronsas_bytes":  1460,
+                      "hub_bytes":  1460
+                  },
+                  {
+                      "path":  "components\\ui\\badge.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "c57030b62760166ab4c3a36a220a45c7699d375f10671dbd54d8156fec04fd1c",
+                      "hub_sha256":  "c57030b62760166ab4c3a36a220a45c7699d375f10671dbd54d8156fec04fd1c",
+                      "ronsas_bytes":  1155,
+                      "hub_bytes":  1155
+                  },
+                  {
+                      "path":  "components\\ui\\breadcrumb.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "d70a97e46e4d0846be2d22b546632e55ab3335a3c82804c0160b45a7abdc760d",
+                      "hub_sha256":  "d70a97e46e4d0846be2d22b546632e55ab3335a3c82804c0160b45a7abdc760d",
+                      "ronsas_bytes":  2850,
+                      "hub_bytes":  2850
+                  },
+                  {
+                      "path":  "components\\ui\\button.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "2c8aae724f8effc35a91f833f9c0e8dee010f5cb0b8698441001dac93e8811bf",
+                      "hub_sha256":  "2c8aae724f8effc35a91f833f9c0e8dee010f5cb0b8698441001dac93e8811bf",
+                      "ronsas_bytes":  1943,
+                      "hub_bytes":  1943
+                  },
+                  {
+                      "path":  "components\\ui\\calendar.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "a1ad621d8bb65ea59b6671542627efc813fafd6d036de4f0276f01b34aa44085",
+                      "hub_sha256":  "a1ad621d8bb65ea59b6671542627efc813fafd6d036de4f0276f01b34aa44085",
+                      "ronsas_bytes":  7387,
+                      "hub_bytes":  7387
+                  },
+                  {
+                      "path":  "components\\ui\\card.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "c6e182e038df4994615be337e682910a3835594f12d7bf61ab0909e6518477b2",
+                      "hub_sha256":  "c6e182e038df4994615be337e682910a3835594f12d7bf61ab0909e6518477b2",
+                      "ronsas_bytes":  1872,
+                      "hub_bytes":  1872
+                  },
+                  {
+                      "path":  "components\\ui\\carousel.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "bdf6f1be424fa2d49cf82d09b219d6613d6bc83340df1105d88ddc328034ede2",
+                      "hub_sha256":  "bdf6f1be424fa2d49cf82d09b219d6613d6bc83340df1105d88ddc328034ede2",
+                      "ronsas_bytes":  6440,
+                      "hub_bytes":  6440
+                  },
+                  {
+                      "path":  "components\\ui\\chart.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "d816f293d915c86968a16100f50df23fc20f9cd0bc6f5a1e8fcadea50a1d58f0",
+                      "hub_sha256":  "d816f293d915c86968a16100f50df23fc20f9cd0bc6f5a1e8fcadea50a1d58f0",
+                      "ronsas_bytes":  10901,
+                      "hub_bytes":  10901
+                  },
+                  {
+                      "path":  "components\\ui\\checkbox.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "d2c880d1a7de1633a5eb6f4d09977f203d737de24fe3d7e8ba959b851fd18145",
+                      "hub_sha256":  "d2c880d1a7de1633a5eb6f4d09977f203d737de24fe3d7e8ba959b851fd18145",
+                      "ronsas_bytes":  1069,
+                      "hub_bytes":  1069
+                  },
+                  {
+                      "path":  "components\\ui\\collapsible.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "0be1d5082be6ce6a06e0f67accb38ef50e981f111187e3954d0a1bca062f52e1",
+                      "hub_sha256":  "0be1d5082be6ce6a06e0f67accb38ef50e981f111187e3954d0a1bca062f52e1",
+                      "ronsas_bytes":  346,
+                      "hub_bytes":  346
+                  },
+                  {
+                      "path":  "components\\ui\\command.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "5f15a9b4aeec3f848264322c65798e92f9af0cb3777ca075796bdfce56deaf54",
+                      "hub_sha256":  "5f15a9b4aeec3f848264322c65798e92f9af0cb3777ca075796bdfce56deaf54",
+                      "ronsas_bytes":  5019,
+                      "hub_bytes":  5019
+                  },
+                  {
+                      "path":  "components\\ui\\context-menu.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "05edd5ec8d9322670502b0c7b6f8cf6a5dc4185d552d5a5a1d2a6e388064cf21",
+                      "hub_sha256":  "05edd5ec8d9322670502b0c7b6f8cf6a5dc4185d552d5a5a1d2a6e388064cf21",
+                      "ronsas_bytes":  7578,
+                      "hub_bytes":  7578
+                  },
+                  {
+                      "path":  "components\\ui\\dialog.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "a5b691c73830e0eab35b93a0ff08703cf7b1dd42a7acd435f1a4ebb9a2e232e9",
+                      "hub_sha256":  "a5b691c73830e0eab35b93a0ff08703cf7b1dd42a7acd435f1a4ebb9a2e232e9",
+                      "ronsas_bytes":  3752,
+                      "hub_bytes":  3752
+                  },
+                  {
+                      "path":  "components\\ui\\drawer.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "096c508d4ebbe9ed00647588e8077cd65970938b773c0e1d252723b903bd620e",
+                      "hub_sha256":  "096c508d4ebbe9ed00647588e8077cd65970938b773c0e1d252723b903bd620e",
+                      "ronsas_bytes":  3071,
+                      "hub_bytes":  3071
+                  },
+                  {
+                      "path":  "components\\ui\\dropdown-menu.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "9aca83be58992cdf5c996afaa9af8cac82366e0b5b7f71f4866dce49b5a0c434",
+                      "hub_sha256":  "9aca83be58992cdf5c996afaa9af8cac82366e0b5b7f71f4866dce49b5a0c434",
+                      "ronsas_bytes":  7784,
+                      "hub_bytes":  7784
+                  },
+                  {
+                      "path":  "components\\ui\\form.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "e4da338bd60483f6facadf68cd22eac13bd1ae5f6417d6142f14930a614fc334",
+                      "hub_sha256":  "e4da338bd60483f6facadf68cd22eac13bd1ae5f6417d6142f14930a614fc334",
+                      "ronsas_bytes":  4372,
+                      "hub_bytes":  4372
+                  },
+                  {
+                      "path":  "components\\ui\\hover-card.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "989e3074c71555f2f3a1e8ba3ff23652309dc44bef9ce17705d241aa1ccf5e2f",
+                      "hub_sha256":  "989e3074c71555f2f3a1e8ba3ff23652309dc44bef9ce17705d241aa1ccf5e2f",
+                      "ronsas_bytes":  1273,
+                      "hub_bytes":  1273
+                  },
+                  {
+                      "path":  "components\\ui\\input-otp.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "73fd79df3eb6381ab797bd172df9517102f88f1a6c6a68bbf43f18cd64cecf0a",
+                      "hub_sha256":  "73fd79df3eb6381ab797bd172df9517102f88f1a6c6a68bbf43f18cd64cecf0a",
+                      "ronsas_bytes":  2230,
+                      "hub_bytes":  2230
+                  },
+                  {
+                      "path":  "components\\ui\\input.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "4ee1c239851691038ddef07a1cac8f3d348a35ff5816ecc296d20c9803b1c3de",
+                      "hub_sha256":  "4ee1c239851691038ddef07a1cac8f3d348a35ff5816ecc296d20c9803b1c3de",
+                      "ronsas_bytes":  798,
+                      "hub_bytes":  798
+                  },
+                  {
+                      "path":  "components\\ui\\label.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "c33a02e76ac4dfd8e328026ca068ec184aae5b00dc454955865edf5f90f403e0",
+                      "hub_sha256":  "c33a02e76ac4dfd8e328026ca068ec184aae5b00dc454955865edf5f90f403e0",
+                      "ronsas_bytes":  737,
+                      "hub_bytes":  737
+                  },
+                  {
+                      "path":  "components\\ui\\menubar.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "c453955303d3e968d87015279966fdefd603c84345e5cdf72c1b4ae0c88c6e59",
+                      "hub_sha256":  "c453955303d3e968d87015279966fdefd603c84345e5cdf72c1b4ae0c88c6e59",
+                      "ronsas_bytes":  8775,
+                      "hub_bytes":  8775
+                  },
+                  {
+                      "path":  "components\\ui\\navigation-menu.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "e9cc8001c5444e4bca8abcaff2f9ed5e27fe40201127f6c170d149462c313362",
+                      "hub_sha256":  "e9cc8001c5444e4bca8abcaff2f9ed5e27fe40201127f6c170d149462c313362",
+                      "ronsas_bytes":  5272,
+                      "hub_bytes":  5272
+                  },
+                  {
+                      "path":  "components\\ui\\pagination.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "4ddeedce9ba3119fd105649f27502cdadd036966323c4cfb6bd6686656e7ddf8",
+                      "hub_sha256":  "4ddeedce9ba3119fd105649f27502cdadd036966323c4cfb6bd6686656e7ddf8",
+                      "ronsas_bytes":  2837,
+                      "hub_bytes":  2837
+                  },
+                  {
+                      "path":  "components\\ui\\popover.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "5b57bee5769e87ab533a8326c6a25fc1940b5a8fbe1c5276f25ba89615cc7030",
+                      "hub_sha256":  "5b57bee5769e87ab533a8326c6a25fc1940b5a8fbe1c5276f25ba89615cc7030",
+                      "ronsas_bytes":  1383,
+                      "hub_bytes":  1383
+                  },
+                  {
+                      "path":  "components\\ui\\progress.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "61646ebf88d17e251bafd69784b40af978e4a5e8311a5651288b203410a9b107",
+                      "hub_sha256":  "61646ebf88d17e251bafd69784b40af978e4a5e8311a5651288b203410a9b107",
+                      "ronsas_bytes":  806,
+                      "hub_bytes":  806
+                  },
+                  {
+                      "path":  "components\\ui\\radio-group.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "2e71f118a77c7adf6c5cc35923576632d0db62c1db4a4aa2b16acad7a841a43d",
+                      "hub_sha256":  "2e71f118a77c7adf6c5cc35923576632d0db62c1db4a4aa2b16acad7a841a43d",
+                      "ronsas_bytes":  1441,
+                      "hub_bytes":  1441
+                  },
+                  {
+                      "path":  "components\\ui\\resizable.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "3c3fdec6f7cca80a152bc861a313758bf28703170cdd322ce4ec9da5f0b67a2f",
+                      "hub_sha256":  "3c3fdec6f7cca80a152bc861a313758bf28703170cdd322ce4ec9da5f0b67a2f",
+                      "ronsas_bytes":  1589,
+                      "hub_bytes":  1589
+                  },
+                  {
+                      "path":  "components\\ui\\scroll-area.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "c9f69c09fada3c8653fb4122988a43f6bf49a0b71e8be5ffeeca94e0d87ca266",
+                      "hub_sha256":  "c9f69c09fada3c8653fb4122988a43f6bf49a0b71e8be5ffeeca94e0d87ca266",
+                      "ronsas_bytes":  1679,
+                      "hub_bytes":  1679
+                  },
+                  {
+                      "path":  "components\\ui\\select.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "27b85948433560e1d1792037dafac2fa4d0dc38e72977464271ceae1bac60a1d",
+                      "hub_sha256":  "27b85948433560e1d1792037dafac2fa4d0dc38e72977464271ceae1bac60a1d",
+                      "ronsas_bytes":  5901,
+                      "hub_bytes":  5901
+                  },
+                  {
+                      "path":  "components\\ui\\separator.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "0f833b4b3a11bdb561f10b704902cb1533d2119bb0c2c7b81fbb47955b621224",
+                      "hub_sha256":  "0f833b4b3a11bdb561f10b704902cb1533d2119bb0c2c7b81fbb47955b621224",
+                      "ronsas_bytes":  747,
+                      "hub_bytes":  747
+                  },
+                  {
+                      "path":  "components\\ui\\sheet.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "b78b82c5e0e83ac972ae96ff489ed1d5c0ae792c77c9cec67d201f0c76d3b098",
+                      "hub_sha256":  "b78b82c5e0e83ac972ae96ff489ed1d5c0ae792c77c9cec67d201f0c76d3b098",
+                      "ronsas_bytes":  4370,
+                      "hub_bytes":  4370
+                  },
+                  {
+                      "path":  "components\\ui\\sidebar.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "6148f06d25729d308ae4effb9f003af2947940d853216bc3ddd346b3d8aceb73",
+                      "hub_sha256":  "6148f06d25729d308ae4effb9f003af2947940d853216bc3ddd346b3d8aceb73",
+                      "ronsas_bytes":  24850,
+                      "hub_bytes":  24850
+                  },
+                  {
+                      "path":  "components\\ui\\skeleton.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "020954b8c6a47e7584eefee6af278bf8ce482b8152585b70052cf196b6fd79a5",
+                      "hub_sha256":  "020954b8c6a47e7584eefee6af278bf8ce482b8152585b70052cf196b6fd79a5",
+                      "ronsas_bytes":  246,
+                      "hub_bytes":  246
+                  },
+                  {
+                      "path":  "components\\ui\\slider.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "5ee4156c0e9a0bfb12fbbdd80a881e5b957e4e4801e7c9082b5d6f7062a7dbbf",
+                      "hub_sha256":  "5ee4156c0e9a0bfb12fbbdd80a881e5b957e4e4801e7c9082b5d6f7062a7dbbf",
+                      "ronsas_bytes":  1048,
+                      "hub_bytes":  1048
+                  },
+                  {
+                      "path":  "components\\ui\\sonner.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "be303e32fe6688cdf44ba42466aed162d4d6341eb279317d1fbeb3b4ae4cbe8b",
+                      "hub_sha256":  "be303e32fe6688cdf44ba42466aed162d4d6341eb279317d1fbeb3b4ae4cbe8b",
+                      "ronsas_bytes":  757,
+                      "hub_bytes":  757
+                  },
+                  {
+                      "path":  "components\\ui\\switch.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "194d3554933df8573ef1bf84584e1acb9b255f55e73b24b2076c36cca116c5e6",
+                      "hub_sha256":  "194d3554933df8573ef1bf84584e1acb9b255f55e73b24b2076c36cca116c5e6",
+                      "ronsas_bytes":  1183,
+                      "hub_bytes":  1183
+                  },
+                  {
+                      "path":  "components\\ui\\table.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "14849bacd517394129565a2736f367a2dc218dee044e9dbc4c37ede9ae56e22b",
+                      "hub_sha256":  "14849bacd517394129565a2736f367a2dc218dee044e9dbc4c37ede9ae56e22b",
+                      "ronsas_bytes":  2914,
+                      "hub_bytes":  2914
+                  },
+                  {
+                      "path":  "components\\ui\\tabs.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "a33395479355fc3cb0127e8731359830ceb29cb137b4090b65a8a9818c2a093d",
+                      "hub_sha256":  "a33395479355fc3cb0127e8731359830ceb29cb137b4090b65a8a9818c2a093d",
+                      "ronsas_bytes":  1987,
+                      "hub_bytes":  1987
+                  },
+                  {
+                      "path":  "components\\ui\\textarea.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "5af8d497b7b1c4f77399bf5b9f1861230d9950d0c2c5fe1bdbf8b3bdb6eab1e0",
+                      "hub_sha256":  "5af8d497b7b1c4f77399bf5b9f1861230d9950d0c2c5fe1bdbf8b3bdb6eab1e0",
+                      "ronsas_bytes":  698,
+                      "hub_bytes":  698
+                  },
+                  {
+                      "path":  "components\\ui\\toggle-group.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "868ca1dc957db5b9eb0b8784c170a5dc39e880234747e127a690bfd6628bcb53",
+                      "hub_sha256":  "868ca1dc957db5b9eb0b8784c170a5dc39e880234747e127a690bfd6628bcb53",
+                      "ronsas_bytes":  1809,
+                      "hub_bytes":  1809
+                  },
+                  {
+                      "path":  "components\\ui\\toggle.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "537f16e684e49fe17451d7cab1b7dbf60a594a4f7698b84277fe374f3aca1f59",
+                      "hub_sha256":  "537f16e684e49fe17451d7cab1b7dbf60a594a4f7698b84277fe374f3aca1f59",
+                      "ronsas_bytes":  1576,
+                      "hub_bytes":  1576
+                  },
+                  {
+                      "path":  "components\\ui\\tooltip.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "657bfcea60e04adf0d5385ae4aabede6158b718206c4b8a91452a728acb9ad00",
+                      "hub_sha256":  "657bfcea60e04adf0d5385ae4aabede6158b718206c4b8a91452a728acb9ad00",
+                      "ronsas_bytes":  1310,
+                      "hub_bytes":  1310
+                  },
+                  {
+                      "path":  "hooks\\use-mobile.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "f6f7a7643d4607721c57e2b8c4081a8f84aefbb0a240f4b9dd1fc20d8d7a61e6",
+                      "hub_sha256":  "f6f7a7643d4607721c57e2b8c4081a8f84aefbb0a240f4b9dd1fc20d8d7a61e6",
+                      "ronsas_bytes":  595,
+                      "hub_bytes":  595
+                  },
+                  {
+                      "path":  "integrations\\supabase\\auth-attacher.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "0340647ab825e3624001603c39c4ce2f10db3fa5945f8f5064379657694a7cf2",
+                      "hub_sha256":  "35fa7443cf6680d89d536bbb7b8a75de42a70b4e5b72d151df8122f93d9f20d6",
+                      "ronsas_bytes":  1416,
+                      "hub_bytes":  632
+                  },
+                  {
+                      "path":  "integrations\\supabase\\auth-middleware.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "e2b87322b86681579d3d83192f855559c6c367fc0763829dbbbf6f3666f0e3fb",
+                      "hub_sha256":  "681a586ac69f82115d87327963ae613f20b370fd5d3e506f9717312061baa186",
+                      "ronsas_bytes":  2349,
+                      "hub_bytes":  2375
+                  },
+                  {
+                      "path":  "integrations\\supabase\\client.server.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "22885e3ada4b6a16ba8b7cf6700f47018cf8ef959a87bf23a29c12afc9f38fd6",
+                      "hub_sha256":  "2fbf471b1f664cfcf9ff6b66acb7de46ad1c5f43f8e32eb11fe5757ff6538e1c",
+                      "ronsas_bytes":  1767,
+                      "hub_bytes":  1793
+                  },
+                  {
+                      "path":  "integrations\\supabase\\client.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "79ce69447bcd73f262e500e83d3174ee940d4f4de7cbc75c1eb891e31104cf49",
+                      "hub_sha256":  "316c7faf1dc43ef9360c383ec8abe56c2d9d9fb10862029388200b5f3c57f1cf",
+                      "ronsas_bytes":  1616,
+                      "hub_bytes":  1642
+                  },
+                  {
+                      "path":  "integrations\\supabase\\types.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "1ddba93db4bbf7564394673a9c9ad68aa1277be707dad6078207e9dbb97c733a",
+                      "hub_sha256":  "5cb34dd50e19633935581dff5c0ec5489e9d173c21fcd8c2fee14c6c32f1e07b",
+                      "ronsas_bytes":  57405,
+                      "hub_bytes":  45982
+                  },
+                  {
+                      "path":  "lib\\admin-bootstrap.core.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "815e582689ad61d7c0694d491627fca892301cb5995724f5e44978b447b4c1a0",
+                      "hub_sha256":  "815e582689ad61d7c0694d491627fca892301cb5995724f5e44978b447b4c1a0",
+                      "ronsas_bytes":  3294,
+                      "hub_bytes":  3294
+                  },
+                  {
+                      "path":  "lib\\admin-bootstrap.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "48c7f2081c7ff61fa7a14ac85e477f61fdef55871d690a3e0cc8e3bed501e3ce",
+                      "hub_sha256":  "3d4bcb27a7acce5aec610e78b6368fc314bdcf3ade84f4365a6a7e87eb166ab3",
+                      "ronsas_bytes":  10153,
+                      "hub_bytes":  10131
+                  },
+                  {
+                      "path":  "lib\\admin-credits.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "a3a38e8a0d937615129da150f80faa9c3d520b8e53af9fdbaab07d8ebaf89395",
+                      "hub_sha256":  "5bad4048c048c4c553a5a51fd9caad20bfa50887238e0d32564a9fa4561fd0dc",
+                      "ronsas_bytes":  16256,
+                      "hub_bytes":  16231
+                  },
+                  {
+                      "path":  "lib\\admin-revenue.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "91196811143c585ebd441a0c4a222f9c135710ee9027a57453a47850c18aa3c8",
+                      "hub_sha256":  "83793f49e66166ec8bc2abdfab9337ea03c14816772ba9f465b29e6a9678bd9b",
+                      "ronsas_bytes":  4279,
+                      "hub_bytes":  4249
+                  },
+                  {
+                      "path":  "lib\\app-registry.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "613a89fa4e656a151f929434ea8bee646b1508283c5d73e3d56d6cefeed5de07",
+                      "hub_sha256":  "8297f791d45658384c7320e0518e7c9a774027b212380b58947898aec7322e66",
+                      "ronsas_bytes":  7452,
+                      "hub_bytes":  8003
+                  },
+                  {
+                      "path":  "lib\\auth-gate-analytics.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "48b92caceeebeecd4929c037e9d781b57171625d07192084e269abe59fcd66cc",
+                      "hub_sha256":  "48b92caceeebeecd4929c037e9d781b57171625d07192084e269abe59fcd66cc",
+                      "ronsas_bytes":  2779,
+                      "hub_bytes":  2779
+                  },
+                  {
+                      "path":  "lib\\auth-gate-debug.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "e1f4bcaac353c0ad5a542d2968eef781b27e213691e190f270368307dc5f2d77",
+                      "hub_sha256":  "e1f4bcaac353c0ad5a542d2968eef781b27e213691e190f270368307dc5f2d77",
+                      "ronsas_bytes":  2004,
+                      "hub_bytes":  2004
+                  },
+                  {
+                      "path":  "lib\\billing-portal.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "21e5e56c0b392bf06152afd690e9ffdd4ec473679ba9f9346e9b56e1f14e02f5",
+                      "hub_sha256":  "44aae65664a8957ab04dfd517c5fa05ea3a379a3f532ba0a0fe44a839a9e4a0d",
+                      "ronsas_bytes":  6254,
+                      "hub_bytes":  3964
+                  },
+                  {
+                      "path":  "lib\\checkout-return.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "4887806b8b96c59fd81e2ab058c80e3de4041ceb7470dd7a0561ba02b5c42778",
+                      "hub_sha256":  "4887806b8b96c59fd81e2ab058c80e3de4041ceb7470dd7a0561ba02b5c42778",
+                      "ronsas_bytes":  3177,
+                      "hub_bytes":  3177
+                  },
+                  {
+                      "path":  "lib\\checkout.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "9a43047bd5b86a8feb3676b7e35c602b9f2363d17504d1c8d6eb3b2ed751febb",
+                      "hub_sha256":  "249adfa3d6f39337ed2854fb3207c231c6980b0a65adba7cf29b9fe414a71f5f",
+                      "ronsas_bytes":  16528,
+                      "hub_bytes":  16829
+                  },
+                  {
+                      "path":  "lib\\ci-alert-config.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "a908034c0cb3436f39af22de4307966b5b82d957f24767e1bddaf6b169910ffa",
+                      "hub_sha256":  "a6ff81e574c49a9caafe5e80b96265c572d48defce544f02d819cbe32f7b29e1",
+                      "ronsas_bytes":  3333,
+                      "hub_bytes":  2955
+                  },
+                  {
+                      "path":  "lib\\ci-repo-presets.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "5c776738c32c18803ca7fbbe74e7e8b5527f90d8c0cbc80a4641f96aa3081e04",
+                      "hub_sha256":  "ed988d28e21bb8219f50e2c7e1ca46339385bf2e87c5c738024651de4b490e9f",
+                      "ronsas_bytes":  2423,
+                      "hub_bytes":  2210
+                  },
+                  {
+                      "path":  "lib\\commercial-policy.ts",
+                      "state":  "ronsas_only",
+                      "ronsas_sha256":  "174a1224adf203d3cb154705cc4496b47301345f8d40d37c8fb848c43236c04f",
+                      "hub_sha256":  null,
+                      "ronsas_bytes":  820,
+                      "hub_bytes":  null
+                  },
+                  {
+                      "path":  "lib\\discernment-guard.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "929e53ca17ddbf5c3ef93b7283faf7264a149993a4ce306e115d0145f083bedc",
+                      "hub_sha256":  "929e53ca17ddbf5c3ef93b7283faf7264a149993a4ce306e115d0145f083bedc",
+                      "ronsas_bytes":  2830,
+                      "hub_bytes":  2830
+                  },
+                  {
+                      "path":  "lib\\discernment.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "0957520075dadf78b9f391a98b970775688c647ed9043b36c1df03aa0fb8043e",
+                      "hub_sha256":  "0957520075dadf78b9f391a98b970775688c647ed9043b36c1df03aa0fb8043e",
+                      "ronsas_bytes":  3668,
+                      "hub_bytes":  3668
+                  },
+                  {
+                      "path":  "lib\\email-domain.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "e94eb6d5b05928f215d939e26633a517174f2b679149bcb32b4759a2c875017c",
+                      "hub_sha256":  "d57271337221e07f45e760f1a7cac52a140d8eabc8d20b5515ec110e3792cee4",
+                      "ronsas_bytes":  5640,
+                      "hub_bytes":  5517
+                  },
+                  {
+                      "path":  "lib\\email-sends.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "259186d1e91f50fcc7ac3526767a533fcce2c8f6f7285d3bc61176231264bcf0",
+                      "hub_sha256":  "a610616d755fc226b627496ec3530cffadf7f18dd84a79a1860ca4260780d1cb",
+                      "ronsas_bytes":  2081,
+                      "hub_bytes":  2060
+                  },
+                  {
+                      "path":  "lib\\entitlement-admin.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "92b4b3b288ded7d2d04829c5a187b916535df8f70602446af11fce79d24bcbf4",
+                      "hub_sha256":  "057bb775e74c021155bf341a5b96e86e9e067b283e90f7c49ca0410ccd57017c",
+                      "ronsas_bytes":  1295,
+                      "hub_bytes":  1274
+                  },
+                  {
+                      "path":  "lib\\entitlement.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "5976c3ee9c629cc126f441b5ed173c4e8156d93b9ec7763b49488eec1622b76a",
+                      "hub_sha256":  "9c8b99819dfe1d2c3e046d7dd293119b97ce7b1ce28c57da21954967307dd994",
+                      "ronsas_bytes":  7012,
+                      "hub_bytes":  8008
+                  },
+                  {
+                      "path":  "lib\\error-capture.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "e6a8a15a852a00dc877bc7c6418b8d67b905e9665f5457e4ffa18992d32a9af8",
+                      "hub_sha256":  "e6a8a15a852a00dc877bc7c6418b8d67b905e9665f5457e4ffa18992d32a9af8",
+                      "ronsas_bytes":  933,
+                      "hub_bytes":  933
+                  },
+                  {
+                      "path":  "lib\\error-page.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "b070f0586e5d17c818700024c9dff021b7e7ffb40cd8e7f7e7bc19ea82efd1b5",
+                      "hub_sha256":  "b070f0586e5d17c818700024c9dff021b7e7ffb40cd8e7f7e7bc19ea82efd1b5",
+                      "ronsas_bytes":  1401,
+                      "hub_bytes":  1401
+                  },
+                  {
+                      "path":  "lib\\feed-cache.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "fdcfea335f7eacb7891f1ad73956a7606fd467b24443e249ff3fa10267cc6368",
+                      "hub_sha256":  "fdcfea335f7eacb7891f1ad73956a7606fd467b24443e249ff3fa10267cc6368",
+                      "ronsas_bytes":  2517,
+                      "hub_bytes":  2517
+                  },
+                  {
+                      "path":  "lib\\github-ci.contract.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "ecfa9e7e3b11fdf7cd97295bec987491753b7bf534ae5f6cc759e54db0c715f4",
+                      "hub_sha256":  "ecfa9e7e3b11fdf7cd97295bec987491753b7bf534ae5f6cc759e54db0c715f4",
+                      "ronsas_bytes":  5475,
+                      "hub_bytes":  5475
+                  },
+                  {
+                      "path":  "lib\\github-ci.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "403d29845dc299c1f6650b45ced5ababdad1ed1f04c337c25869d7f9e9bd5f5e",
+                      "hub_sha256":  "d3d045ece012a2206328ebb1a064d02a688e924e6c6e3ab697b6d7addca28a0b",
+                      "ronsas_bytes":  14590,
+                      "hub_bytes":  13366
+                  },
+                  {
+                      "path":  "lib\\github-health.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "2767faa357600b340593245ae9e6f96be36ff3bc7ab175628fe63267c85ab21e",
+                      "hub_sha256":  "973476ba84005e9bc8a3c8611bf2c1d0da6ab878a9a2b6b05da3978984111d64",
+                      "ronsas_bytes":  7566,
+                      "hub_bytes":  6925
+                  },
+                  {
+                      "path":  "lib\\github-pulls.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "19f5710afd73ea66d4218674eb036afec70b96e5e9e9e720b2c5494e9092b61f",
+                      "hub_sha256":  "bec63d78cbf01c5b6b0fcdcf3ab774ffffd246e43374c21c27c7e77fc0ada634",
+                      "ronsas_bytes":  6346,
+                      "hub_bytes":  5705
+                  },
+                  {
+                      "path":  "lib\\github-releases.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "4831c960ee4077bdf275483e71e83f99fbed3be0798148b0035793230f3d1efd",
+                      "hub_sha256":  "cbf80d60a81e8383a7eac31f07c4a3d459cea76a51f715d949f1cc63a87e761f",
+                      "ronsas_bytes":  6031,
+                      "hub_bytes":  5498
+                  },
+                  {
+                      "path":  "lib\\github-security.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "8bfe73bcd1a5d59b99d27f66ea61aaeb3de485bb559646ed3b1b2e10c4da00b2",
+                      "hub_sha256":  "4e5a0ed6bf9d92b6453d53e6b5f2653552b3f54fcde39712eacaad0ac0c533ae",
+                      "ronsas_bytes":  6090,
+                      "hub_bytes":  5608
+                  },
+                  {
+                      "path":  "lib\\github.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "0ef2f6e31a2a38d825d019203d2bf6bc155976ec57da1d42be8e4aef010d107c",
+                      "hub_sha256":  "32019c76910afcc89ee18744f684ee7d2ee1a832ba55b1bd96942b4f4c3c85cd",
+                      "ronsas_bytes":  3676,
+                      "hub_bytes":  3035
+                  },
+                  {
+                      "path":  "lib\\invoices.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "9e3b58fc73a46c2c14d55e18ae07afe0a86d8ffa4718261a2b864d519d0cc11d",
+                      "hub_sha256":  "7b09f7d83917619873b08d08f5b340025aebb333a940b4724c2f29cd51db4d86",
+                      "ronsas_bytes":  4425,
+                      "hub_bytes":  2460
+                  },
+                  {
+                      "path":  "lib\\itn-logs.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "88b17907e08185ce573c285d20cd24e110c2cab24270dcb6de95371da23b715a",
+                      "hub_sha256":  "0b56b615e58418e69032c574f862e5a622840274a60dc176bdb79989bf8ee3f6",
+                      "ronsas_bytes":  1179,
+                      "hub_bytes":  1158
+                  },
+                  {
+                      "path":  "lib\\newsletter.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "4238c573f6a4f5642bbd3503ce0ea54bd843e75f321f2e3a35ea789be29fddc2",
+                      "hub_sha256":  "8ec5bcbae4cbd5dd1859a38a6d5844243dfbc7fe916a8d324b685d59462138bf",
+                      "ronsas_bytes":  1181,
+                      "hub_bytes":  1176
+                  },
+                  {
+                      "path":  "lib\\origin.functions.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "d1a7c70882b6dc329cc9724d3b557639530173ecb63ae7fff4dae36084e8b3db",
+                      "hub_sha256":  "d1a7c70882b6dc329cc9724d3b557639530173ecb63ae7fff4dae36084e8b3db",
+                      "ronsas_bytes":  376,
+                      "hub_bytes":  376
+                  },
+                  {
+                      "path":  "lib\\payfast-audit.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "d58174e916aaaf4ad19921eb93c41c072d9505bd4116c13c91d17cb2a48ed690",
+                      "hub_sha256":  "0bb3ef3ce2de93f0bd16cec984188792ea5cdcf956590920c90c763066e10d2a",
+                      "ronsas_bytes":  4267,
+                      "hub_bytes":  4246
+                  },
+                  {
+                      "path":  "lib\\plan-changes.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "4ea94868283ddc6af3ced1484946a6f025d78d03424b8a52f28ffc6674ac3f63",
+                      "hub_sha256":  "52ab9dcab46f80d63dac9934ce1957e722ab18194f1e32440101a637ca1e68c7",
+                      "ronsas_bytes":  1175,
+                      "hub_bytes":  1241
+                  },
+                  {
+                      "path":  "lib\\pricing-meta.ts",
+                      "state":  "ronsas_only",
+                      "ronsas_sha256":  "8d5895f88d9072d4744163b3c65f1b83d7857cfa9c8c6c28f83208b911d346df",
+                      "hub_sha256":  null,
+                      "ronsas_bytes":  935,
+                      "hub_bytes":  null
+                  },
+                  {
+                      "path":  "lib\\rcgf.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "bd69853615ec199dbc5c3376b2e1bbca6e9538f20b63632ef1c3d4dc4cdac490",
+                      "hub_sha256":  "bd69853615ec199dbc5c3376b2e1bbca6e9538f20b63632ef1c3d4dc4cdac490",
+                      "ronsas_bytes":  2120,
+                      "hub_bytes":  2120
+                  },
+                  {
+                      "path":  "lib\\repo-slug.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "6fece8b7a554048daf6c11607895663f9bf96496cb6df9d5533671419e4a0246",
+                      "hub_sha256":  "6fece8b7a554048daf6c11607895663f9bf96496cb6df9d5533671419e4a0246",
+                      "ronsas_bytes":  2076,
+                      "hub_bytes":  2076
+                  },
+                  {
+                      "path":  "lib\\requireTier-request.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "202ce8f34c29b8b6be2be7e0449ad64d194b23bd4144882449b07cddf88ed401",
+                      "hub_sha256":  "53f2d35004e681a9e978413801b9e6e111f480001d066838f4d2fee7cdce934a",
+                      "ronsas_bytes":  8796,
+                      "hub_bytes":  7813
+                  },
+                  {
+                      "path":  "lib\\return-to-allowlist.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "89eb06e4c36318c1111a37e1f9e3e6ac053f2a3b08b8bd7f48e42e39e6b7e301",
+                      "hub_sha256":  "f8c0a16a79b63ecd16f13acfa6a22089973d07ee389fb49a4427814fb334f53d",
+                      "ronsas_bytes":  1802,
+                      "hub_bytes":  1762
+                  },
+                  {
+                      "path":  "lib\\rnd-control.core.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "639eda44e4cc1f6d98cc60f04f3306729493d94b8ad199f3ca71bca86a0460fb",
+                      "hub_sha256":  "3283f15b1a7acfcd80fa575b14b99efc9ed3a8ae07768c901a0da4d8a7051fc3",
+                      "ronsas_bytes":  4233,
+                      "hub_bytes":  3862
+                  },
+                  {
+                      "path":  "lib\\rnd-control.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "6f8eaab9086eb52cd32968bb8a868e1d80e798a0821b4db1cdd88bd5b1bf5f61",
+                      "hub_sha256":  "3e5652c49a3f33e8e536c8393dd565c50c733d57bc3007e56848ba608fb4c3da",
+                      "ronsas_bytes":  30920,
+                      "hub_bytes":  27824
+                  },
+                  {
+                      "path":  "lib\\rop-admin.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "4ebcbda19e76960fefd436bce03dd91688cc8bfdadd74d970840b15d1794d714",
+                      "hub_sha256":  "5b36db312c970eed8c77e0a32b6ea11b59a47d519c927b8ddb9d2942552956a4",
+                      "ronsas_bytes":  9435,
+                      "hub_bytes":  9028
+                  },
+                  {
+                      "path":  "lib\\sign-out.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "def1d99046ac3a5ca86f7bac6136bbaa35abe1bd76fe98af02e1169bcce5d009",
+                      "hub_sha256":  "def1d99046ac3a5ca86f7bac6136bbaa35abe1bd76fe98af02e1169bcce5d009",
+                      "ronsas_bytes":  1358,
+                      "hub_bytes":  1358
+                  },
+                  {
+                      "path":  "lib\\subscriptions.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "be4a85c57a818babfe18e778d8270544305a745045eb0ff658fba797bb58dae9",
+                      "hub_sha256":  "b3238a5ba6b9747e65e11ad5292d7aa70f7b2cb2a3d6b1b81047419a9c8a8135",
+                      "ronsas_bytes":  2073,
+                      "hub_bytes":  2134
+                  },
+                  {
+                      "path":  "lib\\test-email.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "b337c6b84718d78eb9bcff8ca5ef09de41af8fd0f15731ee4360f33dbd581e34",
+                      "hub_sha256":  "74439735c62c8c3d0fe2342f03908025e364c2c4cdb56b3e185f87b910f0a0fa",
+                      "ronsas_bytes":  2324,
+                      "hub_bytes":  2319
+                  },
+                  {
+                      "path":  "lib\\utils.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "c0adf27efbfa148d5abcf99e860f8e3e6c8fc77a1f99e023c08ef4f12e6ece29",
+                      "hub_sha256":  "c0adf27efbfa148d5abcf99e860f8e3e6c8fc77a1f99e023c08ef4f12e6ece29",
+                      "ronsas_bytes":  175,
+                      "hub_bytes":  175
+                  },
+                  {
+                      "path":  "lib\\verify-purchase.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "394aa8c5ba63adc29716b6920e50ca47442f9dd3c23685228c8820d8f011f331",
+                      "hub_sha256":  "330f84e60474e6e4c765268d319b53931fcee4d63c666b98c8229fefd84adc1e",
+                      "ronsas_bytes":  2509,
+                      "hub_bytes":  2688
+                  },
+                  {
+                      "path":  "lib\\visits.functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "8de3013e062def21a7bca01566987f3f7307b0e70190305171847e9fe7d12158",
+                      "hub_sha256":  "049bf1cc52a52f4cc0494fed068382ad996376152bf3f76c2b8b16712c49c1ed",
+                      "ronsas_bytes":  3961,
+                      "hub_bytes":  3935
+                  },
+                  {
+                      "path":  "lib\\email-templates\\ci-failure-alert.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "df9c81f8c62301137981eb98d715645fbee9e82df13832656030812eb40703cc",
+                      "hub_sha256":  "df9c81f8c62301137981eb98d715645fbee9e82df13832656030812eb40703cc",
+                      "ronsas_bytes":  5836,
+                      "hub_bytes":  5836
+                  },
+                  {
+                      "path":  "lib\\email-templates\\registry.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "7ae7d12cc670cc98621d880cce9de42fca59f6b89134aa9767568d076d897e4f",
+                      "hub_sha256":  "7ae7d12cc670cc98621d880cce9de42fca59f6b89134aa9767568d076d897e4f",
+                      "ronsas_bytes":  943,
+                      "hub_bytes":  943
+                  },
+                  {
+                      "path":  "lib\\email-templates\\subscription-confirmed.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "3e31161938772c7d742fb1accf4d21f8fc597e2f418444feea654e6371be2052",
+                      "hub_sha256":  "3e31161938772c7d742fb1accf4d21f8fc597e2f418444feea654e6371be2052",
+                      "ronsas_bytes":  3465,
+                      "hub_bytes":  3465
+                  },
+                  {
+                      "path":  "lib\\governance\\contracts.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "56c3c063782b359b04aad481f3997495a470bed40dad9154ac6bad29ae73702a",
+                      "hub_sha256":  "56c3c063782b359b04aad481f3997495a470bed40dad9154ac6bad29ae73702a",
+                      "ronsas_bytes":  3178,
+                      "hub_bytes":  3178
+                  },
+                  {
+                      "path":  "lib\\governance\\functions.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "5ec8177a0bcf8282b43bd0600419d9ec2ca8eff888a687af7e7862fe6cd3eb58",
+                      "hub_sha256":  "eed86f7e46fa5dac044ff45c0f37d34b44335722a7ef7e6eca8ae5dfee5c1658",
+                      "ronsas_bytes":  7413,
+                      "hub_bytes":  10285
+                  },
+                  {
+                      "path":  "lib\\mcp\\bridge-client.ts",
+                      "state":  "ronsas_only",
+                      "ronsas_sha256":  "627eec791519ee8c28a1fd304dab119d362f7c8807914ab474282aa28633ca8f",
+                      "hub_sha256":  null,
+                      "ronsas_bytes":  1785,
+                      "hub_bytes":  null
+                  },
+                  {
+                      "path":  "lib\\mcp\\index.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "e9adb57d4adb122bc9af223b5e0bd83fdd0df75984bc14ff7d9053de88f241c0",
+                      "hub_sha256":  "9ccae0d7e5d8e42c92b95b1cf18141504b8572b1d7fd751073fecf54f2dc9618",
+                      "ronsas_bytes":  1111,
+                      "hub_bytes":  1713
+                  },
+                  {
+                      "path":  "lib\\mcp\\tools\\bridge.ts",
+                      "state":  "ronsas_only",
+                      "ronsas_sha256":  "a06d0a97f23d2f1bfd98f94b3b9f74df0f60eb296140eebeaddc756009e0dc72",
+                      "hub_sha256":  null,
+                      "ronsas_bytes":  8296,
+                      "hub_bytes":  null
+                  },
+                  {
+                      "path":  "lib\\mcp\\tools\\echo.ts",
+                      "state":  "ronsas_only",
+                      "ronsas_sha256":  "515b5cd82b3c422debf3d5044986c8dc5267a4a436962f7fdf17e0c4a24b7e72",
+                      "hub_sha256":  null,
+                      "ronsas_bytes":  462,
+                      "hub_bytes":  null
+                  },
+                  {
+                      "path":  "lib\\mcp\\tools\\list-updates.ts",
+                      "state":  "ronsas_only",
+                      "ronsas_sha256":  "4eab6892f0018cbb010993a1cf61d8b2047a9690404cfd6a5bf6d1598e451f63",
+                      "hub_sha256":  null,
+                      "ronsas_bytes":  1507,
+                      "hub_bytes":  null
+                  },
+                  {
+                      "path":  "lib\\myify\\contracts.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "975b3976ac61d122afe2fdcb66616f013b8df6c21671b575b62044991f36c124",
+                      "hub_sha256":  "975b3976ac61d122afe2fdcb66616f013b8df6c21671b575b62044991f36c124",
+                      "ronsas_bytes":  1586,
+                      "hub_bytes":  1586
+                  },
+                  {
+                      "path":  "lib\\myify\\core.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "20fbccb598d692512e7744281e71eaffd867f0106977a9dd8b8ea5af0813b5bc",
+                      "hub_sha256":  "20fbccb598d692512e7744281e71eaffd867f0106977a9dd8b8ea5af0813b5bc",
+                      "ronsas_bytes":  3581,
+                      "hub_bytes":  3581
+                  },
+                  {
+                      "path":  "lib\\myify\\functions.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "4705ec1c25fbd16018868b78ccf1de85f1f604059d6390367bae0514f3025bf2",
+                      "hub_sha256":  "4705ec1c25fbd16018868b78ccf1de85f1f604059d6390367bae0514f3025bf2",
+                      "ronsas_bytes":  7288,
+                      "hub_bytes":  7288
+                  },
+                  {
+                      "path":  "lib\\rop\\cron-auth.server.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "f0b87cf00fb7a513036da9a434df3b3b183bdb5e3307decd248e4bc4336118c7",
+                      "hub_sha256":  "f0b87cf00fb7a513036da9a434df3b3b183bdb5e3307decd248e4bc4336118c7",
+                      "ronsas_bytes":  1355,
+                      "hub_bytes":  1355
+                  },
+                  {
+                      "path":  "lib\\rop\\delivery-persistence.ts",
+                      "state":  "ronsas_only",
+                      "ronsas_sha256":  "19f5b270b70ef6757a2b6f8867a69dabd132c7e948a10dad20b93f95d18fc4cc",
+                      "hub_sha256":  null,
+                      "ronsas_bytes":  5290,
+                      "hub_bytes":  null
+                  },
+                  {
+                      "path":  "lib\\rop\\hmac.server.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "4c3206e6d55ed6af5559e5e4cdae3f20df6b21d6fc0cf6a415e78e0fa1299d37",
+                      "hub_sha256":  "d21f2f4d7e3e0b2b41ea4906c9d693182f317daa37d88ad18ccdd0e16eafcf7b",
+                      "ronsas_bytes":  5081,
+                      "hub_bytes":  3544
+                  },
+                  {
+                      "path":  "lib\\rop\\ingest-schemas.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "41437d1bac746c2c5d4faa257e3fc5990ed5d0431ca05375f120959a30d33810",
+                      "hub_sha256":  "41437d1bac746c2c5d4faa257e3fc5990ed5d0431ca05375f120959a30d33810",
+                      "ronsas_bytes":  3398,
+                      "hub_bytes":  3398
+                  },
+                  {
+                      "path":  "lib\\rop\\origin-policy.ts",
+                      "state":  "ronsas_only",
+                      "ronsas_sha256":  "8345925dfda019bfd9eb3ca9f570c6056d7488e8753beb4f71e615944bab41b1",
+                      "hub_sha256":  null,
+                      "ronsas_bytes":  3109,
+                      "hub_bytes":  null
+                  },
+                  {
+                      "path":  "routes\\account.billing.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "4dad83b02a48414d2d78eb88643bacf86400585550ff6d25522d7eeaf7fd4c5a",
+                      "hub_sha256":  "48e0326d3910f20ed1e2648567ce74c00f0d2964426f17bdd52c02da860ff2cf",
+                      "ronsas_bytes":  10518,
+                      "hub_bytes":  9530
+                  },
+                  {
+                      "path":  "routes\\account.debug.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "d2c24edc7251241241c91ad7d5667fb8f1c0e36aaca0feabee5d2a384284bc63",
+                      "hub_sha256":  "d2c24edc7251241241c91ad7d5667fb8f1c0e36aaca0feabee5d2a384284bc63",
+                      "ronsas_bytes":  7054,
+                      "hub_bytes":  7054
+                  },
+                  {
+                      "path":  "routes\\account.invoices.$id.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "4f79054fc3b202bbb74f1e1c86bb4d4013b966a5faa8f0879a1ed4e033a3fd72",
+                      "hub_sha256":  "cc812886efa7cc04bc6ffed0073a726550b622641f01e3cf03b3e756914fe7d3",
+                      "ronsas_bytes":  6206,
+                      "hub_bytes":  5885
+                  },
+                  {
+                      "path":  "routes\\account.invoices.by-payment.$pf.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "29bcf857951482c8ad678d0a50b16b0dc537846ce0120dd738442f3e8f2fbbb7",
+                      "hub_sha256":  "f51edc030d64bad5278e2e085754dc50732de437f849fad42057ede5a76766dc",
+                      "ronsas_bytes":  2946,
+                      "hub_bytes":  2748
+                  },
+                  {
+                      "path":  "routes\\account.invoices.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "227a79f54cef3ecd7d0d37b4913cfa130c5d0818176c66b26fede86210aba2ca",
+                      "hub_sha256":  "56179429be56dd20124ccbdfc680c015d0b6c6674ab0e76f548672c7c7d106cf",
+                      "ronsas_bytes":  6160,
+                      "hub_bytes":  5655
+                  },
+                  {
+                      "path":  "routes\\account.subscriptions.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "443e8ed76c3cb264b8056755c9a6ca519b9c861816a2a5211f7b117c810c1775",
+                      "hub_sha256":  "a5eda67e6653a4c800981de929054142e7639d7eec4ce40f06c9ed192a9aaece",
+                      "ronsas_bytes":  29655,
+                      "hub_bytes":  29247
+                  },
+                  {
+                      "path":  "routes\\admin.access.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "2b29bd4135e81b69de28c1cac3f297ecd94f3f00a5662404bef370006825a065",
+                      "hub_sha256":  "cf6a46fe65cfe519bd66fa34f6a4672dac8456b3ca7242237b9f57ea11740834",
+                      "ronsas_bytes":  15209,
+                      "hub_bytes":  15188
+                  },
+                  {
+                      "path":  "routes\\admin.billing.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "04d0f2d9f74d5cd342c32516a934089cdeaf607d97828646587ac9e6b68dbc6a",
+                      "hub_sha256":  "d81f3ec92c36364ffa1f0b40a53daf981827ec30d8d84bc8adfb1a3092e051ff",
+                      "ronsas_bytes":  7347,
+                      "hub_bytes":  7391
+                  },
+                  {
+                      "path":  "routes\\admin.ci-health.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "aa28a545147b9321a3d3076656abed2dd75a975b62db7e9a34ab85fc3125ceae",
+                      "hub_sha256":  "328e43b49932caf868dc41bb26081b14c7801d870b258227d37494a2d89ec2ef",
+                      "ronsas_bytes":  44489,
+                      "hub_bytes":  44533
+                  },
+                  {
+                      "path":  "routes\\admin.credits.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "1d9e0671e2bd1e9d1e5a30b2f475219c510413337696adeba30efe824ac7dcbd",
+                      "hub_sha256":  "4c7abba2ed75c321201f37090d260c756329893e973d5d25b32116664bb135db",
+                      "ronsas_bytes":  27690,
+                      "hub_bytes":  27734
+                  },
+                  {
+                      "path":  "routes\\admin.email-domain.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "8328af5612eb78809114905f54af5973665a359ddacc9f25bffa788a9af2b152",
+                      "hub_sha256":  "d14505eaf738277ec07538cee470be65edf5bf071bc9bf43c299a40b2fd92901",
+                      "ronsas_bytes":  8220,
+                      "hub_bytes":  8264
+                  },
+                  {
+                      "path":  "routes\\admin.emails.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "24f3b53f81513a5b3254f81581150bc7f37548da4605446f9837f34fac41722d",
+                      "hub_sha256":  "ea4701b819b1f281e1136964d2a0139823bb5a57aded4120d8e73122788b659a",
+                      "ronsas_bytes":  14082,
+                      "hub_bytes":  16113
+                  },
+                  {
+                      "path":  "routes\\admin.entitlement-diagnostics.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "2d6e701dc507ca7a0fbbb7f78648bf35593aac1a6d858a3ad7e5b5f0745f48dd",
+                      "hub_sha256":  "b709a1f0d778b9d040d92fd34da1907a1565941b599f003c20392f33b810a3cf",
+                      "ronsas_bytes":  4196,
+                      "hub_bytes":  4240
+                  },
+                  {
+                      "path":  "routes\\admin.index.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "e877963754d2bc034d90fa3d2e454e6050f75563951048d657a73fa86c7f75fe",
+                      "hub_sha256":  "8e78c50c1cffe0601e3b6e9514d20266db6347f5965e9005d1144f3ef190c150",
+                      "ronsas_bytes":  17086,
+                      "hub_bytes":  18012
+                  },
+                  {
+                      "path":  "routes\\admin.invoices.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "e04f3a3a370019f2506792c372b3fd9ac98f847d8333682021105238661025d1",
+                      "hub_sha256":  "5b257e23f68b38c4f450b1a3b2725fc61573f19eacde1871c31e2f8c3b8ee7c5",
+                      "ronsas_bytes":  8291,
+                      "hub_bytes":  8335
+                  },
+                  {
+                      "path":  "routes\\admin.login.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "7694d8579b3658daaed3eb8c7a56f152b1dcef4d4d20354be976123e51bcd0b1",
+                      "hub_sha256":  "7b7fa4236db6ebb6e5c328a827d9bd4eee6374cb73eddb4ed67c67ca20cbb204",
+                      "ronsas_bytes":  7792,
+                      "hub_bytes":  7821
+                  },
+                  {
+                      "path":  "routes\\admin.payfast-audit.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "0d618a79158e80f8754fadb85b36466f7b8a7044cda76b74d80286eb6b02ca8f",
+                      "hub_sha256":  "eaba05de81af287a89f3a644a2a4043f1a7677e6f14d1d264a436e03099b55dc",
+                      "ronsas_bytes":  12224,
+                      "hub_bytes":  12268
+                  },
+                  {
+                      "path":  "routes\\admin.repo-health.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "6ae7e85334c660f5c276cb8a57e31cf9bad0dc8ed15a7382ec158ea42e521f0a",
+                      "hub_sha256":  "7b168981631316f1b7b5f522415e9043dd32058c65ca576bcedd1e3859f06852",
+                      "ronsas_bytes":  16236,
+                      "hub_bytes":  16280
+                  },
+                  {
+                      "path":  "routes\\admin.revenue.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "84b917a5206ab3aa2bf9021f7a926210e200827daffea123132c50a1088e05f2",
+                      "hub_sha256":  "1d9810fc2df4dce104ddf7988b9e9b15813839c12dd799f2a884937cf377dc00",
+                      "ronsas_bytes":  11948,
+                      "hub_bytes":  11992
+                  },
+                  {
+                      "path":  "routes\\admin.rnd.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "cfa12ffadf927ecc5bce55f2c1b0eb6419050fa8fa20d2ca41b04ab05af42765",
+                      "hub_sha256":  "65b8953ac96c82143c3937ef06de51514dcd180164c8276551a892ad6da5ecb1",
+                      "ronsas_bytes":  26481,
+                      "hub_bytes":  28181
+                  },
+                  {
+                      "path":  "routes\\admin.rop.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "8dbf6c0c7af2c47f716259731d67b7c42e1328f87e47f59d06a1633f5378493d",
+                      "hub_sha256":  "91965ee9fc4fe82f53e78a7671fc74a449b9753010cb35c5df8cf32eb737ee41",
+                      "ronsas_bytes":  16877,
+                      "hub_bytes":  16379
+                  },
+                  {
+                      "path":  "routes\\admin.security-scan.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "ef71df7a10c4348b55e0a315ab91e6b09340f5216ad5da81a5153bba3ba9a542",
+                      "hub_sha256":  "19098060dd8b4713fc98c35988421c8f6aae9cd55acf7bb0dced34a9aa05fae0",
+                      "ronsas_bytes":  14674,
+                      "hub_bytes":  14718
+                  },
+                  {
+                      "path":  "routes\\admin.webhooks.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "8ff2d9a798fe101f26bc753432cc10a0e6b9d7eb63ccff8aef5709ab06731ec1",
+                      "hub_sha256":  "c9d5abf68422b400ea8c684608e9d9f2b04bcde154dae3e48d89d5cb6749d888",
+                      "ronsas_bytes":  7063,
+                      "hub_bytes":  7107
+                  },
+                  {
+                      "path":  "routes\\checkout.cancel.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "36fdc5378dd4fb74bd09e6be26224e7968d2201afd0a2f974fca16e671123846",
+                      "hub_sha256":  "36fdc5378dd4fb74bd09e6be26224e7968d2201afd0a2f974fca16e671123846",
+                      "ronsas_bytes":  3618,
+                      "hub_bytes":  3618
+                  },
+                  {
+                      "path":  "routes\\checkout.success.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "4a78ba896f3f04f248b9acb84e9999d80b609d888e5ae93991e36ac554e5d5e6",
+                      "hub_sha256":  "4a78ba896f3f04f248b9acb84e9999d80b609d888e5ae93991e36ac554e5d5e6",
+                      "ronsas_bytes":  9253,
+                      "hub_bytes":  9253
+                  },
+                  {
+                      "path":  "routes\\checkout.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "aa17a744417fdaf58cd67bc406ce717630abfcd84acf87a632f2440db43ef5a3",
+                      "hub_sha256":  "11dc17290f2bedeb9c22b046a0ad0770948e9538351176054848be78714a6263",
+                      "ronsas_bytes":  3816,
+                      "hub_bytes":  3311
+                  },
+                  {
+                      "path":  "routes\\creative-studio.pricing.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "692e4233ded92ee65183157d93eac83da16f951eea05954da8a695cb16547d1e",
+                      "hub_sha256":  "692e4233ded92ee65183157d93eac83da16f951eea05954da8a695cb16547d1e",
+                      "ronsas_bytes":  338,
+                      "hub_bytes":  338
+                  },
+                  {
+                      "path":  "routes\\epublisher.pricing.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "9f78b4e12c627c4126e33b58441a28390eeb59e1423c0e03960ff52a458169e8",
+                      "hub_sha256":  "9f78b4e12c627c4126e33b58441a28390eeb59e1423c0e03960ff52a458169e8",
+                      "ronsas_bytes":  328,
+                      "hub_bytes":  328
+                  },
+                  {
+                      "path":  "routes\\governance.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "bfd03e28d0719fe775c70d1f8bbfaebc8ba63f041663c1d112e579f78d441f2b",
+                      "hub_sha256":  "bfd03e28d0719fe775c70d1f8bbfaebc8ba63f041663c1d112e579f78d441f2b",
+                      "ronsas_bytes":  9224,
+                      "hub_bytes":  9224
+                  },
+                  {
+                      "path":  "routes\\governance_.workspace.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "e29104c4146cd361a9814af05b77e86afbe5423c4e04543316054395dad528bc",
+                      "hub_sha256":  "ca1481d3f7786eb27ad0bcee3394f16e15a94b8b3cd9da5dbf2570f9b84fd8e0",
+                      "ronsas_bytes":  35605,
+                      "hub_bytes":  35644
+                  },
+                  {
+                      "path":  "routes\\index.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "a886829c5c099d3d3670e3c187baf2c42c8457f98a064d060c084a99eb1aeab3",
+                      "hub_sha256":  "416a7f20f06f0b1e7edf1f3dc2f480b95c48fd05ca559f9b9a2c96aaa2834e86",
+                      "ronsas_bytes":  78061,
+                      "hub_bytes":  80656
+                  },
+                  {
+                      "path":  "routes\\legal.governance.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "85bfd9e5cee5b9f82f4b05a46c0b22175104ceb05bfefdc3dd27cff455ece195",
+                      "hub_sha256":  "6d91aa6738f58051db0a1c473703375f44a1bc6365b5a0fb414eb27c7ba50b23",
+                      "ronsas_bytes":  279,
+                      "hub_bytes":  225
+                  },
+                  {
+                      "path":  "routes\\login.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "631f68565e82875d60accabb6cdf98702ebb6541adf8f7dae01c911677c3e3ec",
+                      "hub_sha256":  "cd18473264b5b68842a70d4058183c83640e0a1234e6b37cdd896432c4a140b9",
+                      "ronsas_bytes":  6113,
+                      "hub_bytes":  6541
+                  },
+                  {
+                      "path":  "routes\\mcp.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "0450d208ced1b56584d7cc0fb673c2bbf93699bfdba75a204b62c29e309938c2",
+                      "hub_sha256":  "d6996f9b09e061f125019111f114e8415675a1e9e01f4ff7b1483aea24a2eda9",
+                      "ronsas_bytes":  660,
+                      "hub_bytes":  505
+                  },
+                  {
+                      "path":  "routes\\myify.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "814b0b622b73aa4d8d9bbf5e48ca92136e82b6024cbf8159a9a8bd9aa7139549",
+                      "hub_sha256":  "a5bc1c88c4ad02e93e261ab95beb28bfa44d2a7ae152f193ca06ce08900279f6",
+                      "ronsas_bytes":  33481,
+                      "hub_bytes":  37345
+                  },
+                  {
+                      "path":  "routes\\pricing.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "f1ec2356f76605d64101c8a39be9732f70a4f83d9d2ec34614ab6a3c384dc4f6",
+                      "hub_sha256":  "24cf75197966a4707a6c0d7b75c7f61b7dc3cf9b94b4972323dd94c34927ab07",
+                      "ronsas_bytes":  6887,
+                      "hub_bytes":  3658
+                  },
+                  {
+                      "path":  "routes\\rcgf.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "798d71a68f5d50c74fbe14ddc589f237f227b1abeda435ea0235dea7933e243d",
+                      "hub_sha256":  "3389a2efe229e5679155e9e982c80b18772929b884d3a84ab21e18859e49cd46",
+                      "ronsas_bytes":  267,
+                      "hub_bytes":  213
+                  },
+                  {
+                      "path":  "routes\\sitemap[.]xml.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "9d980c8dac66fad71da71388d929e1d9ee77eb35f6ca8ca1b054050615dd7395",
+                      "hub_sha256":  "83cc221ce813d5877112c961695a6af458f25e1e73f2db1b78bc41ba9afcc0d2",
+                      "ronsas_bytes":  2958,
+                      "hub_bytes":  3350
+                  },
+                  {
+                      "path":  "routes\\sync-vision.pricing.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "bdcd830601502e93f8de393e70555ada257ad2a9d78bdb6ff3a518b183102ba6",
+                      "hub_sha256":  "bdcd830601502e93f8de393e70555ada257ad2a9d78bdb6ff3a518b183102ba6",
+                      "ronsas_bytes":  330,
+                      "hub_bytes":  330
+                  },
+                  {
+                      "path":  "routes\\tools.issue-triage.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "489e7c0c2e87c1c372abd07bea5270f787148462640880e2f05736605a8e08ef",
+                      "hub_sha256":  "8e3b9a2001ea858c0b5704393010b4dcde57a0721e168b8db37027d1b6b0d691",
+                      "ronsas_bytes":  12985,
+                      "hub_bytes":  13029
+                  },
+                  {
+                      "path":  "routes\\tools.pr-status.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "4f5bc37213d2a363a32304784ffa9ea42c75d20b338ab24b3915e62a4adff19a",
+                      "hub_sha256":  "b5c4f4bc8580fa1cfea641c51e04e956a846d968c440ec601285aff185e7028b",
+                      "ronsas_bytes":  16012,
+                      "hub_bytes":  16056
+                  },
+                  {
+                      "path":  "routes\\tools.releases.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "4b0966b899811b22a44d8fc7b8aefa61a9ff287cd59ffc11d83c3f0a60d00b1b",
+                      "hub_sha256":  "f8478e32637b59880cc6cf6b7daec1a22e85314be4dc833fda80eaaa4081a9e7",
+                      "ronsas_bytes":  16585,
+                      "hub_bytes":  16629
+                  },
+                  {
+                      "path":  "routes\\updates.preview.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "c1f76e289ab95bb83518a02486c957306200c8d65dafe8c4e95e7c28c349d41e",
+                      "hub_sha256":  "c1f76e289ab95bb83518a02486c957306200c8d65dafe8c4e95e7c28c349d41e",
+                      "ronsas_bytes":  8891,
+                      "hub_bytes":  8891
+                  },
+                  {
+                      "path":  "routes\\youtube-optimizer.pricing.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "7e30bf710b131517f0c67aca01aa1618ff5986e964f16ee1b278eec87f327420",
+                      "hub_sha256":  "7e30bf710b131517f0c67aca01aa1618ff5986e964f16ee1b278eec87f327420",
+                      "ronsas_bytes":  342,
+                      "hub_bytes":  342
+                  },
+                  {
+                      "path":  "routes\\[.]lovable.oauth.consent.tsx",
+                      "state":  "identical",
+                      "ronsas_sha256":  "4a57ba86f7265a94d587595ac3815a26a8bf34dd1df4d7c4e01adc624e80c40a",
+                      "hub_sha256":  "4a57ba86f7265a94d587595ac3815a26a8bf34dd1df4d7c4e01adc624e80c40a",
+                      "ronsas_bytes":  5702,
+                      "hub_bytes":  5702
+                  },
+                  {
+                      "path":  "routes\\__root.tsx",
+                      "state":  "different",
+                      "ronsas_sha256":  "b1cfcb6c9b8c55ad042f62d043975253b5102e070bd9ca844049d600663172c7",
+                      "hub_sha256":  "7d25d11e0c74fee05a4506ad7d62209269a02746bfae67212dbae1583f618704",
+                      "ronsas_bytes":  6167,
+                      "hub_bytes":  6703
+                  },
+                  {
+                      "path":  "routes\\api\\public\\entitlement.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "0b8c987d3f2680e7693f70831c44e5265c65719732ef10e34e9b8dfab2f475d4",
+                      "hub_sha256":  "8d411b1f81f8b7c861710a59ef7081ca320aa57d6ff5ed48561bf52d238a5e06",
+                      "ronsas_bytes":  7445,
+                      "hub_bytes":  7111
+                  },
+                  {
+                      "path":  "routes\\api\\public\\analytics\\auth-gate.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "cb84850e6e3118bdc2ae8f96d95756480cb65cf20975f285d67127ea4dbbce8d",
+                      "hub_sha256":  "cb84850e6e3118bdc2ae8f96d95756480cb65cf20975f285d67127ea4dbbce8d",
+                      "ronsas_bytes":  3233,
+                      "hub_bytes":  3233
+                  },
+                  {
+                      "path":  "routes\\api\\public\\forms\\create-issue.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "e8ff7661a346efbe36356b049d3046d27534aa3933a4f32bed455434f27b592c",
+                      "hub_sha256":  "ca8d7c5a08dc3ab3803dea8b31428982b94a8a94332266b9ed2d8acba994e35e",
+                      "ronsas_bytes":  5768,
+                      "hub_bytes":  5628
+                  },
+                  {
+                      "path":  "routes\\api\\public\\generate\\creative-studio\\poster.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "52e0e9fbd31c81b5f56baf98019efa8559bc685dbe5c4e5377c3d7cfc3476ed1",
+                      "hub_sha256":  "bda553f83e309f03f5ce291759a94f5c546a7806a65ba7523fa53596bcb9d165",
+                      "ronsas_bytes":  7322,
+                      "hub_bytes":  7537
+                  },
+                  {
+                      "path":  "routes\\api\\public\\hooks\\ci-failure-alerts.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "b329b8b626e9031beff0084a49996082b552b9f1e278f881f4cc77621af2afd2",
+                      "hub_sha256":  "b32017793cb9997afa6c53e8646c5b1c420d11cac11f8656c9e25a46f561fac7",
+                      "ronsas_bytes":  12312,
+                      "hub_bytes":  12082
+                  },
+                  {
+                      "path":  "routes\\api\\public\\hooks\\process-subscription-emails.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "3fab0aecb7a132377734f700470c275ae0f3219f222b9f1630d923a01e3a9100",
+                      "hub_sha256":  "ef5d8255fc82593dec213765f1dbdd02fafeacc20624144674f7c20229cce285",
+                      "ronsas_bytes":  9228,
+                      "hub_bytes":  9196
+                  },
+                  {
+                      "path":  "routes\\api\\public\\payfast\\itn.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "a07d100613efba4406c5167ce1846ec45fbb13ed22c494373cc4dd9fb537e135",
+                      "hub_sha256":  "d3503f3891f8c24b1f6156f1115b3e83efe6eb3bf41a336435cbb9748f8a6eea",
+                      "ronsas_bytes":  23894,
+                      "hub_bytes":  26093
+                  },
+                  {
+                      "path":  "routes\\api\\public\\rop\\ingest-applied.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "f152d95d2ae1e99ca2f7fac3901aef06c2b489d892c727b8816d7dfa4e96e775",
+                      "hub_sha256":  "f152d95d2ae1e99ca2f7fac3901aef06c2b489d892c727b8816d7dfa4e96e775",
+                      "ronsas_bytes":  3771,
+                      "hub_bytes":  3771
+                  },
+                  {
+                      "path":  "routes\\api\\public\\rop\\ingest-perf.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "a654260cef8dc3935cb7b4a25ad07ea43b4e2ebc6ec584192fdb80b7ed1a11ae",
+                      "hub_sha256":  "a654260cef8dc3935cb7b4a25ad07ea43b4e2ebc6ec584192fdb80b7ed1a11ae",
+                      "ronsas_bytes":  1973,
+                      "hub_bytes":  1973
+                  },
+                  {
+                      "path":  "routes\\api\\public\\rop\\ingest-suggestion.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "7e7ff40ebac5bcf195c7e13b27d4e9ee1e419650f8e3ff1edc194f17bf1e436c",
+                      "hub_sha256":  "7e7ff40ebac5bcf195c7e13b27d4e9ee1e419650f8e3ff1edc194f17bf1e436c",
+                      "ronsas_bytes":  2936,
+                      "hub_bytes":  2936
+                  },
+                  {
+                      "path":  "routes\\api\\public\\rop\\pull-broadcasts.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "78dab9d6df2bf24c104e9e7bb739e4eae2a265380531cfda81c50fb30d600cde",
+                      "hub_sha256":  "78dab9d6df2bf24c104e9e7bb739e4eae2a265380531cfda81c50fb30d600cde",
+                      "ronsas_bytes":  1686,
+                      "hub_bytes":  1686
+                  },
+                  {
+                      "path":  "routes\\api\\public\\rop\\cron\\cross-app-scan.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "fa05b46cc8c0be77eec204d5db984280a858567f508731971747ab706c190f42",
+                      "hub_sha256":  "d75d7da4484a23b37a922a237551c6bcdd0c45809144ca9d5524117f52b9ab9a",
+                      "ronsas_bytes":  7150,
+                      "hub_bytes":  7449
+                  },
+                  {
+                      "path":  "routes\\api\\public\\rop\\cron\\measure-outcomes.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "729df758097f7696032edd8cd18d11b1bf67e9f82dea00a1044f609138f5aa4f",
+                      "hub_sha256":  "729df758097f7696032edd8cd18d11b1bf67e9f82dea00a1044f609138f5aa4f",
+                      "ronsas_bytes":  3169,
+                      "hub_bytes":  3169
+                  },
+                  {
+                      "path":  "routes\\api\\public\\updates\\atom.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "7477d36212818cc8ee88f5ca0c395e42a7ffa0910ffed2814bf7144e53025d87",
+                      "hub_sha256":  "7cc4b722a42be9ccc1a493ba0ea1b441b922d418451094d4f7c61f3cdec17346",
+                      "ronsas_bytes":  7863,
+                      "hub_bytes":  8563
+                  },
+                  {
+                      "path":  "routes\\api\\public\\updates\\rss.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "3d19e1e956759b01f7d985c6653f5d77eb1ca12f147220f2f495f28ba1340809",
+                      "hub_sha256":  "a7e7a5282ff88dee5452d492e16f5fb0f2a21abec8e1137191910c898b49482c",
+                      "ronsas_bytes":  7967,
+                      "hub_bytes":  8667
+                  },
+                  {
+                      "path":  "routes\\email\\unsubscribe.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "1ffc6c82a4eb3cdc2830222de9b5536bd0bb6d75fbe7d772d75cbee01b3b7f94",
+                      "hub_sha256":  "1ffc6c82a4eb3cdc2830222de9b5536bd0bb6d75fbe7d772d75cbee01b3b7f94",
+                      "ronsas_bytes":  5546,
+                      "hub_bytes":  5546
+                  },
+                  {
+                      "path":  "routes\\lovable\\email\\suppression.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "d6016288f96806f455ca937b4a2ad09b81d5e4252c94691e7d505b36726540e8",
+                      "hub_sha256":  "1c82134d566fcf6780fa59f4907941153118f529efed7fc60954580ba2ec1bce",
+                      "ronsas_bytes":  6954,
+                      "hub_bytes":  7089
+                  },
+                  {
+                      "path":  "routes\\lovable\\email\\queue\\process.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "a3a29cea1aacf1a2a1aedd9c93e06600c25fc0cbf483eabd57b097c49c118cc9",
+                      "hub_sha256":  "e12915d7d808c69b1afc401820f4eb8ff8745910d7e71ea08148ee38f1b6ac00",
+                      "ronsas_bytes":  13469,
+                      "hub_bytes":  13435
+                  },
+                  {
+                      "path":  "routes\\lovable\\email\\transactional\\preview.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "fa06e01c565e10f5a6e54917f4ff0c5f47bc4a32c2294735b58345c5408c38da",
+                      "hub_sha256":  "418b9cc9265e749a1e98cf1b1ece62149b45eb6fffc55b73d495a1f2d577e44e",
+                      "ronsas_bytes":  3094,
+                      "hub_bytes":  3445
+                  },
+                  {
+                      "path":  "routes\\lovable\\email\\transactional\\send.ts",
+                      "state":  "identical",
+                      "ronsas_sha256":  "7cb90e88907b11e7ff2be18dc2526a5e56799057cd2a8e46418ce1ef04161ce1",
+                      "hub_sha256":  "7cb90e88907b11e7ff2be18dc2526a5e56799057cd2a8e46418ce1ef04161ce1",
+                      "ronsas_bytes":  13552,
+                      "hub_bytes":  13552
+                  },
+                  {
+                      "path":  "routes\\[.mcp]\\list-tools.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "e2797f709e089fd6a8b30242b66da5194f0fed1063f43f0f8e7b58e92b32f606",
+                      "hub_sha256":  "727db35cf8fd271bf8f9a0c8b2cf86b962f6bb96ae3c8dd80b389adeb3283365",
+                      "ronsas_bytes":  807,
+                      "hub_bytes":  626
+                  },
+                  {
+                      "path":  "routes\\[.mcp]\\invoke-tool\\$tool.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "0609f0850688a9e10a99d631dd3df4464590907da0f3ee289834ef2c412c56e0",
+                      "hub_sha256":  "652eacd8658a8a22d6e520da70415810aeadd0ead609723cdf67e812e30b0cd2",
+                      "ronsas_bytes":  833,
+                      "hub_bytes":  638
+                  },
+                  {
+                      "path":  "routes\\[.well-known]\\oauth-protected-resource.ts",
+                      "state":  "different",
+                      "ronsas_sha256":  "7d79d5d09867a93d87772abb2fb2fdbfd3fe32f91df80c7c0f95c67ef30c64f0",
+                      "hub_sha256":  "8d4a0a8d9c773bcb1f9b96039425a24aca6fb5cc41ee3e982a9a01cb2467026c",
+                      "ronsas_bytes":  818,
+                      "hub_bytes":  595
+                  }
+              ]
+}
