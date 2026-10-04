@@ -3,8 +3,8 @@
     "canonical_id":  "RSN-APP-HUB",
     "canonical_name":  "Resonance Hub",
     "environment":  "production",
-    "release":  "PENDING_CANONICAL_RECONCILIATION",
-    "source_commit":  "PENDING_CANONICAL_RECONCILIATION",
+    "release":  "canonical-local-20261004",
+    "source_commit":  "62c93ab5",
     "governance_authority":  "RSN-PLT-DATANEST",
     "system_runtime":  "RSN-SYS-RONSAS",
     "classification":  "public-operational-metadata"

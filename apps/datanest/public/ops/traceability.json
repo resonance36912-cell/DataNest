@@ -3,8 +3,8 @@
     "canonical_id":  "RSN-PLT-DATANEST",
     "canonical_name":  "Resonance DataNest",
     "environment":  "production",
-    "release":  "PENDING_CANONICAL_RECONCILIATION",
-    "source_commit":  "PENDING_CANONICAL_RECONCILIATION",
+    "release":  "canonical-local-20261004",
+    "source_commit":  "62c93ab5",
     "runtime_front_door":  "RSN-APP-HUB",
     "system_runtime":  "RSN-SYS-RONSAS",
     "classification":  "public-operational-metadata"

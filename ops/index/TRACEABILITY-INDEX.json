@@ -1,7 +1,7 @@
 {
     "schema":  "resonance-traceability-index/v1",
     "generatedAt":  "2026-10-04",
-    "status":  "candidate-pending-ealiophin-reconciliation",
+    "status":  "local-certified-pending-remote-promotion",
     "repositoryTarget":  {
                              "canonicalId":  "RSN-PLT-DATANEST",
                              "canonicalRepositoryName":  "DataNest-Supository",
@@ -105,7 +105,7 @@
                       "machineAlias":  "Ealiophin",
                       "environment":  "RSN-ENV-PRD",
                       "role":  "production-master-runtime-authority",
-                      "currentObservation":  "desktop-commander-offline",
+                      "currentObservation":  "online-audited-2026-10-04",
                       "promotionAuthority":  true
                   },
                   {
@@ -357,5 +357,13 @@
                                              "RONSAS YouTube Optimizer"
                                          ]
                          }
-                     ]
+                     ],
+    "certification":  {
+                          "localSourceCommit":  "62c93ab5",
+                          "ronsasStatus":  "18/18-ready",
+                          "traceability":  "35-passed-0-failed",
+                          "openNovaManifest":  "261-files-verified",
+                          "remotePromotion":  "blocked-pending-governance-and-remote-transfer-validation",
+                          "certifiedAt":  "2026-10-04T14:45:23.0903069Z"
+                      }
 }
