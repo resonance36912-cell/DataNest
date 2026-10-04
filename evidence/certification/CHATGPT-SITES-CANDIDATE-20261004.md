@@ -3,13 +3,15 @@
 ## Canonical repository
 - Weed canonical path: `C:\Users\iamas\Resonance\DataNest-Supository-CANONICAL-STAGING`.
 - Exact deployable/runtime artifact source: `3c6b4bb0889b53f8d25ab2897e453c980c25ab7b`.
-- Later control/evidence successor at rebuild time: `76422105595ab5f6eed89d196f3efaddd56f86eb`; its changes are GitLab/deployment governance only and do not alter DataNest, Hub, RONSAS or Open Nova runtime source.
+- Later deployment/governance successors do not alter the sealed DataNest, Hub, RONSAS worker or Open Nova runtime bytes used for this local release-candidate cycle.
 - Ealiophin Open Nova repair `93803e8e78b430e31c035307c11b48d8e75377cb` is reconciled into the artifact source.
+- Spider topology/readiness governance is committed at `7a66e5a2db48c03678123716506217754761f21b`.
 - Target forge identity: `Resonance-AppDev/DataNest-Supository` on GitLab, pending account/group/project creation.
 
 ## Validation
 - Resonance traceability: **35 passed, 0 failed**.
-- Open Nova sealed build manifest: **261 files verified** by `platform/open-nova/scripts/verify-build-manifest.ps1` on both Ealiophin repair source and reconciled Weed source.
+- Open Nova sealed build manifest: **261 files verified** by `platform/open-nova/scripts/verify-build-manifest.ps1` on the reconciled source.
+- RONSAS governed worker-manifest validation: **passed** for Spider and Weed via `platform/ronsas/scripts/verify-worker-ops-manifests.ts`.
 - Hub commercial-mode / public-audit / security checks: **passed** on the fresh frozen-source build.
 - Hub TanStack Start + Nitro production build: **passed**, Cloudflare-module preset, exit code 0.
 - DataNest Next.js static export: **passed**, 21 static routes generated/exported.
@@ -34,7 +36,24 @@
    - Scope: fresh Hub Nitro Cloudflare-module server/public build from the same frozen source.
    - Status: governed release candidate; **not production-certified**.
 
+3. `Spider-RONSAS-worker-ops-release-3c6b4bb0-20261004.zip`
+   - SHA-256: `A475A9EE2328C2CE98F65A2DA7DC050B3008D1DE5EF3387BE5E6FEBB4453B7A0`
+   - ZIP bytes: `4,219`
+   - Scope: governed Spider worker manifest plus `Publish-RonsasControlMirror.ps1`, `Start-RonsasWorkerLoop.ps1`, `Sync-RonsasWorker.ps1`, and `Verify-RONSAS.ps1`.
+   - Status: sealed worker-control release candidate; **not freshly workstation-certified** because the remote Spider device registry remains offline.
+
 The older `*-candidate-20261004.zip` files remain historical evidence only and are superseded by the `*-release-3c6b4bb0-20261004.zip` artifacts above for this local release-candidate cycle.
+
+## Spider topology and authority
+- Canonical node ID: `RSN-NODE-SPIDER-DR-01`.
+- Role: support / disaster-recovery worker.
+- Production promotion authority: **false**.
+- Governed worker controls: `platform/ronsas/ops/workers/spider`.
+- Readiness record: `ops/nodes/SPIDER-READINESS.json`.
+- Dedicated readiness evidence: `evidence/certification/SPIDER-NODE-READINESS-20261004.md`.
+- Desktop Commander remote device ID: `36b21a2a-f70e-4efb-8773-4ac5f0454417`.
+- Current remote registry state during this audit: offline; therefore no fresh filesystem, Git, listener or runtime assertions are made for Spider.
+- Spider being offline does **not** block non-destructive GitLab forge import, but full three-node topology/DR certification remains blocked until a direct Spider audit is completed.
 
 ## ChatGPT Sites domain capability
 OpenAI Help Center, checked 2026-10-04, documents custom-domain connection for ChatGPT Sites where the feature is available. The Site owner uses **Site settings > Add domain**, enters an apex domain or subdomain, receives provider-issued DNS records, applies them at the DNS provider, then refreshes status. This establishes platform capability but does not establish availability on this specific account/site and does not authorize DNS changes.
@@ -43,7 +62,8 @@ No DNS records were changed during this build/certification cycle.
 
 ## Forge migration controls
 - Root GitLab CI contract: `.gitlab-ci.yml`.
-- Deterministic migration exporter: `ops/forge/Export-CanonicalForge.ps1`.
+- CI now includes a governed RONSAS worker-ops audit that verifies the Spider and Weed script bytes against their manifests before certification.
+- Deterministic migration exporter: `ops/forge/Export-CanonicalForge.ps1`; it requires a valid Spider readiness record and prevents Spider from holding promotion authority.
 - Migration runbook: `docs/deployment/GITLAB-FORGE-MIGRATION-RUNBOOK.md`.
 - Static publication remains manual; importing the repository does not authorize production publication or DNS cutover.
 
@@ -52,6 +72,7 @@ The former Open Nova byte-size/SHA manifest failure is resolved for the reconcil
 
 ## Remaining findings and production gates
 - GitLab account/group/project authority is not yet established or protected; a fresh remote-authority clone and CI reproduction remain required before production promotion.
+- Spider requires a fresh direct workstation audit before the complete Ealiophin/Weed/Spider DR topology can be certified current.
 - Target ChatGPT Site/account must expose the Sites feature and, where used, **Add domain**; provider-issued DNS values and TLS status must be captured as evidence before any cutover.
 - Supabase Auth/OAuth redirect allowlists, CSP/CORS, canonical metadata, robots/sitemap origins and service manifests must be updated as one governed cutover.
 - Hub warns that the Nitro Vite builder expects Vite 8 while the Hub currently pins Vite 7.3.6.

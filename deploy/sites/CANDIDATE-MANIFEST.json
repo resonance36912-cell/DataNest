@@ -2,10 +2,11 @@
   "schema": "resonance-sites-candidate@1",
   "generatedAt": "2026-10-04T17:03:00+02:00",
   "updatedOn": "2026-10-04",
-  "status": "rebuilt-candidate-awaiting-forge-domain-and-human-approval",
+  "status": "rebuilt-candidate-awaiting-forge-domain-spider-audit-and-human-approval",
   "canonicalRepository": "DataNest-Supository-CANONICAL-STAGING",
   "artifactSourceCommit": "3c6b4bb0889b53f8d25ab2897e453c980c25ab7b",
   "controlHeadAtRebuild": "76422105595ab5f6eed89d196f3efaddd56f86eb",
+  "spiderGovernanceHead": "7a66e5a2db48c03678123716506217754761f21b",
   "mergedEaliophinHead": "93803e8e78b430e31c035307c11b48d8e75377cb",
   "sourceBundle": {
     "name": "Weed-release-source-3c6b4bb0.bundle",
@@ -24,9 +25,23 @@
     "repairCommit": "93803e8e78b430e31c035307c11b48d8e75377cb",
     "reconciliationCommit": "3c6b4bb0889b53f8d25ab2897e453c980c25ab7b"
   },
+  "spider": {
+    "canonicalId": "RSN-NODE-SPIDER-DR-01",
+    "role": "support-worker-disaster-recovery",
+    "promotionAuthority": false,
+    "readinessRecord": "ops/nodes/SPIDER-READINESS.json",
+    "readinessEvidence": "evidence/certification/SPIDER-NODE-READINESS-20261004.md",
+    "remoteRegistryStatusAtAudit": "offline",
+    "freshWorkstationAudit": false,
+    "forgeImportBlocked": false,
+    "fullTopologyCertificationBlockedUntilFreshAudit": true,
+    "workerManifestValidator": "platform/ronsas/scripts/verify-worker-ops-manifests.ts",
+    "workerManifestValidation": "passed"
+  },
   "buildVerification": {
     "dataNestStatic": "passed",
     "ronsasBundledApps": 7,
+    "ronsasWorkerOps": "passed",
     "hubCommercialSecurityGates": "passed",
     "hubNitroCloudflareBuild": "passed"
   },
@@ -48,18 +63,29 @@
       "bytes": 3403414,
       "productionCertified": false,
       "note": "Fresh TanStack Start/Nitro Cloudflare-module build from the same frozen audited source. SSR, server functions and APIs remain on a supported server runtime rather than a static Sites layer."
+    },
+    {
+      "name": "Spider-RONSAS-worker-ops-release-3c6b4bb0-20261004.zip",
+      "role": "spider-governed-worker-controls",
+      "sourceCommit": "3c6b4bb0889b53f8d25ab2897e453c980c25ab7b",
+      "sha256": "A475A9EE2328C2CE98F65A2DA7DC050B3008D1DE5EF3387BE5E6FEBB4453B7A0",
+      "bytes": 4219,
+      "productionCertified": false,
+      "note": "Sealed governed Spider worker-control package containing manifest plus four RONSAS worker scripts. Deployment to Spider remains blocked from being called freshly certified until direct workstation audit is available."
     }
   ],
   "deploymentModel": {
     "sitesLayer": "DataNest public/static presentation and other lightweight public surfaces",
     "hubRuntime": "Nitro Cloudflare-module or another supported scalable server runtime",
     "statefulServices": "Supabase and governed sovereign services remain external to Sites",
+    "workerNodes": "Ealiophin retains production authority; Weed and Spider are support/DR workers. Spider has no production promotion authority.",
     "customDomain": "OpenAI documents ChatGPT Sites custom-domain connection where the feature is available. Verify the Site settings > Add domain control, capture provider-issued DNS records, and verify TLS before any cutover.",
     "dns": "No cutover performed and no DNS records changed."
   },
   "hardGates": [
     "Establish and protect the new GitLab forge repository authority, then verify a fresh clone matches the governed export/source history.",
-    "Run or reproduce the approved build gates from remote forge authority before production promotion.",
+    "Run or reproduce the approved build and worker-ops gates from remote forge authority before production promotion.",
+    "Complete a fresh direct Spider workstation audit before claiming full three-node topology/DR certification; this does not block non-destructive forge import.",
     "Verify the target ChatGPT Site exposes Add domain, record the provider-issued DNS values, and verify TLS before DNS changes.",
     "Update Supabase Auth/OAuth redirects, CSP/CORS, canonical metadata, robots and sitemap origins as part of the governed cutover.",
     "Record human governance approval before production promotion or DNS cutover."

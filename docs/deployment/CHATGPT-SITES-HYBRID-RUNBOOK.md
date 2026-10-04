@@ -86,6 +86,13 @@ After canonical GitLab import is certified, recreate `Mirror-DataNest` as a fork
 - Candidate changes return through audited merge requests to canonical `DataNest-Supository`.
 - Production artifacts are produced only from protected canonical `main`.
 
+## Worker / DR topology
+- `RSN-NODE-EALIOPHIN-PRD-01` remains production-master/runtime authority.
+- `RSN-NODE-WEED-DR-01` remains a support/recovery worker with no production promotion authority.
+- `RSN-NODE-SPIDER-DR-01` is included as a support/disaster-recovery worker with no production promotion authority.
+- Spider governed worker controls live at `platform/ronsas/ops/workers/spider` and are hash-verified by `platform/ronsas/scripts/verify-worker-ops-manifests.ts`.
+- Spider readiness is tracked at `ops/nodes/SPIDER-READINESS.json` with evidence at `evidence/certification/SPIDER-NODE-READINESS-20261004.md`.
+- The Desktop Commander remote registry still reports Spider offline during this audit, so no fresh workstation filesystem/Git/runtime claims are made. This does not block non-destructive forge import, but it blocks claiming the three-node DR topology is freshly certified until Spider is directly audited.
 ## Custom-domain strategy
 The canonical Hub brand domain remains `reson8.life`.
 
@@ -129,6 +136,8 @@ Preserve the same logical gates even though GitHub is no longer the forge:
 - DataNest Next static build: passed on the fresh frozen-source build.
 - Governed Weed/Ealiophin Git-history merge: completed.
 - Full 7-app RONSAS static aggregation: passed on Windows Node 24 using the committed launcher fix.
+- RONSAS Spider/Weed worker-operation manifest verification: passed; governed worker script bytes match manifests.
+- Spider worker-control release candidate sealed: Spider-RONSAS-worker-ops-release-3c6b4bb0-20261004.zip, SHA-256 A475A9EE2328C2CE98F65A2DA7DC050B3008D1DE5EF3387BE5E6FEBB4453B7A0, 4,219 bytes.
 - Exact artifact source frozen at `3c6b4bb0889b53f8d25ab2897e453c980c25ab7b`; later `76422105` changes are deployment/governance-only and do not alter deployable runtime source.
 - DataNest static release candidate sealed: `DataNest-Sites-static-release-3c6b4bb0-20261004.zip`, SHA-256 `82204DC45B6C38A4C2BE7FD67ACC2349225CBBE45EC35DDB76D6C990A9AB76C9`, 28,847,538 bytes.
 - Resonance Hub Nitro/Cloudflare release candidate sealed: `Resonance-Hub-Nitro-cloudflare-release-3c6b4bb0-20261004.zip`, SHA-256 `2A0A0719B34DBF89B8FE02254F9765C752A2BF8EFE7C9333E5EFF7012418F371`, 3,403,414 bytes.
@@ -146,6 +155,8 @@ Preserve the same logical gates even though GitHub is no longer the forge:
 - [x] Canonical traceability passes 35/35.
 - [x] Open Nova sealed manifest verifies 261 files.
 - [x] Local DataNest + 7 RONSAS and Hub/Nitro release candidates rebuilt from frozen audited source `3c6b4bb0` and SHA-256 sealed.
+- [x] Spider governed worker controls included and manifest-verified; sealed worker-control artifact recorded.
+- [ ] Fresh direct Spider workstation audit completed before declaring full three-node topology/DR certification.
 - [ ] New GitLab forge/project authority established and protected.
 - [ ] Final migration bundle generated from a clean committed head and hash recorded.
 - [ ] Fresh clone from GitLab matches the migration/export SHA exactly.
