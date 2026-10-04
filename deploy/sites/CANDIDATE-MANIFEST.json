@@ -1,0 +1,43 @@
+{
+  "schema": "resonance-sites-candidate@1",
+  "generatedAt": "2026-10-04T17:03:00+02:00",
+  "status": "candidate-rebuild-required-before-production",
+  "canonicalRepository": "DataNest-Supository-CANONICAL-STAGING",
+  "canonicalHeadAtManifest": "332ba0d93ff168cff5cf2847b9a5d5d612543574",
+  "mergedEaliophinHead": "cca7a36e489fce31c0d78f046be3d349179d4bd4",
+  "traceability": {
+    "passed": 35,
+    "failed": 0,
+    "validator": "ops/validation/Test-ResonanceTraceability.ps1"
+  },
+  "artifacts": [
+    {
+      "name": "DataNest-Sites-static-candidate-20261004.zip",
+      "role": "public-static-candidate",
+      "sha256": "27D8DB7277F46855A59961C438EDF829579E8D6D0DFDB31B84A1F7F23CD24489",
+      "bytes": 28790705,
+      "productionCertified": false,
+      "note": "Static DataNest plus seven RONSAS app bundles. Rebuild from final clean release checkout because repository history advanced during candidate generation."
+    },
+    {
+      "name": "Resonance-Hub-Nitro-cloudflare-candidate-20261004.zip",
+      "role": "hub-server-runtime-candidate",
+      "sha256": "AB2386960A51C8FCDE37444FEE69ECE91E87C5D5510749A4361688302201E374",
+      "bytes": 3375476,
+      "productionCertified": false,
+      "note": "TanStack Start/Nitro Cloudflare-module build. Keep SSR, server functions and APIs on a supported server runtime rather than flattening them into static Sites assets."
+    }
+  ],
+  "deploymentModel": {
+    "sitesLayer": "DataNest public/static presentation and other lightweight public surfaces",
+    "hubRuntime": "Nitro Cloudflare-module or another supported scalable server runtime",
+    "statefulServices": "Supabase and governed sovereign services remain external to Sites",
+    "dns": "No cutover performed. Custom-domain binding/TLS must be verified on the chosen provider origin before promotion."
+  },
+  "hardGates": [
+    "Rebuild all deployable artifacts from the final clean release checkout.",
+    "Resolve or governance-exclude the Open Nova sealed-manifest byte-size verification failure.",
+    "Verify provider-issued Sites origin and custom-domain support before DNS changes.",
+    "Record human governance approval before production promotion."
+  ]
+}
