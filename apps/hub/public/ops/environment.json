@@ -1,0 +1,8 @@
+{
+    "schema":  "resonance-public-environment/v1",
+    "canonical_id":  "RSN-APP-HUB",
+    "environment":  "production",
+    "deployment_state":  "migration-reconciliation",
+    "public_origin":  "https://reson8.life",
+    "internal_topology_exposed":  false
+}

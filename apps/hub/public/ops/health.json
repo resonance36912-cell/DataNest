@@ -1,0 +1,8 @@
+{
+    "schema":  "resonance-public-health/v1",
+    "canonical_id":  "RSN-APP-HUB",
+    "status":  "migration-reconciliation",
+    "ready":  false,
+    "checked_at":  null,
+    "detail_policy":  "public-summary-only"
+}

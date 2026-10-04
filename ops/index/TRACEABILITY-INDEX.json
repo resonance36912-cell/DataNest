@@ -1,0 +1,314 @@
+{
+    "schema":  "resonance-traceability-index/v1",
+    "generatedAt":  "2026-10-04",
+    "status":  "candidate-pending-ealiophin-reconciliation",
+    "repositoryTarget":  {
+                             "canonicalId":  "RSN-PLT-DATANEST",
+                             "canonicalRepositoryName":  "DataNest-Supository",
+                             "strategy":  "single-governed-monorepo-with-bounded-authority-domains"
+                         },
+    "environments":  [
+                         {
+                             "canonicalId":  "RSN-ENV-DEV",
+                             "slug":  "dev",
+                             "name":  "Development"
+                         },
+                         {
+                             "canonicalId":  "RSN-ENV-RND",
+                             "slug":  "rnd",
+                             "name":  "Research and Development"
+                         },
+                         {
+                             "canonicalId":  "RSN-ENV-TST",
+                             "slug":  "test",
+                             "name":  "Test"
+                         },
+                         {
+                             "canonicalId":  "RSN-ENV-STG",
+                             "slug":  "staging",
+                             "name":  "Staging"
+                         },
+                         {
+                             "canonicalId":  "RSN-ENV-PRD",
+                             "slug":  "production",
+                             "name":  "Production"
+                         },
+                         {
+                             "canonicalId":  "RSN-ENV-DR",
+                             "slug":  "recovery",
+                             "name":  "Disaster Recovery / Support Worker"
+                         }
+                     ],
+    "platforms":  [
+                      {
+                          "canonicalId":  "RSN-PLT-DATANEST",
+                          "canonicalName":  "Resonance DataNest",
+                          "slug":  "datanest",
+                          "repoPath":  "apps/datanest",
+                          "authority":  "governance-certified-knowledge-audit-transparency",
+                          "aliases":  [
+                                          "DataNest",
+                                          "DataNest-Supository",
+                                          "resonance-datanest"
+                                      ]
+                      },
+                      {
+                          "canonicalId":  "RSN-APP-HUB",
+                          "canonicalName":  "Resonance Hub",
+                          "slug":  "hub",
+                          "repoPath":  "apps/hub",
+                          "authority":  "runtime-commercial-customer-front-door",
+                          "aliases":  [
+                                          "resonance-hub",
+                                          "RONS Hub",
+                                          "RONSAS Hub",
+                                          "reson8.life"
+                                      ]
+                      },
+                      {
+                          "canonicalId":  "RSN-SYS-RONSAS",
+                          "canonicalName":  "Resonance Open Nova Sovereign Application Suite",
+                          "slug":  "ronsas",
+                          "repoPath":  "platform/ronsas",
+                          "authority":  "sovereign-runtime-module-service-orchestration-topology-recovery",
+                          "aliases":  [
+                                          "RONSAS",
+                                          "rons-sovereign-codebase"
+                                      ]
+                      },
+                      {
+                          "canonicalId":  "RSN-PLT-OPENNOVA",
+                          "canonicalName":  "Resonance Open Nova Development Platform",
+                          "slug":  "open-nova",
+                          "repoPath":  "platform/open-nova",
+                          "authority":  "provider-neutral-development-migration-tooling",
+                          "aliases":  [
+                                          "OpenNova",
+                                          "ResonanceAppDev_ZeroCredit",
+                                          "Foundry"
+                                      ]
+                      },
+                      {
+                          "canonicalId":  "RSN-GOV-RCGF",
+                          "canonicalName":  "Resonance Constitutional Governance Framework",
+                          "slug":  "rcgf",
+                          "repoPath":  "governance/rcgf",
+                          "authority":  "constitutional-policy-reference",
+                          "aliases":  [
+                                          "RCGF"
+                                      ]
+                      }
+                  ],
+    "nodes":  [
+                  {
+                      "canonicalId":  "RSN-NODE-EALIOPHIN-PRD-01",
+                      "machineAlias":  "Ealiophin",
+                      "environment":  "RSN-ENV-PRD",
+                      "role":  "production-master-runtime-authority",
+                      "currentObservation":  "desktop-commander-offline",
+                      "promotionAuthority":  true
+                  },
+                  {
+                      "canonicalId":  "RSN-NODE-WEED-DR-01",
+                      "machineAlias":  "Weed",
+                      "environment":  "RSN-ENV-DR",
+                      "role":  "support-worker-compatibility-recovery",
+                      "currentObservation":  "online-audited",
+                      "promotionAuthority":  false
+                  },
+                  {
+                      "canonicalId":  "RSN-NODE-SPIDER-DR-01",
+                      "machineAlias":  "Spider",
+                      "environment":  "RSN-ENV-DR",
+                      "role":  "support-worker",
+                      "currentObservation":  "not-freshly-observed-this-session",
+                      "promotionAuthority":  false
+                  }
+              ],
+    "services":  [
+                     {
+                         "canonicalId":  "RSN-SVC-HUB-WEB-PRD",
+                         "legacyId":  "hub",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  4173,
+                         "kind":  "core-module",
+                         "required":  true
+                     },
+                     {
+                         "canonicalId":  "RSN-SVC-EPUBLISHER-WEB-PRD",
+                         "legacyId":  "epublisher",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  3101,
+                         "kind":  "application-module",
+                         "required":  true
+                     },
+                     {
+                         "canonicalId":  "RSN-SVC-CREATIVE-STUDIO-PRD",
+                         "legacyId":  "creative-studio",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  3201,
+                         "kind":  "application-module",
+                         "required":  true
+                     },
+                     {
+                         "canonicalId":  "RSN-SVC-SYNC-VISION-PRD",
+                         "legacyId":  "sync-vision",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  3301,
+                         "kind":  "application-module",
+                         "required":  true
+                     },
+                     {
+                         "canonicalId":  "RSN-SVC-YOUTUBE-OPTIMIZER-PRD",
+                         "legacyId":  "youtube-optimizer",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  3401,
+                         "kind":  "application-module",
+                         "required":  true
+                     },
+                     {
+                         "canonicalId":  "RSN-SVC-LAUNCH-BROKER-PRD",
+                         "legacyId":  "launch-broker",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  4450,
+                         "kind":  "control-service",
+                         "required":  true
+                     },
+                     {
+                         "canonicalId":  "RSN-SVC-MUSETALK-BRIDGE-PRD",
+                         "legacyId":  "musetalk-bridge",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  7863,
+                         "kind":  "media-service",
+                         "required":  true
+                     },
+                     {
+                         "canonicalId":  "RSN-SVC-STT-LOCAL-PRD",
+                         "legacyId":  "local-stt",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  7864,
+                         "kind":  "ai-service",
+                         "required":  true
+                     },
+                     {
+                         "canonicalId":  "RSN-SVC-IMAGE-LOCAL-PRD",
+                         "legacyId":  "local-image",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  7865,
+                         "kind":  "ai-service",
+                         "required":  true
+                     },
+                     {
+                         "canonicalId":  "RSN-SVC-LLM-LOCAL-PRD",
+                         "legacyId":  "local-llm",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  7866,
+                         "kind":  "ai-service",
+                         "required":  true
+                     },
+                     {
+                         "canonicalId":  "RSN-SVC-CREATIVE-SOURCE-PRD",
+                         "legacyId":  "creative-source",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  7867,
+                         "kind":  "content-service",
+                         "required":  true
+                     },
+                     {
+                         "canonicalId":  "RSN-SVC-AI-BROKER-PRD",
+                         "legacyId":  "ai-broker",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  7868,
+                         "kind":  "ai-governance-service",
+                         "required":  true
+                     },
+                     {
+                         "canonicalId":  "RSN-SVC-EPUBLISHER-STT-PRD",
+                         "legacyId":  "epublisher-stt",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  7869,
+                         "kind":  "ai-service",
+                         "required":  true
+                     },
+                     {
+                         "canonicalId":  "RSN-SVC-PREMIUM-IMAGE-PRD",
+                         "legacyId":  "premium-image",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  7870,
+                         "kind":  "ai-service",
+                         "required":  true
+                     },
+                     {
+                         "canonicalId":  "RSN-SVC-FOUNDRY-PRD",
+                         "legacyId":  "foundry",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  8787,
+                         "kind":  "development-service",
+                         "required":  true
+                     },
+                     {
+                         "canonicalId":  "RSN-SVC-SOVEREIGN-BACKEND-PRD",
+                         "legacyId":  "sovereign-backend",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  58600,
+                         "listenPort":  8787,
+                         "kind":  "data-service",
+                         "required":  true
+                     },
+                     {
+                         "canonicalId":  "RSN-SVC-OLLAMA-PRD",
+                         "legacyId":  "ollama",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  11434,
+                         "kind":  "local-model-runtime",
+                         "required":  true
+                     },
+                     {
+                         "canonicalId":  "RSN-SVC-MYIFY-HUB-PRD",
+                         "legacyId":  "myify",
+                         "node":  "RSN-NODE-EALIOPHIN-PRD-01",
+                         "port":  4173,
+                         "kind":  "hub-application-module",
+                         "required":  false
+                     }
+                 ],
+    "publicAssetPlane":  {
+                             "class":  "operational-publication",
+                             "canonicalPrefix":  "RSN-PUB",
+                             "recommendedRoot":  "public/ops",
+                             "allowed":  [
+                                             "release",
+                                             "environment",
+                                             "catalog",
+                                             "health",
+                                             "traceability",
+                                             "approved-transparency",
+                                             "icons",
+                                             "robots",
+                                             "webmanifest",
+                                             "public-content-feeds"
+                                         ],
+                             "forbidden":  [
+                                               "secrets",
+                                               "credentials",
+                                               "private-keys",
+                                               "local-paths",
+                                               "private-node-addresses",
+                                               "internal-topology",
+                                               "database-connection-strings",
+                                               "raw-logs",
+                                               "private-user-data",
+                                               "unapproved-audit-evidence"
+                                           ],
+                             "generationPolicy":  "allowlist-transform-from-internal-registry"
+                         },
+    "weedAudit":  {
+                      "ronsasControlHead":  "819b773a263c277693031d76c1b4d32542365fd7",
+                      "workerHead":  "31af5284ef0690f7079ff278791b90d211ea41f4",
+                      "workerRelation":  "ancestor-613-commits-behind-control",
+                      "hubHead":  "1cbc8b72f88c210c076c4a9f9edafb40e55414fc",
+                      "hubStagedPaths":  8,
+                      "hubStagedPatch":  "resonance-hub-Weed-staged.patch",
+                      "openNovaManifestVerifiedFiles":  199
+                  }
+}

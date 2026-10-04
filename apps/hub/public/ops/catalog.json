@@ -1,0 +1,37 @@
+{
+    "schema":  "resonance-public-catalog/v1",
+    "canonical_id":  "RSN-APP-HUB",
+    "applications":  [
+                         {
+                             "canonical_id":  "RSN-APP-HUB",
+                             "name":  "Resonance Hub",
+                             "public_url":  "https://reson8.life",
+                             "status":  "migration-reconciliation"
+                         },
+                         {
+                             "canonical_id":  "RSN-APP-EPUBLISHER",
+                             "name":  "ePublisher",
+                             "public_url":  "https://epublisher.reson8.life",
+                             "status":  "revalidation-required"
+                         },
+                         {
+                             "canonical_id":  "RSN-APP-CREATIVE-STUDIO",
+                             "name":  "Creative Studio",
+                             "public_url":  "https://creative.reson8.life",
+                             "status":  "revalidation-required"
+                         },
+                         {
+                             "canonical_id":  "RSN-APP-SYNC-VISION",
+                             "name":  "Sync Vision",
+                             "public_url":  "https://sync.reson8.life",
+                             "status":  "revalidation-required"
+                         },
+                         {
+                             "canonical_id":  "RSN-APP-YOUTUBE-OPTIMIZER",
+                             "name":  "YouTube Optimizer",
+                             "public_url":  "https://youtube.reson8.life",
+                             "status":  "revalidation-required"
+                         }
+                     ],
+    "publication_policy":  "public-urls-and-public-state-only"
+}

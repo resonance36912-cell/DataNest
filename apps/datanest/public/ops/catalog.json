@@ -1,0 +1,18 @@
+{
+    "schema":  "resonance-public-catalog/v1",
+    "canonical_id":  "RSN-PLT-DATANEST",
+    "capabilities":  [
+                         "project-governance",
+                         "stakeholder-management",
+                         "datanest-ai",
+                         "think-tanks",
+                         "product-lab",
+                         "unifi-planning",
+                         "transcheduler",
+                         "runs",
+                         "checkpoints",
+                         "audit",
+                         "transparency"
+                     ],
+    "publication_policy":  "capability-names-only-no-private-project-state"
+}

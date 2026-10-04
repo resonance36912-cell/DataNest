@@ -1,0 +1,11 @@
+{
+    "schema":  "resonance-public-traceability/v1",
+    "canonical_id":  "RSN-PLT-DATANEST",
+    "canonical_name":  "Resonance DataNest",
+    "environment":  "production",
+    "release":  "PENDING_CANONICAL_RECONCILIATION",
+    "source_commit":  "PENDING_CANONICAL_RECONCILIATION",
+    "runtime_front_door":  "RSN-APP-HUB",
+    "system_runtime":  "RSN-SYS-RONSAS",
+    "classification":  "public-operational-metadata"
+}

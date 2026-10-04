@@ -1,0 +1,8 @@
+{
+    "schema":  "resonance-public-environment/v1",
+    "canonical_id":  "RSN-PLT-DATANEST",
+    "environment":  "production",
+    "deployment_state":  "migration-reconciliation",
+    "public_origin":  "PENDING_NEW_PROVIDER",
+    "internal_topology_exposed":  false
+}
