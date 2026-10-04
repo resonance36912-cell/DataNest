@@ -1,0 +1,149 @@
+[
+  {
+    "app": "Reson8 Hub",
+    "status": "Free Promotion",
+    "tone": "pilot",
+    "change": "All Resonance products are temporarily free while real usage, provider consumption, infrastructure cost, and support demand are measured.",
+    "date": "Sep 2026",
+    "href": "/pricing",
+    "cta": "Promotion details",
+    "details": "New billing and checkout are paused during the Resonance Free Access Promotion. The Hub continues to record governed usage and cost signals so future pricing can be based on measured operating evidence rather than assumptions.",
+    "links": [
+      {
+        "label": "Promotion details",
+        "href": "/pricing"
+      },
+      {
+        "label": "Governance framework (RCGF v1.0)",
+        "href": "/governance"
+      }
+    ]
+  },
+  {
+    "app": "Resonance Publish",
+    "status": "Free Promotion",
+    "tone": "pilot",
+    "change": "Full Resonance Publish access is free during the promotion while generation, publishing, export, and support costs are measured.",
+    "date": "Sep 2026",
+    "href": "https://epublisher.reson8.life",
+    "cta": "Open free",
+    "details": "Resonance Publish commercial feature gates are paused during the promotion. Sign-in can still be required so projects persist and generation, export, storage, and support usage can be measured for sustainable future pricing.",
+    "links": [
+      {
+        "label": "Open Resonance Publish",
+        "href": "https://epublisher.reson8.life"
+      },
+      {
+        "label": "Promotion details",
+        "href": "/pricing"
+      }
+    ]
+  },
+  {
+    "app": "Resonance Creator Studio",
+    "status": "Free Promotion",
+    "tone": "pilot",
+    "change": "Resonance Creator Studio generation access is temporarily free while image, media, storage, and provider costs are measured.",
+    "date": "Sep 2026",
+    "href": "https://creative.reson8.life",
+    "cta": "Open free",
+    "details": "Resonance Creator Studio paid-generation gates are paused during the promotion. Operational telemetry remains active so real image, media, infrastructure, and support cost can inform a later pricing model.",
+    "links": [
+      {
+        "label": "Open Resonance Creator Studio",
+        "href": "https://creative.reson8.life"
+      },
+      {
+        "label": "Promotion details",
+        "href": "/pricing"
+      }
+    ]
+  },
+  {
+    "app": "Resonance Media Sync",
+    "status": "Free Promotion",
+    "tone": "pilot",
+    "change": "Resonance Media Sync storyboard, lipsync, rendering, and export access is included during the promotion while video-provider costs are measured.",
+    "date": "Sep 2026",
+    "href": "https://sync.reson8.life",
+    "cta": "Open free",
+    "details": "Resonance Media Sync commercial gates are paused during the promotion. Storyboard, lipsync, rendering, export, storage, and provider usage continue to be measured so future pricing can reflect actual cost.",
+    "links": [
+      {
+        "label": "Open Resonance Media Sync",
+        "href": "https://sync.reson8.life"
+      },
+      {
+        "label": "Promotion details",
+        "href": "/pricing"
+      }
+    ]
+  },
+  {
+    "app": "Resonance Creator Growth",
+    "status": "Free Promotion",
+    "tone": "pilot",
+    "change": "Resonance Creator Growth audits, thumbnail generation, and growth tools are temporarily free while AI usage and operating costs are measured.",
+    "date": "Sep 2026",
+    "href": "https://youtube.reson8.life",
+    "cta": "Open free",
+    "details": "Resonance Creator Growth commercial gates are paused during the promotion. Audit, thumbnail, AI, and infrastructure usage remain measurable so a sustainable future pricing model can be based on real cost.",
+    "links": [
+      {
+        "label": "Open Resonance Creator Growth",
+        "href": "https://youtube.reson8.life"
+      },
+      {
+        "label": "Promotion details",
+        "href": "/pricing"
+      }
+    ]
+  },
+  {
+    "app": "Career Compass",
+    "status": "Free Pilot",
+    "tone": "pilot",
+    "change": "Career Compass remains free for schools and learners while report-generation, support, and delivery costs are measured.",
+    "date": "Sep 2026",
+    "href": "https://www.career-compass.org/#how",
+    "cta": "Join pilot",
+    "details": "Career Compass remains in an open free pilot for schools, counsellors, and learners. The pilot measures demand, support load, report-generation cost, and delivery requirements before any post-pilot commercial model is set.",
+    "links": [
+      {
+        "label": "How it works",
+        "href": "https://www.career-compass.org/#how"
+      },
+      {
+        "label": "Career Compass home",
+        "href": "https://www.career-compass.org"
+      }
+    ]
+  },
+  {
+    "app": "The Resonance Podcast",
+    "status": "Live",
+    "tone": "live",
+    "change": "New season live — free episodes, media kits, and shop. Never a subscription.",
+    "date": "Jun 2026",
+    "href": "https://www.resonance-podcast.com/episodes",
+    "cta": "Listen",
+    "details": "The new season is streaming on the podcast site with free episodes, downloadable media kits, and a merch shop. The podcast is intentionally never gated behind a subscription.",
+    "links": [
+      { "label": "Listen now", "href": "https://www.resonance-podcast.com/episodes" },
+      { "label": "Media kits", "href": "https://www.resonance-podcast.com/episodes" }
+    ]
+  },
+  {
+    "app": "Reson8 Governance",
+    "status": "New",
+    "tone": "new",
+    "change": "Resonance Constitutional Governance Framework v1.0 published — how we build, price, and evolve every app.",
+    "date": "May 2026",
+    "href": "/governance",
+    "cta": "Read RCGF",
+    "details": "RCGF v1.0 is the constitutional framework that governs how every Resonance app is built, priced, and evolved. It codifies our principles around user sovereignty, honest pricing, transparent AI usage, and pass/pack alignment across the ecosystem.\n\nThe framework is public, versioned, and referenced directly in the AI prompts that power our optimization protocol.",
+    "links": [
+      { "label": "Read RCGF v1.0", "href": "/governance" }
+    ]
+  }
+]

@@ -1,0 +1,3 @@
+[install]
+# Seven-day supply-chain guard for newly resolved packages.
+minimumReleaseAge = 604800

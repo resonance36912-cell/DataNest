@@ -1,0 +1,130 @@
+schema_version: 2
+prepared_at: 2026-10-04
+status: prepared_no_transfers_executed
+target_owner: Resonance-AppDev
+migration_type: github_native_repository_transfer
+authority_reference: docs/consolidation/REPOSITORY_AUTHORITY_MATRIX.md
+
+transfer_control:
+  any_transfer_allowed: false
+  mirror_transfer_allowed: false
+  datanest_transfer_allowed: false
+
+  # HARD STOP: every pre_transfer_hard_stops value must be true before
+  # mirror_transfer_allowed or any_transfer_allowed may become true.
+  pre_transfer_hard_stops:
+    source_admin_access_restored: false
+    complete_source_inventory_with_exact_head_shas: false
+    authority_domains_classified_for_all_source_repositories: false
+    deployment_and_configuration_dependencies_captured: false
+    rollback_checkpoints_captured: false
+    backup_and_ref_evidence_captured: false
+    target_names_and_transfer_permissions_verified: false
+    pages_domains_actions_environments_integrations_mapped: false
+    open_pr_issue_review_state_inventoried: false
+    resonance_hub_main_protected: false
+    resonance_hub_required_reviews_and_checks_verified: false
+
+  # HARD STOP: canonical DataNest transfer requires all pre-transfer stops,
+  # plus every canonical_transfer_hard_stops value below.
+  canonical_transfer_hard_stops:
+    mirror_rehearsal_completed: false
+    mirror_post_transfer_validation_passed: false
+    datanest_open_governance_reconciled: false
+    datanest_live_head_refs_reverified: false
+
+  evaluation_rules:
+    - any_transfer_allowed_must_remain_false_unless_all_pre_transfer_hard_stops_are_true
+    - mirror_transfer_allowed_must_remain_false_unless_all_pre_transfer_hard_stops_are_true
+    - datanest_transfer_allowed_must_remain_false_unless_all_pre_transfer_hard_stops_and_all_canonical_transfer_hard_stops_are_true
+    - a_false_or_missing_hard_stop_is_a_governance_blocker
+
+repositories:
+  - source: Resonance-AppDev/resonance-hub
+    target: Resonance-AppDev/resonance-hub
+    role: product_runtime_hub
+    canonical_authority_domain: runtime_commercial_hub_ecosystem_integration
+    action: retain
+    verified: true
+    default_branch: main
+    prepared_main_sha: aa2adacb1dfef869f8e011528ad5ed9bfeabb38a
+    notes:
+      - Admin/push access verified through active Resonance identity.
+      - GitHub branch-level protection on main was not enabled at preparation time.
+      - Protected-main governance is a hard pre-transfer gate before Mirror rehearsal.
+
+  - source: DataNest-Supository/DataNest
+    target: Resonance-AppDev/DataNest
+    role: governance_registry_certification_control_plane
+    canonical_authority_domain: governance_registry_audit_certification_state_control_plane
+    action: transfer_after_access_restoration_inventory_hub_protection_and_mirror_validation
+    verified: partially_via_existing_refs
+    last_known_default_branch_sha: afd2ce44e9150eceb0b6b254bec58aa4476e81d5
+    open_governance_items:
+      - pr: 469
+        last_known_head_sha: c581e0393aad6b3825e5c86eca749eacbc88669e
+        disposition: verify_live_and_reconcile_before_canonical_transfer
+    pages_custom_domain: inventory_required
+    secrets_environments: inventory_required_without_secret_values
+    branch_rulesets: inventory_required
+
+  - source: DataNest-Supository/Mirror-DataNest
+    target: Resonance-AppDev/Mirror-DataNest
+    role: rd_test_mode_visual_functional_validation
+    canonical_authority_domain: experimental_ui_and_functional_validation
+    action: rehearsal_only_after_all_pre_transfer_hard_stops_clear
+    verified: known_project_repository_not_live_api_verified
+    pages_custom_domain: inventory_required
+    secrets_environments: inventory_required_without_secret_values
+    branch_rulesets: inventory_required
+
+  - source: DataNest-Supository/*
+    target: Resonance-AppDev/*
+    role: source_inventory_pending
+    canonical_authority_domain: classification_required_before_transfer
+    action: inventory_classify_then_decide_individually
+    verified: false
+    blocker: DataNest-Supository account/API access suspended
+
+gates_in_order:
+  - approve_pr_144_governance_charter
+  - restore_source_admin_access
+  - complete_source_repository_inventory_with_exact_head_shas
+  - classify_repository_authority_domains
+  - capture_deployment_configuration_dependencies_and_rollback_checkpoints
+  - verify_target_name_availability_and_transfer_permissions
+  - capture_refs_tags_releases_prs_issues_rules_and_backup_evidence
+  - map_pages_domains_actions_environments_integrations_without_secret_values
+  - protect_resonance_hub_main
+  - verify_resonance_hub_required_reviews_and_checks
+  - clear_all_pre_transfer_hard_stops
+  - transfer_mirror_first
+  - validate_mirror_post_transfer
+  - reconcile_open_datanest_governance_items
+  - reverify_datanest_live_head_refs
+  - clear_all_canonical_transfer_hard_stops
+  - transfer_datanest
+  - rebind_cross_repository_references_and_external_integrations
+  - enforce_and_verify_transferred_repository_governance
+  - run_end_to_end_acceptance
+
+transfer_guarantee_language:
+  preserves: repository_history_and_supported_github_repository_metadata
+  explicit_revalidation_required:
+    - github_pages_and_custom_domains
+    - authentication_bound_configuration
+    - workflows_and_actions_dependencies
+    - organization_policy
+    - deployments_and_environments
+    - external_integrations_and_webhooks
+    - oauth_callbacks_and_hard_coded_repository_urls
+
+rollback_posture: staged_checkpointed_and_operationally_reversible_within_a_controlled_rollback_window
+
+prohibitions:
+  - no_source_repo_deletion_before_validation
+  - no_recreation_at_old_source_paths_during_redirect_or_rollback_validation
+  - no_force_push_or_history_rewrite
+  - no_monorepo_merge_without_separate_explicit_governance_decision
+  - no_bypass_via_alternate_identity
+  - no_transfer_while_any_required_hard_stop_is_false_or_missing

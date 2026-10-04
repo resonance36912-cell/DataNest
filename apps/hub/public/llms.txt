@@ -1,0 +1,26 @@
+# The Resonance Hub
+
+> Reson8.life is the source of truth for the Resonance ecosystem. All core Resonance apps are currently available at no charge under the Resonance Free Access Promotion while real operating costs are measured.
+
+## Free Access Promotion
+
+- **No payment required.** Resonance Publish, Resonance Creator Studio, Resonance Media Sync, and Resonance Creator Growth are free to use during the promotion.
+- **No active checkout.** New purchases, subscriptions, credit packs, top-ups, and PayFast launches are disabled.
+- **Costing in progress.** Provider usage, rendering, storage, infrastructure, and support demand are measured so future pricing can be based on validated cost.
+- **Historical records retained.** Previous billing and payment records remain available internally for audit and reconciliation; they are not an active sales model.
+- **Future pricing is not yet established.** A paid model will require a new governed release after costing is complete.
+
+## Pages
+
+- [Home](/): The Resonance Hub - apps, updates, roadmap, and governance.
+- [Free access](/pricing): Current promotion status and links to every free app.
+- [Governance](/governance): The Resonance Constitutional Governance Framework (RCGF).
+
+## Apps
+
+- [Resonance Publish](https://epublisher.reson8.life): Research, storyboard, narration, and audiovisual publishing. Free during the promotion.
+- [Resonance Creator Studio](https://creative.reson8.life): Posters, brochures, ads, social content, and creative media generation. Free during the promotion.
+- [Resonance Media Sync](https://sync.reson8.life): Music-video storyboards, scene generation, lipsync workflows, and exports. Free during the promotion.
+- [Resonance Creator Growth](https://youtube.reson8.life): Channel audits, thumbnails, content strategy, and growth tooling. Free during the promotion.
+- [Career Compass](https://www.career-compass.org): Career and aptitude discovery pilot.
+- [The Resonance Podcast](https://www.resonance-podcast.com): Free ecosystem media and conversations.
