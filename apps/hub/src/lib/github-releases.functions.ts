@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireRonsAuth } from "@/lib/rons-auth-middleware";
 import { hasBackendRole } from "@/lib/backend-provider.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { memoizeRequest } from "./request-memo.server";
 import { githubJson } from "./github-provider.server";
 
 async function ghFetch(path: string) {
@@ -70,34 +71,38 @@ export const listRecentReleases = createServerFn({ method: "POST" })
             `/repos/${repo}/releases?per_page=${limit}`,
           )) as any[];
 
+          const loadWorkflowRuns = memoizeRequest(
+            async (target: string): Promise<WorkflowRunSummary[]> => {
+              const query = /^[0-9a-f]{7,40}$/i.test(target)
+                ? `head_sha=${target}`
+                : `branch=${encodeURIComponent(target)}&event=push`;
+              const wr = (await ghFetch(
+                `/repos/${repo}/actions/runs?${query}&per_page=20`,
+              )) as any;
+              return ((wr?.workflow_runs ?? []) as any[])
+                .slice(0, 10)
+                .map<WorkflowRunSummary>((run) => ({
+                  id: run.id,
+                  name: run.name ?? run.workflow_id ?? null,
+                  status: run.status ?? null,
+                  conclusion: run.conclusion ?? null,
+                  html_url: run.html_url,
+                  event: run.event ?? null,
+                  head_sha: run.head_sha,
+                  run_number: run.run_number ?? null,
+                  created_at: run.created_at,
+                  updated_at: run.updated_at,
+                }));
+            },
+          );
+
           const enriched = await Promise.all(
             releases.map(async (r) => {
-              const sha = r.target_commitish;
               let runs: WorkflowRunSummary[] = [];
               let runs_error: string | undefined;
-              // Fetch workflow runs for the release's commit sha, when it looks like a sha
-              // (target_commitish can also be a branch name like "main").
+              // Share one lookup per release target within this repository request.
               try {
-                const query = /^[0-9a-f]{7,40}$/i.test(sha)
-                  ? `head_sha=${sha}`
-                  : `branch=${encodeURIComponent(sha)}&event=push&per_page=10`;
-                const wr = (await ghFetch(
-                  `/repos/${repo}/actions/runs?${query}&per_page=20`,
-                )) as any;
-                runs = ((wr?.workflow_runs ?? []) as any[])
-                  .slice(0, 10)
-                  .map<WorkflowRunSummary>((run) => ({
-                    id: run.id,
-                    name: run.name ?? run.workflow_id ?? null,
-                    status: run.status ?? null,
-                    conclusion: run.conclusion ?? null,
-                    html_url: run.html_url,
-                    event: run.event ?? null,
-                    head_sha: run.head_sha,
-                    run_number: run.run_number ?? null,
-                    created_at: run.created_at,
-                    updated_at: run.updated_at,
-                  }));
+                runs = await loadWorkflowRuns(r.target_commitish);
               } catch (err) {
                 runs_error = (err as Error).message;
               }
