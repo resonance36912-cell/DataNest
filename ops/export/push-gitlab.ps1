@@ -9,9 +9,10 @@ if ((git -C $repo status --porcelain)) { throw 'Canonical repository is not clea
 $head = (git -C $repo rev-parse HEAD).Trim()
 $defaultBranch = 'main'
 $remote = 'gitlab'
-$existing = git -C $repo remote get-url $remote 2>$null
-if ($LASTEXITCODE -eq 0) {
-  if ($existing.Trim() -ne $GitLabProjectUrl) { throw "Remote '$remote' already points to a different URL: $existing" }
+$remotes = @(git -C $repo remote)
+if ($remotes -contains $remote) {
+  $existing = (git -C $repo remote get-url $remote).Trim()
+  if ($existing -ne $GitLabProjectUrl) { throw "Remote '$remote' already points to a different URL: $existing" }
 } elseif (-not $DryRun) {
   git -C $repo remote add $remote $GitLabProjectUrl
 }
