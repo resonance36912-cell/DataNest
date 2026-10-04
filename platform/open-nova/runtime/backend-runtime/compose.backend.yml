@@ -66,7 +66,7 @@ services:
       - storage-access-key
       - storage-secret-key
   gateway:
-    image: resonance-service-gateway:0.9
+    image: resonance-service-gateway:0.10
     pull_policy: never
     restart: unless-stopped
     security_opt:
@@ -101,14 +101,14 @@ volumes:
   resonance-object-data:
 secrets:
   postgres-password:
-    file: ../../runtime/secrets/postgres-password
+    file: ../../../runtime/secrets/postgres-password
   auth-signing-key:
-    file: ../../runtime/secrets/auth-signing-key
+    file: ../../../runtime/secrets/auth-signing-key
   auth-exchange-key:
-    file: ../../runtime/secrets/auth-exchange-key
+    file: ../../../runtime/secrets/auth-exchange-key
   gateway-procedure-key:
-    file: ../../runtime/secrets/gateway-procedure-key
+    file: ../../../runtime/secrets/gateway-procedure-key
   storage-access-key:
-    file: ../../runtime/secrets/storage-access-key
+    file: ../../../runtime/secrets/storage-access-key
   storage-secret-key:
-    file: ../../runtime/secrets/storage-secret-key
+    file: ../../../runtime/secrets/storage-secret-key

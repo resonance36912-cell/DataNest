@@ -22,12 +22,16 @@ try:
 except ImportError:
     import checkout_audit as checkout_ops
 try:
+    from . import governance as governance_ops
+except ImportError:
+    import governance as governance_ops
+try:
     import psycopg
     from psycopg import sql
 except Exception:  # allows static/unit validation before local wheel provisioning
     psycopg=None; sql=None
 
-app=FastAPI(title="Resonance Sovereign Gateway",version="0.9.0")
+app=FastAPI(title="Resonance Sovereign Gateway",version="0.10.0")
 DATABASE_URL=os.getenv("DATABASE_URL","postgresql://resonance@postgres:5432/resonance")
 DB_PASSWORD_FILE=os.getenv("POSTGRES_PASSWORD_FILE","/run/secrets/postgres-password")
 PROCEDURE_KEY_FILE=os.getenv("GATEWAY_PROCEDURE_KEY_FILE","/run/secrets/gateway-procedure-key")
@@ -55,8 +59,13 @@ class ProcedureCall(BaseModel):
 
 BOOTSTRAP_PROCEDURES={"create_admin_bootstrap_challenge","cancel_admin_bootstrap_challenge","bootstrap_first_admin"}
 BOOTSTRAP_PROCEDURES_ENABLED=os.getenv("RONS_BOOTSTRAP_PROCEDURES_ENABLED","0")=="1"
-ALLOWED_PROCEDURES={"transaction_probe","mirror_user_roles","read_subscription_mirror","read_subscription_account","mirror_subscriptions","read_account_invoices","read_admin_invoices","read_billing_account","read_billing_admin","record_payfast_launch"} | (BOOTSTRAP_PROCEDURES if BOOTSTRAP_PROCEDURES_ENABLED else set())
-PROTECTED_TABLES={"admin_bootstrap_state","admin_bootstrap_email_challenges","invoices","credit_wallets","credit_ledger","billing_receipts","payfast_launch_logs"}
+GOVERNANCE_PROCEDURES={
+    "governance_list_participants","governance_list_proposals","governance_get_proposal",
+    "governance_create_proposal","governance_submit_proposal","governance_add_evidence",
+    "governance_add_review","governance_record_decision","governance_register_agent",
+}
+ALLOWED_PROCEDURES={"transaction_probe","mirror_user_roles","read_subscription_mirror","read_subscription_account","mirror_subscriptions","read_account_invoices","read_admin_invoices","read_billing_account","read_billing_admin","record_payfast_launch"} | GOVERNANCE_PROCEDURES | (BOOTSTRAP_PROCEDURES if BOOTSTRAP_PROCEDURES_ENABLED else set())
+PROTECTED_TABLES={"admin_bootstrap_state","admin_bootstrap_email_challenges","invoices","credit_wallets","credit_ledger","billing_receipts","payfast_launch_logs","governance_participants","governance_proposals","governance_evidence","governance_reviews","governance_decisions","governance_events"}
 PROTECTED_WRITE_TABLES={"user_roles","subscriptions"}
 SUBSCRIPTION_ENTITLEMENT_COLUMNS={"app","tier","status","current_period_end"}
 
@@ -263,6 +272,26 @@ def procedure(body:ProcedureCall,request:Request):
             except ValueError as exc: raise HTTPException(400,str(exc))
             except subscription_ops.SubscriptionConflict as exc: raise HTTPException(409,str(exc))
         return {"procedure":"mirror_subscriptions",**result}
+    if body.name in GOVERNANCE_PROCEDURES:
+        password=Path(DB_PASSWORD_FILE).read_text(encoding="utf-8").strip() if Path(DB_PASSWORD_FILE).exists() else None
+        try:
+            with psycopg.connect(DATABASE_URL,password=password) as conn:
+                if body.name=="governance_list_participants": payload={"participants":governance_ops.list_participants(conn)}
+                elif body.name=="governance_list_proposals": payload={"proposals":governance_ops.list_proposals(conn)}
+                elif body.name=="governance_get_proposal":
+                    if set(body.args)!={"proposal_id"}: raise ValueError("invalid_get_proposal_args")
+                    payload=governance_ops.get_proposal(conn,body.args["proposal_id"])
+                elif body.name=="governance_create_proposal": payload={"proposal":governance_ops.create_proposal(conn,body.args)}
+                elif body.name=="governance_submit_proposal": payload={"proposal":governance_ops.submit_proposal(conn,body.args)}
+                elif body.name=="governance_add_evidence": payload={"evidence":governance_ops.add_evidence(conn,body.args)}
+                elif body.name=="governance_add_review": payload={"review":governance_ops.add_review(conn,body.args)}
+                elif body.name=="governance_record_decision": payload={"decision":governance_ops.record_decision(conn,body.args)}
+                else: payload={"participant":governance_ops.register_agent(conn,body.args)}
+        except governance_ops.GovernanceNotFound as exc: raise HTTPException(404,str(exc))
+        except governance_ops.GovernanceForbidden as exc: raise HTTPException(403,str(exc))
+        except governance_ops.GovernanceConflict as exc: raise HTTPException(409,str(exc))
+        except ValueError as exc: raise HTTPException(400,str(exc))
+        return {"procedure":body.name,**payload}
     if body.name in BOOTSTRAP_PROCEDURES:
         args=body.args
         expected={"user_id","token_hash"} if body.name=="cancel_admin_bootstrap_challenge" else {"user_id","verified_email","token_hash"}

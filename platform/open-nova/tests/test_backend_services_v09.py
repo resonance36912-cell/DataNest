@@ -183,7 +183,7 @@ def test_gateway_procedure_contract_is_allowlisted_not_raw_sql():
     compat=Path("apps/rons-hub-backend/open-nova-adapters/supabase-compat.ts").read_text(encoding="utf-8")
     assert '"mirror_user_roles"' in gateway_source and '"transaction_probe"' in gateway_source
     assert 'procedure: POST /v1/db/procedure' in contract
-    assert 'allowlisted_procedures: [transaction_probe, mirror_user_roles, read_subscription_mirror, read_subscription_account, mirror_subscriptions, read_account_invoices, read_admin_invoices, read_billing_account, read_billing_admin, record_payfast_launch]' in contract
+    assert 'governance_create_proposal' in contract and 'governance_record_decision' in contract
     assert 'arbitrary_sql: false' in contract
     assert 'procedure: "/v1/db/procedure"' in compat
     assert 'arbitrarySql: false' in compat
@@ -191,7 +191,11 @@ def test_gateway_procedure_contract_is_allowlisted_not_raw_sql():
 
 def test_bootstrap_procedures_are_staged_and_disabled_by_default(tmp_path: Path, monkeypatch):
     assert gateway_mod.BOOTSTRAP_PROCEDURES_ENABLED is False
-    assert gateway_mod.ALLOWED_PROCEDURES == {"transaction_probe", "mirror_user_roles", "read_subscription_mirror", "read_subscription_account", "mirror_subscriptions", "read_account_invoices", "read_admin_invoices", "read_billing_account", "read_billing_admin", "record_payfast_launch"}
+    baseline={"transaction_probe", "mirror_user_roles", "read_subscription_mirror", "read_subscription_account", "mirror_subscriptions", "read_account_invoices", "read_admin_invoices", "read_billing_account", "read_billing_admin", "record_payfast_launch"}
+    assert gateway_mod.ALLOWED_PROCEDURES == baseline | gateway_mod.GOVERNANCE_PROCEDURES
+    assert gateway_mod.BOOTSTRAP_PROCEDURES.isdisjoint(gateway_mod.ALLOWED_PROCEDURES)
+    for table in {"governance_participants","governance_proposals","governance_evidence","governance_reviews","governance_decisions","governance_events"}:
+        assert table in gateway_mod.PROTECTED_TABLES
     key=tmp_path / "procedure.key"; key.write_text("p" * 64, encoding="utf-8")
     monkeypatch.setattr(gateway_mod,"PROCEDURE_KEY_FILE",str(key))
     result=TestClient(gateway_mod.app).post(

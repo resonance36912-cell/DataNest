@@ -25,7 +25,7 @@ services:
     container_port: 9000
     required: true
   gateway:
-    image: resonance-service-gateway:0.9
+    image: resonance-service-gateway:0.10
     host: 127.0.0.1
     port: 58600
     container_port: 8000

@@ -152,8 +152,9 @@ class SovereignBackendRuntime:
             elif sid == "gateway":
                 lines += ["    environment:", "      DATABASE_URL: postgresql://resonance@postgres:5432/resonance", "      POSTGRES_PASSWORD_FILE: /run/secrets/postgres-password", "      AUTH_URL: http://auth:8080", "      STORAGE_URL: http://storage:9000", "      OLLAMA_URL: http://host.containers.internal:11434", "      GATEWAY_PROCEDURE_KEY_FILE: /run/secrets/gateway-procedure-key", "    secrets:", "      - postgres-password", "      - gateway-procedure-key", "    depends_on:", "      - postgres", "      - auth", "      - storage"]
         lines += ["networks:", "  sovereign-internal:", "    internal: true", "volumes:", "  resonance-postgres-data:", "  resonance-auth-data:", "  resonance-object-data:", "secrets:"]
+        secret_rel = os.path.relpath(self.secrets_root, self.runtime_root).replace("\\", "/")
         for name in ("postgres-password", "auth-signing-key", "auth-exchange-key", "gateway-procedure-key", "storage-access-key", "storage-secret-key"):
-            lines += [f"  {name}:", f"    file: ../../runtime/secrets/{name}"]
+            lines += [f"  {name}:", f"    file: {secret_rel}/{name}"]
         return "\n".join(lines) + "\n"
 
     def write_runtime(self, *, confirmed: bool = False) -> dict[str, Any]:
