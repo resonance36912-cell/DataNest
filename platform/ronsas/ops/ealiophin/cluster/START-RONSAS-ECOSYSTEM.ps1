@@ -195,7 +195,8 @@ function Assert-KnownPort([string]$Name, [int]$Port, [string]$Expected) {
             [string]$_.Name -ieq [string]$identity.process -and ([string]$_.CommandLine -like "*$Expected*" -or ($allowBlankCommandLine -and [string]::IsNullOrWhiteSpace([string]$_.CommandLine)))
         })
         if ($candidates.Count -ne 1) {
-            throw "$Name port $Port is exposed through PID 0, but exactly one matching $($identity.process) process was not found. No process was stopped."
+            Write-Warning "[SAFE REUSE] $Name PID-0 listener fingerprint is valid, but Windows does not expose an attributable process. Reusing as unowned without process mutation."
+            return [pscustomobject]@{ pid=0; owned=$false; command=''; identity='pid0-endpoint-fingerprint-only-unowned' }
         }
         $resolvedPid = [int]$candidates[0].ProcessId
         Write-Host "[SAFE REUSE] $Name PID 0 listener resolved to PID $resolvedPid by loopback endpoint fingerprint + unique expected command line." -ForegroundColor Yellow
