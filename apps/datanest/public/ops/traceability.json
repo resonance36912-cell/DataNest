@@ -4,7 +4,7 @@
     "canonical_name":  "Resonance DataNest",
     "environment":  "production",
     "release":  "canonical-local-20261004",
-    "source_commit":  "62c93ab5",
+    "source_commit":  "ed1b9725",
     "runtime_front_door":  "RSN-APP-HUB",
     "system_runtime":  "RSN-SYS-RONSAS",
     "classification":  "public-operational-metadata"

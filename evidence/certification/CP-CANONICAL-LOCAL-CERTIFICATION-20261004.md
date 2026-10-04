@@ -5,7 +5,7 @@ Scope: Ealiophin local canonical consolidation and runtime alignment prior to re
 ## Certified source state
 
 - Canonical repository: `DataNest-Supository-canonical`.
-- Source baseline commit: `62c93ab5` (`fix(ronsas): avoid PowerShell PID variable collision`).
+- Source baseline commit: `ed1b9725` (`fix(ronsas): avoid PowerShell PID variable collision`).
 - Authority boundaries: DataNest governance, Hub runtime/commercial frontend, RONSAS orchestration/control, Open Nova development/migration, RCGF constitutional governance, bounded product applications and sovereign backend.
 - Historical source lines remain recoverable through namespaced `legacy/*` refs; original repositories were not reset/cleaned/rebased.
 - Duplicate RONSAS frontend authority was removed from canonical `main` after SHA-256 delta capture under `evidence/reconciliation/ronsas-hub/`.

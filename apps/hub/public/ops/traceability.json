@@ -4,7 +4,7 @@
     "canonical_name":  "Resonance Hub",
     "environment":  "production",
     "release":  "canonical-local-20261004",
-    "source_commit":  "62c93ab5",
+    "source_commit":  "ed1b9725",
     "governance_authority":  "RSN-PLT-DATANEST",
     "system_runtime":  "RSN-SYS-RONSAS",
     "classification":  "public-operational-metadata"

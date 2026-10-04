@@ -359,7 +359,7 @@
                          }
                      ],
     "certification":  {
-                          "localSourceCommit":  "62c93ab5",
+                          "localSourceCommit":  "ed1b9725",
                           "ronsasStatus":  "18/18-ready",
                           "traceability":  "35-passed-0-failed",
                           "openNovaManifest":  "261-files-verified",
