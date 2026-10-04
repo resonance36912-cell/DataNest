@@ -1,0 +1,64 @@
+{
+  "contract": "resonance-sites-deployment-plan@1",
+  "generatedOn": "2026-10-04",
+  "source": {
+    "repositoryRole": "canonical-consolidated-candidate",
+    "pathOnWeed": "C:\\Users\\iamas\\Resonance\\DataNest-Supository-CANONICAL-STAGING",
+    "releaseCandidateCommit": "ec75ecef116511f8a1e2d2cacb2e6d53468a726d",
+    "governedMergeCommit": "b9dfb45f80299d7c32b009779fbc32e3dfad742b"
+  },
+  "domains": {
+    "canonicalHub": "reson8.life",
+    "canonicalHubWww": "www.reson8.life",
+    "dnsPolicy": "activate-only-after-provider-origin-and-governance-approval"
+  },
+  "surfaces": [
+    {
+      "id": "RSN-WEB-DATANEST",
+      "sourcePath": "apps/datanest",
+      "deploymentClass": "static-public-site",
+      "sitesCandidate": true,
+      "stateProvider": "supabase",
+      "basePathDuringMigration": "/DataNest"
+    },
+    {
+      "id": "RSN-WEB-HUB",
+      "sourcePath": "apps/hub",
+      "deploymentClass": "ssr-api-web-application",
+      "sitesCandidate": "public-static-layer-only",
+      "serverRuntime": "nitro-cloudflare-module",
+      "fallbackRuntime": "railway-where-governed"
+    },
+    {
+      "id": "RSN-SVC-SOVEREIGN-BACKEND",
+      "sourcePath": "services/sovereign-backend",
+      "deploymentClass": "stateful-service-runtime",
+      "sitesCandidate": false
+    },
+    {
+      "id": "RSN-PLATFORM-RONSAS",
+      "sourcePath": "platform/ronsas",
+      "deploymentClass": "orchestration-worker-node-plane",
+      "sitesCandidate": false
+    },
+    {
+      "id": "RSN-PLATFORM-OPEN-NOVA",
+      "sourcePath": "platform/open-nova",
+      "deploymentClass": "development-migration-runtime",
+      "sitesCandidate": false,
+      "certificationGate": "open-nova-build-manifest-byte-size-failure"
+    }
+  ],
+  "promotion": {
+    "flow": [
+      "mirror-rnd",
+      "automated-audit",
+      "human-review",
+      "canonical-main",
+      "immutable-build",
+      "production-deploy",
+      "post-deploy-verification"
+    ],
+    "productionAuthority": "canonical-main-only"
+  }
+}
