@@ -1,0 +1,20 @@
+[DN:CHECKPOINT]
+checkpoint_id=CP-LOCAL-CONSOLIDATION-PREFLIGHT-20261004
+timestamp=2026-10-04T14:00:00+02:00
+repo=DataNest-Supository/DataNest
+branch=governance/local-consolidation-alignment-20261004
+baseline_sha=afd2ce44e9150eceb0b6b254bec58aa4476e81d5
+state=LOCAL_SOURCE_VALIDATED_WITH_BASELINE_DRIFT
+completed=Frozen local source alignment; transfer-sensitive inventory; PR469 delta separation; contract/Hub alignment/branch-protection validation; targeted governance suite 21/21 pass
+in_progress=none
+pending=Restore live source administration; inventory Mirror; reconcile 11 focused baseline unit failures; re-read PR469 live governance; verify target branch protection and external bindings
+hard_stops=any_transfer_allowed:false; mirror_transfer_allowed:false; datanest_transfer_allowed:false
+source_scan=DataNest-Supository:471; Mirror-DataNest:31; old Pages origin:121; Hub repo refs:7
+pr469_head=c581e0393aad6b3825e5c86eca749eacbc88669e
+pr469_delta=6 files; 258 insertions; 8 deletions; accessibility/governance scope kept separate from migration
+validation=contracts:pass; hub_alignment:pass; branch_protection_tree:pass; targeted_governance_tests:21/21; focused_baseline_failures:11/35
+next_action=Restore verified GitHub source access, compare live source HEAD/workflows against frozen local evidence, inventory Mirror, reconcile baseline drift, and clear gates only with exact evidence
+blockers=DataNest-Supository account suspended; Mirror source absent locally; live source governance unavailable; baseline unit drift not reconciled
+evidence=docs/governance/DATANEST_TRANSFER_SENSITIVE_INVENTORY_20261004.md; docs/governance/DATANEST_LOCAL_BASELINE_VALIDATION_20261004.md
+parent_checkpoint=CP-LOCAL-SOURCE-ALIGNMENT-20261004-1354
+chat_lineage=CHAT-RESONANCE-DATANEST-CONSOLIDATION-LOCAL-02
