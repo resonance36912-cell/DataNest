@@ -93,19 +93,22 @@ Preserve the same logical gates even when GitHub is no longer the forge:
 - Hub production build: passed.
 - DataNest Next static build: passed.
 - Governed Weed/Ealiophin Git-history merge: completed.
+- Full 7-app RONSAS static aggregation: passed on Windows Node 24 using the committed launcher fix.
+- DataNest static candidate artifact sealed: SHA-256 `27D8DB7277F46855A59961C438EDF829579E8D6D0DFDB31B84A1F7F23CD24489`.
+- Resonance Hub Nitro/Cloudflare candidate artifact sealed: SHA-256 `AB2386960A51C8FCDE37444FEE69ECE91E87C5D5510749A4361688302201E374`.
 
 ### Open findings
 - Open Nova sealed package manifest byte-size verification fails and remains a hard certification gate.
 - Hub build reports Vite 7.3.6 while the Nitro Vite builder warns that Vite 8 is expected.
 - Several TanStack server functions still use deprecated `inputValidator()` and should migrate to `validator()`.
 - DataNest CSS contains two autoprefixer warnings for `end`; use `flex-end` for broader compatibility.
-- Full RONSAS static aggregation must pass after the Node 24 Windows launcher fix before the aggregate artifact is certified.
+- RONSAS aggregation now passes; remaining build warnings include oversized JavaScript chunks and dependency deprecation notices that should be remediated as optimization/security maintenance rather than treated as silent success.
 
 ## Production cutover checklist
 - [ ] New forge/repository authority established and protected.
-- [ ] `ec75ecef...` or a reviewed successor is the exact release source.
+- [ ] `db7bb5a1922a1ba794abdcabc140e71f257054a7` or a reviewed successor is the exact release source.
 - [ ] All public/static artifacts rebuilt from a clean checkout.
-- [ ] RONSAS static aggregation passes on the release checkout.
+- [x] RONSAS static aggregation passes on the validated Windows build path; rerun from the final clean release checkout before production publication.
 - [ ] Open Nova certification gate resolved or explicitly excluded from the public release scope by governance.
 - [ ] Site origin and custom-domain binding verified.
 - [ ] TLS verified for every canonical hostname.
