@@ -1,0 +1,16 @@
+# Resonance Creative Studio
+
+> AI-powered creative studio that turns any URL, image, document, or prompt into posters, brochures, advertisements, social media posts, and cinematic videos.
+
+Resonance Creative Studio generates two unique design variants per request, supports cross-posting to Instagram, Facebook, X, LinkedIn, and YouTube, and includes AI-powered editing, object removal, and cinematic video rendering.
+
+## Pages
+
+- [Home](/): Overview of the studio's capabilities, features, and styles.
+- [About](/about): Detailed breakdown of content types, AI workflows, and supported formats.
+- [Contact](/contact): How to reach the team, FAQ, and contact form.
+
+## Optional
+
+- [Terms of Service](/terms): Legal terms for using the studio.
+- [Privacy Policy](/privacy): How user data is handled.
