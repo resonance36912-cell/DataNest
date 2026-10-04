@@ -101,7 +101,30 @@ function Wait-Http([string]$Name, [string]$Url, [int]$Seconds = 30) {
 }
 function Assert-KnownPort([string]$Name, [int]$Port, [string]$Expected) {
     $listener = Get-ListenerRecord $Port
-    if (-not $listener) { return $null }
+    if (-not $listener) {
+        $identity = $KnownEndpointIdentities[$Name]
+        if (-not $identity) { return $null }
+        try {
+            $response = Invoke-WebRequest -UseBasicParsing -Uri ([string]$identity.url) -TimeoutSec 5
+        } catch {
+            return $null
+        }
+        $contentType = [string]$response.Headers['Content-Type']
+        $contentMatches = [string]$response.Content -like ('*' + [string]$identity.marker + '*')
+        if ($response.StatusCode -ne 200 -or $contentType -notlike ([string]$identity.contentType + '*') -or -not $contentMatches) {
+            throw "$Name endpoint is reachable without a Windows listener record, but its fingerprint is not recognized. No process was stopped."
+        }
+        $candidates = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object {
+            [string]$_.Name -ieq [string]$identity.process -and
+            ([string]::IsNullOrWhiteSpace([string]$_.CommandLine) -or [string]$_.CommandLine -like "*$Expected*")
+        })
+        if ($candidates.Count -ne 1) {
+            throw "$Name endpoint is healthy without a Windows listener record, but exactly one matching $($identity.process) process was not found. No process was stopped."
+        }
+        $resolvedPid = [int]$candidates[0].ProcessId
+        Write-Host "[SAFE REUSE] $Name has no Windows listener record; resolved to PID $resolvedPid by endpoint fingerprint + unique expected process." -ForegroundColor Yellow
+        return [pscustomobject]@{ pid=$resolvedPid; owned=$false; command=[string]$candidates[0].CommandLine; identity='no-listener-record-endpoint-and-unique-process' }
+    }
     $listenerPid = [int]$listener.OwningProcess
     $cmd = if ($listenerPid -gt 0) { Get-CommandLine $listenerPid } else { '' }
     if ($cmd -like "*$Expected*") {
