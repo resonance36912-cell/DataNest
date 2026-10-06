@@ -20,7 +20,8 @@
  *     (i.e. some auth/integrity check) — guards against accidentally
  *     shipping an unauthenticated write endpoint.
  */
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 
 type Finding = { file: string; line: number; rule: string; detail: string };
@@ -72,6 +73,33 @@ const ALLOW_INNER_HTML_EXPRESSIONS = new Map<string, RegExp>([
   ], // audited static PostHog bootstrap; no user-controlled interpolation
 ]);
 
+// RONSAS no longer owns the application runtime. When its retired src tree is absent,
+// delegate runtime SAST to Hub, which is the current runtime/commercial authority.
+if (!existsSync("src")) {
+  const delegated = spawnSync(
+    process.execPath,
+    ["run", "--cwd", "../../apps/hub", "verify:security"],
+    { stdio: "inherit" },
+  );
+
+  if (delegated.error) {
+    console.error("❌ verify-security-invariants: Hub security delegation failed to start.");
+    console.error(delegated.error);
+    process.exit(1);
+  }
+
+  if (delegated.status !== 0) {
+    console.error(
+      `❌ verify-security-invariants: Hub security authority failed with exit ${delegated.status ?? "unknown"}.`,
+    );
+    process.exit(delegated.status ?? 1);
+  }
+
+  console.log(
+    "✓ verify-security-invariants: Hub runtime security authority verified; RONSAS src is retired.",
+  );
+  process.exit(0);
+}
 for (const file of walk("src")) {
   const sourcePath = file.replaceAll("\\", "/");
   if (!/\.(ts|tsx|js|jsx)$/.test(sourcePath)) continue;

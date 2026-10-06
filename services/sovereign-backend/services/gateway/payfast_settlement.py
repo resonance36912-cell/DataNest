@@ -23,7 +23,7 @@ ATTEMPT_FIELDS={
 SETTLEMENT_FIELDS={
     "event_id","payload_hash","sku","user_id","app","tier","amount_cents","currency",
     "billing_cycle","payment_status","pf_payment_id","m_payment_id","payfast_token",
-    "recipient_email","source_ip",
+    "recipient_email","source_ip","free_promotion_active",
 }
 
 
@@ -121,6 +121,9 @@ def normalize_event(event: Any) -> dict[str,Any]:
         raise ValueError("Invalid settlement currency")
     if event["billing_cycle"]!="monthly":
         raise ValueError("Invalid billing_cycle")
+    free_promotion_active=event["free_promotion_active"]
+    if not isinstance(free_promotion_active,bool):
+        raise ValueError("Invalid free_promotion_active")
     payment=_text(event["payment_status"],"payment_status",40).upper()
     if not STATUS_RE.fullmatch(payment):
         raise ValueError("Invalid payment_status")
@@ -140,6 +143,7 @@ def normalize_event(event: Any) -> dict[str,Any]:
         "payfast_token":_text(event["payfast_token"],"payfast_token",1000,True),
         "recipient_email":_email(event["recipient_email"]),
         "source_ip":_text(event["source_ip"],"source_ip",100,True),
+        "free_promotion_active":free_promotion_active,
     }
 
 
@@ -153,6 +157,11 @@ def next_subscription_status(payment_status: str) -> tuple[str,bool]:
         return "past_due",False
     return "pending",False
 
+
+def apply_free_promotion_status(provider_status: str,free_promotion_active: bool) -> str:
+    if free_promotion_active and provider_status=="active":
+        return "cancelled"
+    return provider_status
 
 def classify_change(prior: dict[str,Any]|None,new_tier: str,next_status: str,is_refund: bool) -> str:
     if is_refund:
@@ -213,13 +222,17 @@ def record_attempt(conn,row: Any) -> dict[str,Any]:
 def settle(conn,event: Any) -> dict[str,Any]:
     clean=normalize_event(event)
     now=datetime.now(timezone.utc)
-    next_status,is_refund=next_subscription_status(clean["payment_status"])
+    provider_next_status,is_refund=next_subscription_status(clean["payment_status"])
+    next_status=apply_free_promotion_status(provider_next_status,clean["free_promotion_active"])
     period_end=_next_month(now) if next_status=="active" else None
     metadata={
         "sku":clean["sku"],
         "user_id":clean["user_id"],
         "payment_status":clean["payment_status"],
         "m_payment_id":clean["m_payment_id"],
+        "free_promotion_active":clean["free_promotion_active"],
+        "provider_subscription_status":provider_next_status,
+        "settled_subscription_status":next_status,
     }
 
     with conn.transaction(), conn.cursor() as cur:

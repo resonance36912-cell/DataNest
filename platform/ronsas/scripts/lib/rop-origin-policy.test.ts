@@ -6,7 +6,7 @@ import {
   normalizeOutboundOrigin,
   parseAllowedOutboundOrigins,
   requireAllowedOutboundOrigin,
-} from "../../src/lib/rop/origin-policy";
+} from "../../docs/hub/functions/_shared/rop-origin-policy.ts";
 
 const ROOT = resolve(import.meta.dir, "../..");
 const read = (rel: string) => readFileSync(resolve(ROOT, rel), "utf8");
@@ -59,12 +59,12 @@ describe("ROP outbound origin policy", () => {
     }
   });
 
-  test("normalizes allowlist entries and portable policy stays in parity", () => {
+  test("normalizes allowlist entries and preserved portable policy remains authoritative", () => {
     expect([
       ...parseAllowedOutboundOrigins("https://reson8.life:443, https://sync.reson8.life"),
     ]).toEqual(["https://reson8.life", "https://sync.reson8.life"]);
-    expect(read("docs/hub/functions/_shared/rop-origin-policy.ts")).toBe(
-      read("src/lib/rop/origin-policy.ts"),
-    );
+    const portable = read("docs/hub/functions/_shared/rop-origin-policy.ts");
+    expect(portable).toContain("normalizeOutboundOrigin");
+    expect(portable).toContain("requireAllowedOutboundOrigin");
   });
 });

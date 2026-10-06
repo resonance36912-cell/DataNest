@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getBackendProvider, recordPayfastItnAttempt, settlePayfastItn } from "@/lib/backend-provider.server";
+import { FREE_PROMOTION_ACTIVE } from "@/lib/promotion";
 import { createHash } from "crypto";
 
 /**
@@ -226,6 +227,7 @@ export const Route = createFileRoute("/api/public/payfast/itn")({
               payfast_token: params.token ?? null,
               recipient_email: params.email_address ?? null,
               source_ip: sourceIp,
+              free_promotion_active: FREE_PROMOTION_ACTIVE,
             });
             return new Response(settled.response_body, { status: settled.http_status });
           } catch (err) {
@@ -323,11 +325,18 @@ export const Route = createFileRoute("/api/public/payfast/itn")({
         //   FAILED    → renewal failed; treat as past_due until retried
         //   anything else → pending
         const isRefund = paymentStatus === "REFUND" || paymentStatus === "REFUNDED";
-        const nextStatus =
+        const providerNextStatus =
           paymentStatus === "COMPLETE" ? "active" :
           paymentStatus === "CANCELLED" ? "cancelled" :
           isRefund ? "cancelled" :
           paymentStatus === "FAILED" ? "past_due" : "pending";
+
+        // Preserve PayFast payment truth while preventing paid entitlement
+        // reactivation during the governed free-promotion period.
+        const nextStatus =
+          FREE_PROMOTION_ACTIVE && providerNextStatus === "active"
+            ? "cancelled"
+            : providerNextStatus;
 
         const periodEnd = new Date();
         // Monthly-only billing. See note on SKU_CATALOG above.

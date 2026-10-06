@@ -20,7 +20,7 @@
 
 import { fetchSubscriptionRows, resolveBearerUserId } from "@/lib/backend-provider.server";
 import { deriveFeatures, type AppKey, type Tier } from "@/lib/entitlement.functions";
-import { FREE_PROMOTION_ACTIVE } from "@/lib/promotion";
+import { FREE_PROMOTION_ACTIVE, FREE_PROMOTION_TIER } from "@/lib/promotion";
 
 // ── Tier ranking (mirror of canonical) ──────────────────────────────────────
 const TIER_RANK: Record<Tier, number> = {
@@ -43,7 +43,7 @@ type CachedEntitlement = {
   userId: string;
   tier: Tier;
   status: "active" | "pending" | "past_due" | "cancelled" | "inactive";
-  source: "direct" | "all_access" | "none";
+  source: "direct" | "all_access" | "trial" | "none";
   expiresAt: string | null;
   features: Record<string, boolean>;
   checkedAt: string;
@@ -143,14 +143,31 @@ export async function requireTierFromRequest(args: {
     );
   }
 
-  // 3. Cache lookup.
+  // 3. Promotion authority wins before cache or subscription lookup.
   let ent: CachedEntitlement | undefined;
+  if (FREE_PROMOTION_ACTIVE) {
+    ent = {
+      ok: true,
+      app,
+      userId,
+      tier: FREE_PROMOTION_TIER,
+      status: "active",
+      source: "trial",
+      expiresAt: null,
+      features: deriveFeatures(app, FREE_PROMOTION_TIER),
+      checkedAt: new Date().toISOString(),
+      hasAccess: true,
+      currentPeriodEnd: null,
+    };
+  }
+
+  // 4. Cache lookup.
   const hit = cache.get(cacheKey(userId, app));
-  if (hit && hit.expiresAt > Date.now()) {
+  if (!ent && hit && hit.expiresAt > Date.now()) {
     ent = hit.ent;
   }
 
-  // 4. DB lookup on miss. We query directly (we're already in the hub),
+  // 5. DB lookup on miss. We query directly (we're already in the hub),
   //    matching `/api/public/entitlement` exactly so spoke- and proxy-paths
   //    return identical answers.
   if (!ent) {
@@ -211,7 +228,7 @@ export async function requireTierFromRequest(args: {
     }
   }
 
-  // 5. Evaluate.
+  // 6. Evaluate.
   const allowed =
     ent.status === "active" && (ent.source === "all_access" || hasAtLeast(ent.tier, required));
 

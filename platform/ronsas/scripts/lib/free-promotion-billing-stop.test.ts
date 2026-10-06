@@ -7,8 +7,8 @@ const request = JSON.parse(
 );
 const worker = readFileSync("ops/ealiophin/billing/stop-payfast-recurring.mjs", "utf8");
 const workflow = readFileSync(".github/workflows/stop-free-promotion-billing.yml", "utf8");
-const checkout = readFileSync("src/lib/checkout.functions.ts", "utf8");
-const itn = readFileSync("src/routes/api/public/payfast/itn.ts", "utf8");
+const checkout = readFileSync("../../apps/hub/src/lib/checkout.functions.ts", "utf8");
+const itn = readFileSync("../../apps/hub/src/routes/api/public/payfast/itn.ts", "utf8");
 
 test("free promotion disables new and recurring billing", () => {
   expect(request.schema).toBe("ronsas-free-promotion-billing-stop/v1");
@@ -22,7 +22,9 @@ test("free promotion disables new and recurring billing", () => {
   expect(request.policy.cancelProviderTokens).toBe(true);
   expect(request.policy.refundPriorPayments).toBe(false);
   expect(checkout).toContain("if (FREE_PROMOTION_ACTIVE)");
-  expect(checkout).toContain("throw new Error(FREE_PROMOTION_MESSAGE)");
+  expect(checkout).toContain(
+    'throw new Error("Checkout is disabled during the Resonance free-access promotion.")',
+  );
 });
 
 test("production recurring-billing stop is sovereign-authoritative and fail closed", () => {
@@ -44,9 +46,10 @@ test("legacy PayFast worker remains redacted and explicit if a reviewed migratio
 });
 
 test("late paid notifications cannot reactivate paid entitlement during promotion", () => {
-  expect(itn).toContain('import { FREE_PROMOTION_ACTIVE } from "@/lib/commercial-policy"');
+  expect(itn).toContain('import { FREE_PROMOTION_ACTIVE } from "@/lib/promotion"');
   expect(itn).toContain("const providerNextStatus");
   expect(itn).toContain('FREE_PROMOTION_ACTIVE && providerNextStatus === "active"');
+  expect(itn).toContain("free_promotion_active: FREE_PROMOTION_ACTIVE");
   expect(itn).toContain('? "cancelled"');
   expect(itn).toContain('paymentStatus === "COMPLETE" || isRefund');
 });

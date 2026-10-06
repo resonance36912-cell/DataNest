@@ -3,9 +3,10 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.cwd();
-const runtimeRoute = join(root, "src/routes/api/public/hub-control/pull-config.ts");
+const hubRoot = join(root, "../../apps/hub");
+const runtimeRoute = join(hubRoot, "src/routes/api/public/hub-control/pull-config.ts");
 const portableFunction = join(root, "docs/hub/functions/rop-pull-config/index.ts");
-const routeTree = readFileSync(join(root, "src/routeTree.gen.ts"), "utf8");
+const routeTree = readFileSync(join(hubRoot, "src/routeTree.gen.ts"), "utf8");
 const review = readFileSync(
   join(root, "docs/architecture/ROP-PULL-CONFIG-REVIEW-20260916.md"),
   "utf8",

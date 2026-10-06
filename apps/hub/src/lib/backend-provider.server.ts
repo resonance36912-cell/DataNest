@@ -586,6 +586,7 @@ export type PayfastItnSettlementEvent = {
   payfast_token: string | null;
   recipient_email: string | null;
   source_ip: string | null;
+  free_promotion_active: boolean;
 };
 
 export type PayfastItnSettlementResult = {

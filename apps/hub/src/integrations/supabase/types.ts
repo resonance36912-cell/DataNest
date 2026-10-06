@@ -1332,6 +1332,15 @@ export type Database = {
         Args: { _token_hash: string; _user_id: string; _verified_email: string }
         Returns: string
       }
+      consume_rop_nonce: {
+        Args: {
+          _app_id: string;
+          _nonce: string;
+          _request_timestamp: number;
+          _ttl_seconds: number;
+        };
+        Returns: boolean;
+      };
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean

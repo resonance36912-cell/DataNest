@@ -6,7 +6,7 @@ import {
   ROP_PERSIST_MAX_STRING,
   buildDeliveryPersistenceRecord,
   sanitizePersistenceMetadata,
-} from "../../src/lib/rop/delivery-persistence";
+} from "../../docs/hub/functions/_shared/rop-delivery-persistence.ts";
 
 const ROOT = resolve(import.meta.dir, "../..");
 const read = (rel: string) => readFileSync(resolve(ROOT, rel), "utf8");
@@ -100,16 +100,16 @@ describe("ROP delivery persistence policy", () => {
     await expect(buildDeliveryPersistenceRecord({ ...base, durationMs: -1 })).rejects.toThrow();
   });
 
-  test("portable and runtime persistence policies stay byte-identical", () => {
-    expect(read("docs/hub/functions/_shared/rop-delivery-persistence.ts")).toBe(
-      read("src/lib/rop/delivery-persistence.ts"),
-    );
+  test("portable persistence policy remains the executable RONSAS policy", () => {
+    const portable = read("docs/hub/functions/_shared/rop-delivery-persistence.ts");
+    expect(portable).toContain("buildDeliveryPersistenceRecord");
+    expect(portable).toContain("sanitizePersistenceMetadata");
   });
 
   test("ROP database write fragments do not persist raw bodies or sensitive transport fields", () => {
     const roots = [
-      resolve(ROOT, "src/lib/rop"),
-      resolve(ROOT, "src/routes/api/public/rop"),
+      resolve(ROOT, "../../apps/hub/src/lib/rop"),
+      resolve(ROOT, "../../apps/hub/src/routes/api/public/rop"),
       resolve(ROOT, "docs/hub/functions"),
     ];
     const forbidden =

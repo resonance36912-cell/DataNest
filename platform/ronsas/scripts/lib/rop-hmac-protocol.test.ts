@@ -2,7 +2,7 @@ import { createHmac } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, test } from "bun:test";
-import { hashSigningKey, signBody } from "../../src/lib/rop/hmac.server";
+import { hashSigningKey, signBody } from "../../../../apps/hub/src/lib/rop/hmac.server.ts";
 
 const ROOT = resolve(import.meta.dir, "../..");
 const read = (rel: string) => readFileSync(resolve(ROOT, rel), "utf8");
@@ -25,7 +25,7 @@ describe("ROP HMAC protocol", () => {
   });
 
   test("runtime verifier requires canonical app-id and nonce headers", () => {
-    const src = read("src/lib/rop/hmac.server.ts");
+    const src = read("../../apps/hub/src/lib/rop/hmac.server.ts");
     expect(src).toContain('headers.get("x-rop-app-id")');
     expect(src).toContain('headers.get("x-rop-nonce")');
     expect(src).not.toContain('headers.get("x-rop-app")');

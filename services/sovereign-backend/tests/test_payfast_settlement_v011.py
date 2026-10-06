@@ -23,6 +23,7 @@ def valid_event():
         "payfast_token":"token-test",
         "recipient_email":"QA@STAGING.INVALID",
         "source_ip":"127.0.0.1",
+        "free_promotion_active":False,
     }
 
 
@@ -137,6 +138,12 @@ def test_payment_status_mapping_matches_existing_itn_contract():
     assert payfast_settlement.next_subscription_status("FAILED")==("past_due",False)
     assert payfast_settlement.next_subscription_status("PROCESSING")==("pending",False)
 
+
+def test_free_promotion_cancels_entitlement_without_rewriting_provider_status():
+    provider_status,is_refund=payfast_settlement.next_subscription_status("COMPLETE")
+    assert (provider_status,is_refund)==("active",False)
+    assert payfast_settlement.apply_free_promotion_status(provider_status,True)=="cancelled"
+    assert payfast_settlement.apply_free_promotion_status(provider_status,False)=="active"
 
 def test_plan_change_classification_is_deterministic():
     assert payfast_settlement.classify_change(None,"creator","active",False)=="initial"
