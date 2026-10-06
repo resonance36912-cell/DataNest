@@ -50,31 +50,104 @@ const shardName = (index) => `sitemap-${index + 1}.xml`;
  * across `files`. `perFile` records every file's own last-commit date and
  * `failures` records files git could not date (untracked, missing, no git).
  */
+const SOURCE_HISTORY_COMMIT = "948d5d28852949f73c4fd67a1fd87b9c6df83ba2";
+const IMPORT_BOUNDARY_SUBJECT =
+  `Add 'apps/epublisher/' from commit '${SOURCE_HISTORY_COMMIT}'`;
+
+function gitRecord(args) {
+  const out = execFileSync(
+    "git",
+    ["log", "-1", "--format=%H%x09%ad%x09%s", "--date=short", ...args],
+    {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    },
+  ).trim();
+
+  if (!out) return null;
+
+  const [commit, date, ...subjectParts] = out.split("\t");
+
+  return {
+    commit,
+    date,
+    subject: subjectParts.join("\t"),
+  };
+}
+
+/**
+ * Returns the newest truthful git date across `files`.
+ *
+ * When a current monorepo path ends exactly at the known ePublisher import
+ * boundary, the import commit is not treated as a content modification.
+ * Instead, provenance continues through the preserved pre-import source
+ * history at SOURCE_HISTORY_COMMIT using the original source path.
+ */
 function gitLastModified(files) {
   let newest = null;
   let newestFile = null;
+  let newestOrigin = "git";
+
   const perFile = {};
+  const sourceHistoryFiles = [];
   const failures = [];
+
   for (const file of files) {
     try {
-      const out = execFileSync("git", ["log", "-1", "--format=%ad", "--date=short", "--", file], {
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "ignore"],
-      }).trim();
-      if (out) {
-        perFile[file] = out;
-        if (!newest || out > newest) {
-          newest = out;
-          newestFile = file;
-        }
-      } else {
+      const current = gitRecord(["--", file]);
+
+      if (!current) {
         failures.push({ file, reason: "no commit history for path" });
+        continue;
+      }
+
+      let record = current;
+      let origin = "git";
+
+      if (current.subject === IMPORT_BOUNDARY_SUBJECT) {
+        const historical = gitRecord([
+          SOURCE_HISTORY_COMMIT,
+          "--",
+          `:(top)${file}`,
+        ]);
+
+        if (!historical) {
+          failures.push({
+            file,
+            reason:
+              "monorepo import boundary detected but preserved pre-import source history is unavailable",
+          });
+          continue;
+        }
+
+        record = historical;
+        origin = "source-history";
+        sourceHistoryFiles.push(file);
+      }
+
+      perFile[file] = record.date;
+
+      if (!newest || record.date > newest) {
+        newest = record.date;
+        newestFile = file;
+        newestOrigin = origin;
       }
     } catch (error) {
-      failures.push({ file, reason: (error?.message ?? "git failed").split("\n")[0] });
+      failures.push({
+        file,
+        reason: (error?.message ?? "git failed").split("\n")[0],
+      });
     }
   }
-  return { date: newest, file: newestFile, perFile, failures };
+
+  return {
+    date: newest,
+    file: newestFile,
+    origin: newestOrigin,
+    perFile,
+    sourceHistoryFiles,
+    failures,
+  };
 }
 
 /** Existing sitemap files on disk (root plus any shards from a previous run). */
@@ -116,8 +189,11 @@ const urls = entries.map((entry) => {
 
   if (git.date) {
     lastmod = git.date;
-    source = "git";
-    detail = `last commit touching ${git.file}`;
+    source = git.origin;
+    detail =
+      git.origin === "source-history"
+        ? `pre-import source history for ${git.file}`
+        : `last commit touching ${git.file}`;
   } else if (fallback) {
     lastmod = fallback;
     source = "fallback";
@@ -229,8 +305,8 @@ for (const path of existingSitemapFiles()) {
 }
 
 // --- lastmod provenance audit log -------------------------------------------
-const ICON = { git: "✓", fallback: "~", omitted: "·" };
-const counts = { git: 0, fallback: 0, omitted: 0 };
+const ICON = { git: "✓", "source-history": "↺", fallback: "~", omitted: "·" };
+const counts = { git: 0, "source-history": 0, fallback: 0, omitted: 0 };
 const pad = Math.max(...audit.map((row) => row.path.length));
 
 if (chunks.length <= 1) {
@@ -255,7 +331,10 @@ for (const row of audit) {
   const staleFallback = row.source === "fallback";
   if (VERBOSE || staleFallback || row.source === "omitted") {
     for (const [file, date] of Object.entries(row.git.perFile)) {
-      console.log(`      · ${file} → ${date}`);
+      const provenance = row.git.sourceHistoryFiles.includes(file)
+        ? " [source-history]"
+        : "";
+      console.log(`      · ${file} → ${date}${provenance}`);
     }
     for (const failure of row.git.failures) {
       console.log(`      ! ${failure.file} → no git date (${failure.reason})`);
@@ -266,7 +345,7 @@ for (const row of audit) {
   }
 }
 console.log(
-  `summary: ${counts.git} git-derived, ${counts.fallback} carried-over, ${counts.omitted} omitted` +
+  `summary: ${counts.git} current-git, ${counts["source-history"]} source-history, ${counts.fallback} carried-over, ${counts.omitted} omitted` +
     (VERBOSE ? "" : "  (run with --verbose for per-source-file dates)"),
 );
 if (counts.fallback > 0) {
