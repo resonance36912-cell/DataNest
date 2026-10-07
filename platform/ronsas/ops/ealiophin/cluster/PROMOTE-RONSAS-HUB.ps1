@@ -84,7 +84,9 @@ function Start-Hub([string]$Entry,[int]$Port,[switch]$DetachFromActionsCleanup) 
         }
         $out = Join-Path $ReceiptRoot ("hub-$Port.out.log")
         $err = Join-Path $ReceiptRoot ("hub-$Port.err.log")
-        return Start-Process -FilePath $Node -ArgumentList @(("--env-file=" + $EnvFile),$Entry) -WorkingDirectory $HubSource -RedirectStandardOutput $out -RedirectStandardError $err -WindowStyle Hidden -PassThru
+        $relativeEntry = [IO.Path]::GetRelativePath($HubSource,$Entry)
+        if ([IO.Path]::IsPathRooted($relativeEntry) -or $relativeEntry.StartsWith('..')) { throw 'Hub entry escaped HubSource.' }
+        return Start-Process -FilePath $Node -ArgumentList @('--env-file=.env.local',$relativeEntry) -WorkingDirectory $HubSource -RedirectStandardOutput $out -RedirectStandardError $err -WindowStyle Hidden -PassThru
     } finally {
         foreach ($key in $prior.Keys) { [Environment]::SetEnvironmentVariable($key,$prior[$key],'Process') }
     }
