@@ -38,3 +38,6 @@ Thumbs.db
 # Local migration scratch
 _evidence-local/
 _tmp/
+# Open Nova runtime secret material is local-only.
+/platform/open-nova/runtime/secrets/**
+!/platform/open-nova/runtime/secrets/.gitkeep
