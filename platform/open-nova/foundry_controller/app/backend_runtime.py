@@ -58,13 +58,14 @@ class SovereignBackendRuntime:
     local operator/container engine; this controller generates and verifies evidence.
     """
 
-    def __init__(self, workspace_root: Path, policy: dict[str, Any], registry: AppRegistry | None = None):
+    def __init__(self, workspace_root: Path, policy: dict[str, Any], registry: AppRegistry | None = None, *, state_root: Path | None = None):
         self.workspace = workspace_root.resolve()
+        self.state_root = (state_root or self.workspace).resolve()
         cfg = policy.get("backend_runtime", {})
         self.manifest = (self.workspace / str(cfg.get("manifest", "governance/backend-runtime.yaml"))).resolve()
         self.apps_root = (self.workspace / str(cfg.get("apps_root", "apps"))).resolve()
-        self.runtime_root = (self.workspace / str(cfg.get("runtime_root", "runtime/backend-runtime"))).resolve()
-        self.secrets_root = (self.workspace / str(cfg.get("secrets_root", "runtime/secrets"))).resolve()
+        self.runtime_root = (self.state_root / str(cfg.get("runtime_root", "runtime/backend-runtime"))).resolve()
+        self.secrets_root = (self.state_root / str(cfg.get("secrets_root", "runtime/secrets"))).resolve()
         self.require_confirmation = bool(cfg.get("require_confirmation", True))
         self.registry = registry
 
@@ -164,7 +165,7 @@ class SovereignBackendRuntime:
         self.runtime_root.mkdir(parents=True, exist_ok=True)
         path = self.runtime_root / "compose.backend.yml"
         path.write_text(text, encoding="utf-8")
-        return {"written": True, "path": str(path.relative_to(self.workspace)).replace("\\", "/"), "network_external": False, "pull_policy": "never"}
+        return {"written": True, "path": str(path.relative_to(self.state_root)).replace("\\", "/"), "network_external": False, "pull_policy": "never"}
 
     def _app(self, app_id: str) -> Path:
         if not APP_ID_RE.fullmatch(app_id):

@@ -1154,7 +1154,16 @@ async def build_cycle(req: BuildCycleRequest) -> dict[str, Any]:
 
 def backend_runtime() -> SovereignBackendRuntime:
     policy = load_policy()
-    return SovereignBackendRuntime(workspace(policy).root, policy, app_registry())
+    source_root = workspace(policy).root
+    configured_state_root = os.getenv("BACKEND_STATE_ROOT")
+    if configured_state_root:
+        candidate = Path(configured_state_root)
+        if not candidate.is_absolute():
+            raise GovernanceViolation("BACKEND_STATE_ROOT must be an absolute path.")
+        state_root = candidate.resolve()
+    else:
+        state_root = source_root
+    return SovereignBackendRuntime(source_root, policy, app_registry(), state_root=state_root)
 
 
 @app.get("/v1/backend/validate")

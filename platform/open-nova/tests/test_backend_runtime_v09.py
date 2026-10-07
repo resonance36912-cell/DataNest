@@ -187,3 +187,40 @@ def test_migration_scanner_still_blocks_top_level_transaction_control(tmp_path: 
     (app / "001_explicit_tx.sql").write_text("BEGIN;\nCREATE TABLE demo(id integer);\nCOMMIT;\n",encoding="utf-8")
     plan=r.migration_plan("demo")
     assert any("transaction_control_not_allowed" in b for b in plan["blockers"])
+
+
+def test_backend_runtime_splits_source_and_state_roots(tmp_path):
+    source_root = (tmp_path / "source").resolve()
+    state_root = (tmp_path / "state").resolve()
+    source_root.mkdir()
+    state_root.mkdir()
+
+    policy = {
+        "backend_runtime": {
+            "manifest": "governance/backend-runtime.yaml",
+            "apps_root": "apps",
+            "runtime_root": "runtime/backend-runtime",
+            "secrets_root": "runtime/secrets",
+            "require_confirmation": True,
+        }
+    }
+
+    runtime = SovereignBackendRuntime(
+        source_root,
+        policy,
+        state_root=state_root,
+    )
+
+    assert runtime.workspace == source_root
+    assert runtime.state_root == state_root
+    assert runtime.manifest == source_root / "governance" / "backend-runtime.yaml"
+    assert runtime.apps_root == source_root / "apps"
+    assert runtime.runtime_root == state_root / "runtime" / "backend-runtime"
+    assert runtime.secrets_root == state_root / "runtime" / "secrets"
+
+    runtime.render_compose = lambda: "services:\n"
+    result = runtime.write_runtime(confirmed=True)
+
+    assert result["path"] == "runtime/backend-runtime/compose.backend.yml"
+    assert (state_root / "runtime" / "backend-runtime" / "compose.backend.yml").read_text(encoding="utf-8") == "services:\n"
+    assert not (source_root / "runtime" / "backend-runtime" / "compose.backend.yml").exists()
