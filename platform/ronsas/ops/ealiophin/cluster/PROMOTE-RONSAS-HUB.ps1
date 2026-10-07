@@ -49,7 +49,7 @@ function Test-Http([string]$Url,[string]$Marker='RONSAS') {
 function Wait-Http([string]$Url,[int]$Seconds=45) {
     $deadline = (Get-Date).AddSeconds($Seconds)
     while ((Get-Date) -lt $deadline) {
-        if (Test-Http $Url) { return $true }
+        if (Test-Http $Url 'sovereign') { return $true }
         Start-Sleep -Milliseconds 500
     }
     return $false
@@ -97,7 +97,7 @@ function Stop-VerifiedHub([int]$Port) {
     if (-not $listenerPid) { return $null }
     $proc = Get-CimInstance Win32_Process -Filter "ProcessId=$listenerPid" -ErrorAction SilentlyContinue
     if (-not $proc -or [string]$proc.Name -ne 'node.exe') { throw "Port $Port is not owned by the expected Node Hub process." }
-    if (-not (Test-Http ("http://127.0.0.1:$Port/") 'RONSAS')) { throw "Port $Port failed the Hub endpoint fingerprint; refusing to stop it." }
+    if (-not (Test-Http ("http://127.0.0.1:$Port/api/health") 'sovereign')) { throw "Port $Port failed the Hub endpoint fingerprint; refusing to stop it." }
     Stop-Process -Id $listenerPid -Force -ErrorAction Stop
     $deadline = (Get-Date).AddSeconds(10)
     while ((Get-Date) -lt $deadline -and (Get-ListenerPid $Port)) { Start-Sleep -Milliseconds 250 }
@@ -121,7 +121,7 @@ function Clear-StaleCandidateListener([int]$Port,[string]$ExpectedEntry) {
         throw "Candidate port $Port is occupied by Node, but not by the expected RONSAS candidate entry; refusing cleanup."
     }
 
-    if (-not (Test-Http ("http://127.0.0.1:$Port/") 'RONSAS')) {
+    if (-not (Test-Http ("http://127.0.0.1:$Port/api/health") 'sovereign')) {
         throw "Candidate port $Port matches the expected entry but failed the RONSAS endpoint fingerprint; refusing cleanup."
     }
 
@@ -152,7 +152,7 @@ try {
     Clear-StaleCandidateListener -Port $CandidatePort -ExpectedEntry $CandidateEntry | Out-Null
     Write-Host ("[RONSAS] Validating Hub candidate on port $CandidatePort...")
     $candidateProcess = Start-Hub $CandidateEntry $CandidatePort
-    if (-not (Wait-Http ("http://127.0.0.1:$CandidatePort/") 45)) { throw 'Candidate Hub failed isolated health validation.' }
+    if (-not (Wait-Http ("http://127.0.0.1:$CandidatePort/api/health") 45)) { throw 'Candidate Hub failed isolated health validation.' }
     Stop-VerifiedHub $CandidatePort | Out-Null
     $candidateProcess = $null
     Write-Host '[RONSAS] Candidate health validation passed.'
@@ -171,7 +171,7 @@ try {
     Move-Item -LiteralPath $Candidate -Destination $Live
 
     $newProcess = Start-Hub $LiveEntry $LivePort -DetachFromActionsCleanup
-    if (-not (Wait-Http ("http://127.0.0.1:$LivePort/") 45)) { throw 'Promoted Hub failed production health validation.' }
+    if (-not (Wait-Http ("http://127.0.0.1:$LivePort/api/health") 45)) { throw 'Promoted Hub failed production health validation.' }
     $newPid = Get-ListenerPid $LivePort
     if (-not $newPid) { throw 'Promoted Hub is reachable but listener PID was not found.' }
     Update-State $newPid
@@ -188,12 +188,12 @@ try {
     if ($candidateProcess -and -not $candidateProcess.HasExited) { Stop-Process -Id $candidateProcess.Id -Force -ErrorAction SilentlyContinue }
     if (-not $ValidateOnly) {
         $failedPid = Get-ListenerPid $LivePort
-        if ($failedPid -and (Test-Http ("http://127.0.0.1:$LivePort/") 'RONSAS')) { Stop-Process -Id $failedPid -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 1 }
+        if ($failedPid -and (Test-Http ("http://127.0.0.1:$LivePort/api/health") 'sovereign')) { Stop-Process -Id $failedPid -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 1 }
         if ($rollback -and (Test-Path -LiteralPath $rollback)) {
             if (Test-Path -LiteralPath $Live) { Move-Item -LiteralPath $Live -Destination (Join-Path $HubSource ('.output-failed-' + $stamp)) }
             Move-Item -LiteralPath $rollback -Destination $Live
             $restored = Start-Hub $LiveEntry $LivePort -DetachFromActionsCleanup
-            if (Wait-Http ("http://127.0.0.1:$LivePort/") 45) {
+            if (Wait-Http ("http://127.0.0.1:$LivePort/api/health") 45) {
                 $restoredPid = Get-ListenerPid $LivePort
                 if ($restoredPid) { Update-State $restoredPid }
             }
