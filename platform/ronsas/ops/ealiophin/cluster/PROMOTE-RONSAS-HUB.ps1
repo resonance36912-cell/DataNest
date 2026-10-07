@@ -58,6 +58,18 @@ function Wait-Http([string]$Url,[int]$Seconds=45) {
 function Get-ListenerPid([int]$Port) {
     $l = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($l) { return [int]$l.OwningProcess }
+
+    $netstat = Get-Command netstat.exe -ErrorAction SilentlyContinue
+    if ($netstat) {
+        $pattern = '^\s*TCP\s+\S+:' + [regex]::Escape([string]$Port) + '\s+\S+\s+LISTENING\s+(\d+)\s*$'
+
+        foreach ($line in (& $netstat.Source -ano -p tcp 2>$null)) {
+            if ($line -match $pattern) {
+                return [int]$Matches[1]
+            }
+        }
+    }
+
     return $null
 }
 
