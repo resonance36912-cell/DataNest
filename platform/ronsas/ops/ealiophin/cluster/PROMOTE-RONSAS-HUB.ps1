@@ -104,6 +104,31 @@ function Start-Hub([string]$Entry,[int]$Port,[switch]$DetachFromActionsCleanup) 
     }
 }
 
+function Stop-OwnedHubProcess([System.Diagnostics.Process]$Process,[int]$Port) {
+    if (-not $Process) { throw "No owned Hub process was supplied for port $Port." }
+
+    $Process.Refresh()
+    if ($Process.HasExited) { throw "Owned Hub process $($Process.Id) exited before governed cleanup." }
+
+    $ownedProcessId = [int]$Process.Id
+    $proc = Get-CimInstance Win32_Process -Filter "ProcessId=$ownedProcessId" -ErrorAction SilentlyContinue
+    if (-not $proc -or [string]$proc.Name -ne 'node.exe') {
+        throw "Owned Hub PID $ownedProcessId is not the expected Node process."
+    }
+
+    if (-not (Test-Http ("http://127.0.0.1:$Port/api/health") 'sovereign')) {
+        throw "Owned Hub PID $ownedProcessId failed the sovereign endpoint fingerprint."
+    }
+
+    Stop-Process -Id $ownedProcessId -Force -ErrorAction Stop
+
+    if (-not $Process.WaitForExit(10000)) {
+        throw "Owned Hub PID $ownedProcessId did not terminate within 10 seconds."
+    }
+
+    return $ownedProcessId
+}
+
 function Stop-VerifiedHub([int]$Port) {
     $listenerPid = Get-ListenerPid $Port
     if (-not $listenerPid) { return $null }
@@ -159,13 +184,15 @@ function Update-State([int]$ProcessId) {
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $CandidateEntry).Hash.ToLowerInvariant()
 $candidateProcess = $null
+$newProcess = $null
+$restored = $null
 $rollback = $null
 try {
     Clear-StaleCandidateListener -Port $CandidatePort -ExpectedEntry $CandidateEntry | Out-Null
     Write-Host ("[RONSAS] Validating Hub candidate on port $CandidatePort...")
     $candidateProcess = Start-Hub $CandidateEntry $CandidatePort
     if (-not (Wait-Http ("http://127.0.0.1:$CandidatePort/api/health") 45)) { throw 'Candidate Hub failed isolated health validation.' }
-    Stop-VerifiedHub $CandidatePort | Out-Null
+    Stop-OwnedHubProcess -Process $candidateProcess -Port $CandidatePort | Out-Null
     $candidateProcess = $null
     Write-Host '[RONSAS] Candidate health validation passed.'
 
@@ -184,8 +211,9 @@ try {
 
     $newProcess = Start-Hub $LiveEntry $LivePort -DetachFromActionsCleanup
     if (-not (Wait-Http ("http://127.0.0.1:$LivePort/api/health") 45)) { throw 'Promoted Hub failed production health validation.' }
-    $newPid = Get-ListenerPid $LivePort
-    if (-not $newPid) { throw 'Promoted Hub is reachable but listener PID was not found.' }
+    $newProcess.Refresh()
+    if ($newProcess.HasExited) { throw 'Promoted Hub process exited after becoming healthy.' }
+    $newPid = [int]$newProcess.Id
     Update-State $newPid
 
     $sourceHead = ''
@@ -199,15 +227,30 @@ try {
     $failure = $_.Exception.Message
     if ($candidateProcess -and -not $candidateProcess.HasExited) { Stop-Process -Id $candidateProcess.Id -Force -ErrorAction SilentlyContinue }
     if (-not $ValidateOnly) {
-        $failedPid = Get-ListenerPid $LivePort
-        if ($failedPid -and (Test-Http ("http://127.0.0.1:$LivePort/api/health") 'sovereign')) { Stop-Process -Id $failedPid -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 1 }
+        if ($newProcess) {
+            try { $newProcess.Refresh() } catch {}
+            if (-not $newProcess.HasExited) {
+                Stop-Process -Id $newProcess.Id -Force -ErrorAction SilentlyContinue
+                $newProcess.WaitForExit(10000) | Out-Null
+            }
+        }
         if ($rollback -and (Test-Path -LiteralPath $rollback)) {
             if (Test-Path -LiteralPath $Live) { Move-Item -LiteralPath $Live -Destination (Join-Path $HubSource ('.output-failed-' + $stamp)) }
             Move-Item -LiteralPath $rollback -Destination $Live
             $restored = Start-Hub $LiveEntry $LivePort -DetachFromActionsCleanup
             if (Wait-Http ("http://127.0.0.1:$LivePort/api/health") 45) {
-                $restoredPid = Get-ListenerPid $LivePort
-                if ($restoredPid) { Update-State $restoredPid }
+                $restored.Refresh()
+                if (-not $restored.HasExited) {
+                    $restoredPid = [int]$restored.Id
+                    Update-State $restoredPid
+                }
+            }
+            elseif ($restored) {
+                try { $restored.Refresh() } catch {}
+                if (-not $restored.HasExited) {
+                    Stop-Process -Id $restored.Id -Force -ErrorAction SilentlyContinue
+                    $restored.WaitForExit(10000) | Out-Null
+                }
             }
         }
     }
